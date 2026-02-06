@@ -1,0 +1,50 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Profil bébé{% endblock %}
+{% block page_title %}Profil bébé{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
+        <span>/</span>
+        <span>Profil bébé</span>
+    </div>
+{% endblock %}
+
+{% block header_actions %}
+    <button type="button" class="btn btn-primary admin-btn-primary">
+        <i class="fas fa-plus me-1"></i> Ajouter un profil
+    </button>
+{% endblock %}
+
+{% block content %}
+    <div class="admin-card">
+        <div class="admin-card-header">Profils bébé</div>
+        <div class="admin-card-body p-0">
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Prénom</th>
+                            <th>Date de naissance</th>
+                            <th>Parent / Responsable</th>
+                            <th>Statut</th>
+                            <th width="120"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5">
+                                <div class="admin-empty py-4">
+                                    <i class="fas fa-baby"></i>
+                                    <p>Aucun profil bébé pour le moment.</p>
+                                    <button type="button" class="btn btn-primary admin-btn-primary">Ajouter un profil bébé</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

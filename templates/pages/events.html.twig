@@ -1,0 +1,128 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Événements - Maternia{% endblock %}
+
+{% block body %}
+    <!-- Hero -->
+    <div class="container-fluid py-5 hero-header wow fadeIn" data-wow-delay="0.1s">
+        <div class="container py-5">
+            <div class="row g-5">
+                <div class="col-lg-8 col-md-12">
+                    <h1 class="mb-3 text-primary">Événements</h1>
+                    <h1 class="mb-4 display-1 text-white">Rencontres et ateliers pour mamans</h1>
+                    <p class="lead text-white mb-0">Cafés des mamans, ateliers portage, journées bien-être… Découvrez les prochains événements près de chez vous.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Intro + filtre visuel -->
+    <section class="container-fluid py-4 bg-light border-bottom border-primary">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <p class="text-muted mb-0">Tous nos événements sont dédiés aux futures et jeunes mamans. Inscription sur place ou en ligne selon l’événement.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-2 mt-lg-0">
+                    <span class="badge bg-primary px-3 py-2">À venir</span>
+                    <span class="badge bg-secondary px-3 py-2 ms-2">Sur place</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Liste des événements -->
+    <section class="container-fluid events py-5">
+        <div class="container py-5">
+            <div class="mx-auto text-center wow fadeIn mb-5" data-wow-delay="0.1s" style="max-width: 600px;">
+                <h4 class="text-primary mb-4 border-bottom border-primary border-2 d-inline-block p-2 title-border-radius">À la une</h4>
+                <h2 class="mb-0 display-6">Prochains événements</h2>
+            </div>
+            <div class="row g-5 justify-content-center">
+                <div class="col-lg-6 col-xl-4 wow fadeIn" data-wow-delay="0.1s">
+                    <div class="events-item bg-primary rounded overflow-hidden h-100 d-flex flex-column">
+                        <div class="events-inner position-relative flex-grow-1 d-flex flex-column">
+                            <div class="events-img overflow-hidden rounded-circle position-relative mx-auto mt-4" style="width: 200px; height: 200px;">
+                                <img src="{{ asset('img/event-1.jpg') }}" class="img-fluid w-100 h-100 rounded-circle" alt="Café des mamans" style="object-fit: cover;">
+                                <div class="event-overlay">
+                                    <a href="{{ asset('img/event-1.jpg') }}" data-lightbox="events-page"><i class="fas fa-search-plus text-white fa-2x"></i></a>
+                                </div>
+                            </div>
+                            <div class="px-4 py-2 bg-secondary text-white text-center events-rate">À venir</div>
+                            <div class="d-flex justify-content-between px-4 py-2 bg-secondary flex-wrap gap-1">
+                                <small class="text-white"><i class="fas fa-calendar me-1 text-primary"></i> 10h - 12h</small>
+                                <small class="text-white"><i class="fas fa-map-marker-alt me-1 text-primary"></i> Sur place</small>
+                            </div>
+                        </div>
+                        <div class="events-text p-4 border border-primary bg-white border-top-0 rounded-bottom">
+                            <a href="#" class="h4 text-decoration-none text-dark d-block">Café des mamans</a>
+                            <p class="mb-0 mt-2 text-muted">Rencontres conviviales entre futures et jeunes mamans. Échanges et partage d’expériences dans une ambiance bienveillante.</p>
+                            <a href="#" class="btn btn-primary btn-sm mt-3 btn-border-radius">En savoir plus</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-xl-4 wow fadeIn" data-wow-delay="0.2s">
+                    <div class="events-item bg-primary rounded overflow-hidden h-100 d-flex flex-column">
+                        <div class="events-inner position-relative flex-grow-1 d-flex flex-column">
+                            <div class="events-img overflow-hidden rounded-circle position-relative mx-auto mt-4" style="width: 200px; height: 200px;">
+                                <img src="{{ asset('img/event-2.jpg') }}" class="img-fluid w-100 h-100 rounded-circle" alt="Atelier portage" style="object-fit: cover;">
+                                <div class="event-overlay">
+                                    <a href="{{ asset('img/event-2.jpg') }}" data-lightbox="events-page"><i class="fas fa-search-plus text-white fa-2x"></i></a>
+                                </div>
+                            </div>
+                            <div class="px-4 py-2 bg-secondary text-white text-center events-rate">À venir</div>
+                            <div class="d-flex justify-content-between px-4 py-2 bg-secondary flex-wrap gap-1">
+                                <small class="text-white"><i class="fas fa-calendar me-1 text-primary"></i> 14h - 16h</small>
+                                <small class="text-white"><i class="fas fa-map-marker-alt me-1 text-primary"></i> Sur place</small>
+                            </div>
+                        </div>
+                        <div class="events-text p-4 border border-primary bg-white border-top-0 rounded-bottom">
+                            <a href="#" class="h4 text-decoration-none text-dark d-block">Atelier portage</a>
+                            <p class="mb-0 mt-2 text-muted">Découverte du portage physiologique pour les nouveau-nés. Apprenez les nœuds et les bonnes postures avec une professionnelle.</p>
+                            <a href="#" class="btn btn-primary btn-sm mt-3 btn-border-radius">En savoir plus</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-xl-4 wow fadeIn" data-wow-delay="0.3s">
+                    <div class="events-item bg-primary rounded overflow-hidden h-100 d-flex flex-column">
+                        <div class="events-inner position-relative flex-grow-1 d-flex flex-column">
+                            <div class="events-img overflow-hidden rounded-circle position-relative mx-auto mt-4" style="width: 200px; height: 200px;">
+                                <img src="{{ asset('img/event-3.jpg') }}" class="img-fluid w-100 h-100 rounded-circle" alt="Journée bien-être" style="object-fit: cover;">
+                                <div class="event-overlay">
+                                    <a href="{{ asset('img/event-3.jpg') }}" data-lightbox="events-page"><i class="fas fa-search-plus text-white fa-2x"></i></a>
+                                </div>
+                            </div>
+                            <div class="px-4 py-2 bg-secondary text-white text-center events-rate">À venir</div>
+                            <div class="d-flex justify-content-between px-4 py-2 bg-secondary flex-wrap gap-1">
+                                <small class="text-white"><i class="fas fa-calendar me-1 text-primary"></i> 9h - 12h</small>
+                                <small class="text-white"><i class="fas fa-map-marker-alt me-1 text-primary"></i> Sur place</small>
+                            </div>
+                        </div>
+                        <div class="events-text p-4 border border-primary bg-white border-top-0 rounded-bottom">
+                            <a href="#" class="h4 text-decoration-none text-dark d-block">Journée bien-être maman-bébé</a>
+                            <p class="mb-0 mt-2 text-muted">Moment dédié au bien-être des mamans et des bébés : massages, relaxation et conseils pour les premiers mois.</p>
+                            <a href="#" class="btn btn-primary btn-sm mt-3 btn-border-radius">En savoir plus</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Événements passés / à venir (bloc info) -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="border border-primary rounded-3 bg-light p-4 p-lg-5 wow fadeIn" data-wow-delay="0.2s">
+                        <div class="row align-items-center">
+                            <div class="col-lg-8">
+                                <h5 class="text-primary mb-2">Vous organisez un événement pour mamans ?</h5>
+                                <p class="text-muted mb-0">Proposez votre atelier ou votre rencontre sur la plateforme Maternia et touchez les futures et jeunes mamans de votre région.</p>
+                            </div>
+                            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                                <a href="#contact" class="btn btn-primary px-4 py-3 btn-border-radius">Nous contacter</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

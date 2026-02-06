@@ -1,0 +1,224 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Marketplace - Maternia{% endblock %}
+
+{% block body %}
+    <!-- Hero Marketplace -->
+    <div class="container-fluid py-5 hero-header wow fadeIn" data-wow-delay="0.1s">
+        <div class="container py-5">
+            <div class="row g-5">
+                <div class="col-lg-7 col-md-12">
+                    <h1 class="mb-3 text-primary">Marketplace</h1>
+                    <h1 class="mb-5 display-1 text-white">Produits & services pour mamans et bébés</h1>
+                    <p class="lead text-white mb-4">Une sélection soignée pour la grossesse, la naissance et les premiers mois.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Catégories -->
+    <section class="container-fluid py-5 bg-light">
+        <div class="container py-4">
+            <div class="mx-auto text-center wow fadeIn mb-5" data-wow-delay="0.1s" style="max-width: 600px;">
+                <h4 class="text-primary mb-4 border-bottom border-primary border-2 d-inline-block p-2 title-border-radius">Catégories</h4>
+                <h2 class="mb-0 display-6">Parcourir par thème</h2>
+            </div>
+            <div class="row g-4 justify-content-center">
+                <div class="col-6 col-md-4 col-lg-2 wow fadeIn" data-wow-delay="0.1s">
+                    <a href="#produits" class="text-decoration-none marketplace-cat border border-primary rounded-3 bg-white d-flex flex-column align-items-center justify-content-center p-4 h-100 transition-cat">
+                        <i class="fas fa-heart fa-2x text-primary mb-2"></i>
+                        <span class="text-dark fw-semibold small text-center">Grossesse</span>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2 wow fadeIn" data-wow-delay="0.2s">
+                    <a href="#produits" class="text-decoration-none marketplace-cat border border-primary rounded-3 bg-white d-flex flex-column align-items-center justify-content-center p-4 h-100 transition-cat">
+                        <i class="fas fa-baby fa-2x text-primary mb-2"></i>
+                        <span class="text-dark fw-semibold small text-center">Bébé</span>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2 wow fadeIn" data-wow-delay="0.3s">
+                    <a href="#produits" class="text-decoration-none marketplace-cat border border-primary rounded-3 bg-white d-flex flex-column align-items-center justify-content-center p-4 h-100 transition-cat">
+                        <i class="fas fa-spa fa-2x text-primary mb-2"></i>
+                        <span class="text-dark fw-semibold small text-center">Soins</span>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2 wow fadeIn" data-wow-delay="0.4s">
+                    <a href="#produits" class="text-decoration-none marketplace-cat border border-primary rounded-3 bg-white d-flex flex-column align-items-center justify-content-center p-4 h-100 transition-cat">
+                        <i class="fas fa-tshirt fa-2x text-primary mb-2"></i>
+                        <span class="text-dark fw-semibold small text-center">Mode</span>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2 wow fadeIn" data-wow-delay="0.5s">
+                    <a href="#produits" class="text-decoration-none marketplace-cat border border-primary rounded-3 bg-white d-flex flex-column align-items-center justify-content-center p-4 h-100 transition-cat">
+                        <i class="fas fa-couch fa-2x text-primary mb-2"></i>
+                        <span class="text-dark fw-semibold small text-center">Équipement</span>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2 wow fadeIn" data-wow-delay="0.6s">
+                    <a href="#produits" class="text-decoration-none marketplace-cat border border-primary rounded-3 bg-white d-flex flex-column align-items-center justify-content-center p-4 h-100 transition-cat">
+                        <i class="fas fa-hands-helping fa-2x text-primary mb-2"></i>
+                        <span class="text-dark fw-semibold small text-center">Services</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Produits -->
+    <section class="container-fluid py-5 service" id="produits">
+        <div class="container py-5">
+            <div class="mx-auto text-center wow fadeIn mb-5" data-wow-delay="0.1s" style="max-width: 600px;">
+                <h4 class="text-primary mb-4 border-bottom border-primary border-2 d-inline-block p-2 title-border-radius">Boutique</h4>
+                <h1 class="mb-5 display-6">Une sélection pour vous</h1>
+            </div>
+            <div class="row g-4">
+                <div class="col-sm-6 col-lg-4 col-xl-3 wow fadeIn" data-wow-delay="0.1s">
+                    <div class="marketplace-card border border-primary bg-white rounded-3 overflow-hidden h-100 d-flex flex-column">
+                        <div class="marketplace-card-img position-relative overflow-hidden">
+                            <img src="{{ asset('img/blog-1.jpg') }}" class="img-fluid w-100" alt="Produit grossesse" style="height: 200px; object-fit: cover;">
+                            <span class="position-absolute top-0 end-0 m-2 badge bg-primary">Grossesse</span>
+                        </div>
+                        <div class="p-3 flex-grow-1 d-flex flex-column">
+                            <h6 class="text-primary mb-2">Coque de grossesse</h6>
+                            <p class="text-muted small mb-2 flex-grow-1">Confort et maintien pour le ventre en croissance.</p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <span class="fw-bold text-primary">29,90 €</span>
+                                <a href="#" class="btn btn-primary btn-sm btn-border-radius">Voir</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-4 col-xl-3 wow fadeIn" data-wow-delay="0.2s">
+                    <div class="marketplace-card border border-primary bg-white rounded-3 overflow-hidden h-100 d-flex flex-column">
+                        <div class="marketplace-card-img position-relative overflow-hidden">
+                            <img src="{{ asset('img/blog-2.jpg') }}" class="img-fluid w-100" alt="Produit bébé" style="height: 200px; object-fit: cover;">
+                            <span class="position-absolute top-0 end-0 m-2 badge bg-secondary">Bébé</span>
+                        </div>
+                        <div class="p-3 flex-grow-1 d-flex flex-column">
+                            <h6 class="text-primary mb-2">Kit naissance</h6>
+                            <p class="text-muted small mb-2 flex-grow-1">Essentiels pour les premiers jours de bébé.</p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <span class="fw-bold text-primary">49,90 €</span>
+                                <a href="#" class="btn btn-primary btn-sm btn-border-radius">Voir</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-4 col-xl-3 wow fadeIn" data-wow-delay="0.3s">
+                    <div class="marketplace-card border border-primary bg-white rounded-3 overflow-hidden h-100 d-flex flex-column">
+                        <div class="marketplace-card-img position-relative overflow-hidden">
+                            <img src="{{ asset('img/blog-3.jpg') }}" class="img-fluid w-100" alt="Soins" style="height: 200px; object-fit: cover;">
+                            <span class="position-absolute top-0 end-0 m-2 badge bg-primary">Soins</span>
+                        </div>
+                        <div class="p-3 flex-grow-1 d-flex flex-column">
+                            <h6 class="text-primary mb-2">Huile ventre & corps</h6>
+                            <p class="text-muted small mb-2 flex-grow-1">Soin nourrissant pour la peau pendant la grossesse.</p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <span class="fw-bold text-primary">18,90 €</span>
+                                <a href="#" class="btn btn-primary btn-sm btn-border-radius">Voir</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-4 col-xl-3 wow fadeIn" data-wow-delay="0.4s">
+                    <div class="marketplace-card border border-primary bg-white rounded-3 overflow-hidden h-100 d-flex flex-column">
+                        <div class="marketplace-card-img position-relative overflow-hidden">
+                            <img src="{{ asset('img/program-1.jpg') }}" class="img-fluid w-100" alt="Équipement" style="height: 200px; object-fit: cover;">
+                            <span class="position-absolute top-0 end-0 m-2 badge bg-secondary">Équipement</span>
+                        </div>
+                        <div class="p-3 flex-grow-1 d-flex flex-column">
+                            <h6 class="text-primary mb-2">Coussin d’allaitement</h6>
+                            <p class="text-muted small mb-2 flex-grow-1">Confort pour maman et bébé lors de l’allaitement.</p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <span class="fw-bold text-primary">39,90 €</span>
+                                <a href="#" class="btn btn-primary btn-sm btn-border-radius">Voir</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-4 col-xl-3 wow fadeIn" data-wow-delay="0.1s">
+                    <div class="marketplace-card border border-primary bg-white rounded-3 overflow-hidden h-100 d-flex flex-column">
+                        <div class="marketplace-card-img position-relative overflow-hidden">
+                            <img src="{{ asset('img/program-2.jpg') }}" class="img-fluid w-100" alt="Mode" style="height: 200px; object-fit: cover;">
+                            <span class="position-absolute top-0 end-0 m-2 badge bg-primary">Mode</span>
+                        </div>
+                        <div class="p-3 flex-grow-1 d-flex flex-column">
+                            <h6 class="text-primary mb-2">Robe grossesse</h6>
+                            <p class="text-muted small mb-2 flex-grow-1">Élégante et confortable pour toutes les occasions.</p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <span class="fw-bold text-primary">45,00 €</span>
+                                <a href="#" class="btn btn-primary btn-sm btn-border-radius">Voir</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-4 col-xl-3 wow fadeIn" data-wow-delay="0.2s">
+                    <div class="marketplace-card border border-primary bg-white rounded-3 overflow-hidden h-100 d-flex flex-column">
+                        <div class="marketplace-card-img position-relative overflow-hidden">
+                            <img src="{{ asset('img/program-3.jpg') }}" class="img-fluid w-100" alt="Bébé" style="height: 200px; object-fit: cover;">
+                            <span class="position-absolute top-0 end-0 m-2 badge bg-secondary">Bébé</span>
+                        </div>
+                        <div class="p-3 flex-grow-1 d-flex flex-column">
+                            <h6 class="text-primary mb-2">Tapis d’éveil</h6>
+                            <p class="text-muted small mb-2 flex-grow-1">Doux et stimulant pour les premiers mois.</p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <span class="fw-bold text-primary">34,90 €</span>
+                                <a href="#" class="btn btn-primary btn-sm btn-border-radius">Voir</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-4 col-xl-3 wow fadeIn" data-wow-delay="0.3s">
+                    <div class="marketplace-card border border-primary bg-white rounded-3 overflow-hidden h-100 d-flex flex-column">
+                        <div class="marketplace-card-img position-relative overflow-hidden">
+                            <img src="{{ asset('img/event-1.jpg') }}" class="img-fluid w-100" alt="Services" style="height: 200px; object-fit: cover;">
+                            <span class="position-absolute top-0 end-0 m-2 badge bg-primary">Services</span>
+                        </div>
+                        <div class="p-3 flex-grow-1 d-flex flex-column">
+                            <h6 class="text-primary mb-2">Séance bien-être</h6>
+                            <p class="text-muted small mb-2 flex-grow-1">Massage future maman ou post-natal.</p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <span class="fw-bold text-primary">60,00 €</span>
+                                <a href="#" class="btn btn-primary btn-sm btn-border-radius">Réserver</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-4 col-xl-3 wow fadeIn" data-wow-delay="0.4s">
+                    <div class="marketplace-card border border-primary bg-white rounded-3 overflow-hidden h-100 d-flex flex-column">
+                        <div class="marketplace-card-img position-relative overflow-hidden">
+                            <img src="{{ asset('img/galary-1.jpg') }}" class="img-fluid w-100" alt="Soins bébé" style="height: 200px; object-fit: cover;">
+                            <span class="position-absolute top-0 end-0 m-2 badge bg-secondary">Soins</span>
+                        </div>
+                        <div class="p-3 flex-grow-1 d-flex flex-column">
+                            <h6 class="text-primary mb-2">Lait corps bébé</h6>
+                            <p class="text-muted small mb-2 flex-grow-1">Douceur et protection pour la peau de bébé.</p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <span class="fw-bold text-primary">12,90 €</span>
+                                <a href="#" class="btn btn-primary btn-sm btn-border-radius">Voir</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-5 wow fadeIn" data-wow-delay="0.2s">
+                <a href="#" class="btn btn-primary px-5 py-3 btn-border-radius">Voir plus de produits</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="container-fluid py-5 bg-light">
+        <div class="container py-4">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h4 class="text-primary mb-2">Vendez sur la marketplace Maternia</h4>
+                    <p class="text-muted mb-0">Vous proposez des produits ou services pour futures et jeunes mamans ? Rejoignez notre marketplace.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                    <a href="#contact" class="btn btn-primary px-4 py-3 btn-border-radius">Nous contacter</a>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
