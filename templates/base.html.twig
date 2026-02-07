@@ -65,30 +65,28 @@
                     <span class="fa fa-bars text-primary"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
-                    <div class="navbar-nav mx-auto">
-                        <a href="{{ path('app_home') }}" class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_home' %} active{% endif %}">Accueil</a>
-                        <a href="{{ path('app_services') }}" class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_services' %} active{% endif %}">Services</a>
-                        <a href="{{ path('app_marketplace') }}" class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_marketplace' %} active{% endif %}">Marketplace</a>
-                        <a href="{{ path('app_events') }}" class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_events' %} active{% endif %}">Événements</a>
-                        <a href="{{ path('app_appointment') }}" class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_appointment' %} active{% endif %}">Rendez-vous</a>
-                        <a href="#contact" class="nav-item nav-link">Contact</a>
-                    </div>
-                    <div class="d-flex me-4">
-                        <div id="phone-tada" class="d-flex align-items-center justify-content-center">
-                            <a href="" class="position-relative wow tada" data-wow-delay=".9s" >
-                                <i class="fa fa-phone-alt text-primary fa-2x me-4"></i>
-                                <div class="position-absolute" style="top: -7px; left: 20px;">
-                                    <span><i class="fa fa-comment-dots text-secondary"></i></span>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="d-flex flex-column pe-3 border-end border-primary">
-                            <span class="text-primary">Une question ?</span>
-                            <a href="#contact"><span class="text-secondary">Contactez-nous</span></a>
-                        </div>
-                    </div>
-                    <button class="btn-search btn btn-primary btn-md-square rounded-circle" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fas fa-search text-white"></i></button>
-                </div>
+    <div class="navbar-nav mx-auto">
+        <a href="{{ path('app_home') }}" class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_home' %} active{% endif %}">Accueil</a>
+        <a href="{{ path('app_services') }}" class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_services' %} active{% endif %}">Services</a>
+        <a href="{{ path('app_marketplace') }}" class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_marketplace' %} active{% endif %}">Marketplace</a>
+        <a href="{{ path('app_events') }}" class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_events' %} active{% endif %}">Événements</a>
+        <a href="{{ path('app_appointment') }}" class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_appointment' %} active{% endif %}">Rendez-vous</a>
+    </div>
+    
+    <div class="d-flex align-items-center me-4">
+        {% if app.user %}
+            <a href="{{ path('app_logout') }}" class="btn btn-outline-primary btn-border-radius px-3 me-2">Déconnexion</a>
+            <a href="#" class="text-primary"><i class="fas fa-user-circle fa-2x"></i></a>
+        {% else %}
+            <a href="{{ path('app_login') }}" class="btn btn-link text-primary me-2 fw-bold">Connexion</a>
+            <a href="{{ path('app_register') }}" class="btn btn-primary btn-border-radius px-4 py-2 text-white">S'inscrire</a>
+        {% endif %}
+    </div>
+
+    <button class="btn-search btn btn-primary btn-md-square rounded-circle" data-bs-toggle="modal" data-bs-target="#searchModal">
+        <i class="fas fa-search text-white"></i>
+    </button>
+</div>
             </nav>
         </div>
     </div>

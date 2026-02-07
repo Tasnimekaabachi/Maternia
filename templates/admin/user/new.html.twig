@@ -1,0 +1,28 @@
+{# templates/admin/user/new.html.twig #}
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Ajouter une Maman{% endblock %}
+{% block page_title %}Créer un nouvel utilisateur{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 text-primary">Informations de l'utilisateur</h5>
+                </div>
+                <div class="card-body p-4">
+                    {# This points to the corrected form partial #}
+                    {{ include('admin/user/_form.html.twig') }}
+                </div>
+                <div class="card-footer bg-light d-flex justify-content-between">
+                    <a href="{{ path('admin_user_index') }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
