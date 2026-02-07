@@ -1,0 +1,48 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Tableau de bord{% endblock %}
+{% block page_title %}Tableau de bord{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
+        <span>/</span>
+        <span>Tableau de bord</span>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="admin-stats">
+        <div class="admin-stat">
+            <div class="admin-stat-value">0</div>
+            <div class="admin-stat-label">Suivis grossesse actifs</div>
+        </div>
+        <div class="admin-stat">
+            <div class="admin-stat-value">0</div>
+            <div class="admin-stat-label">Produits marketplace</div>
+        </div>
+        <div class="admin-stat">
+            <div class="admin-stat-value">0</div>
+            <div class="admin-stat-label">Événements à venir</div>
+        </div>
+        <div class="admin-stat">
+            <div class="admin-stat-value">0</div>
+            <div class="admin-stat-label">Rendez-vous ce mois</div>
+        </div>
+        <div class="admin-stat">
+            <div class="admin-stat-value">0</div>
+            <div class="admin-stat-label">Profils bébé</div>
+        </div>
+    </div>
+
+    <div class="admin-card">
+        <div class="admin-card-header">Activité récente</div>
+        <div class="admin-card-body">
+            <div class="admin-empty">
+                <i class="fas fa-inbox text-muted"></i>
+                <p class="mb-0">Aucune activité récente pour le moment.</p>
+                <small>Les données s’afficheront ici une fois les gestions utilisées.</small>
+            </div>
+        </div>
+    </div>
+{% endblock %}
