@@ -1,0 +1,50 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Suivi grossesse{% endblock %}
+{% block page_title %}Suivi grossesse{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
+        <span>/</span>
+        <span>Suivi grossesse</span>
+    </div>
+{% endblock %}
+
+{% block header_actions %}
+    <button type="button" class="btn btn-primary admin-btn-primary">
+        <i class="fas fa-plus me-1"></i> Ajouter un suivi
+    </button>
+{% endblock %}
+
+{% block content %}
+    <div class="admin-card">
+        <div class="admin-card-header">Liste des suivis grossesse</div>
+        <div class="admin-card-body p-0">
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Patiente</th>
+                            <th>Début grossesse</th>
+                            <th>Terme prévu</th>
+                            <th>Statut</th>
+                            <th width="120"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5">
+                                <div class="admin-empty py-4">
+                                    <i class="fas fa-heart"></i>
+                                    <p>Aucun suivi grossesse pour le moment.</p>
+                                    <button type="button" class="btn btn-primary admin-btn-primary">Créer un suivi</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
