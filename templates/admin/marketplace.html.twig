@@ -1,0 +1,50 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Marketplace{% endblock %}
+{% block page_title %}Marketplace{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
+        <span>/</span>
+        <span>Marketplace</span>
+    </div>
+{% endblock %}
+
+{% block header_actions %}
+    <button type="button" class="btn btn-primary admin-btn-primary">
+        <i class="fas fa-plus me-1"></i> Ajouter un produit
+    </button>
+{% endblock %}
+
+{% block content %}
+    <div class="admin-card">
+        <div class="admin-card-header">Produits & services</div>
+        <div class="admin-card-body p-0">
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Produit / Service</th>
+                            <th>Catégorie</th>
+                            <th>Prix</th>
+                            <th>Statut</th>
+                            <th width="120"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5">
+                                <div class="admin-empty py-4">
+                                    <i class="fas fa-shopping-bag"></i>
+                                    <p>Aucun produit ou service pour le moment.</p>
+                                    <button type="button" class="btn btn-primary admin-btn-primary">Ajouter un produit</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
