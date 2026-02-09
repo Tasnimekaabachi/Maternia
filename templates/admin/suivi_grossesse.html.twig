@@ -11,39 +11,152 @@
     </div>
 {% endblock %}
 
-{% block header_actions %}
-    <button type="button" class="btn btn-primary admin-btn-primary">
-        <i class="fas fa-plus me-1"></i> Ajouter un suivi
-    </button>
-{% endblock %}
+{% block header_actions %}{% endblock %}
 
 {% block content %}
-    <div class="admin-card">
-        <div class="admin-card-header">Liste des suivis grossesse</div>
+    {# Carte principale : barre de recherche + tri au-dessus de la liste #}
+    <div class="admin-card admin-card-list">
+        <div class="admin-card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <span>Liste des mamans</span>
+        </div>
+
+        {# Barre de recherche et tri — au-dessus de la liste #}
+        <div class="admin-list-toolbar">
+            <form method="get" action="{{ path('admin_suivi_grossesse') }}" class="admin-list-toolbar-form">
+                <div class="admin-list-toolbar-group">
+                    <label for="groupe_sanguin" class="admin-list-toolbar-label">Groupe sanguin</label>
+                    <select name="groupe_sanguin" id="groupe_sanguin" class="form-select form-select-sm admin-list-toolbar-select">
+                        <option value="">Tous</option>
+                        <option value="A+" {{ filtre_groupe == 'A+' ? 'selected' : '' }}>A+</option>
+                        <option value="A-" {{ filtre_groupe == 'A-' ? 'selected' : '' }}>A-</option>
+                        <option value="B+" {{ filtre_groupe == 'B+' ? 'selected' : '' }}>B+</option>
+                        <option value="B-" {{ filtre_groupe == 'B-' ? 'selected' : '' }}>B-</option>
+                        <option value="AB+" {{ filtre_groupe == 'AB+' ? 'selected' : '' }}>AB+</option>
+                        <option value="AB-" {{ filtre_groupe == 'AB-' ? 'selected' : '' }}>AB-</option>
+                        <option value="O+" {{ filtre_groupe == 'O+' ? 'selected' : '' }}>O+</option>
+                        <option value="O-" {{ filtre_groupe == 'O-' ? 'selected' : '' }}>O-</option>
+                    </select>
+                </div>
+                <div class="admin-list-toolbar-group">
+                    <label for="tri" class="admin-list-toolbar-label">Tri par</label>
+                    <select name="tri" id="tri" class="form-select form-select-sm admin-list-toolbar-select">
+                        <option value="date" {{ tri == 'date' ? 'selected' : '' }}>Date</option>
+                        <option value="taille" {{ tri == 'taille' ? 'selected' : '' }}>Taille</option>
+                        <option value="poids" {{ tri == 'poids' ? 'selected' : '' }}>Poids</option>
+                    </select>
+                </div>
+                <div class="admin-list-toolbar-group">
+                    <label for="ordre" class="admin-list-toolbar-label">Ordre</label>
+                    <select name="ordre" id="ordre" class="form-select form-select-sm admin-list-toolbar-select">
+                        <option value="DESC" {{ ordre == 'DESC' ? 'selected' : '' }}>Décroissant</option>
+                        <option value="ASC" {{ ordre == 'ASC' ? 'selected' : '' }}>Croissant</option>
+                    </select>
+                </div>
+                <div class="admin-list-toolbar-group admin-list-toolbar-actions">
+                    <button type="submit" class="btn btn-sm btn-primary admin-btn-primary">
+                        <i class="fas fa-search me-1"></i> Appliquer
+                    </button>
+                </div>
+            </form>
+        </div>
+
         <div class="admin-card-body p-0">
             <div class="table-responsive">
                 <table class="admin-table">
                     <thead>
                         <tr>
-                            <th>Patiente</th>
-                            <th>Début grossesse</th>
-                            <th>Terme prévu</th>
-                            <th>Statut</th>
-                            <th width="120"></th>
+                            <th>#</th>
+                            <th>Numéro urgence</th>
+                            <th>Groupe sanguin</th>
+                            <th>Taille / Poids</th>
+                            <th>IMC</th>
+                            <th>Activité physique</th>
+                            <th>Date enregistrement</th>
+                            <th width="140"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td colspan="5">
-                                <div class="admin-empty py-4">
-                                    <i class="fas fa-heart"></i>
-                                    <p>Aucun suivi grossesse pour le moment.</p>
-                                    <button type="button" class="btn btn-primary admin-btn-primary">Créer un suivi</button>
-                                </div>
-                            </td>
-                        </tr>
+                        {% if mamans|length == 0 %}
+                            <tr>
+                                <td colspan="8">
+                                    <div class="admin-empty py-4">
+                                        <i class="fas fa-heart"></i>
+                                        <p>Aucune maman enregistrée pour le moment.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            {% for maman in mamans %}
+                                <tr>
+                                    <td>{{ maman.id }}</td>
+                                    <td>{{ maman.numeroUrgence }}</td>
+                                    <td>{{ maman.groupeSanguin }}</td>
+                                    <td>{{ maman.taille }} cm / {{ maman.poids ?? '—' }} kg</td>
+                                    <td>
+                                        {% if maman.imc %}
+                                            {{ maman.imc }} ({{ maman.imcCategorie }})
+                                            {% if maman.imcAlerte %}
+                                                <span class="admin-badge admin-badge-warning ms-1" title="Alerte IMC">⚠️</span>
+                                            {% endif %}
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ maman.niveauActivitePhysique }}</td>
+                                    <td>{{ maman.dateCreation ? maman.dateCreation|date('d/m/Y H:i') : '—' }}</td>
+                                    <td>
+                                        <a href="{{ path('admin_maman_show', { id: maman.id }) }}" class="btn btn-sm btn-outline-primary me-1" title="Voir"><i class="fas fa-eye"></i></a>
+                                        <a href="{{ path('admin_maman_edit', { id: maman.id }) }}" class="btn btn-sm btn-outline-secondary" title="Modifier"><i class="fas fa-edit"></i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    {# Stats en bas — répartition groupe sanguin et fumeur #}
+    <div class="row g-3 mt-2">
+        <div class="col-md-6">
+            <div class="admin-card admin-card-stats h-100">
+                <div class="admin-card-header admin-card-stats-header">
+                    <i class="fas fa-tint me-2"></i> Répartition par groupe sanguin
+                </div>
+                <div class="admin-card-body">
+                    {% if stats_groupe_sanguin|length > 0 %}
+                        <ul class="admin-stats-list">
+                            {% for groupe, nb in stats_groupe_sanguin %}
+                                <li class="d-flex justify-content-between align-items-center py-2">
+                                    <span>{{ groupe }}</span>
+                                    <span class="admin-stats-badge">{{ nb }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted mb-0 small">Aucune donnée</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="admin-card admin-card-stats h-100">
+                <div class="admin-card-header admin-card-stats-header">
+                    <i class="fas fa-smoking me-2"></i> Mode de vie (fumeuse)
+                </div>
+                <div class="admin-card-body">
+                    <ul class="admin-stats-list">
+                        <li class="d-flex justify-content-between align-items-center py-2">
+                            <span>Oui</span>
+                            <span class="admin-stats-badge">{{ stats_fumeur.oui }}</span>
+                        </li>
+                        <li class="d-flex justify-content-between align-items-center py-2">
+                            <span>Non</span>
+                            <span class="admin-stats-badge">{{ stats_fumeur.non }}</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

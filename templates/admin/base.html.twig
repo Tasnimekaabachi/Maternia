@@ -24,7 +24,7 @@
                     <i class="fas fa-tachometer-alt"></i>
                     Tableau de bord
                 </a>
-                <a href="{{ path('admin_suivi_grossesse') }}" class="nav-link {{ app.request.attributes.get('_route') == 'admin_suivi_grossesse' ? 'active' : '' }}">
+                <a href="{{ path('admin_suivi_grossesse') }}" class="nav-link {{ (app.request.attributes.get('_route') == 'admin_suivi_grossesse' or app.request.attributes.get('_route') starts with 'admin_maman_') ? 'active' : '' }}">
                     <i class="fas fa-heart"></i>
                     Suivi grossesse
                 </a>

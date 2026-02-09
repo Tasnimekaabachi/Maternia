@@ -1,0 +1,97 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Profil maman #{{ maman.id }}{% endblock %}
+{% block page_title %}Profil maman #{{ maman.id }}{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
+        <span>/</span>
+        <a href="{{ path('admin_suivi_grossesse') }}">Suivi grossesse</a>
+        <span>/</span>
+        <span>Profil #{{ maman.id }}</span>
+    </div>
+{% endblock %}
+
+{% block header_actions %}
+    <a href="{{ path('admin_suivi_grossesse') }}" class="btn btn-outline-secondary me-2"><i class="fas fa-arrow-left me-1"></i> Retour à la liste</a>
+    <a href="{{ path('admin_maman_edit', { id: maman.id }) }}" class="btn btn-primary admin-btn-primary"><i class="fas fa-edit me-1"></i> Modifier</a>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="admin-card mb-4">
+                <div class="admin-card-header"><i class="fas fa-phone-alt me-2"></i> Contact & santé</div>
+                <div class="admin-card-body">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="admin-field"><span class="admin-field-label">Numéro d'urgence</span><span class="admin-field-value">+216 {{ maman.numeroUrgence }}</span></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="admin-field"><span class="admin-field-label">Groupe sanguin</span><span class="admin-field-value">{{ maman.groupeSanguin }}</span></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="admin-field"><span class="admin-field-label">Taille</span><span class="admin-field-value">{{ maman.taille }} cm</span></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="admin-field"><span class="admin-field-label">Poids</span><span class="admin-field-value">{{ maman.poids ?? '—' }} kg</span></div>
+                        </div>
+                        {% if maman.imc %}
+                        <div class="col-sm-6">
+                            <div class="admin-field">
+                                <span class="admin-field-label">IMC</span>
+                                <span class="admin-field-value">{{ maman.imc }} ({{ maman.imcCategorie }}){% if maman.imcAlerte %} <span class="admin-badge admin-badge-warning">Alerte</span>{% endif %}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="admin-card mb-4">
+                <div class="admin-card-header"><i class="fas fa-file-medical me-2"></i> Antécédents & traitements</div>
+                <div class="admin-card-body">
+                    <div class="admin-field mb-3"><span class="admin-field-label">Allergies</span><span class="admin-field-value">{{ maman.allergies ?? '—' }}</span></div>
+                    <div class="admin-field mb-3"><span class="admin-field-label">Antécédents médicaux</span><span class="admin-field-value">{{ maman.antecedentsMedicaux ?? '—' }}</span></div>
+                    <div class="admin-field mb-3"><span class="admin-field-label">Maladies chroniques</span><span class="admin-field-value">{{ maman.maladiesChroniques ?? '—' }}</span></div>
+                    <div class="admin-field"><span class="admin-field-label">Médicaments actuels</span><span class="admin-field-value">{{ maman.medicamentsActuels ?? '—' }}</span></div>
+                </div>
+            </div>
+            <div class="admin-card mb-4">
+                <div class="admin-card-header"><i class="fas fa-heartbeat me-2"></i> Mode de vie</div>
+                <div class="admin-card-body">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="admin-field"><span class="admin-field-label">Fumeuse</span><span class="admin-field-value">{{ maman.fumeur ? 'Oui' : 'Non' }}</span></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="admin-field"><span class="admin-field-label">Consommation alcool</span><span class="admin-field-value">{{ maman.consommationAlcool ? 'Oui' : 'Non' }}</span></div>
+                        </div>
+                        <div class="col-12">
+                            <div class="admin-field"><span class="admin-field-label">Niveau d'activité physique</span><span class="admin-field-value">{{ maman.niveauActivitePhysique }}</span></div>
+                        </div>
+                        <div class="col-12">
+                            <div class="admin-field"><span class="admin-field-label">Habitudes alimentaires</span><span class="admin-field-value">{{ maman.habitudesAlimentaires }}</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="admin-card mb-4">
+                <div class="admin-card-header">Informations système</div>
+                <div class="admin-card-body">
+                    <div class="admin-field mb-3"><span class="admin-field-label">ID</span><span class="admin-field-value">#{{ maman.id }}</span></div>
+                    <div class="admin-field mb-3"><span class="admin-field-label">Date création</span><span class="admin-field-value">{{ maman.dateCreation ? maman.dateCreation|date('d/m/Y H:i') : '—' }}</span></div>
+                    <div class="admin-field"><span class="admin-field-label">Dernière mise à jour</span><span class="admin-field-value">{{ maman.dateMiseAJour ? maman.dateMiseAJour|date('d/m/Y H:i') : '—' }}</span></div>
+                </div>
+            </div>
+            <div class="admin-card">
+                <div class="admin-card-body">
+                    <a href="{{ path('admin_maman_edit', { id: maman.id }) }}" class="btn btn-primary admin-btn-primary w-100 mb-2"><i class="fas fa-edit me-1"></i> Modifier le profil</a>
+                    {{ include('admin/maman/_delete_form.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

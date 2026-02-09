@@ -68,6 +68,7 @@
                     <div class="navbar-nav mx-auto">
                         <a href="{{ path('app_home') }}" class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_home' %} active{% endif %}">Accueil</a>
                         <a href="{{ path('app_services') }}" class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_services' %} active{% endif %}">Services</a>
+                        <a href="{{ path('app_suivi_grossesse_creer') }}" class="nav-item nav-link{% if app.request.attributes.get('_route') starts with 'app_suivi_grossesse' %} active{% endif %}">Mon suivi</a>
                         <a href="{{ path('app_marketplace') }}" class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_marketplace' %} active{% endif %}">Marketplace</a>
                         <a href="{{ path('app_events') }}" class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_events' %} active{% endif %}">Événements</a>
                         <a href="{{ path('app_appointment') }}" class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_appointment' %} active{% endif %}">Rendez-vous</a>

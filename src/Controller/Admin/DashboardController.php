@@ -2,7 +2,9 @@
 
 namespace App\Controller\Admin;
 
+use App\Repository\MamanRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -16,9 +18,23 @@ final class DashboardController extends AbstractController
     }
 
     #[Route('/suivi-grossesse', name: 'suivi_grossesse', methods: ['GET'])]
-    public function suiviGrossesse(): Response
+    public function suiviGrossesse(Request $request, MamanRepository $mamanRepository): Response
     {
-        return $this->render('admin/suivi_grossesse.html.twig');
+        $groupeSanguin = $request->query->get('groupe_sanguin');
+        $tri = $request->query->get('tri', 'date');
+        $ordre = $request->query->get('ordre', 'DESC');
+        $sortBy = $tri === 'taille' ? MamanRepository::SORT_TAILLE : ($tri === 'poids' ? MamanRepository::SORT_POIDS : MamanRepository::SORT_DATE);
+        $mamans = $mamanRepository->findForAdmin($groupeSanguin, $sortBy, $ordre);
+        $statsGroupe = $mamanRepository->getStatsByGroupeSanguin();
+        $statsFumeur = $mamanRepository->getStatsByFumeur();
+        return $this->render('admin/suivi_grossesse.html.twig', [
+            'mamans' => $mamans,
+            'stats_groupe_sanguin' => $statsGroupe,
+            'stats_fumeur' => $statsFumeur,
+            'filtre_groupe' => $groupeSanguin,
+            'tri' => $tri,
+            'ordre' => $ordre,
+        ]);
     }
 
     #[Route('/marketplace', name: 'marketplace', methods: ['GET'])]

@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Maman{% endblock %}
+
+{% block body %}
+    <h1>Maman</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ maman.id }}</td>
+            </tr>
+            <tr>
+                <th>NumeroUrgence</th>
+                <td>{{ maman.numeroUrgence }}</td>
+            </tr>
+            <tr>
+                <th>GroupeSanguin</th>
+                <td>{{ maman.groupeSanguin }}</td>
+            </tr>
+            <tr>
+                <th>Allergies</th>
+                <td>{{ maman.allergies }}</td>
+            </tr>
+            <tr>
+                <th>AntecedentsMedicaux</th>
+                <td>{{ maman.antecedentsMedicaux }}</td>
+            </tr>
+            <tr>
+                <th>Poids</th>
+                <td>{{ maman.poids }}</td>
+            </tr>
+            <tr>
+                <th>Taille</th>
+                <td>{{ maman.taille }}</td>
+            </tr>
+            <tr>
+                <th>MaladiesChroniques</th>
+                <td>{{ maman.maladiesChroniques }}</td>
+            </tr>
+            <tr>
+                <th>MedicamentsActuels</th>
+                <td>{{ maman.medicamentsActuels }}</td>
+            </tr>
+            <tr>
+                <th>Fumeur</th>
+                <td>{{ maman.fumeur ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>ConsommationAlcool</th>
+                <td>{{ maman.consommationAlcool ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>NiveauActivitePhysique</th>
+                <td>{{ maman.niveauActivitePhysique }}</td>
+            </tr>
+            <tr>
+                <th>HabitudesAlimentaires</th>
+                <td>{{ maman.habitudesAlimentaires }}</td>
+            </tr>
+            <tr>
+                <th>DateCreation</th>
+                <td>{{ maman.dateCreation ? maman.dateCreation|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>DateMiseAJour</th>
+                <td>{{ maman.dateMiseAJour ? maman.dateMiseAJour|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_maman_index') }}">back to list</a>
+
+    <a href="{{ path('app_maman_edit', {'id': maman.id}) }}">edit</a>
+
+    {{ include('maman/_delete_form.html.twig') }}
+{% endblock %}
