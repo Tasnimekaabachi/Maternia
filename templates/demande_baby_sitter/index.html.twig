@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}DemandeBabySitter index{% endblock %}
+
+{% block body %}
+    <h1>DemandeBabySitter index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>NomParent</th>
+                <th>EmailParent</th>
+                <th>Message</th>
+                <th>DateDemande</th>
+                <th>Statut</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for demande_baby_sitter in demande_baby_sitters %}
+            <tr>
+                <td>{{ demande_baby_sitter.id }}</td>
+                <td>{{ demande_baby_sitter.nomParent }}</td>
+                <td>{{ demande_baby_sitter.emailParent }}</td>
+                <td>{{ demande_baby_sitter.message }}</td>
+                <td>{{ demande_baby_sitter.dateDemande ? demande_baby_sitter.dateDemande|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ demande_baby_sitter.statut }}</td>
+                <td>
+                    <a href="{{ path('app_demande_baby_sitter_show', {'id': demande_baby_sitter.id}) }}">show</a>
+                    <a href="{{ path('app_demande_baby_sitter_edit', {'id': demande_baby_sitter.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_demande_baby_sitter_new') }}">Create new</a>
+{% endblock %}

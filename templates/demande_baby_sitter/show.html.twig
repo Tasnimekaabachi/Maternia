@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}DemandeBabySitter{% endblock %}
+
+{% block body %}
+    <h1>DemandeBabySitter</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ demande_baby_sitter.id }}</td>
+            </tr>
+            <tr>
+                <th>NomParent</th>
+                <td>{{ demande_baby_sitter.nomParent }}</td>
+            </tr>
+            <tr>
+                <th>EmailParent</th>
+                <td>{{ demande_baby_sitter.emailParent }}</td>
+            </tr>
+            <tr>
+                <th>Message</th>
+                <td>{{ demande_baby_sitter.message }}</td>
+            </tr>
+            <tr>
+                <th>DateDemande</th>
+                <td>{{ demande_baby_sitter.dateDemande ? demande_baby_sitter.dateDemande|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Statut</th>
+                <td>{{ demande_baby_sitter.statut }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_demande_baby_sitter_index') }}">back to list</a>
+
+    <a href="{{ path('app_demande_baby_sitter_edit', {'id': demande_baby_sitter.id}) }}">edit</a>
+
+    {{ include('demande_baby_sitter/_delete_form.html.twig') }}
+{% endblock %}

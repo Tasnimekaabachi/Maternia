@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des offres babysitter{% endblock %}
+
+{% block body %}
+
+<h1>Liste des offres babysitter</h1>
+
+<form method="get">
+    <input type="text" name="ville" placeholder="Ville">
+    <input type="number" name="tarif" placeholder="Tarif max">
+    <button type="submit">Rechercher</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Ville</th>
+            <th>Tarif</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for offre in offre_baby_sitters %}
+        <tr>
+            <td>{{ offre.nomBabysitter }}</td>
+            <td>{{ offre.ville }}</td>
+            <td>{{ offre.tarif }}</td>
+            <td>
+                <a href="{{ path('app_offre_baby_sitter_show', {'id': offre.id}) }}">Show</a>
+                <a href="{{ path('app_offre_baby_sitter_edit', {'id': offre.id}) }}">Edit</a>
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="4">Aucune offre trouvée</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

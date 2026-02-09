@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}OffreBabySitter{% endblock %}
+
+{% block body %}
+    <h1>OffreBabySitter</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ offre_baby_sitter.id }}</td>
+            </tr>
+            <tr>
+                <th>NomBabysitter</th>
+                <td>{{ offre_baby_sitter.nomBabysitter }}</td>
+            </tr>
+            <tr>
+                <th>Telephone</th>
+                <td>{{ offre_baby_sitter.telephone }}</td>
+            </tr>
+            <tr>
+                <th>Experience</th>
+                <td>{{ offre_baby_sitter.experience }}</td>
+            </tr>
+            <tr>
+                <th>Ville</th>
+                <td>{{ offre_baby_sitter.ville }}</td>
+            </tr>
+            <tr>
+                <th>Tarif</th>
+                <td>{{ offre_baby_sitter.tarif }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ offre_baby_sitter.description }}</td>
+            </tr>
+            <tr>
+                <th>Disponibilite</th>
+                <td>{{ offre_baby_sitter.disponibilite ? 'Yes' : 'No' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_offre_baby_sitter_index') }}">back to list</a>
+
+    <a href="{{ path('app_offre_baby_sitter_edit', {'id': offre_baby_sitter.id}) }}">edit</a>
+
+    {{ include('offre_baby_sitter/_delete_form.html.twig') }}
+{% endblock %}
