@@ -46,6 +46,14 @@ final class MamanController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/pdf', name: 'pdf', methods: ['GET'])]
+    public function pdf(Maman $maman): Response
+    {
+        return $this->render('admin/maman/pdf_print.html.twig', [
+            'maman' => $maman,
+        ]);
+    }
+
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Maman $maman, EntityManagerInterface $entityManager): Response
     {

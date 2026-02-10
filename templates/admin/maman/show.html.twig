@@ -13,10 +13,7 @@
     </div>
 {% endblock %}
 
-{% block header_actions %}
-    <a href="{{ path('admin_suivi_grossesse') }}" class="btn btn-outline-secondary me-2"><i class="fas fa-arrow-left me-1"></i> Retour à la liste</a>
-    <a href="{{ path('admin_maman_edit', { id: maman.id }) }}" class="btn btn-primary admin-btn-primary"><i class="fas fa-edit me-1"></i> Modifier</a>
-{% endblock %}
+{% block header_actions %}{% endblock %}
 
 {% block content %}
     <div class="row">
@@ -83,13 +80,13 @@
                 <div class="admin-card-body">
                     <div class="admin-field mb-3"><span class="admin-field-label">ID</span><span class="admin-field-value">#{{ maman.id }}</span></div>
                     <div class="admin-field mb-3"><span class="admin-field-label">Date création</span><span class="admin-field-value">{{ maman.dateCreation ? maman.dateCreation|date('d/m/Y H:i') : '—' }}</span></div>
-                    <div class="admin-field"><span class="admin-field-label">Dernière mise à jour</span><span class="admin-field-value">{{ maman.dateMiseAJour ? maman.dateMiseAJour|date('d/m/Y H:i') : '—' }}</span></div>
-                </div>
-            </div>
-            <div class="admin-card">
-                <div class="admin-card-body">
-                    <a href="{{ path('admin_maman_edit', { id: maman.id }) }}" class="btn btn-primary admin-btn-primary w-100 mb-2"><i class="fas fa-edit me-1"></i> Modifier le profil</a>
-                    {{ include('admin/maman/_delete_form.html.twig') }}
+                    <div class="admin-field mb-4"><span class="admin-field-label">Dernière mise à jour</span><span class="admin-field-value">{{ maman.dateMiseAJour ? maman.dateMiseAJour|date('d/m/Y H:i') : '—' }}</span></div>
+                    <div class="admin-show-actions">
+                        <a href="{{ path('admin_suivi_grossesse') }}" class="btn btn-outline-rose"><i class="fas fa-arrow-left me-1"></i> Annuler</a>
+                        <a href="{{ path('admin_maman_pdf', { id: maman.id }) }}" class="btn admin-btn-rose" target="_blank"><i class="fas fa-file-pdf me-1"></i> PDF</a>
+                        <a href="{{ path('admin_maman_edit', { id: maman.id }) }}" class="btn admin-btn-rose"><i class="fas fa-edit me-1"></i> Modifier</a>
+                        {{ include('admin/maman/_delete_form.html.twig') }}
+                    </div>
                 </div>
             </div>
         </div>

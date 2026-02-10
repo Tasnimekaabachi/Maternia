@@ -42,17 +42,17 @@
     {% block navbar %}
     <!-- Navbar start -->
     <div class="container-fluid border-bottom bg-light wow fadeIn" data-wow-delay="0.1s">
-        <div class="container topbar bg-primary d-none d-lg-block py-2">
-            <div class="d-flex justify-content-between">
-                <div class="top-info ps-2">
-                    <small class="me-3"><i class="fas fa-map-marker-alt me-2 text-secondary"></i> <a href="#" class="text-white">Contact</a></small>
-                    <small class="me-3"><i class="fas fa-envelope me-2 text-secondary"></i><a href="#" class="text-white">contact@maternia.fr</a></small>
+        <div class="container topbar topbar-compact bg-primary d-none d-lg-block">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="top-info">
+                    <span class="topbar-item"><i class="fas fa-map-marker-alt me-1 opacity-75"></i><a href="#contact" class="text-white text-decoration-none">Contact</a></span>
+                    <span class="topbar-item"><i class="fas fa-envelope me-1 opacity-75"></i><a href="mailto:contact@maternia.fr" class="text-white text-decoration-none">contact@maternia.fr</a></span>
                 </div>
-                <div class="top-link pe-2">
-                    <a href="" class="btn btn-light btn-sm-square rounded-circle"><i class="fab fa-facebook-f text-secondary"></i></a>
-                    <a href="" class="btn btn-light btn-sm-square rounded-circle"><i class="fab fa-twitter text-secondary"></i></a>
-                    <a href="" class="btn btn-light btn-sm-square rounded-circle"><i class="fab fa-instagram text-secondary"></i></a>
-                    <a href="" class="btn btn-light btn-sm-square rounded-circle me-0"><i class="fab fa-linkedin-in text-secondary"></i></a>
+                <div class="top-link">
+                    <a href="" class="btn btn-light btn-sm-square rounded-circle" aria-label="Facebook"><i class="fab fa-facebook-f text-secondary"></i></a>
+                    <a href="" class="btn btn-light btn-sm-square rounded-circle" aria-label="Twitter"><i class="fab fa-twitter text-secondary"></i></a>
+                    <a href="" class="btn btn-light btn-sm-square rounded-circle" aria-label="Instagram"><i class="fab fa-instagram text-secondary"></i></a>
+                    <a href="" class="btn btn-light btn-sm-square rounded-circle me-0" aria-label="LinkedIn"><i class="fab fa-linkedin-in text-secondary"></i></a>
                 </div>
             </div>
         </div>
@@ -114,6 +114,18 @@
         </div>
     </div>
     <!-- Modal Search End -->
+
+    {# Flash messages (succès / erreur / warning) #}
+    <div class="container mt-3">
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show shadow-sm" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
 
     {% block body %}
 

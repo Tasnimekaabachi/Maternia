@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil maman #{{ maman.id }} - Maternia</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; color: #333; margin: 24px; max-width: 800px; }
+        .no-print { margin-bottom: 24px; }
+        .btn-pdf { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #FF1D8D; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .btn-pdf:hover { background: #ff5ba8; }
+        h1 { color: #4a7ba7; font-size: 1.5rem; border-bottom: 2px solid #4a7ba7; padding-bottom: 8px; margin-bottom: 20px; }
+        h2 { color: #374151; font-size: 1.1rem; margin-top: 20px; margin-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+        th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid #e5e7eb; }
+        th { background: #f8f9fb; font-weight: 600; color: #374151; width: 40%; }
+        .footer { margin-top: 32px; font-size: 12px; color: #6b7280; }
+        @media print {
+            .no-print { display: none !important; }
+            body { margin: 16px; font-size: 11px; }
+            h1 { font-size: 18px; }
+            h2 { font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print">
+        <button type="button" class="btn-pdf" onclick="window.print();">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+            Enregistrer en PDF
+        </button>
+        <p style="margin-top: 12px; color: #6b7280; font-size: 0.9rem;">Cliquez sur le bouton puis choisissez « Enregistrer au format PDF » ou « Microsoft Print to PDF » dans la fenêtre d’impression.</p>
+    </div>
+
+    <h1>Maternia – Profil maman #{{ maman.id }}</h1>
+    <p><strong>Généré le</strong> {{ "now"|date("d/m/Y à H:i") }}</p>
+
+    <h2>Contact & santé</h2>
+    <table>
+        <tr><th>Numéro d'urgence</th><td>+216 {{ maman.numeroUrgence }}</td></tr>
+        <tr><th>Groupe sanguin</th><td>{{ maman.groupeSanguin }}</td></tr>
+        <tr><th>Taille</th><td>{{ maman.taille }} cm</td></tr>
+        <tr><th>Poids</th><td>{{ maman.poids ?? '—' }} kg</td></tr>
+        {% if maman.imc %}
+        <tr><th>IMC</th><td>{{ maman.imc }} ({{ maman.imcCategorie }})</td></tr>
+        {% endif %}
+    </table>
+
+    <h2>Antécédents & traitements</h2>
+    <table>
+        <tr><th>Allergies</th><td>{{ maman.allergies ?? '—' }}</td></tr>
+        <tr><th>Antécédents médicaux</th><td>{{ maman.antecedentsMedicaux ?? '—' }}</td></tr>
+        <tr><th>Maladies chroniques</th><td>{{ maman.maladiesChroniques ?? '—' }}</td></tr>
+        <tr><th>Médicaments actuels</th><td>{{ maman.medicamentsActuels ?? '—' }}</td></tr>
+    </table>
+
+    <h2>Mode de vie</h2>
+    <table>
+        <tr><th>Fumeuse</th><td>{{ maman.fumeur ? 'Oui' : 'Non' }}</td></tr>
+        <tr><th>Consommation alcool</th><td>{{ maman.consommationAlcool ? 'Oui' : 'Non' }}</td></tr>
+        <tr><th>Niveau d'activité physique</th><td>{{ maman.niveauActivitePhysique }}</td></tr>
+        <tr><th>Habitudes alimentaires</th><td>{{ maman.habitudesAlimentaires }}</td></tr>
+    </table>
+
+    <h2>Informations système</h2>
+    <table>
+        <tr><th>ID</th><td>#{{ maman.id }}</td></tr>
+        <tr><th>Date de création</th><td>{{ maman.dateCreation ? maman.dateCreation|date('d/m/Y H:i') : '—' }}</td></tr>
+        <tr><th>Dernière mise à jour</th><td>{{ maman.dateMiseAJour ? maman.dateMiseAJour|date('d/m/Y H:i') : '—' }}</td></tr>
+    </table>
+
+    <div class="footer">Document généré par Maternia – Suivi grossesse – Confidentialité des données.</div>
+
+    <script>
+        if (window.location.hash === '#print') {
+            window.print();
+        }
+    </script>
+</body>
+</html>

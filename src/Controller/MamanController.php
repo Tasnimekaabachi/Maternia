@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Maman;
 use App\Form\MamanType;
+use App\Repository\GrosesseRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,8 +15,9 @@ final class MamanController extends AbstractController
 {
     /**
      * Page publique : la maman remplit son profil pour le suivi de grossesse.
+     * URL unifiée : /suivi_grossesse (création) et /suivi_grossesse/{id} (voir une maman).
      */
-    #[Route('/mon-suivi-grossesse', name: 'app_suivi_grossesse_creer', methods: ['GET', 'POST'])]
+    #[Route('/suivi_grossesse', name: 'app_suivi_grossesse_creer', methods: ['GET', 'POST'])]
     public function suiviGrossesseCreer(Request $request, EntityManagerInterface $entityManager): Response
     {
         $maman = new Maman();
@@ -25,7 +27,8 @@ final class MamanController extends AbstractController
             $entityManager->persist($maman);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_suivi_grossesse_show', ['id' => $maman->getId()], Response::HTTP_SEE_OTHER);
+            // Étape 2 : enchaîner directement sur le formulaire grossesse
+            return $this->redirectToRoute('app_maman_grossesse_edit', ['id' => $maman->getId()], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('pages/mon_profil_maman.html.twig', [
@@ -36,7 +39,16 @@ final class MamanController extends AbstractController
     }
 
     /**
-     * Alias : /mon-suivi-grossesse/{id} redirige vers la vue personnelle.
+     * Ancienne URL : GET /mon-suivi-grossesse redirige vers /suivi_grossesse.
+     */
+    #[Route('/mon-suivi-grossesse', name: 'app_suivi_grossesse_creer_alias', methods: ['GET'])]
+    public function suiviGrossesseCreerAlias(Request $request): Response
+    {
+        return $this->redirectToRoute('app_suivi_grossesse_creer', $request->query->all(), Response::HTTP_MOVED_PERMANENTLY);
+    }
+
+    /**
+     * Ancienne URL : /mon-suivi-grossesse/{id} redirige vers /suivi_grossesse/{id}.
      */
     #[Route('/mon-suivi-grossesse/{id}', name: 'app_suivi_grossesse_show_alias', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function suiviGrossesseShowAlias(Maman $maman): Response
@@ -49,12 +61,14 @@ final class MamanController extends AbstractController
      * /suivi_grossesse/{id}
      */
     #[Route('/suivi_grossesse/{id}', name: 'app_suivi_grossesse_show', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function suiviGrossesseShow(Maman $maman): Response
+    public function suiviGrossesseShow(Maman $maman, GrosesseRepository $grosesseRepository): Response
     {
         $imc = $maman->getImc();
         $imcCategorie = $maman->getImcCategorie();
         $imcAlerte = $maman->isImcAlerte();
         $conseils = $this->getConseilsSante($maman);
+
+        $grossesse = $grosesseRepository->findOneBy(['maman' => $maman], ['dateCreation' => 'DESC']);
 
         return $this->render('pages/mon_profil_maman.html.twig', [
             'maman' => $maman,
@@ -63,6 +77,7 @@ final class MamanController extends AbstractController
             'imc_categorie' => $imcCategorie,
             'imc_alerte' => $imcAlerte,
             'conseils' => $conseils,
+            'grossesse' => $grossesse,
         ]);
     }
 

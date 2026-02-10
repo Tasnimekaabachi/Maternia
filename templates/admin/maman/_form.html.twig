@@ -55,10 +55,10 @@
 </div>
 
 <div class="form-actions d-flex flex-wrap align-items-center gap-2">
-    <button type="submit" class="btn btn-primary admin-btn-primary">
+    <button type="submit" class="btn admin-btn-rose">
         <i class="fas fa-check me-1"></i> {{ button_label|default('Enregistrer') }}
     </button>
-    <a href="{{ path('admin_suivi_grossesse') }}" class="btn btn-outline-secondary">Annuler</a>
+    <a href="{{ path('admin_suivi_grossesse') }}" class="btn btn-outline-rose">Annuler</a>
 </div>
 
 {{ form_widget(form._token) }}

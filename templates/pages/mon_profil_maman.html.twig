@@ -65,7 +65,68 @@
                     </div>
                 {% endif %}
 
-                <div class="row g-4">
+                {# Résumé grossesse (pour confirmer que ça s'est bien enregistré) #}
+                <div class="border border-primary rounded-3 bg-light p-4 mb-4 shadow-sm">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <h4 class="text-primary mb-0"><i class="fas fa-baby-carriage me-2"></i> Suivi de grossesse</h4>
+                        <a href="{{ path('app_maman_grossesse_edit', { id: maman.id }) }}" class="btn admin-btn-rose btn-sm">
+                            <i class="fas fa-edit me-1"></i> Modifier grossesse
+                        </a>
+                    </div>
+                    <hr class="my-3">
+
+                    {% if grossesse %}
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <span class="text-muted small d-block">Semaine actuelle</span>
+                                <strong>{{ grossesse.semaineActuelle ?? '—' }}</strong>
+                            </div>
+                            <div class="col-md-4">
+                                <span class="text-muted small d-block">Trimestre</span>
+                                <strong>{{ grossesse.trimestreActuel ?? '—' }}</strong>
+                            </div>
+                            <div class="col-md-4">
+                                <span class="text-muted small d-block">Accouchement prévu</span>
+                                <strong>
+                                    {% if grossesse.dateAccouchementPrevue %}
+                                        {{ grossesse.dateAccouchementPrevue|date('d/m/Y') }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </strong>
+                            </div>
+                            <div class="col-md-6">
+                                <span class="text-muted small d-block">Poids actuel (grossesse)</span>
+                                <strong>{{ grossesse.poidsActuel is not null ? grossesse.poidsActuel ~ ' kg' : '—' }}</strong>
+                            </div>
+                            <div class="col-md-6">
+                                <span class="text-muted small d-block">Statut</span>
+                                <strong>{{ grossesse.statutGrossesse ?? '—' }}</strong>
+                            </div>
+                            <div class="col-12">
+                                <span class="text-muted small d-block">Symptômes</span>
+                                <span>{{ grossesse.symptomes ?: '—' }}</span>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="mb-0 text-muted">Aucune grossesse enregistrée pour le moment. Cliquez sur « Mon suivi de grossesse » pour la compléter.</p>
+                    {% endif %}
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-6">
+                        <div class="d-grid d-md-flex gap-2">
+                            <a href="#informations-maman" class="btn btn-outline-primary">
+                                <i class="fas fa-user me-1"></i> Mes informations maman
+                            </a>
+                            <a href="{{ path('app_maman_grossesse_edit', { id: maman.id }) }}" class="btn admin-btn-rose">
+                                <i class="fas fa-baby-carriage me-1"></i> Mon suivi de grossesse
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4" id="informations-maman">
                     <div class="col-lg-8">
                         <div class="border border-primary rounded-3 bg-light p-4 mb-4 shadow-sm">
                             <h4 class="text-primary mb-3"><i class="fas fa-phone-alt me-2"></i> Informations grossesse & contact</h4>

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\MamanRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -225,6 +227,17 @@ private ?\DateTimeInterface $dateCreation = null;
 #[ORM\Column(type: 'datetime')]
 private ?\DateTimeInterface $dateMiseAJour = null;
 
+/**
+ * @var Collection<int, Grosesse>
+ */
+#[ORM\OneToMany(targetEntity: Grosesse::class, mappedBy: 'maman')]
+private Collection $grosesses;
+
+public function __construct()
+{
+    $this->grosesses = new ArrayCollection();
+}
+
 #[ORM\PrePersist]
 public function setDateCreationValue(): void
 {
@@ -293,4 +306,33 @@ public function getDateMiseAJour(): ?\DateTimeInterface
         }
         return $imc < 17 || $imc > 35;
     }
+
+/**
+ * @return Collection<int, Grosesse>
+ */
+public function getGrosesses(): Collection
+{
+    return $this->grosesses;
+}
+
+public function addGrosess(Grosesse $grosess): static
+{
+    if (!$this->grosesses->contains($grosess)) {
+        $this->grosesses->add($grosess);
+        $grosess->setMaman($this);
+    }
+
+    return $this;
+}
+
+public function removeGrosess(Grosesse $grosess): static
+{
+    if ($this->grosesses->removeElement($grosess)) {
+        if ($grosess->getMaman() === $this) {
+            $grosess->setMaman(null);
+        }
+    }
+
+    return $this;
+}
 }
