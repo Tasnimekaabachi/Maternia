@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Repository\GrosesseRepository;
 use App\Repository\MamanRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,23 +18,33 @@ final class DashboardController extends AbstractController
         return $this->render('admin/dashboard.html.twig');
     }
 
-    #[Route('/suivi-grossesse', name: 'suivi_grossesse', methods: ['GET'])]
-    public function suiviGrossesse(Request $request, MamanRepository $mamanRepository): Response
+    #[Route('/suivi', name: 'suivi', methods: ['GET'])]
+    public function suivi(MamanRepository $mamanRepository, GrosesseRepository $grosesseRepository): Response
     {
-        $groupeSanguin = $request->query->get('groupe_sanguin');
-        $tri = $request->query->get('tri', 'date');
-        $ordre = $request->query->get('ordre', 'DESC');
-        $sortBy = $tri === 'taille' ? MamanRepository::SORT_TAILLE : ($tri === 'poids' ? MamanRepository::SORT_POIDS : MamanRepository::SORT_DATE);
-        $mamans = $mamanRepository->findForAdmin($groupeSanguin, $sortBy, $ordre);
-        $statsGroupe = $mamanRepository->getStatsByGroupeSanguin();
-        $statsFumeur = $mamanRepository->getStatsByFumeur();
-        return $this->render('admin/suivi_grossesse.html.twig', [
-            'mamans' => $mamans,
-            'stats_groupe_sanguin' => $statsGroupe,
-            'stats_fumeur' => $statsFumeur,
-            'filtre_groupe' => $groupeSanguin,
-            'tri' => $tri,
-            'ordre' => $ordre,
+        $totalMamans = $mamanRepository->count([]);
+        $totalGrossesses = $grosesseRepository->count([]);
+        $statsStatut = $grosesseRepository->getStatsByStatut();
+
+        return $this->render('admin/suivi_choice.html.twig', [
+            'total_mamans' => $totalMamans,
+            'total_grossesses' => $totalGrossesses,
+            'grossesses_en_cours' => $statsStatut['enCours'] ?? 0,
+            'grossesses_terminees' => $statsStatut['terminee'] ?? 0,
+        ]);
+    }
+
+    #[Route('/suivi-grossesse', name: 'suivi_grossesse', methods: ['GET'])]
+    public function suiviGrossesse(MamanRepository $mamanRepository, GrosesseRepository $grosesseRepository): Response
+    {
+        $totalMamans = $mamanRepository->count([]);
+        $totalGrossesses = $grosesseRepository->count([]);
+        $statsStatut = $grosesseRepository->getStatsByStatut();
+
+        return $this->render('admin/suivi_choice.html.twig', [
+            'total_mamans' => $totalMamans,
+            'total_grossesses' => $totalGrossesses,
+            'grossesses_en_cours' => $statsStatut['enCours'] ?? 0,
+            'grossesses_terminees' => $statsStatut['terminee'] ?? 0,
         ]);
     }
 

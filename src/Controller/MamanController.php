@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Maman;
 use App\Form\MamanType;
 use App\Repository\GrosesseRepository;
+use App\Service\ConseilsSuiviService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -61,7 +62,7 @@ final class MamanController extends AbstractController
      * /suivi_grossesse/{id}
      */
     #[Route('/suivi_grossesse/{id}', name: 'app_suivi_grossesse_show', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function suiviGrossesseShow(Maman $maman, GrosesseRepository $grosesseRepository): Response
+    public function suiviGrossesseShow(Maman $maman, GrosesseRepository $grosesseRepository, ConseilsSuiviService $conseilsSuiviService): Response
     {
         $imc = $maman->getImc();
         $imcCategorie = $maman->getImcCategorie();
@@ -69,6 +70,35 @@ final class MamanController extends AbstractController
         $conseils = $this->getConseilsSante($maman);
 
         $grossesse = $grosesseRepository->findOneBy(['maman' => $maman], ['dateCreation' => 'DESC']);
+
+        $grossesseConseil = null;
+        $grossesseAlertes = [];
+        $bebeAgeMois = null;
+        $bebeConseil = null;
+
+        if ($grossesse) {
+            $semaine = $grossesse->getSemaineActuelle();
+            $statut = $grossesse->getStatutGrossesse();
+
+            if ($statut !== 'terminee' && $semaine !== null) {
+                $grossesseConseil = $conseilsSuiviService->conseilsGrossesse($semaine);
+
+                if ($statut === 'aRisque') {
+                    $grossesseAlertes[] = 'Grossesse déclarée à risque : un suivi rapproché avec votre médecin est recommandé.';
+                }
+                if ($grossesse->getTypeGrossesse() === 'multiple') {
+                    $grossesseAlertes[] = 'Grossesse multiple : contrôles prénataux plus fréquents conseillés.';
+                }
+                if ($imcAlerte) {
+                    $grossesseAlertes[] = 'IMC à risque : surveillez la prise de poids avec un professionnel de santé.';
+                }
+            } elseif ($statut === 'terminee') {
+                $bebeAgeMois = $conseilsSuiviService->getAgeBebeEnMois($grossesse);
+                if ($bebeAgeMois !== null) {
+                    $bebeConseil = $conseilsSuiviService->conseilsBebe($bebeAgeMois);
+                }
+            }
+        }
 
         return $this->render('pages/mon_profil_maman.html.twig', [
             'maman' => $maman,
@@ -78,6 +108,10 @@ final class MamanController extends AbstractController
             'imc_alerte' => $imcAlerte,
             'conseils' => $conseils,
             'grossesse' => $grossesse,
+            'grossesse_conseil' => $grossesseConseil,
+            'grossesse_alertes' => $grossesseAlertes,
+            'bebe_age_mois' => $bebeAgeMois,
+            'bebe_conseil' => $bebeConseil,
         ]);
     }
 

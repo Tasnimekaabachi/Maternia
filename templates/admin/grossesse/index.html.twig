@@ -1,0 +1,514 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Grossesses & bébés{% endblock %}
+{% block page_title %}Grossesses & bébés{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
+        <span>/</span>
+        <span>Grossesses & bébés</span>
+    </div>
+{% endblock %}
+
+{% block header_actions %}{% endblock %}
+
+{% block content %}
+    <style>
+        .pregnancy-hero {
+            padding: 1.5rem 1.75rem;
+            border-radius: var(--radius-lg);
+            background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+        }
+        .pregnancy-hero-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--bs-primary);
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+        }
+        .pregnancy-hero-title span.icon {
+            font-size: 2rem;
+        }
+        .pregnancy-hero-subtitle {
+            margin-top: .25rem;
+            color: #6b7280;
+            font-size: .95rem;
+        }
+        .pregnancy-list-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: .75rem;
+            margin-bottom: 1.25rem;
+        }
+        .pregnancy-search {
+            position: relative;
+            flex: 1;
+            min-width: 220px;
+        }
+        .pregnancy-search input {
+            width: 100%;
+            padding: .5rem .9rem .5rem 2.1rem;
+            border-radius: 999px;
+            border: 1px solid var(--bs-border);
+            font-size: .9rem;
+        }
+        .pregnancy-search span.icon {
+            position: absolute;
+            left: .75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: .9rem;
+            color: #9ca3af;
+        }
+        .pregnancy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1rem;
+        }
+        .pregnancy-card {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--bs-border);
+            box-shadow: var(--shadow-sm);
+            padding: 1rem 1.1rem;
+            display: flex;
+            flex-direction: column;
+            gap: .6rem;
+            transition: box-shadow .2s ease, transform .2s ease, border-color .2s ease;
+            border-left: 4px solid var(--bs-primary);
+        }
+        .pregnancy-card.completed {
+            border-left-color: #22c55e;
+        }
+        .pregnancy-card.high-risk {
+            border-left-color: #ef4444;
+        }
+        .pregnancy-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: .5rem;
+        }
+        .pregnancy-id {
+            font-size: .8rem;
+            font-weight: 600;
+            padding: .15rem .6rem;
+            border-radius: 999px;
+            background: var(--bs-surface);
+            color: var(--bs-primary);
+        }
+        .pregnancy-title {
+            font-size: .95rem;
+            font-weight: 600;
+            color: #111827;
+        }
+        .status-badge {
+            padding: .2rem .6rem;
+            border-radius: 999px;
+            font-size: .75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-badge.enCours {
+            background: #e0f2fe;
+            color: #1d4ed8;
+        }
+        .status-badge.aRisque {
+            background: #fef3c7;
+            color: #b45309;
+        }
+        .status-badge.terminee {
+            background: #dcfce7;
+            color: #15803d;
+        }
+        .pregnancy-meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: .6rem;
+            font-size: .8rem;
+        }
+        .meta-label {
+            display: block;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: .04em;
+            font-size: .7rem;
+        }
+        .meta-value {
+            font-weight: 500;
+            color: #111827;
+        }
+        .baby-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: .25rem;
+            padding: .15rem .55rem;
+            border-radius: 999px;
+            background: #f9fafb;
+            font-size: .75rem;
+            color: #4b5563;
+        }
+        .pregnancy-card-actions {
+            display: flex;
+            gap: .5rem;
+            margin-top: .75rem;
+        }
+        .pregnancy-card-actions .btn-sm {
+            border-radius: var(--radius);
+            font-size: .75rem;
+            padding: .25rem .6rem;
+        }
+        /* Section statistiques améliorée */
+        .stats-overview-section {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--bs-border);
+        }
+        .stats-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+        .status-pie {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 8px solid #f9fafb;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+            flex-shrink: 0;
+        }
+        .status-pie::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .status-legend {
+            display: flex;
+            flex-direction: column;
+            gap: .75rem;
+            min-width: 280px;
+        }
+        .legend-header {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: .5rem;
+            padding-bottom: .75rem;
+            border-bottom: 2px solid #f3f4f6;
+        }
+        .status-legend-item {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: .5rem .75rem;
+            border-radius: var(--radius);
+            transition: background-color .2s ease;
+        }
+        .status-legend-item:hover {
+            background-color: #f9fafb;
+        }
+        .status-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 999px;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+        .status-dot.enCours { background: #3b82f6; }
+        .status-dot.aRisque { background: #f97316; }
+        .status-dot.terminee { background: #22c55e; }
+        .status-label {
+            font-weight: 600;
+            color: #374151;
+            flex: 1;
+        }
+        .status-count {
+            font-weight: 700;
+            color: #111827;
+            font-size: 1.1rem;
+            min-width: 35px;
+            text-align: right;
+        }
+        .status-percent {
+            color: #6b7280;
+            font-size: .85rem;
+            font-weight: 500;
+            min-width: 45px;
+            text-align: right;
+        }
+        .legend-total {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: .75rem;
+            padding-top: .75rem;
+            border-top: 2px solid #f3f4f6;
+            font-weight: 700;
+        }
+        .total-label {
+            color: #111827;
+            font-size: 1rem;
+        }
+        .total-count {
+            color: var(--bs-primary);
+            font-size: 1.3rem;
+        }
+    </style>
+
+    <div class="pregnancy-hero">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+                <div class="pregnancy-hero-title">
+                    <span class="icon">👶</span>
+                    <span>Vue d’ensemble des grossesses</span>
+                </div>
+                <p class="pregnancy-hero-subtitle mb-0">
+                    Suivi global des grossesses, bébés et états de risque pour le backoffice Maternia.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {% set enCours = stats_statut.enCours|default(0) %}
+    {% set aRisque = stats_statut.aRisque|default(0) %}
+    {% set terminee = stats_statut.terminee|default(0) %}
+    {% set total = enCours + aRisque + terminee %}
+
+    {% if total > 0 %}
+        {% set pEn = (enCours * 100 / total) %}
+        {% set pRisk = (aRisque * 100 / total) %}
+        {% set pTerm = 100 - pEn - pRisk %}
+        {% set pEnEnd = pEn %}
+        {% set pRiskEnd = pEn + pRisk %}
+        <div class="stats-overview-section">
+            <h3 class="mb-3" style="font-size: 1.15rem; font-weight: 700; color: #111827;">
+                Vue globale des statuts de grossesse
+            </h3>
+            <div class="stats-container">
+                <div class="status-pie"
+                     style="background: conic-gradient(
+                        #3b82f6 0 {{ pEnEnd }}%,
+                        #f97316 {{ pEnEnd }}% {{ pRiskEnd }}%,
+                        #22c55e {{ pRiskEnd }}% 100%
+                     );">
+                </div>
+                <div class="status-legend">
+                    <div class="legend-header">Répartition par statut</div>
+                    <div class="status-legend-item">
+                        <span class="status-dot enCours"></span>
+                        <span class="status-label">En cours</span>
+                        <span class="status-count">{{ enCours }}</span>
+                        <span class="status-percent">{{ pEn|number_format(0) }}%</span>
+                    </div>
+                    <div class="status-legend-item">
+                        <span class="status-dot aRisque"></span>
+                        <span class="status-label">À risque</span>
+                        <span class="status-count">{{ aRisque }}</span>
+                        <span class="status-percent">{{ pRisk|number_format(0) }}%</span>
+                    </div>
+                    <div class="status-legend-item">
+                        <span class="status-dot terminee"></span>
+                        <span class="status-label">Terminée</span>
+                        <span class="status-count">{{ terminee }}</span>
+                        <span class="status-percent">{{ pTerm|number_format(0) }}%</span>
+                    </div>
+                    <div class="legend-total">
+                        <span class="total-label">Total des grossesses</span>
+                        <span class="total-count">{{ total }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="pregnancy-list-toolbar mb-3">
+        <div class="pregnancy-search">
+            <span class="icon">🔍</span>
+            <input type="text" id="pregnancySearch" placeholder="Rechercher par maman, statut, type...">
+        </div>
+        <div class="btn-group btn-group-sm" role="group" aria-label="Tri">
+            <button type="button" class="btn btn-outline-secondary" data-sort="priority">Priorité</button>
+            <button type="button" class="btn btn-outline-secondary" data-sort="date">Date ajout</button>
+            <button type="button" class="btn btn-outline-secondary" data-sort="statut">Statut</button>
+        </div>
+    </div>
+
+    {% if grossesses|length > 0 %}
+        <div class="pregnancy-grid" id="pregnancyGrid">
+            {% for g in grossesses %}
+                {% set bebesData = g.bebes is iterable ? g.bebes : [] %}
+                {% set isRisk = g.statutGrossesse == 'aRisque' %}
+                <div class="pregnancy-card {% if g.statutGrossesse == 'terminee' %}completed{% endif %} {% if isRisk %}high-risk{% endif %}"
+                     data-statut="{{ g.statutGrossesse }}"
+                     data-created="{{ g.dateCreation ? g.dateCreation|date('U') : 0 }}"
+                     data-priority="{% if g.statutGrossesse == 'aRisque' %}1{% elseif g.statutGrossesse == 'enCours' %}2{% else %}3{% endif %}">
+                    <div class="pregnancy-card-header">
+                        <div>
+                            <span class="pregnancy-id">#{{ g.id }}</span>
+                            <div class="pregnancy-title mt-1">
+                                {% if g.maman %}
+                                    Maman #{{ g.maman.id }}
+                                {% else %}
+                                    Grossesse sans maman assignée
+                                {% endif %}
+                            </div>
+                        </div>
+                        <span class="status-badge {{ g.statutGrossesse }}">
+                            {{ g.statutGrossesse ?? '—' }}
+                        </span>
+                    </div>
+
+                        <div class="pregnancy-meta">
+                        <div>
+                            <span class="meta-label">Type</span>
+                            <span class="meta-value">{{ g.typeGrossesse ?? '—' }}</span>
+                        </div>
+                        <div>
+                            <span class="meta-label">Nb bébés</span>
+                            <span class="meta-value">{{ g.nombreBebes ?? '—' }}</span>
+                        </div>
+                        <div>
+                            <span class="meta-label">Début / DDR</span>
+                            <span class="meta-value">
+                                {% if g.dateDebutGrossesse %}
+                                    {{ g.dateDebutGrossesse|date('d/m/Y') }}
+                                {% elseif g.dateDernieresRegles %}
+                                    {{ g.dateDernieresRegles|date('d/m/Y') }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="meta-label">Accouchement réel</span>
+                            <span class="meta-value">
+                                {{ g.dateAccouchementReelle ? g.dateAccouchementReelle|date('d/m/Y') : '—' }}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="meta-label">Poids actuel</span>
+                            <span class="meta-value">
+                                {{ g.poidsActuel is not null ? g.poidsActuel ~ ' kg' : '—' }}
+                            </span>
+                        </div>
+                        {% if g.statutGrossesse != 'terminee' %}
+                            <div>
+                                <span class="meta-label">Semaine / Trimestre</span>
+                                <span class="meta-value">
+                                    {{ g.semaineActuelle ?? '—' }} / {{ g.trimestreActuel ?? '—' }}
+                                </span>
+                            </div>
+                        {% else %}
+                            <div>
+                                <span class="meta-label">Symptômes</span>
+                                <span class="meta-value">
+                                    {{ g.symptomes ?: '—' }}
+                                </span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    {% if bebesData|length > 0 or g.nomBebe %}
+                        <div class="mt-2">
+                            {% if bebesData|length > 0 %}
+                                {% for bebe in bebesData %}
+                                    <span class="baby-pill mb-1">
+                                        👶 {{ bebe.nom ?? 'Bébé' }}
+                                        {% if bebe.poids is defined and bebe.poids is not null %}
+                                            · {{ bebe.poids }} kg
+                                        {% endif %}
+                                    </span>
+                                {% endfor %}
+                            {% else %}
+                                <span class="baby-pill">
+                                    👶 {{ g.nomBebe }}
+                                    {% if g.poidsNaissance %} · {{ g.poidsNaissance }} kg{% endif %}
+                                </span>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <div class="pregnancy-card-actions">
+                        <a href="{{ path('admin_grosesse_show', { id: g.id }) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{{ path('admin_grosesse_edit', { id: g.id }) }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="admin-empty py-5">
+            <i class="fas fa-baby"></i>
+            <p class="mt-2 mb-1">Aucune grossesse enregistrée pour le moment.</p>
+            <p class="text-muted small mb-0">Les grossesses créées côté maman apparaîtront automatiquement ici.</p>
+        </div>
+    {% endif %}
+
+    <script>
+        (function () {
+            const input = document.getElementById('pregnancySearch');
+            const grid = document.getElementById('pregnancyGrid');
+            const cards = grid ? Array.from(grid.querySelectorAll('.pregnancy-card')) : [];
+            const sortButtons = document.querySelectorAll('[data-sort]');
+
+            if (input) {
+                input.addEventListener('input', function (e) {
+                    const term = e.target.value.toLowerCase();
+                    cards.forEach(card => {
+                        const text = card.textContent.toLowerCase();
+                        card.style.display = term === '' || text.includes(term) ? '' : 'none';
+                    });
+                });
+            }
+
+            function sortCards(mode) {
+                if (!grid) return;
+                const sorted = cards.slice().sort((a, b) => {
+                    if (mode === 'date') {
+                        const da = parseInt(a.dataset.created || '0', 10);
+                        const db = parseInt(b.dataset.created || '0', 10);
+                        return db - da; // plus récent d'abord
+                    }
+                    if (mode === 'statut') {
+                        return (a.dataset.statut || '').localeCompare(b.dataset.statut || '');
+                    }
+                    // priorité par défaut
+                    const pa = parseInt(a.dataset.priority || '3', 10);
+                    const pb = parseInt(b.dataset.priority || '3', 10);
+                    return pa - pb;
+                });
+                sorted.forEach(card => grid.appendChild(card));
+            }
+
+            sortButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    sortButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    sortCards(btn.dataset.sort);
+                });
+            });
+        })();
+    </script>
+{% endblock %}

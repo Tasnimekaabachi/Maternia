@@ -21,49 +21,73 @@ class Grosesse
     private bool $connaitDDR = false;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Assert\LessThanOrEqual('today', message: 'La date doit être antérieure ou égale à aujourd’hui.')]
+    #[Assert\GreaterThan('-10 months', message: 'La date ne peut pas être antérieure à 10 mois.')]
     private ?\DateTime $dateDernieresRegles = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Assert\LessThanOrEqual('today', message: 'La date doit être antérieure ou égale à aujourd’hui.')]
+    #[Assert\GreaterThan('-10 months', message: 'La date ne peut pas être antérieure à 10 mois.')]
     private ?\DateTime $dateDebutGrossesse = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\Choice(choices: ['enCours', 'aRisque', 'terminee'], message: 'Choisissez un statut valide.')]
     private ?string $statutGrossesse = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\Choice(choices: ['simple', 'multiple'], message: 'Choisissez un type valide.')]
     private ?string $typeGrossesse = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\Positive(message: 'Le poids doit être positif.')]
+    #[Assert\Range(min: 30, max: 200, notInRangeMessage: 'Le poids doit être entre {{ min }} et {{ max }} kg.')]
     private ?float $poidsActuel = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(max: 2000, maxMessage: 'Les symptômes ne peuvent pas dépasser {{ limit }} caractères.')]
     private ?string $symptomes = null;
 
     #[ORM\Column(nullable: true)]
     private ?float $indiceRisque = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Assert\LessThanOrEqual('today', message: 'La date d’accouchement réelle doit être dans le passé ou aujourd’hui.')]
     private ?\DateTime $dateAccouchementReelle = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\Range(min: 2, max: 5, notInRangeMessage: 'Le nombre de bébés doit être entre {{ min }} et {{ max }}.')]
     private ?int $nombreBebes = null;
 
     #[ORM\Column(length: 200, nullable: true)]
+    #[Assert\Length(min: 2, max: 50, minMessage: 'Le prénom doit contenir au moins {{ limit }} caractères.', maxMessage: 'Le prénom ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $nomBebe = null;
 
-    #[ORM\Column(length: 50, nullable: true)]
+    #[ORM\Column(length: 10, nullable: true)]
+    #[Assert\Choice(choices: ['F', 'M'], message: 'Choisissez un sexe valide.')]
     private ?string $sexeBebe = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\Range(min: 0.5, max: 6, notInRangeMessage: 'Le poids de naissance doit être entre {{ min }} et {{ max }} kg.')]
     private ?float $poidsNaissance = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\Range(min: 25, max: 65, notInRangeMessage: 'La taille de naissance doit être entre {{ min }} et {{ max }} cm.')]
     private ?float $tailleNaissance = null;
 
     #[ORM\Column(length: 100, nullable: true)]
+    #[Assert\Choice(choices: ['sain', 'premature', 'soins', 'autre'], message: 'Choisissez un état valide.')]
     private ?string $etatNaissance = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(max: 3000, maxMessage: 'Le commentaire ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $commentaireGeneral = null;
+
+    /**
+     * Données structurées pour plusieurs bébés (sans nouvelle entité).
+     * Stockées en base dans un champ LONGTEXT (JSON sérialisé).
+     */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $bebes = null;
 
     #[ORM\ManyToOne(inversedBy: 'grosesses')]
     #[ORM\JoinColumn(nullable: false)]
@@ -285,6 +309,27 @@ class Grosesse
         return $this;
     }
 
+    public function getBebes(): array
+    {
+        if ($this->bebes === null || $this->bebes === '') {
+            return [];
+        }
+
+        $decoded = json_decode($this->bebes, true);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    public function setBebes(?array $bebes): static
+    {
+        if ($bebes === null || $bebes === []) {
+            $this->bebes = null;
+        } else {
+            $this->bebes = json_encode($bebes, JSON_THROW_ON_ERROR);
+        }
+
+        return $this;
+    }
+
     public function getMaman(): ?Maman
     {
         return $this->maman;
@@ -365,6 +410,30 @@ class Grosesse
             if ($this->nombreBebes === null || $this->nombreBebes < 2) {
                 $context->buildViolation('Pour une grossesse multiple, indiquez le nombre de bébés (2, 3, ...).')
                     ->atPath('nombreBebes')
+                    ->addViolation();
+            }
+        }
+
+        // Si grossesse terminée, bloc bébé cohérent
+        if ($this->statutGrossesse === 'terminee') {
+            if ($this->dateAccouchementReelle === null) {
+                $context->buildViolation('Veuillez renseigner la date d’accouchement réelle.')
+                    ->atPath('dateAccouchementReelle')
+                    ->addViolation();
+            }
+            if ($this->nomBebe === null || $this->nomBebe === '') {
+                $context->buildViolation('Veuillez renseigner le prénom du bébé.')
+                    ->atPath('nomBebe')
+                    ->addViolation();
+            }
+        }
+
+        // dateAccouchementReelle >= début de grossesse
+        if ($this->dateAccouchementReelle instanceof \DateTimeInterface) {
+            $base = $this->connaitDDR ? $this->dateDernieresRegles : $this->dateDebutGrossesse;
+            if ($base instanceof \DateTimeInterface && $this->dateAccouchementReelle < $base) {
+                $context->buildViolation('La date d’accouchement réelle ne peut pas être avant le début de la grossesse.')
+                    ->atPath('dateAccouchementReelle')
                     ->addViolation();
             }
         }

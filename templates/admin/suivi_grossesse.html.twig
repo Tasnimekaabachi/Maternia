@@ -117,6 +117,90 @@
         </div>
     </div>
 
+    {# Liste des grossesses & bébés #}
+    <div class="admin-card mt-3">
+        <div class="admin-card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <span>Grossesses & bébés</span>
+            <a href="{{ path('admin_grosesse_index') }}" class="btn btn-sm btn-outline-primary">
+                Voir tout le détail
+            </a>
+        </div>
+        <div class="admin-card-body p-0">
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Maman</th>
+                            <th>Statut</th>
+                            <th>Type</th>
+                            <th>Nb bébés</th>
+                            <th>Date début</th>
+                            <th>Date accouchement réelle</th>
+                            <th>Bébés</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% if grossesses is defined and grossesses|length > 0 %}
+                        {% for g in grossesses %}
+                            <tr>
+                                <td>{{ g.id }}</td>
+                                <td>
+                                    {% if g.maman %}
+                                        Maman #{{ g.maman.id }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                                <td>{{ g.statutGrossesse }}</td>
+                                <td>{{ g.typeGrossesse }}</td>
+                                <td>{{ g.nombreBebes ?? '—' }}</td>
+                                <td>
+                                    {% if g.dateDebutGrossesse %}
+                                        {{ g.dateDebutGrossesse|date('d/m/Y') }}
+                                    {% elseif g.dateDernieresRegles %}
+                                        {{ g.dateDernieresRegles|date('d/m/Y') }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ g.dateAccouchementReelle ? g.dateAccouchementReelle|date('d/m/Y') : '—' }}
+                                </td>
+                                <td>
+                                    {% set bebesData = g.bebes %}
+                                    {% if bebesData is iterable and bebesData|length > 0 %}
+                                        {% for bebe in bebesData %}
+                                            👶 {{ bebe.nom ?? 'Bébé' }}
+                                            {% if bebe.poids is defined and bebe.poids is not null %}
+                                                ({{ bebe.poids }} kg)
+                                            {% endif %}
+                                            <br>
+                                        {% endfor %}
+                                    {% elseif g.nomBebe %}
+                                        👶 {{ g.nomBebe }}{% if g.poidsNaissance %} ({{ g.poidsNaissance }} kg){% endif %}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8">
+                                <div class="admin-empty py-4">
+                                    <i class="fas fa-baby"></i>
+                                    <p>Aucune grossesse enregistrée pour le moment.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     {# Stats en bas — répartition groupe sanguin et fumeur #}
     <div class="row g-3 mt-2">
         <div class="col-md-6">

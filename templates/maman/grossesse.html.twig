@@ -64,6 +64,14 @@
                             {% if is_new %}Créer mon suivi de grossesse{% else %}Mettre à jour mon suivi de grossesse{% endif %}
                         </h4>
 
+                        {# Message global si le formulaire a été soumis mais contient des erreurs #}
+                        {% if form.vars.submitted and not form.vars.valid %}
+                            <div class="alert alert-danger">
+                                Certaines informations ne sont pas valides. Merci de corriger les champs indiqués en rouge puis de réessayer.
+                                {{ form_errors(form) }}
+                            </div>
+                        {% endif %}
+
                         {{ form_start(form, {'attr': {'id': 'grossesseForm'}}) }}
 
                             <h5 class="text-primary mb-3"><i class="fas fa-calendar-alt me-2"></i>Début de grossesse</h5>
@@ -105,7 +113,7 @@
                                 <div class="alert alert-info small mb-3">
                                     Cette section s’affiche uniquement si le statut est <strong>Terminée</strong>.
                                 </div>
-                                <div class="row g-3 mb-3">
+                                <div id="singleBabyFields" class="row g-3 mb-3">
                                     <div class="col-md-6">
                                         {{ form_row(form.dateAccouchementReelle) }}
                                     </div>
@@ -125,6 +133,25 @@
                                         {{ form_row(form.tailleNaissance) }}
                                     </div>
                                 </div>
+
+                                {% if form.bebes is defined %}
+                                    <div id="bebesCollectionWrapper" class="mt-3">
+                                        <h6 class="text-primary mb-2"><i class="fas fa-baby-carriage me-2"></i>Bébés de la grossesse</h6>
+                                        <p class="small text-muted mb-2">
+                                            Pour une grossesse multiple, les bébés seront listés ici. Le nombre de blocs est synchronisé avec le champ
+                                            <strong>Nombre de bébés</strong>.
+                                        </p>
+                                        <div id="bebesCollection"
+                                             data-prototype="{{ form_row(form.bebes.vars.prototype)|e('html_attr') }}"
+                                             data-index="{{ form.bebes|length }}">
+                                            {% for bebeForm in form.bebes %}
+                                                <div class="border rounded-3 p-3 mb-2 bebe-item bg-white shadow-sm">
+                                                    {{ form_row(bebeForm) }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <div class="d-flex flex-wrap gap-2 mt-3">
@@ -155,11 +182,57 @@
             const connaitDDR = form.querySelector('[name$="[connaitDDR]"]');
             const statut = form.querySelector('[name$="[statutGrossesse]"]');
             const type = form.querySelector('[name$="[typeGrossesse]"]');
+            const nombreBebesInput = form.querySelector('[name$="[nombreBebes]"]');
 
             const fieldDDR = document.getElementById('fieldDDR');
             const fieldDebut = document.getElementById('fieldDebut');
             const sectionBebe = document.getElementById('sectionBebe');
             const fieldNombreBebes = document.getElementById('fieldNombreBebes');
+            const singleBabyFields = document.getElementById('singleBabyFields');
+            const bebesWrapper = document.getElementById('bebesCollectionWrapper');
+            const bebesList = document.getElementById('bebesCollection');
+
+            let bebesIndex = bebesList ? parseInt(bebesList.getAttribute('data-index') || bebesList.children.length || 0, 10) : 0;
+
+            function addBebeForm() {
+                if (!bebesList) return;
+                const prototype = bebesList.getAttribute('data-prototype');
+                if (!prototype) return;
+                const newFormHtml = prototype.replace(/__name__/g, String(bebesIndex));
+                const wrapper = document.createElement('div');
+                wrapper.className = 'border rounded-3 p-3 mb-2 bebe-item bg-white shadow-sm';
+                wrapper.innerHTML = newFormHtml;
+                bebesList.appendChild(wrapper);
+                bebesIndex++;
+            }
+
+            function syncBebesWithNombre() {
+                if (!type || type.value !== 'multiple') {
+                    return;
+                }
+                if (!nombreBebesInput || !bebesList) {
+                    return;
+                }
+                let desired = parseInt(nombreBebesInput.value || '0', 10);
+                if (isNaN(desired) || desired < 2) {
+                    desired = 2;
+                }
+                if (desired > 5) {
+                    desired = 5;
+                }
+                let current = bebesList.querySelectorAll('.bebe-item').length;
+
+                while (current < desired) {
+                    addBebeForm();
+                    current++;
+                }
+                while (current > desired) {
+                    const last = bebesList.querySelector('.bebe-item:last-of-type');
+                    if (!last) break;
+                    bebesList.removeChild(last);
+                    current--;
+                }
+            }
 
             function toggleDDR() {
                 const useDDR = connaitDDR && connaitDDR.checked;
@@ -175,15 +248,22 @@
             function toggleMultiple() {
                 const isMultiple = type && type.value === 'multiple';
                 if (fieldNombreBebes) fieldNombreBebes.style.display = isMultiple ? '' : 'none';
+                if (bebesWrapper) bebesWrapper.style.display = isMultiple ? '' : 'none';
+                if (singleBabyFields) singleBabyFields.style.display = isMultiple ? 'none' : '';
+                if (isMultiple) {
+                    syncBebesWithNombre();
+                }
             }
 
             if (connaitDDR) connaitDDR.addEventListener('change', toggleDDR);
             if (statut) statut.addEventListener('change', toggleBebe);
             if (type) type.addEventListener('change', toggleMultiple);
+            if (nombreBebesInput) nombreBebesInput.addEventListener('change', syncBebesWithNombre);
 
             toggleDDR();
             toggleBebe();
             toggleMultiple();
+            syncBebesWithNombre();
         })();
     </script>
 {% endblock %}

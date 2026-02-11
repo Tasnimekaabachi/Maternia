@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Maman;
 use App\Form\MamanType;
+use App\Repository\MamanRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,9 +15,28 @@ use Symfony\Component\Routing\Attribute\Route;
 final class MamanController extends AbstractController
 {
     #[Route('', name: 'index', methods: ['GET'])]
-    public function index(): Response
+    public function index(Request $request, MamanRepository $mamanRepository): Response
     {
-        return $this->redirectToRoute('admin_suivi_grossesse', [], Response::HTTP_SEE_OTHER);
+        $groupeSanguin = $request->query->get('groupe_sanguin');
+        $tri = $request->query->get('tri', 'date');
+        $ordre = $request->query->get('ordre', 'DESC');
+
+        $sortBy = $tri === 'taille'
+            ? MamanRepository::SORT_TAILLE
+            : ($tri === 'poids' ? MamanRepository::SORT_POIDS : MamanRepository::SORT_DATE);
+
+        $mamans = $mamanRepository->findForAdmin($groupeSanguin, $sortBy, $ordre);
+        $statsGroupe = $mamanRepository->getStatsByGroupeSanguin();
+        $statsFumeur = $mamanRepository->getStatsByFumeur();
+
+        return $this->render('admin/maman/index.html.twig', [
+            'mamans' => $mamans,
+            'stats_groupe_sanguin' => $statsGroupe,
+            'stats_fumeur' => $statsFumeur,
+            'filtre_groupe' => $groupeSanguin,
+            'tri' => $tri,
+            'ordre' => $ordre,
+        ]);
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]

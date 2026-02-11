@@ -1,0 +1,98 @@
+{{ form_start(form, { attr: { class: 'admin-form' } }) }}
+
+<div class="form-section">
+    <h3 class="form-section-title"><i class="fas fa-calendar-alt"></i> Début de grossesse</h3>
+    <div class="row g-3">
+        <div class="col-md-6">
+            {{ form_row(form.connaitDDR) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.dateDernieresRegles) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.dateDebutGrossesse) }}
+        </div>
+    </div>
+</div>
+
+<div class="form-section">
+    <h3 class="form-section-title"><i class="fas fa-heart"></i> Suivi grossesse</h3>
+    <div class="row g-3">
+        <div class="col-md-4">
+            {{ form_row(form.statutGrossesse) }}
+        </div>
+        <div class="col-md-4">
+            {{ form_row(form.typeGrossesse) }}
+        </div>
+        <div class="col-md-4">
+            {{ form_row(form.nombreBebes) }}
+        </div>
+        <div class="col-md-4">
+            {{ form_row(form.poidsActuel) }}
+        </div>
+        <div class="col-12">
+            {{ form_row(form.symptomes) }}
+        </div>
+        <div class="col-12">
+            {{ form_row(form.commentaireGeneral) }}
+        </div>
+    </div>
+</div>
+
+<div class="form-section">
+    <h3 class="form-section-title"><i class="fas fa-baby"></i> Naissance & bébé</h3>
+    <div class="row g-3">
+        <div class="col-md-6">
+            {{ form_row(form.dateAccouchementReelle) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.nomBebe) }}
+        </div>
+        <div class="col-md-4">
+            {{ form_row(form.sexeBebe) }}
+        </div>
+        <div class="col-md-4">
+            {{ form_row(form.etatNaissance) }}
+        </div>
+        <div class="col-md-4">
+            {{ form_row(form.poidsNaissance) }}
+        </div>
+        <div class="col-md-4">
+            {{ form_row(form.tailleNaissance) }}
+        </div>
+        <div class="col-12">
+            {# Rendu personnalisé de la collection pour éviter les labels "0", "1", ... #}
+            <label class="form-label fw-semibold">Bébés (liste détaillée)</label>
+            <div class="row g-3">
+                {% for bebeForm in form.bebes %}
+                    <div class="col-md-6">
+                        <div class="border rounded-3 p-3 bebe-item bg-white shadow-sm">
+                            <div class="mb-2 fw-semibold">Bébé {{ loop.index }}</div>
+                            {{ form_row(bebeForm) }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="form-section">
+    <h3 class="form-section-title"><i class="fas fa-user"></i> Maman liée</h3>
+    <div class="row g-3">
+        <div class="col-md-6">
+            {{ form_row(form.maman) }}
+        </div>
+    </div>
+</div>
+
+<div class="form-actions d-flex flex-wrap align-items-center gap-2">
+    <button type="submit" class="btn admin-btn-rose">
+        <i class="fas fa-check me-1"></i> {{ button_label|default('Enregistrer') }}
+    </button>
+    <a href="{{ path('admin_grosesse_index') }}" class="btn btn-outline-rose">Annuler</a>
+</div>
+
+{{ form_widget(form._token) }}
+{{ form_end(form, {'render_rest': false}) }}
+

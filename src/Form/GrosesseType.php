@@ -8,6 +8,10 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -23,13 +27,19 @@ class GrosesseType extends AbstractType
                 'required' => false,
                 'label' => 'Je connais la date de mes dernières règles (DDR)',
             ])
-            ->add('dateDernieresRegles', null, [
+            ->add('dateDernieresRegles', DateType::class, [
                 'required' => false,
                 'label' => 'Date des dernières règles (DDR)',
+                'widget' => 'single_text',
+                'format' => 'yyyy-MM-dd',
+                'html5' => true,
             ])
-            ->add('dateDebutGrossesse', null, [
+            ->add('dateDebutGrossesse', DateType::class, [
                 'required' => false,
                 'label' => 'Date de début de grossesse (si DDR inconnue)',
+                'widget' => 'single_text',
+                'format' => 'yyyy-MM-dd',
+                'html5' => true,
             ])
             ->add('statutGrossesse', ChoiceType::class, [
                 'choices' => [
@@ -49,6 +59,10 @@ class GrosesseType extends AbstractType
             ->add('nombreBebes', null, [
                 'required' => false,
                 'label' => 'Nombre de bébés (si multiple)',
+                // HTML5 : commence à 2 pour une grossesse multiple
+                'attr' => [
+                    'min' => 2,
+                ],
             ])
             ->add('poidsActuel', null, [
                 'required' => false,
@@ -60,17 +74,28 @@ class GrosesseType extends AbstractType
                 'attr' => ['rows' => 3],
             ])
             // indiceRisque : calculé automatiquement → pas saisi par la maman
-            ->add('dateAccouchementReelle', null, [
+            ->add('dateAccouchementReelle', DateType::class, [
                 'required' => false,
                 'label' => 'Date d’accouchement réelle',
+                'widget' => 'single_text',
+                'format' => 'yyyy-MM-dd',
+                'html5' => true,
             ])
             ->add('nomBebe', null, [
                 'required' => false,
                 'label' => 'Nom / prénom bébé',
             ])
-            ->add('sexeBebe', null, [
+            ->add('sexeBebe', ChoiceType::class, [
                 'required' => false,
-                'label' => 'Sexe bébé',
+                'label' => 'Sexe du bébé',
+                'choices' => [
+                    'Fille' => 'F',
+                    'Garçon' => 'M',
+                ],
+                // menu déroulant comme typeGrossesse (pas radio)
+                'expanded' => false,
+                'multiple' => false,
+                'placeholder' => 'Sélectionner',
             ])
             ->add('poidsNaissance', null, [
                 'required' => false,
@@ -80,14 +105,32 @@ class GrosesseType extends AbstractType
                 'required' => false,
                 'label' => 'Taille naissance (cm)',
             ])
-            ->add('etatNaissance', null, [
+            ->add('etatNaissance', ChoiceType::class, [
                 'required' => false,
-                'label' => 'État naissance',
+                'label' => 'État de naissance',
+                'choices' => [
+                    'Sain' => 'sain',
+                    'Prématuré' => 'premature',
+                    'Soins' => 'soins',
+                    'Autre' => 'autre',
+                ],
+                // menu déroulant comme sexeBebe
+                'expanded' => false,
+                'multiple' => false,
+                'placeholder' => 'Sélectionner',
             ])
             ->add('commentaireGeneral', TextareaType::class, [
                 'required' => false,
                 'label' => 'Commentaire général',
                 'attr' => ['rows' => 3],
+            ])
+            ->add('bebes', CollectionType::class, [
+                'entry_type' => BebesType::class,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
+                'required' => false,
+                'label' => 'Bébés (liste détaillée)',
             ])
         ;
 
