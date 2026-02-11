@@ -5,7 +5,6 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
-        /* 1. Consistent Flowing Background */
         .login-page-wrapper {
             background: linear-gradient(-45deg, #e0c3fc, #fbc2eb, #a1c4fd, #c2e9fb);
             background-size: 400% 400%;
@@ -23,7 +22,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* 2. High-Contrast Card */
         .auth-card {
             background: #ffffff;
             border-radius: 40px;
@@ -35,44 +33,26 @@
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .auth-card:hover {
-            transform: translateY(-10px);
-        }
+        .auth-card:hover { transform: translateY(-10px); }
 
-        /* 3. Hover Scaling for Textfields */
         .form-control {
             background-color: #f7fafc !important;
             border: 2px solid transparent !important;
             border-radius: 15px !important;
             padding: 15px 20px !important;
-            color: #2d3748;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
 
         .form-control:hover, .form-control:focus {
-            transform: scale(1.03);
+            transform: scale(1.02);
             background-color: #ffffff !important;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            border-color: #fbc2eb !important;
+            box-shadow: 0 0 0 0.25 margin rgba(251, 194, 235, 0.25) !important;
         }
 
-        .form-control:focus {
-            border-color: #f06292 !important;
-            outline: none;
-        }
-
-        /* 4. Typography & Button */
         .welcome-title { color: #4a5568; font-weight: 700; font-size: 2rem; }
         .welcome-title span { color: #d53f8c; }
         
-        .label-custom { 
-            font-size: 0.8rem; 
-            font-weight: 700; 
-            color: #718096; 
-            text-transform: uppercase; 
-            margin-bottom: 8px; 
-            display: block; 
-        }
-
         .btn-login {
             background: linear-gradient(90deg, #ff6b8b 0%, #f06292 100%);
             border: none;
@@ -80,27 +60,62 @@
             color: white;
             font-weight: 700;
             padding: 18px;
-            text-transform: uppercase;
             box-shadow: 0 10px 20px rgba(255, 107, 139, 0.3);
             transition: all 0.3s ease;
-            margin-top: 20px;
         }
 
-        .btn-login:hover {
-            transform: scale(1.05);
-            filter: brightness(1.1);
-            color: white;
-        }
-
-        /* Error Alert Styling */
-        .alert-custom {
-            background-color: #fff5f5;
-            color: #c53030;
-            border-radius: 12px;
+        .btn-face {
+            background: #ffffff;
+            border: 2px solid #a1c4fd;
+            border-radius: 20px;
+            color: #718096;
+            font-weight: 600;
             padding: 12px;
-            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .btn-face:hover {
+            background: #f0f7ff;
+            color: #a1c4fd;
+            transform: scale(1.02);
+        }
+
+        #videoContainer {
+            position: relative;
             margin-bottom: 20px;
-            border: 1px solid #feb2b2;
+            border-radius: 20px;
+            overflow: hidden;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        #videoLogin {
+            width: 100%;
+            background: #2d3748;
+            transform: scaleX(-1);
+        }
+
+        .scan-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            height: 70%;
+            border: 3px dashed rgba(255,255,255,0.6);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .forgot-password-link {
+            color: #718096;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+
+        .forgot-password-link:hover {
+            color: #d53f8c;
         }
     </style>
 {% endblock %}
@@ -108,41 +123,54 @@
 {% block body %}
 <div class="login-page-wrapper">
     <div class="auth-card">
-        <form method="post">
-            <div class="text-center mb-5">
-                <h2 class="welcome-title">Heureuse de vous <span>revoir !</span></h2>
-                <p class="text-muted small">Connectez-vous à votre espace Maternia</p>
-            </div>
+        <div class="text-center mb-4">
+            <h2 class="welcome-title">Heureuse de vous <span>revoir !</span></h2>
+            <p class="text-muted small">Connectez-vous à votre espace Maternia</p>
+        </div>
 
+        {# Zone de Scan Vidéo #}
+        <div id="videoContainer">
+            <video id="videoLogin" autoplay muted playsinline></video>
+            <div class="scan-overlay"></div>
+            <p class="small text-center mt-2 text-primary fw-bold" id="scanStatus">Initialisation de la caméra...</p>
+        </div>
+
+        <form method="post" id="loginForm">
             {% if error %}
-                <div class="alert-custom text-center">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-            {% endif %}
-
-            {% if app.user %}
-                <div class="mb-3 text-center">
-                    Vous êtes connecté en tant que {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Déconnexion</a>
-                </div>
+                <div class="alert alert-danger text-center small" style="border-radius: 15px;">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
             {% endif %}
 
             <div class="mb-4">
-                <label for="inputEmail" class="label-custom">Email</label>
+                <label for="inputEmail" class="label-custom small fw-bold text-muted mb-2">Email</label>
                 <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus placeholder="maman@exemple.com">
             </div>
 
-            <div class="mb-4">
-                <label for="inputPassword" class="label-custom">Mot de passe</label>
+            <div class="mb-2">
+                <label for="inputPassword" class="label-custom small fw-bold text-muted mb-2">Mot de passe</label>
                 <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required placeholder="••••••••">
+            </div>
+
+            {# Lien Mot de passe oublié réintégré #}
+            <div class="text-end mb-4">
+                <a href="{{ path('app_forgot_password') }}" class="forgot-password-link text-decoration-none">
+                    Mot de passe oublié ?
+                </a>
             </div>
 
             <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-            <div class="form-check mb-4">
-                <input type="checkbox" name="_remember_me" id="remember_me" class="form-check-input">
-                <label class="form-check-label small text-muted" for="remember_me">Se souvenir de moi</label>
+            <button class="btn btn-login w-100 mb-3" type="submit">
+                Se connecter <i class="fas fa-sign-in-alt ms-2"></i>
+            </button>
+
+            <div class="divider d-flex align-items-center my-4">
+                <hr class="flex-grow-1" style="color: #cbd5e0;">
+                <span class="mx-3 text-muted small uppercase">ou</span>
+                <hr class="flex-grow-1" style="color: #cbd5e0;">
             </div>
 
-            <button class="btn btn-login w-100" type="submit">
-                Se connecter <i class="fas fa-sign-in-alt ms-2"></i>
+            <button type="button" class="btn btn-face w-100" id="btnFaceScan" onclick="startFaceLogin()">
+                <i class="fas fa-video me-2 text-primary"></i> Se connecter par Face Scan
             </button>
 
             <div class="text-center mt-4">
@@ -151,4 +179,61 @@
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        async function startFaceLogin() {
+            const videoContainer = document.getElementById('videoContainer');
+            const video = document.getElementById('videoLogin');
+            const status = document.getElementById('scanStatus');
+            const loginForm = document.getElementById('loginForm');
+
+            loginForm.style.display = 'none';
+            videoContainer.style.display = 'block';
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                status.innerText = "Cadrez votre visage dans le cercle...";
+
+                setTimeout(() => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    canvas.getContext('2d').drawImage(video, 0, 0);
+
+                    canvas.toBlob(blob => {
+                        const formData = new FormData();
+                        formData.append('photo', blob, 'login.jpg');
+
+                        status.innerText = "Identification en cours...";
+
+                        // On pointe vers la route app_check_face définie dans le SecurityController
+                        fetch("{{ path('app_check_face') }}", {
+                            method: "POST",
+                            body: formData
+                        }).then(response => response.json())
+                        .then(res => {
+                            if (res.success) {
+                                status.innerText = "Succès ! Redirection...";
+                                window.location.href = "{{ path('app_user_profile') }}";
+                            } else {
+                                alert("Erreur : " + res.error);
+                                location.reload();
+                            }
+                        }).catch(err => {
+                            alert("Erreur serveur : " + err.message);
+                            location.reload();
+                        });
+                    }, 'image/jpeg');
+                }, 3000); // 3 secondes pour bien se placer
+
+            } catch (err) {
+                alert("Impossible d'accéder à la caméra : " + err.message);
+                location.reload();
+            }
+        }
+    </script>
 {% endblock %}

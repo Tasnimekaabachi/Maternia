@@ -33,7 +33,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\Column(length: 30)]
+    #[ORM\Column(length: 35)]
     private ?string $nom = null;
 
     #[ORM\Column(length: 30)]
@@ -41,6 +41,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 30)]
     private ?string $type = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $facialId = null;
 
     public function getId(): ?int
     {
@@ -144,6 +147,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setType(string $type): static
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    public function getFacialId(): ?string
+    {
+        return $this->facialId;
+    }
+
+    public function setFacialId(?string $facialId): static
+    {
+        $this->facialId = $facialId;
 
         return $this;
     }

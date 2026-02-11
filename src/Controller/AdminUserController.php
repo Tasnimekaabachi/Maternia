@@ -6,55 +6,97 @@ use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route; 
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[Route('/admin/user')]
 final class AdminUserController extends AbstractController
 {
-    // Change the name from app_admin_user_index to admin_user_index
-    #[Route('', name: 'admin_user_index', methods: ['GET'])]
-    public function index(UserRepository $userRepository): Response
+    /**
+     * Liste des utilisateurs avec recherche et tri
+     */
+    #[Route('/', name: 'admin_user_index', methods: ['GET'])]
+    public function index(Request $request, UserRepository $userRepository): Response
     {
-        // Change template path from 'admin_user/index.html.twig' to 'admin/user/index.html.twig'
+        $query = $request->query->get('q');
+        $sort = $request->query->get('sort', 'id');
+        $direction = $request->query->get('direction', 'ASC');
+
         return $this->render('admin/user/index.html.twig', [
-            'users' => $userRepository->findAll(),
+            'users' => $userRepository->findBySearch($query, $sort, $direction),
+            'last_query' => $query
         ]);
     }
 
-    #[Route('/new', name: 'admin_user_new', methods: ['GET', 'POST'])]
-public function new(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
-{
-    $user = new User();
-    
-    // 1. Initialize required fields that aren't in the form
-    $user->setRoles(['ROLE_USER']);
-    
-    $form = $this->createForm(UserType::class, $user);
-    $form->handleRequest($request);
+    /**
+     * Exportation de la liste actuelle en PDF
+     */
+    #[Route('/export/pdf', name: 'admin_user_pdf', methods: ['GET'])]
+    public function exportPdf(Request $request, UserRepository $userRepository): Response
+    {
+        $query = $request->query->get('q');
+        $sort = $request->query->get('sort', 'id');
+        $direction = $request->query->get('direction', 'ASC');
 
-    if ($form->isSubmitted() && $form->isValid()) {
-        // 2. Set a temporary password if the field is missing from the form
-        // You'll need to inject UserPasswordHasherInterface in the method arguments
-        $hashedPassword = $passwordHasher->hashPassword($user, 'ChangeMe123!');
-        $user->setPassword($hashedPassword);
+        $users = $userRepository->findBySearch($query, $sort, $direction);
 
-        $entityManager->persist($user);
-        $entityManager->flush();
+        $pdfOptions = new Options();
+        $pdfOptions->set('defaultFont', 'Arial');
+        $dompdf = new Dompdf($pdfOptions);
 
-        return $this->redirectToRoute('admin_user_index', [], Response::HTTP_SEE_OTHER);
+        $html = $this->renderView('admin/user/pdf.html.twig', [
+            'users' => $users,
+            'date' => new \DateTime()
+        ]);
+
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        return new Response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="liste_utilisateurs_maternia.pdf"'
+        ]);
     }
 
-    return $this->render('admin/user/new.html.twig', [
-        'user' => $user,
-        'form' => $form,
-    ]);
-}
+    /**
+     * Création d'un nouvel utilisateur
+     */
+    #[Route('/new', name: 'admin_user_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        $user = new User();
+        $user->setRoles(['ROLE_USER']); // Rôle par défaut
+        
+        $form = $this->createForm(UserType::class, $user);
+        $form->handleRequest($request);
 
-    #[Route('/{id}', name: 'admin_user_show', methods: ['GET'])]
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Hachage du mot de passe par défaut
+            $hashedPassword = $passwordHasher->hashPassword($user, 'ChangeMe123!');
+            $user->setPassword($hashedPassword);
+
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('admin_user_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('admin/user/new.html.twig', [
+            'user' => $user,
+            'form' => $form,
+        ]);
+    }
+
+    /**
+     * Affichage d'un utilisateur spécifique
+     */
+    #[Route('/{id}', name: 'admin_user_show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function show(User $user): Response
     {
         return $this->render('admin/user/show.html.twig', [
@@ -62,6 +104,9 @@ public function new(Request $request, EntityManagerInterface $entityManager, Use
         ]);
     }
 
+    /**
+     * Modification d'un utilisateur
+     */
     #[Route('/{id}/edit', name: 'admin_user_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
@@ -70,7 +115,6 @@ public function new(Request $request, EntityManagerInterface $entityManager, Use
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-
             return $this->redirectToRoute('admin_user_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -80,6 +124,9 @@ public function new(Request $request, EntityManagerInterface $entityManager, Use
         ]);
     }
 
+    /**
+     * Suppression d'un utilisateur
+     */
     #[Route('/{id}', name: 'admin_user_delete', methods: ['POST'])]
     public function delete(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {

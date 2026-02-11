@@ -74,14 +74,17 @@
     </div>
     
     <div class="d-flex align-items-center me-4">
-        {% if app.user %}
-            <a href="{{ path('app_logout') }}" class="btn btn-outline-primary btn-border-radius px-3 me-2">Déconnexion</a>
-            <a href="#" class="text-primary"><i class="fas fa-user-circle fa-2x"></i></a>
-        {% else %}
-            <a href="{{ path('app_login') }}" class="btn btn-link text-primary me-2 fw-bold">Connexion</a>
-            <a href="{{ path('app_register') }}" class="btn btn-primary btn-border-radius px-4 py-2 text-white">S'inscrire</a>
-        {% endif %}
-    </div>
+    {% if app.user %}
+        <a href="{{ path('app_logout') }}" class="btn btn-outline-primary btn-border-radius px-3 me-2">Déconnexion</a>
+        {# On remplace le href="#" par le chemin vers le profil #}
+        <a href="{{ path('app_user_profile') }}" class="text-primary">
+            <i class="fas fa-user-circle fa-2x"></i>
+        </a>
+    {% else %}
+        <a href="{{ path('app_login') }}" class="btn btn-link text-primary me-2 fw-bold">Connexion</a>
+        <a href="{{ path('app_register') }}" class="btn btn-primary btn-border-radius px-4 py-2 text-white">S'inscrire</a>
+    {% endif %}
+</div>
 
     <button class="btn-search btn btn-primary btn-md-square rounded-circle" data-bs-toggle="modal" data-bs-target="#searchModal">
         <i class="fas fa-search text-white"></i>

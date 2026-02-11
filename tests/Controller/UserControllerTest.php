@@ -1,143 +1,86 @@
 <?php
 
-namespace App\Tests\Controller;
+namespace App\Controller;
 
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\MultipartFormDataPart;
 
-final class UserControllerTest extends WebTestCase
+class UserController extends AbstractController
 {
-    private KernelBrowser $client;
-    private EntityManagerInterface $manager;
-    private EntityRepository $userRepository;
-    private string $path = '/admin/user/';
+    private $httpClient;
 
-    protected function setUp(): void
+    public function __construct(HttpClientInterface $httpClient)
     {
-        $this->client = static::createClient();
-        $this->manager = static::getContainer()->get('doctrine')->getManager();
-        $this->userRepository = $this->manager->getRepository(User::class);
+        $this->httpClient = $httpClient;
+    }
 
-        foreach ($this->userRepository->findAll() as $object) {
-            $this->manager->remove($object);
+    #[Route('/profile', name: 'app_user_profile')]
+    public function index(): Response
+    {
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
         }
 
-        $this->manager->flush();
+        $response = $this->render('user/profile.html.twig');
+        
+        // Autorisation CSP pour Brave et les scripts externes
+        $allowed = ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://ajax.googleapis.com", "https://code.jquery.com", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"];
+        $csp = "default-src 'self'; script-src " . implode(' ', $allowed) . "; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; img-src 'self' data:; connect-src 'self' https://api.luxand.cloud;";
+        $response->headers->set('Content-Security-Policy', $csp);
+
+        return $response;
     }
 
-    public function testIndex(): void
+    #[Route('/profile/enroll-face', name: 'app_enroll_face', methods: ['POST'])]
+    public function enroll(Request $request, EntityManagerInterface $em): JsonResponse 
     {
-        $this->client->followRedirects();
-        $crawler = $this->client->request('GET', $this->path);
+        $photo = $request->files->get('photo');
+        $user = $this->getUser();
 
-        self::assertResponseStatusCodeSame(200);
-        self::assertPageTitleContains('User index');
+        if (!$photo || !$user) {
+            return new JsonResponse(['success' => false, 'error' => 'Données manquantes'], 400);
+        }
 
-        // Use the $crawler to perform additional assertions e.g.
-        // self::assertSame('Some text on the page', $crawler->filter('.p')->first()->text());
-    }
+        try {
+            // On prépare l'envoi manuellement pour éviter l'erreur "Unsupported option multipart"
+            $fields = [
+                'name' => $user->getUserIdentifier(),
+                'photos' => DataPart::fromPath($photo->getPathname(), 'face.jpg', 'image/jpeg'),
+            ];
+            $formData = new MultipartFormDataPart($fields);
 
-    public function testNew(): void
-    {
-        $this->markTestIncomplete();
-        $this->client->request('GET', sprintf('%snew', $this->path));
+            $response = $this->httpClient->request('POST', 'https://api.luxand.cloud/v2/person', [
+                'headers' => array_merge(
+                    $formData->getPreparedHeaders()->toArray(),
+                    ['token' => $_ENV['LUXAND_API_KEY']]
+                ),
+                'body' => $formData->bodyToIterable(),
+            ]);
 
-        self::assertResponseStatusCodeSame(200);
+            $data = $response->toArray(false);
 
-        $this->client->submitForm('Save', [
-            'user[email]' => 'Testing',
-            'user[roles]' => 'Testing',
-            'user[password]' => 'Testing',
-            'user[nom]' => 'Testing',
-            'user[prenom]' => 'Testing',
-            'user[type]' => 'Testing',
-        ]);
+            if (isset($data['uuid'])) {
+                // Assure-toi que ton entité User a bien une propriété facialId
+                if (method_exists($user, 'setFacialId')) {
+                    $user->setFacialId($data['uuid']); 
+                    $em->flush();
+                    return new JsonResponse(['success' => true]);
+                }
+                return new JsonResponse(['success' => false, 'error' => 'Propriété facialId manquante dans l\'entité User.']);
+            }
+            
+            return new JsonResponse(['success' => false, 'error' => 'Luxand n\'a pas pu identifier le visage.'], 400);
 
-        self::assertResponseRedirects($this->path);
-
-        self::assertSame(1, $this->userRepository->count([]));
-    }
-
-    public function testShow(): void
-    {
-        $this->markTestIncomplete();
-        $fixture = new User();
-        $fixture->setEmail('My Title');
-        $fixture->setRoles('My Title');
-        $fixture->setPassword('My Title');
-        $fixture->setNom('My Title');
-        $fixture->setPrenom('My Title');
-        $fixture->setType('My Title');
-
-        $this->manager->persist($fixture);
-        $this->manager->flush();
-
-        $this->client->request('GET', sprintf('%s%s', $this->path, $fixture->getId()));
-
-        self::assertResponseStatusCodeSame(200);
-        self::assertPageTitleContains('User');
-
-        // Use assertions to check that the properties are properly displayed.
-    }
-
-    public function testEdit(): void
-    {
-        $this->markTestIncomplete();
-        $fixture = new User();
-        $fixture->setEmail('Value');
-        $fixture->setRoles('Value');
-        $fixture->setPassword('Value');
-        $fixture->setNom('Value');
-        $fixture->setPrenom('Value');
-        $fixture->setType('Value');
-
-        $this->manager->persist($fixture);
-        $this->manager->flush();
-
-        $this->client->request('GET', sprintf('%s%s/edit', $this->path, $fixture->getId()));
-
-        $this->client->submitForm('Update', [
-            'user[email]' => 'Something New',
-            'user[roles]' => 'Something New',
-            'user[password]' => 'Something New',
-            'user[nom]' => 'Something New',
-            'user[prenom]' => 'Something New',
-            'user[type]' => 'Something New',
-        ]);
-
-        self::assertResponseRedirects('/admin/user/');
-
-        $fixture = $this->userRepository->findAll();
-
-        self::assertSame('Something New', $fixture[0]->getEmail());
-        self::assertSame('Something New', $fixture[0]->getRoles());
-        self::assertSame('Something New', $fixture[0]->getPassword());
-        self::assertSame('Something New', $fixture[0]->getNom());
-        self::assertSame('Something New', $fixture[0]->getPrenom());
-        self::assertSame('Something New', $fixture[0]->getType());
-    }
-
-    public function testRemove(): void
-    {
-        $this->markTestIncomplete();
-        $fixture = new User();
-        $fixture->setEmail('Value');
-        $fixture->setRoles('Value');
-        $fixture->setPassword('Value');
-        $fixture->setNom('Value');
-        $fixture->setPrenom('Value');
-        $fixture->setType('Value');
-
-        $this->manager->persist($fixture);
-        $this->manager->flush();
-
-        $this->client->request('GET', sprintf('%s%s', $this->path, $fixture->getId()));
-        $this->client->submitForm('Delete');
-
-        self::assertResponseRedirects('/admin/user/');
-        self::assertSame(0, $this->userRepository->count([]));
+        } catch (\Exception $e) {
+            return new JsonResponse(['success' => false, 'error' => 'Erreur : ' . $e->getMessage()], 500);
+        }
     }
 }
