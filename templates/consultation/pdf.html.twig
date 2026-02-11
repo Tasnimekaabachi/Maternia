@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation de rendez-vous - {{ creneau.reference }}</title>
+    <style>
+        body {
+            font-family: 'DejaVu Sans', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #0d6efd;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0d6efd;
+            margin-bottom: 10px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background: #198754;
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .section-title {
+            color: #0d6efd;
+            border-bottom: 2px solid #0d6efd;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .info-item {
+            margin-bottom: 10px;
+        }
+        
+        .label {
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .value {
+            color: #333;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .qrcode {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .important {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        @media print {
+            .no-print {
+                display: none;
+            }
+            
+            body {
+                font-size: 12pt;
+            }
+            
+            .section {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- En-tête -->
+    <div class="header">
+        <div class="logo">MATERNIA</div>
+        <h1>Confirmation de rendez-vous</h1>
+        <p>Votre consultation a été réservée avec succès</p>
+        <div>
+            <strong>Référence :</strong> {{ creneau.reference }}
+            <span class="badge">CONFIRMÉ</span>
+        </div>
+        <p><small>Date d'émission : {{ "now"|date("d/m/Y H:i") }}</small></p>
+    </div>
+
+    <!-- Détails du rendez-vous -->
+    <div class="section">
+        <h2 class="section-title">📅 Détails du rendez-vous</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="label">Médecin :</div>
+                <div class="value">{{ creneau.nomMedecin }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">Spécialité :</div>
+                <div class="value">{{ creneau.consultation.categorie }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">Date :</div>
+                <div class="value">{{ creneau.dateDebut|date('d/m/Y') }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">Heure :</div>
+                <div class="value">{{ creneau.dateDebut|date('H:i') }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">Durée :</div>
+                <div class="value">
+                    {% set difference = creneau.dateFin.diff(creneau.dateDebut) %}
+                    {{ difference.h }}h{{ "%02d"|format(difference.i) }}
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="label">Lieu :</div>
+                <div class="value">Cabinet Maternia<br>123 Rue des Mamans, 75000 Paris</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informations patient -->
+    <div class="section">
+        <h2 class="section-title">👤 Informations patient</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="label">Nom complet :</div>
+                <div class="value">{{ creneau.prenomClient }} {{ creneau.nomClient }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">Email :</div>
+                <div class="value">{{ creneau.emailClient }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">Téléphone :</div>
+                <div class="value">{{ creneau.telephoneClient }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">Type de patient :</div>
+                <div class="value">
+                    {% if creneau.typePatient == 'MAMAN' %}
+                        Maman
+                    {% else %}
+                        Bébé
+                    {% endif %}
+                </div>
+            </div>
+            {% if creneau.typePatient == 'MAMAN' and creneau.moisGrossesse %}
+            <div class="info-item">
+                <div class="label">Mois de grossesse :</div>
+                <div class="value">{{ creneau.moisGrossesse }} mois</div>
+            </div>
+            {% elseif creneau.typePatient == 'BEBE' and creneau.dateNaissanceBebe %}
+            <div class="info-item">
+                <div class="label">Date de naissance :</div>
+                <div class="value">{{ creneau.dateNaissanceBebe|date('d/m/Y') }}</div>
+            </div>
+            {% endif %}
+            <div class="info-item">
+                <div class="label">Date de réservation :</div>
+                <div class="value">{{ creneau.dateReservation|date('d/m/Y H:i') }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informations importantes -->
+    <div class="important">
+        <h3>⚠️ Informations importantes</h3>
+        <ul>
+            <li>Présentez-vous 15 minutes avant l'heure du rendez-vous</li>
+            <li>Apportez votre carte vitale et pièce d'identité</li>
+            <li>En cas d'empêchement, contactez-nous au 01 23 45 67 89</li>
+            <li>Annulation gratuite jusqu'à 24h avant le rendez-vous</li>
+            <li>Un retard de plus de 15 minutes peut entraîner l'annulation du rendez-vous</li>
+        </ul>
+    </div>
+
+    <!-- Code QR (simulé) -->
+    <div class="qrcode">
+        <div style="border: 1px solid #ddd; padding: 10px; display: inline-block;">
+            <div style="font-family: monospace; font-size: 10px; line-height: 1;">
+                ██████████████████████████<br>
+                ██ ▄▄▄▄▄ █▀ █ ▀█▄▄▀ ████<br>
+                ██ █   █ █▄▀█▀▀▀▀█▀▀ ████<br>
+                ██ █▄▄▄█ █ ▄ ▀▄ ▄▀▄ ████<br>
+                ██▄▄▄▄▄▄▄█▄█▄█ █ █▄█ ████<br>
+                ██▄ ▄▀▄▄▄ ▄ ▄▀▀▄▄▄▀ ▀▀███<br>
+                ██▀▀▄▄▀▄▀ ▀▀ ▄▀▄▀▄ ▀ ████<br>
+                ██ ▄▄▄▄▄ █▄▀▄ ▀ █▄█  ████<br>
+                ██ █   █ █▀ ██▀ ▄ ▄█▄████<br>
+                ██ █▄▄▄█ █ ▀▄▀ ▀ ▀▀ █████<br>
+                ██▄▄▄▄▄▄▄█▄▄▄█▄▄▄▄█▄▄████<br>
+            </div>
+            <div style="margin-top: 10px; font-size: 12px;">
+                Code QR pour vérification<br>
+                Référence: {{ creneau.reference }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Pied de page -->
+    <div class="footer">
+        <p><strong>MATERNIA - Centre de santé maternelle et infantile</strong></p>
+        <p>123 Rue des Mamans, 75000 Paris | Tél: 01 23 45 67 89 | Email: contact@maternia.fr</p>
+        <p>www.maternia.fr | SIRET: 123 456 789 00012 | N° d'agrément: AG-12345-2024</p>
+        <p style="margin-top: 20px; font-style: italic;">
+            Ce document a été généré automatiquement. Il fait foi de confirmation de rendez-vous.
+        </p>
+        <div class="no-print" style="margin-top: 20px;">
+            <button onclick="window.print()" style="padding: 10px 20px; background: #0d6efd; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                🖨️ Imprimer ce document
+            </button>
+        </div>
+    </div>
+</body>
+</html>
