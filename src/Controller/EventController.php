@@ -65,17 +65,14 @@ class EventController extends AbstractController
         $event = new Event();
         $form = $this->createForm(EventType::class, $event);
 
-        // Get existing images from img directory for the gallery
         $existingImages = $this->getExistingImages();
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Handle image selection
             $selectedImage = $form->get('selectedImage')->getData();
 
             if ($selectedImage) {
-                // Use selected existing image
                 $event->setImage($selectedImage);
             }
 
@@ -99,17 +96,14 @@ class EventController extends AbstractController
         $event = new Event();
         $form = $this->createForm(EventType::class, $event);
 
-        // Get existing images from img directory for the gallery
         $existingImages = $this->getExistingImages();
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Handle image selection
             $selectedImage = $form->get('selectedImage')->getData();
 
             if ($selectedImage) {
-                // Use selected existing image
                 $event->setImage($selectedImage);
             }
 
@@ -146,15 +140,12 @@ class EventController extends AbstractController
     #[Route('/admin/event/{id}/edit', name: 'app_event_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
-        // Store current image for comparison
         $currentImage = $event->getImage();
 
         $form = $this->createForm(EventType::class, $event);
 
-        // Get existing images from img directory for the gallery
         $existingImages = $this->getExistingImages();
 
-        // Set initial value for selectedImage if event has an image
         if ($currentImage) {
             $form->get('selectedImage')->setData($currentImage);
         }
@@ -162,14 +153,11 @@ class EventController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Handle image selection
             $selectedImage = $form->get('selectedImage')->getData();
 
             if ($selectedImage && $selectedImage !== $currentImage) {
-                // Use selected existing image (different from current)
                 $event->setImage($selectedImage);
             }
-            // If no image is selected, keep the current one
 
             $entityManager->flush();
 
@@ -207,10 +195,6 @@ class EventController extends AbstractController
             'limit' => $limit
         ]);
     }
-
-    /**
-     * Get existing images from the img directory for gallery
-     */
     private function getExistingImages(): array
     {
         $images = [];
@@ -224,7 +208,6 @@ class EventController extends AbstractController
                 $images[] = $file->getFilename();
             }
 
-            // Sort alphabetically
             sort($images);
         }
 

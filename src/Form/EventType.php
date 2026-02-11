@@ -43,7 +43,6 @@ class EventType extends AbstractType
                 'placeholder' => 'Choisissez une catégorie',
                 'label' => 'Catégorie',
             ])
-            // Add field for selecting existing images
             ->add('selectedImage', HiddenType::class, [
                 'mapped' => false,
                 'required' => false,
