@@ -28,60 +28,92 @@
 
     .stat-card-premium {
         background: white;
-        border-radius: 24px;
-        padding: 2rem;
+        border-radius: 20px;
+        padding: 1.5rem;
         border: 1px solid #FCE4EC;
-        box-shadow: 0 10px 25px rgba(255, 138, 171, 0.08);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 25px rgba(255, 138, 171, 0.05);
+        transition: all 0.3s ease;
+        text-align: center;
         position: relative;
         overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-
-    .stat-card-premium:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 15px 35px rgba(255, 138, 171, 0.15);
     }
 
     .stat-card-premium .label {
-        font-size: 0.85rem;
+        font-size: 0.75rem;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 1px;
         color: #A0A0A0;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
     }
 
     .stat-card-premium .value {
-        font-size: 2.5rem;
+        font-size: 2rem;
         font-weight: 800;
         color: #4A4A4A;
     }
 
-    .stat-card-premium::after {
-        content: '';
+    /* RECHERCHE & TRIS (DESIGN SPÉCIFIQUE) */
+    .search-box {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    .search-box i {
         position: absolute;
-        bottom: 0; left: 0; width: 100%; height: 6px;
-        background: var(--gradient-feminine);
-        opacity: 0.6;
+        left: 12px;
+        color: #9ca3af;
+        font-size: 0.85rem;
+    }
+    .search-input {
+        border: 2px solid #e5e7eb;
+        border-radius: 25px;
+        padding: 6px 14px 6px 34px;
+        font-size: 0.85rem;
+        width: 200px;
+        transition: all 0.3s;
+        outline: none;
+        background: #fafbfc;
+    }
+    .search-input:focus {
+        border-color: var(--primary-pink);
+        width: 260px;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(255, 138, 171, 0.1);
     }
 
+    .sort-group { display: flex; gap: 4px; }
+    .sort-btn {
+        border: 2px solid #e5e7eb;
+        background: white;
+        border-radius: 8px;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: #6b7280;
+    }
+    .sort-btn:hover { border-color: var(--primary-pink); color: var(--primary-pink); }
+    .sort-btn.active {
+        background: var(--gradient-feminine);
+        color: white;
+        border-color: transparent;
+    }
+    .sort-arrow { font-size: 0.7rem; }
+
     .admin-card {
-        background: var(--glass-white);
-        backdrop-filter: blur(10px);
+        background: white;
         border-radius: 24px;
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+        border: 1px solid #FCE4EC;
+        box-shadow: 0 15px 35px rgba(255, 138, 171, 0.05);
         overflow: hidden;
         margin-top: 2rem;
     }
 
     .admin-card-header {
-        padding: 1.5rem 2.5rem;
-        background: white;
+        padding: 1.25rem 2rem;
         border-bottom: 1px solid #FCE4EC;
         display: flex;
         justify-content: space-between;
@@ -90,185 +122,109 @@
         gap: 1rem;
     }
 
-    .search-input-wrapper {
-        position: relative;
-        min-width: 300px;
-    }
-
-    .search-input-wrapper i {
-        position: absolute;
-        left: 1.25rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--primary-pink);
-    }
-
-    .search-input {
-        width: 100%;
-        padding: 0.75rem 1rem 0.75rem 3rem;
-        border-radius: 50px;
-        border: 1px solid #FCE4EC;
-        background: #FDF2F8;
-        font-size: 0.9rem;
-        transition: all 0.3s;
-    }
-
-    .search-input:focus {
-        background: white;
-        border-color: var(--primary-pink);
-        box-shadow: 0 0 0 4px rgba(255, 138, 171, 0.1);
-        outline: none;
-    }
-
-    .premium-table {
-        margin-bottom: 0;
-    }
-
     .premium-table th {
         background: #FDF2F8;
-        padding: 1.25rem 1.5rem;
+        padding: 1rem 1.5rem;
         text-transform: uppercase;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         font-weight: 700;
         letter-spacing: 1px;
         color: #db2777;
-        border: none;
-        cursor: pointer;
-    }
-
-    .premium-table th:hover {
-        background: #FCE4EC;
     }
 
     .premium-table td {
         padding: 1.25rem 1.5rem;
         vertical-align: middle;
         border-bottom: 1px solid #F3E5F5;
-        color: #4A4A4A;
-        font-size: 0.95rem;
-    }
-
-    .premium-table tr:hover td {
-        background: #FFF9FB;
+        font-size: 0.9rem;
     }
 
     .doctor-profile {
         display: flex;
         align-items: center;
-        gap: 1rem;
+        gap: 0.75rem;
     }
 
     .pdp-wrapper {
-        width: 48px;
-        height: 48px;
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
         overflow: hidden;
-        border: 3px solid white;
-        box-shadow: 0 4px 10px rgba(255, 138, 171, 0.2);
+        border: 2px solid white;
+        box-shadow: 0 3px 8px rgba(255, 138, 171, 0.2);
         background: var(--gradient-feminine);
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
         font-weight: 700;
-        font-size: 1.1rem;
     }
 
-    .pdp-wrapper img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
+    .pdp-wrapper img { width: 100%; height: 100%; object-fit: cover; }
 
     .badge-pink-soft {
         background: #FCE4EC;
         color: #db2777;
         border: 1px solid #fbcfe8;
-        padding: 0.5rem 1rem;
+        padding: 4px 12px;
         border-radius: 50px;
         font-weight: 600;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
     }
 
     .time-badge {
         display: inline-flex;
         flex-direction: column;
-        align-items: center;
-        padding: 0.5rem 1rem;
-        border-radius: 12px;
-        min-width: 80px;
-        border: 1px solid #fbcfe8;
-    }
-
-    .time-badge.debut { background: #E8F5E9; color: #2E7D32; border-color: #C8E6C9; }
-    .time-badge.fin { background: #FFF5F5; color: #D32F2F; border-color: #FFCDD2; }
-
-    .time-badge .label { font-size: 0.6rem; text-transform: uppercase; font-weight: 800; }
-    .time-badge .value { font-size: 0.9rem; font-weight: 700; }
-
-    .btn-action {
-        width: 36px;
-        height: 36px;
+        padding: 4px 10px;
         border-radius: 10px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s;
-        border: none;
-        background: white;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        min-width: 70px;
+        text-align: center;
     }
+    .time-badge.debut { background: #E8F5E9; color: #2E7D32; border: 1px solid #C8E6C9; }
+    .time-badge.fin { background: #FFF5F5; color: #D32F2F; border: 1px solid #FFCDD2; }
+    .time-badge .label { font-size: 0.55rem; text-transform: uppercase; font-weight: 800; }
+    .time-badge .value { font-size: 0.85rem; font-weight: 700; }
 
-    .btn-view { color: #4A90E2; }
-    .btn-edit { color: #FF8AAB; }
-    .btn-delete { color: #FF5252; }
-
-    .btn-action:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    .btn-action-circle {
+        width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+        background: white; border: 1px solid #FCE4EC; transition: all 0.2s; text-decoration: none; font-size: 0.8rem;
     }
+    .btn-action-view { color: #4dabf7; }
+    .btn-action-edit { color: #FF8AAB; }
+    .btn-action-delete { color: #fa5252; }
+    .btn-action-circle:hover { background: #FDF2F8; transform: scale(1.1); }
 
     .btn-feminine {
         background: var(--gradient-feminine);
         color: white;
         border-radius: 50px;
-        padding: 0.75rem 2rem;
+        padding: 0.6rem 1.5rem;
         font-weight: 700;
         border: none;
-        box-shadow: 0 10px 20px rgba(255, 138, 171, 0.3);
-        transition: all 0.3s;
+        box-shadow: 0 5px 15px rgba(255, 138, 171, 0.2);
     }
-
-    .btn-feminine:hover {
-        transform: scale(1.05) translateY(-2px);
-        box-shadow: 0 15px 30px rgba(255, 138, 171, 0.4);
-        color: white;
-    }
+    .btn-feminine:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 138, 171, 0.3); color: white; }
 
     .statut-badge {
-        padding: 0.4rem 0.8rem;
+        padding: 4px 10px;
         border-radius: 50px;
         font-weight: 700;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
     }
-
     .statut-dispo { background: #E8F5E9; color: #2E7D32; }
     .statut-reserve { background: #FFF3E0; color: #E65100; }
-
-    /* PDF STYLE OVERRIDE */
-    #pdf-content { font-family: 'Inter', sans-serif; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 {% endblock %}
 
 {% block header_actions %}
-<div class="d-flex gap-3">
-    <button onclick="exportPDF()" class="btn btn-outline-danger" style="border-radius: 50px; padding: 0.75rem 1.5rem;">
-        <i class="fas fa-file-pdf me-2"></i> Exporter PDF
+<div class="d-flex gap-2">
+    <button onclick="exportPDF()" class="btn btn-outline-danger" style="border-radius: 8px; font-weight: 600; padding: 0.5rem 1rem;">
+        <i class="fas fa-file-pdf me-1"></i> PDF
     </button>
     <a href="{{ path('app_admin_consultation_creneau_new') }}" class="btn btn-feminine">
-        <i class="fas fa-plus-circle me-2"></i> Ajouter un créneau
+        <i class="fas fa-plus-circle me-1"></i> Nouveau créneau
     </a>
 </div>
 {% endblock %}
@@ -276,8 +232,8 @@
 {% block content %}
 <div class="index-container">
     <div class="container">
-        {# SECTION STATISTIQUES #}
-        <div class="row g-4 mb-4">
+        {# STATS #}
+        <div class="row g-3 mb-4">
             {% set total = creneaux|length %}
             {% set dispo = creneaux|filter(c => c.statutReservation == 'DISPONIBLE')|length %}
             {% set res = total - dispo %}
@@ -289,40 +245,49 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="stat-card-premium" style="border-color: #A5D6A7;">
-                    <div class="label" style="color: #2E7D32;">Disponibles</div>
-                    <div class="value" style="color: #2E7D32;">{{ dispo }}</div>
+                <div class="stat-card-premium" style="border-bottom: 3px solid #4CAF50;">
+                    <div class="label" style="color: #4CAF50;">Disponibles</div>
+                    <div class="value">{{ dispo }}</div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="stat-card-premium" style="border-color: #FFAB91;">
-                    <div class="label" style="color: #D84315;">Réservés</div>
-                    <div class="value" style="color: #D84315;">{{ res }}</div>
+                <div class="stat-card-premium" style="border-bottom: 3px solid #FF5252;">
+                    <div class="label" style="color: #FF5252;">Réservés</div>
+                    <div class="value">{{ res }}</div>
                 </div>
             </div>
         </div>
 
-        {# SECTION LISTE #}
         <div class="admin-card">
             <div class="admin-card-header">
-                <h2 class="h5 mb-0 fw-bold">
-                    <i class="fas fa-calendar-heart me-2" style="color: var(--primary-pink);"></i>
-                    Gestion des Rendez-vous
-                </h2>
-                <div class="search-input-wrapper">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="slotSearch" class="search-input" placeholder="Rechercher un médecin ou une spécialité...">
+                <h5 class="mb-0 fw-bold">Gestion des rendez-vous</h5>
+                <div class="d-flex gap-3 align-items-center">
+                    {# RECHERCHE #}
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="creneauSearch" class="search-input" placeholder="Rechercher...">
+                    </div>
+                    {# TRIS #}
+                    <div class="sort-group">
+                        <button class="sort-btn active" onclick="sortTable(0, this)" title="Trier par médecin">
+                            <i class="fas fa-user-md"></i> <i class="fas fa-arrow-up sort-arrow"></i>
+                        </button>
+                        <button class="sort-btn" onclick="sortTable(1, this)" title="Trier par date">
+                            <i class="fas fa-calendar-alt"></i> <i class="fas fa-arrow-up sort-arrow"></i>
+                        </button>
+                    </div>
+                    <span class="badge bg-danger rounded-pill px-3">{{ total }}</span>
                 </div>
             </div>
             <div class="table-responsive">
                 <table class="table premium-table" id="slotsTable">
                     <thead>
                         <tr>
-                            <th onclick="sortTable(0)">Médecin & Type <i class="fas fa-sort small ms-1 opacity-50"></i></th>
-                            <th onclick="sortTable(1)">Date <i class="fas fa-sort small ms-1 opacity-50"></i></th>
+                            <th>Médecin & Type</th>
+                            <th>Jour</th>
                             <th>Début</th>
                             <th>Fin</th>
-                            <th onclick="sortTable(4)">Statut <i class="fas fa-sort small ms-1 opacity-50"></i></th>
+                            <th class="text-center">Statut</th>
                             <th class="text-end">Actions</th>
                         </tr>
                     </thead>
@@ -357,40 +322,26 @@
                             <td>
                                 <div class="time-badge debut">
                                     <span class="label">H. Début</span>
-                                    <span class="value">{{ creneau.heureDebut ? creneau.heureDebut|date('H:i') : (creneau.dateDebut ? creneau.dateDebut|date('H:i') : '-') }}</span>
+                                    <span class="value">{{ creneau.heureDebut ? creneau.heureDebut|date('H:i') : '-' }}</span>
                                 </div>
                             </td>
                             <td>
                                 <div class="time-badge fin">
                                     <span class="label">H. Fin</span>
-                                    <span class="value">{{ creneau.heureFin ? creneau.heureFin|date('H:i') : (creneau.dateFin ? creneau.dateFin|date('H:i') : '-') }}</span>
+                                    <span class="value">{{ creneau.heureFin ? creneau.heureFin|date('H:i') : '-' }}</span>
                                 </div>
                             </td>
-                            <td>
+                            <td class="text-center">
                                 <span class="statut-badge {% if creneau.statutReservation == 'DISPONIBLE' %}statut-dispo{% else %}statut-reserve{% endif %}">
-                                    <i class="fas {% if creneau.statutReservation == 'DISPONIBLE' %}fa-check-circle{% else %}fa-clock{% endif %} me-2"></i>
                                     {{ creneau.statutReservation }}
                                 </span>
                             </td>
                             <td class="text-end">
                                 <div class="d-flex justify-content-end gap-2">
-                                    <a href="{{ path('app_admin_consultation_creneau_show', {'id': creneau.id}) }}" class="btn-action btn-view" title="Détails">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{{ path('app_admin_consultation_creneau_edit', {'id': creneau.id}) }}" class="btn-action btn-edit" title="Modifier">
-                                        <i class="fas fa-pen"></i>
-                                    </a>
-                                    <button class="btn-action btn-delete" title="Supprimer" onclick="confirmDelete('{{ path('app_admin_consultation_creneau_delete', {'id': creneau.id}) }}', '{{ csrf_token('delete' ~ creneau.id) }}', this.closest('tr'))">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                    <a href="{{ path('app_admin_consultation_creneau_show', {'id': creneau.id}) }}" class="btn-action-circle btn-action-view"><i class="fas fa-eye"></i></a>
+                                    <a href="{{ path('app_admin_consultation_creneau_edit', {'id': creneau.id}) }}" class="btn-action-circle btn-action-edit"><i class="fas fa-pen"></i></a>
+                                    <button class="btn-action-circle btn-action-delete" title="Supprimer" onclick="confirmDelete('{{ path('app_admin_consultation_creneau_delete', {'id': creneau.id}) }}', '{{ csrf_token('delete' ~ creneau.id) }}', this.closest('tr'))"><i class="fas fa-trash"></i></button>
                                 </div>
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="6" class="text-center py-5 text-muted">
-                                <i class="fas fa-calendar-times mb-3 opacity-25" style="font-size: 3rem;"></i>
-                                <p>Aucun créneau programmé pour le moment.</p>
                             </td>
                         </tr>
                         {% endfor %}
@@ -401,29 +352,27 @@
     </div>
 </div>
 
-{# CONTENU HIDDEN POUR EXPORT PDF #}
+{# PDF CONTENT #}
 <div id="pdfContent" style="display: none;">
     <div style="padding: 40px; font-family: sans-serif;">
-        <h1 style="color: #FF8AAB; border-bottom: 2px solid #FCE4EC; padding-bottom: 10px;">Rapport des Créneaux - Maternia</h1>
-        <p>Date: {{ "now"|date('d/m/Y H:i') }}</p>
+        <h1 style="color: #FF8AAB;">Rapport des Créneaux - Maternia</h1>
+        <hr>
         <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
             <thead>
                 <tr style="background: #FDF2F8;">
-                    <th style="padding: 10px; border: 1px solid #FCE4EC;">Médecin</th>
-                    <th style="padding: 10px; border: 1px solid #FCE4EC;">Spécialité</th>
-                    <th style="padding: 10px; border: 1px solid #FCE4EC;">Date</th>
-                    <th style="padding: 10px; border: 1px solid #FCE4EC;">Début</th>
-                    <th style="padding: 10px; border: 1px solid #FCE4EC;">Statut</th>
+                    <th style="padding: 10px; border: 1px solid #EEE;">Médecin</th>
+                    <th style="padding: 10px; border: 1px solid #EEE;">Date</th>
+                    <th style="padding: 10px; border: 1px solid #EEE;">Début</th>
+                    <th style="padding: 10px; border: 1px solid #EEE;">Statut</th>
                 </tr>
             </thead>
             <tbody>
-                {% for creneau in creneaux %}
+                {% for c in creneaux %}
                 <tr>
-                    <td style="padding: 10px; border: 1px solid #FCE4EC;">{{ creneau.nomMedecin }}</td>
-                    <td style="padding: 10px; border: 1px solid #FCE4EC;">{{ creneau.consultation.categorie }}</td>
-                    <td style="padding: 10px; border: 1px solid #FCE4EC;">{{ creneau.jour ? creneau.jour|date('d/m/Y') : '-' }}</td>
-                    <td style="padding: 10px; border: 1px solid #FCE4EC;">{{ creneau.heureDebut ? creneau.heureDebut|date('H:i') : '-' }}</td>
-                    <td style="padding: 10px; border: 1px solid #FCE4EC;">{{ creneau.statutReservation }}</td>
+                    <td style="padding: 10px; border: 1px solid #EEE;">{{ c.nomMedecin }}</td>
+                    <td style="padding: 10px; border: 1px solid #EEE;">{{ c.jour ? c.jour|date('d/m/Y') : '-' }}</td>
+                    <td style="padding: 10px; border: 1px solid #EEE;">{{ c.heureDebut ? c.heureDebut|date('H:i') : '-' }}</td>
+                    <td style="padding: 10px; border: 1px solid #EEE;">{{ c.statutReservation }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -432,20 +381,23 @@
 </div>
 
 <script>
-    // RECHERCHE EN TEMPS RÉEL
-    document.getElementById('slotSearch').addEventListener('keyup', function() {
-        const query = this.value.toLowerCase();
-        const rows = document.querySelectorAll('.creneau-row');
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(query) ? '' : 'none';
+    // RECHERCHE
+    document.getElementById('creneauSearch').addEventListener('keyup', function() {
+        const q = this.value.toLowerCase();
+        document.querySelectorAll('.creneau-row').forEach(row => {
+            row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
         });
     });
 
-    // TRI DU TABLEAU
-    function sortTable(n) {
+    // TRI
+    function sortTable(n, btn) {
         const table = document.getElementById("slotsTable");
         let switching = true, i, x, y, shouldSwitch, dir = "asc", switchcount = 0;
+        
+        document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const arrow = btn.querySelector('.sort-arrow');
+
         while (switching) {
             switching = false;
             const rows = table.rows;
@@ -454,13 +406,9 @@
                 x = rows[i].getElementsByTagName("TD")[n];
                 y = rows[i+1].getElementsByTagName("TD")[n];
                 if (dir == "asc") {
-                    if (x.textContent.toLowerCase() > y.textContent.toLowerCase()) {
-                        shouldSwitch = true; break;
-                    }
+                    if (x.textContent.toLowerCase() > y.textContent.toLowerCase()) { shouldSwitch = true; break; }
                 } else {
-                    if (x.textContent.toLowerCase() < y.textContent.toLowerCase()) {
-                        shouldSwitch = true; break;
-                    }
+                    if (x.textContent.toLowerCase() < y.textContent.toLowerCase()) { shouldSwitch = true; break; }
                 }
             }
             if (shouldSwitch) {
@@ -468,53 +416,45 @@
                 switching = true;
                 switchcount++;
             } else if (switchcount == 0 && dir == "asc") {
-                dir = "desc"; switching = true;
+                dir = "desc";
+                switching = true;
+                arrow.className = "fas fa-arrow-down sort-arrow";
+            } else if (dir == "desc") {
+                arrow.className = "fas fa-arrow-down sort-arrow";
+            } else {
+                arrow.className = "fas fa-arrow-up sort-arrow";
             }
         }
     }
 
-    // SUPPRESSION
-    function confirmDelete(url, token, row) {
-        Swal.fire({
-            title: 'Action Irréversible ?',
-            text: "Ce créneau sera supprimé définitivement.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#FF5C8D',
-            cancelButtonColor: '#B0B0B0',
-            confirmButtonText: 'Oui, supprimer',
-            cancelButtonText: 'Annuler',
-            borderRadius: '24px'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const formData = new FormData();
-                formData.append('_token', token);
-                fetch(url, { method: 'POST', body: formData, headers: {'X-Requested-With': 'XMLHttpRequest'} })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        row.classList.add('animate__animated', 'animate__fadeOutLeft');
-                        setTimeout(() => row.remove(), 500);
-                        Swal.fire({ title: '✨ Supprimé !', icon: 'success', confirmButtonColor: '#FF8AAB', timer: 1500, showConfirmButton: false });
-                    }
-                });
-            }
-        });
-    }
-
-    // EXPORT PDF
+    // PDF
     function exportPDF() {
         const element = document.getElementById('pdfContent');
         element.style.display = 'block';
-        const opt = {
-            margin: 10,
-            filename: 'maternia_creneaux.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-        };
-        html2pdf().from(element).set(opt).save().then(() => {
-            element.style.display = 'none';
+        html2pdf().from(element).set({
+            margin: 10, filename: 'maternia_creneaux.pdf',
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        }).save().then(() => element.style.display = 'none');
+    }
+
+    // DELETE
+    function confirmDelete(url, token, row) {
+        Swal.fire({
+            title: 'Action Irréversible ?', text: "Ce créneau sera supprimé définitivement.",
+            icon: 'warning', showCancelButton: true, confirmButtonColor: '#FF5C8D', cancelButtonColor: '#B0B0B0',
+            confirmButtonText: 'Oui, supprimer', borderRadius: '24px'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const formData = new FormData(); formData.append('_token', token);
+                fetch(url, { method: 'POST', body: formData, headers: {'X-Requested-With': 'XMLHttpRequest'} })
+                .then(r => r.json()).then(data => {
+                    if (data.success) {
+                        row.classList.add('animate__animated', 'animate__fadeOutLeft');
+                        setTimeout(() => row.remove(), 500);
+                        Swal.fire({ title: '✨ Supprimé !', icon: 'success', timer: 1500, showConfirmButton: false });
+                    }
+                });
+            }
         });
     }
 </script>
