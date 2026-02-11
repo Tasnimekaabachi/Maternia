@@ -192,28 +192,22 @@
     .btn-action-view { color: #4dabf7; }
     .btn-action-edit { color: #FF8AAB; }
     .btn-action-delete { color: #fa5252; }
-    .btn-action-circle:hover { background: #FDF2F8; transform: scale(1.1); }
-
-    .btn-feminine {
-        background: var(--gradient-feminine);
-        color: white;
-        border-radius: 50px;
-        padding: 0.6rem 1.5rem;
-        font-weight: 700;
-        border: none;
-        box-shadow: 0 5px 15px rgba(255, 138, 171, 0.2);
+    .progress-bar-premium {
+        height: 6px; background: #F3F4F6; border-radius: 10px; overflow: hidden; margin-top: 10px;
     }
-    .btn-feminine:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 138, 171, 0.3); color: white; }
+    .progress-fill-rose { background: var(--gradient-feminine); height: 100%; }
 
-    .statut-badge {
-        padding: 4px 10px;
-        border-radius: 50px;
-        font-weight: 700;
-        font-size: 0.7rem;
+    .chart-container-premium {
+        background: white; border-radius: 20px; padding: 1.5rem; border: 1px solid #FCE4EC;
+        box-shadow: 0 10px 25px rgba(255, 138, 171, 0.05); height: 320px;
     }
-    .statut-dispo { background: #E8F5E9; color: #2E7D32; }
-    .statut-reserve { background: #FFF3E0; color: #E65100; }
+
+    .top-rank-card {
+        padding: 0.8rem 1.2rem; background: #FFF9FA; border-radius: 12px; margin-bottom: 0.5rem;
+        display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--primary-pink);
+    }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 {% endblock %}
@@ -232,28 +226,62 @@
 {% block content %}
 <div class="index-container">
     <div class="container">
-        {# STATS #}
-        <div class="row g-3 mb-4">
-            {% set total = creneaux|length %}
-            {% set dispo = creneaux|filter(c => c.statutReservation == 'DISPONIBLE')|length %}
-            {% set res = total - dispo %}
-            
-            <div class="col-md-4">
-                <div class="stat-card-premium">
-                    <div class="label">Total Créneaux</div>
-                    <div class="value">{{ total }}</div>
+        {# SECTION STATS WAW #}
+        {% set occRate = stats.total > 0 ? (stats.reserves / stats.total * 100)|round(1) : 0 %}
+
+        <div class="row g-4 mb-5">
+            {# CHIFFRES CLÉS #}
+            <div class="col-lg-3">
+                <div class="d-flex flex-column gap-3">
+                    <div class="stat-card-premium">
+                        <div class="label">Capacité Totale</div>
+                        <div class="value">{{ stats.total }}</div>
+                        <div class="progress-bar-premium"><div class="progress-fill-rose" style="width: 100%"></div></div>
+                    </div>
+                    <div class="stat-card-premium">
+                        <div class="label">Taux d'Occupation</div>
+                        <div class="value">{{ occRate }}%</div>
+                        <div class="progress-bar-premium"><div class="progress-fill-rose" style="width: {{ occRate }}%"></div></div>
+                    </div>
+                    <div class="stat-card-premium">
+                        <div class="label" style="color: #4CAF50;">Créneaux Libres</div>
+                        <div class="value" style="color: #4CAF50;">{{ stats.disponibles }}</div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="stat-card-premium" style="border-bottom: 3px solid #4CAF50;">
-                    <div class="label" style="color: #4CAF50;">Disponibles</div>
-                    <div class="value">{{ dispo }}</div>
+
+            {# GRAPHIQUE DONUT #}
+            <div class="col-lg-4">
+                <div class="chart-container-premium">
+                    <h6 class="fw-bold mb-3 text-muted" style="font-size: 0.75rem; text-transform: uppercase;">Répartition Disponibilité</h6>
+                    <div style="height: 230px;"><canvas id="occupancyChart"></canvas></div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="stat-card-premium" style="border-bottom: 3px solid #FF5252;">
-                    <div class="label" style="color: #FF5252;">Réservés</div>
-                    <div class="value">{{ res }}</div>
+
+            {# GRAPHIQUE ACTIVITÉ #}
+            <div class="col-lg-5">
+                <div class="chart-container-premium">
+                    <h6 class="fw-bold mb-3 text-muted" style="font-size: 0.75rem; text-transform: uppercase;">Activité Hebdomadaire</h6>
+                    <div style="height: 230px;"><canvas id="activityChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        {# TOP PRATICIENS #}
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="admin-card mt-0" style="background: var(--soft-pink); border-color: var(--primary-pink);">
+                    <div class="p-4 text-center">
+                        <h6 class="fw-bold mb-4" style="color: #db2777;">🔥 Nos Praticiens les plus actifs dans l'agenda</h6>
+                        <div class="d-flex justify-content-center flex-wrap gap-4">
+                            {% for medecin, count in stats.topMedecins %}
+                                <div class="top-rank-card shadow-sm" style="background: white; min-width: 220px; border-radius: 15px;">
+                                    <span class="fw-bold">{{ medecin }}</span>
+                                    <span class="badge rounded-pill bg-danger" style="font-size: 0.8rem;">{{ count }} créneaux</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -276,7 +304,7 @@
                             <i class="fas fa-calendar-alt"></i> <i class="fas fa-arrow-up sort-arrow"></i>
                         </button>
                     </div>
-                    <span class="badge bg-danger rounded-pill px-3">{{ total }}</span>
+                    <span class="badge bg-danger rounded-pill px-3">{{ stats.total }}</span>
                 </div>
             </div>
             <div class="table-responsive">
@@ -457,6 +485,69 @@
             }
         });
     }
+
+    // --- CHARTS WAW INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const chartColors = {
+            pink: '#FF8AAB',
+            green: '#4CAF50',
+            violet: '#E1BEE7',
+            light: '#F3F4F6'
+        };
+
+        const ctxOcc = document.getElementById('occupancyChart');
+        if (ctxOcc) {
+            new Chart(ctxOcc, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Réservés', 'Libres'],
+                    datasets: [{
+                        data: [{{ stats.reserves }}, {{ stats.disponibles }}],
+                        backgroundColor: [chartColors.pink, chartColors.green],
+                        borderWidth: 0,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '80%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true, font: { weight: '700' } } }
+                    }
+                }
+            });
+        }
+
+        const ctxAct = document.getElementById('activityChart');
+        if (ctxAct) {
+            new Chart(ctxAct, {
+                type: 'bar',
+                data: {
+                    labels: {{ parJourLabels|json_encode|raw }},
+                    datasets: [{
+                        label: 'Créneaux par jour',
+                        data: {{ parJourValues|json_encode|raw }},
+                        backgroundColor: chartColors.pink + '99',
+                        borderColor: chartColors.pink,
+                        borderWidth: 2,
+                        borderRadius: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { display: false } },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+    });
 </script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 {% endblock %}

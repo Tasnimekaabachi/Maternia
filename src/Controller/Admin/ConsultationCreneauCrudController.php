@@ -18,11 +18,62 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ConsultationCreneauCrudController extends AbstractController
 {
     #[Route('/', name: 'app_admin_consultation_creneau_index', methods: ['GET'])]
-    public function index(ConsultationCreneauRepository $creneauRepository): Response
+    public function index(ConsultationCreneauRepository $creneauRepository, ConsultationRepository $consultationRepository): Response
     {
+        $creneaux = $creneauRepository->findAllOrdered();
+        
+        // --- STATISTIQUES "WAW" ---
+        $stats = [
+            'total' => count($creneaux),
+            'disponibles' => 0,
+            'reserves' => 0,
+            'parJour' => [], // Pour le graphique d'activité hebdomadaire
+            'topMedecins' => [], // Pour le classement
+        ];
+
+        $days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+        foreach ($days as $day) { $stats['parJour'][$day] = 0; }
+
+        foreach ($creneaux as $c) {
+            // Disponibilité
+            if ($c->getStatutReservation() === 'DISPONIBLE') {
+                $stats['disponibles']++;
+            } else {
+                $stats['reserves']++;
+            }
+
+            // Répartition par jour (si renseigné)
+            if ($c->getJour()) {
+                $dayNameFr = $this->getFrenchDayName($c->getJour());
+                if (isset($stats['parJour'][$dayNameFr])) {
+                    $stats['parJour'][$dayNameFr]++;
+                }
+            }
+
+            // Top Médecins
+            $medName = $c->getNomMedecin() ?: 'Inconnu';
+            $stats['topMedecins'][$medName] = ($stats['topMedecins'][$medName] ?? 0) + 1;
+        }
+
+        arsort($stats['topMedecins']);
+        $stats['topMedecins'] = array_slice($stats['topMedecins'], 0, 5);
+
         return $this->render('admin/consultation_creneau/index.html.twig', [
-            'creneaux' => $creneauRepository->findAllOrdered(),
+            'creneaux' => $creneaux,
+            'stats' => $stats,
+            'parJourLabels' => array_keys($stats['parJour']),
+            'parJourValues' => array_values($stats['parJour']),
         ]);
+    }
+
+    private function getFrenchDayName(\DateTimeInterface $date): string
+    {
+        $days = [
+            'Sunday' => 'Dimanche', 'Monday' => 'Lundi', 'Tuesday' => 'Mardi',
+            'Wednesday' => 'Mercredi', 'Thursday' => 'Jeudi', 'Friday' => 'Vendredi',
+            'Saturday' => 'Samedi'
+        ];
+        return $days[$date->format('l')] ?? $date->format('l');
     }
 
     #[Route('/new', name: 'app_admin_consultation_creneau_new', methods: ['GET', 'POST'])]
