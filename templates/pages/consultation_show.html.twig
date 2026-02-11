@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ consultation.categorie }}{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <h1 class="text-primary">{{ consultation.categorie }}</h1>
+
+    <img src="{{ asset('uploads/consultations/' ~ consultation.image) }}"
+         class="img-fluid my-4"
+         alt="{{ consultation.categorie }}">
+
+    <p class="lead">{{ consultation.description }}</p>
+
+    <a href="{{ path('appointment_form', {id: consultation.id}) }}"
+       class="btn btn-primary">
+        Réserver maintenant
+    </a>
+</div>
+{% endblock %}

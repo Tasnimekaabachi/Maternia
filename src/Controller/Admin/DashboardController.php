@@ -15,6 +15,15 @@ final class DashboardController extends AbstractController
         return $this->render('admin/dashboard.html.twig');
     }
 
+    // Supprimez la route consultations existante car maintenant
+    // elle sera gérée par le CRUDController
+    // #[Route('/consultations', name: 'consultations', methods: ['GET'])]
+    // public function consultations(): Response
+    // {
+    //     return $this->render('admin/consultations.html.twig');
+    // }
+
+    // Gardez les autres routes...
     #[Route('/suivi-grossesse', name: 'suivi_grossesse', methods: ['GET'])]
     public function suiviGrossesse(): Response
     {
@@ -31,12 +40,6 @@ final class DashboardController extends AbstractController
     public function evenements(): Response
     {
         return $this->render('admin/evenements.html.twig');
-    }
-
-    #[Route('/consultations', name: 'consultations', methods: ['GET'])]
-    public function consultations(): Response
-    {
-        return $this->render('admin/consultations.html.twig');
     }
 
     #[Route('/profil-bebe', name: 'profil_bebe', methods: ['GET'])]

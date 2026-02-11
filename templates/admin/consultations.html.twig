@@ -12,38 +12,147 @@
 {% endblock %}
 
 {% block header_actions %}
-    <button type="button" class="btn btn-primary admin-btn-primary">
-        <i class="fas fa-plus me-1"></i> Nouveau rendez-vous
-    </button>
+    <div class="d-flex gap-2">
+        <a href="{{ path('admin_consultations_new') }}" class="btn btn-primary admin-btn-primary">
+            <i class="fas fa-plus me-1"></i> Nouvelle catégorie
+        </a>
+        <a href="{{ path('admin_creneaux_new') }}" class="btn btn-success">
+            <i class="fas fa-calendar-plus me-1"></i> Nouveau créneau
+        </a>
+    </div>
 {% endblock %}
 
 {% block content %}
-    <div class="admin-card">
-        <div class="admin-card-header">Rendez-vous & consultations</div>
-        <div class="admin-card-body p-0">
-            <div class="table-responsive">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Patient(e)</th>
-                            <th>Date & heure</th>
-                            <th>Type</th>
-                            <th>Statut</th>
-                            <th width="120"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="5">
-                                <div class="admin-empty py-4">
-                                    <i class="fas fa-stethoscope"></i>
-                                    <p>Aucune consultation enregistrée.</p>
-                                    <button type="button" class="btn btn-primary admin-btn-primary">Créer un rendez-vous</button>
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="admin-card">
+                <div class="admin-card-header">Liste des consultations</div>
+                <div class="admin-card-body p-0">
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Catégorie</th>
+                                    <th>Pour</th>
+                                    <th>Statut</th>
+                                    <th>Ordre</th>
+                                    <th width="120">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for consultation in consultations %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ consultation.categorie }}</strong>
+                                            {% if consultation.icon %}
+                                                <i class="{{ consultation.icon }} ms-2"></i>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge 
+                                                {% if consultation.pour == 'BEBE' %}bg-info
+                                                {% elseif consultation.pour == 'MAMAN' %}bg-pink
+                                                {% else %}bg-purple{% endif %}">
+                                                {{ consultation.pour }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if consultation.statut %}
+                                                <span class="badge bg-success">Actif</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Inactif</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ consultation.ordreAffichage }}</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{{ path('admin_consultations_show', {'id': consultation.id}) }}" 
+                                                   class="btn btn-outline-primary" title="Voir">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{{ path('admin_consultations_edit', {'id': consultation.id}) }}" 
+                                                   class="btn btn-outline-secondary" title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <form method="post" action="{{ path('admin_consultations_delete', {'id': consultation.id}) }}" 
+                                                      onsubmit="return confirm('Supprimer cette catégorie ?');" style="display: inline;">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ consultation.id) }}">
+                                                    <button class="btn btn-outline-danger" title="Supprimer">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="admin-empty py-4">
+                                                <i class="fas fa-stethoscope"></i>
+                                                <p>Aucune catégorie de consultation.</p>
+                                                <a href="{{ path('admin_consultations_new') }}" class="btn btn-primary admin-btn-primary">
+                                                    Créer une catégorie
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="admin-card">
+                <div class="admin-card-header">Derniers créneaux</div>
+                <div class="admin-card-body">
+                    <a href="{{ path('admin_creneaux_index') }}" class="btn btn-sm btn-outline-primary mb-3 float-end">
+                        Voir tous <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                    
+                    {% set derniers_creneaux = [] %}
+                    {% for consultation in consultations %}
+                        {% for creneau in consultation.consultationCreneaus|slice(0, 3) %}
+                            {% set derniers_creneaux = derniers_creneaux|merge([creneau]) %}
+                        {% endfor %}
+                    {% endfor %}
+                    
+                    {% if derniers_creneaux|length > 0 %}
+                        <div class="list-group">
+                            {% for creneau in derniers_creneaux|slice(0, 5) %}
+                                <div class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ creneau.nomMedecin }}</h6>
+                                        <small>{{ creneau.dateDebut|date('d/m H:i') }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ creneau.consultation.categorie }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small>
+                                            {% if creneau.statutReservation == 'DISPONIBLE' %}
+                                                <span class="badge bg-success">Disponible</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">Réservé</span>
+                                            {% endif %}
+                                        </small>
+                                        <a href="{{ path('admin_creneaux_show', {'id': creneau.id}) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-external-link-alt"></i>
+                                        </a>
+                                    </div>
                                 </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-calendar-times fa-2x text-muted mb-3"></i>
+                            <p class="text-muted">Aucun créneau programmé</p>
+                            <a href="{{ path('admin_creneaux_new') }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus me-1"></i> Ajouter un créneau
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>

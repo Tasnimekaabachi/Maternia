@@ -1,0 +1,494 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Modifier le créneau{% endblock %}
+{% block page_title %}Modifier le créneau{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* DESIGN ÉLÉGANT ROSE & BLEU (Ref. Consultation CRUD) */
+    /* DESIGN ÉLÉGANT & FÉMININ (Refined Palette) */
+    :root {
+        --primary-pink: #FF8AAB;
+        --soft-pink: #FFD1DC;
+        --deep-pink: #FF5C8D;
+        --rose-gold: #E5A29D;
+        --lavender: #E1BEE7;
+        --glass-white: rgba(255, 255, 255, 0.9);
+        --gradient-feminine: linear-gradient(135deg, #FF8AAB 0%, #E1BEE7 100%);
+        --gradient-soft: linear-gradient(135deg, #FFF5F5 0%, #FCE4EC 100%);
+    }
+
+    .new-consultation-container {
+        background: var(--gradient-soft);
+        min-height: 100vh;
+        padding: 3rem 0;
+    }
+
+    .glass-card {
+        background: var(--glass-white);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 20px 40px rgba(255, 138, 171, 0.1);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .header-gradient {
+        background: var(--gradient-feminine);
+        padding: 3rem 2rem;
+        color: white;
+        position: relative;
+    }
+
+    .header-gradient::after {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 0; right: 0; height: 50px;
+        background: linear-gradient(to top, var(--glass-white), transparent);
+    }
+
+    .section-container {
+        padding: 2.5rem;
+    }
+
+    .section-title {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-bottom: 2.5rem;
+        font-weight: 700;
+        color: #4A4A4A;
+        font-size: 1.3rem;
+        letter-spacing: 0.5px;
+    }
+
+    .section-title::before {
+        content: '';
+        position: absolute;
+        left: 0; top: 0; bottom: 0; width: 6px;
+        background: var(--gradient-feminine);
+        border-radius: 10px;
+    }
+
+    .modern-input {
+        border: 1px solid #F3E5F5;
+        border-radius: 14px;
+        padding: 0.85rem 1.2rem;
+        font-size: 0.95rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        width: 100%;
+        background-color: #FFFFFF;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .modern-input:focus {
+        border-color: var(--primary-pink);
+        box-shadow: 0 0 0 4px rgba(255, 138, 171, 0.15);
+        transform: translateY(-1px);
+        outline: none;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #6D6D6D;
+        margin-bottom: 0.6rem;
+        font-size: 0.88rem;
+        display: block;
+    }
+
+    .input-with-icon i {
+        position: absolute;
+        left: 1.2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary-pink);
+        z-index: 2;
+        font-size: 0.95rem;
+        opacity: 0.8;
+    }
+
+    .input-with-icon .modern-input {
+        padding-left: 3.2rem;
+    }
+
+    .doctor-card {
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 20px;
+        padding: 2.5rem;
+        border: 1px dashed var(--soft-pink);
+        transition: all 0.3s ease;
+    }
+
+    .doctor-card:hover {
+        border-style: solid;
+        background: white;
+        box-shadow: 0 10px 20px rgba(255, 138, 171, 0.05);
+    }
+
+    .btn-modern {
+        padding: 0.85rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        border: none;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        letter-spacing: 0.5px;
+    }
+
+    .btn-primary-modern {
+        background: var(--gradient-feminine);
+        color: white;
+        box-shadow: 0 10px 20px rgba(255, 138, 171, 0.3);
+    }
+
+    .btn-primary-modern:hover {
+        transform: scale(1.03) translateY(-3px);
+        box-shadow: 0 15px 25px rgba(255, 138, 171, 0.4);
+        color: white;
+    }
+
+    .creneau-item {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid #FCE4EC;
+        position: relative;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+
+    .remove-creneau {
+        position: absolute;
+        top: -12px;
+        right: -12px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #FF5252;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: 3px solid white;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        box-shadow: 0 4px 10px rgba(255, 82, 82, 0.3);
+    }
+
+    .remove-creneau:hover {
+        transform: rotate(90deg) scale(1.1);
+        background: #D32F2F;
+    }
+
+    .add-btn-wrapper {
+        border: 2px dashed #F8BBD0;
+        border-radius: 20px;
+        padding: 2.5rem;
+        text-align: center;
+        background: rgba(252, 228, 236, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .add-btn-wrapper:hover {
+        border-color: var(--primary-pink);
+        background: rgba(252, 228, 236, 0.5);
+    }
+
+    /* FLATPICKR CUSTOMIZATION */
+    .flatpickr-calendar {
+        background: #fff;
+        box-shadow: 0 15px 35px rgba(255, 138, 171, 0.15) !important;
+        border: 1px solid #FCE4EC !important;
+        border-radius: 16px !important;
+    }
+
+    .flatpickr-day.selected {
+        background: var(--primary-pink) !important;
+        border-color: var(--primary-pink) !important;
+    }
+
+    .flatpickr-months .flatpickr-month {
+        background: var(--gradient-feminine);
+        border-radius: 16px 16px 0 0;
+    }</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="new-consultation-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="glass-card">
+                    <div class="header-gradient text-center">
+                        <div class="position-absolute top-0 start-0 p-3">
+                            <a href="{{ path('app_admin_consultation_creneau_index') }}" class="text-white opacity-75 hover-opacity-100 text-decoration-none small">
+                                <i class="fas fa-chevron-left me-1"></i> Retour aux consultations
+                            </a>
+                        </div>
+                        <i class="fas fa-edit fa-3x mb-3"></i>
+                        <h1 class="h2 fw-bold mb-1">Modifier le Créneau #{{ creneau.id }}</h1>
+                        <p class="mb-0 opacity-90">Mise à jour manuelle des informations</p>
+                    </div>
+
+                    <div class="section-container">
+                        {{ form_start(form, {'attr': {'class': 'form-modern', 'novalidate': 'novalidate'}}) }}
+                        
+                        <div class="mb-5">
+                            <h3 class="section-title">Informations du Médecin & Consultation</h3>
+                            <div class="doctor-card">
+                                <div class="row g-4">
+                                    <div class="col-md-12">
+                                        <label class="form-label">Type de Consultation *</label>
+                                        <div class="input-with-icon">
+                                            <i class="fas fa-stethoscope"></i>
+                                            {{ form_widget(form.consultation, {'attr': {'class': 'form-select modern-input'}}) }}
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Nom du Médecin *</label>
+                                        <div class="input-with-icon">
+                                            <i class="fas fa-user-md"></i>
+                                            {{ form_widget(form.nomMedecin, {'attr': {'class': 'form-control modern-input'}}) }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label class="form-label">Spécialité</label>
+                                        <div class="input-with-icon">
+                                            <i class="fas fa-award"></i>
+                                            {{ form_widget(form.specialiteMedecin, {'attr': {'class': 'form-control modern-input'}}) }}
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label class="form-label">Photo du Médecin (URL ou nom de fichier)</label>
+                                        <div class="input-with-icon">
+                                            <i class="fas fa-image"></i>
+                                            {{ form_widget(form.photoMedecin, {'attr': {'class': 'form-control modern-input'}}) }}
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label class="form-label">Description du Médecin</label>
+                                        <div class="input-with-icon">
+                                            <i class="fas fa-align-left" style="top: 20px; transform: none;"></i>
+                                            {{ form_widget(form.descriptionMedecin, {'attr': {'class': 'form-control modern-input', 'rows': '3'}}) }}
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label">Jour</label>
+                                        {{ form_widget(form.jour, {'attr': {'class': 'form-control modern-input datepicker'}}) }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">H. Début</label>
+                                        {{ form_widget(form.heureDebut, {'attr': {'class': 'form-control modern-input timepicker'}}) }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">H. Fin</label>
+                                        {{ form_widget(form.heureFin, {'attr': {'class': 'form-control modern-input timepicker'}}) }}
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label">Durée (min)</label>
+                                        {{ form_widget(form.dureeMinutes, {'attr': {'class': 'form-control modern-input'}}) }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Nombre de places</label>
+                                        {{ form_widget(form.nombrePlaces, {'attr': {'class': 'form-control modern-input'}}) }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Statut</label>
+                                        {{ form_widget(form.statutReservation, {'attr': {'class': 'form-select modern-input'}}) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h3 class="section-title">Ajouter d'autres créneaux pour ce médecin</h3>
+                            
+                            <div id="creneaux-container" 
+                                 data-prototype="{{ form_widget(form.creneauxHoraires.vars.prototype)|e('html_attr') }}" 
+                                 data-index="{{ form.creneauxHoraires|length }}">
+                            </div>
+                            
+                            <div class="add-btn-wrapper mt-3">
+                                <button type="button" id="add-creneau" class="btn btn-primary-modern btn-modern">
+                                    <i class="fas fa-plus me-2"></i>
+                                    Ajouter un autre horaire spécifique
+                                </button>
+                            </div>
+                        </div>
+
+                        {% if creneau.statutReservation == 'RESERVE' or creneau.reservation %}
+                        <div class="mb-4">
+                            <h3 class="section-title">Détails de la réservation</h3>
+                            <div class="p-4 rounded-4 bg-white border">
+                                {{ form_widget(form.reservation) }}
+                            </div>
+                        </div>
+                        {% else %}
+                             {% do form.reservation.setRendered() %}
+                        {% endif %}
+
+                        <div class="mt-5 pt-4 border-top d-flex justify-content-between">
+                            <a href="{{ path('app_admin_consultation_creneau_index') }}" class="btn btn-light btn-modern">
+                                <i class="fas fa-times me-2"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary-modern btn-modern">
+                                <i class="fas fa-save me-2"></i> Enregistrer les modifications
+                            </button>
+                        </div>
+
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Function to calculate end time
+        function calculateHeureFin(containerElement, isMain = false) {
+            const dureeInput = document.querySelector('[id$="_dureeMinutes"]');
+            let debutInput, finInput;
+
+            if (isMain) {
+                debutInput = document.querySelector('[id$="_heureDebut"]:not([id*="_creneauxHoraires_"])');
+                finInput = document.querySelector('[id$="_heureFin"]:not([id*="_creneauxHoraires_"])');
+            } else {
+                debutInput = containerElement.querySelector('[id$="_heureDebut"]');
+                finInput = containerElement.querySelector('[id$="_heureFin"]');
+            }
+
+            if (debutInput && debutInput.value && dureeInput && dureeInput.value && finInput) {
+                const [hours, minutes] = debutInput.value.split(':').map(Number);
+                const duree = parseInt(dureeInput.value);
+                
+                const date = new Date();
+                date.setHours(hours);
+                date.setMinutes(minutes + duree);
+                
+                const newHours = String(date.getHours()).padStart(2, '0');
+                const newMinutes = String(date.getMinutes()).padStart(2, '0');
+                
+                if (finInput._flatpickr) {
+                    finInput._flatpickr.setDate(`${newHours}:${newMinutes}`);
+                } else {
+                    finInput.value = `${newHours}:${newMinutes}`;
+                }
+            }
+        }
+
+        // Init flatpickr for the single slot fields (Edit mode main slot)
+        flatpickr(".datepicker", { 
+            locale: "fr", 
+            dateFormat: "Y-m-d", 
+            altInput: true, 
+            altFormat: "j F Y",
+            disableMobile: "true"
+        });
+        
+        flatpickr(".timepicker", { 
+            enableTime: true, 
+            noCalendar: true, 
+            dateFormat: "H:i", 
+            altInput: true,
+            altFormat: "h:i K",
+            time_24hr: false,
+            minuteIncrement: 5,
+            disableMobile: "true",
+            onClose: function(selectedDates, dateStr, instance) {
+                if (instance.element.id.includes('heureDebut')) {
+                    calculateHeureFin(null, true);
+                }
+            }
+        });
+
+        const container = document.getElementById('creneaux-container');
+        const addButton = document.getElementById('add-creneau');
+
+        if (container && addButton) {
+            let index = parseInt(container.dataset.index) || 0;
+            
+            function addCreneau() {
+                const prototype = container.dataset.prototype;
+                const newForm = prototype.replace(/__name__/g, index);
+                
+                const wrapper = document.createElement('div');
+                wrapper.className = 'creneau-item';
+                wrapper.innerHTML = `
+                    <div class="remove-creneau"><i class="fas fa-times"></i></div>
+                    <div class="row g-3">
+                        ${newForm}
+                    </div>
+                `;
+                
+                container.appendChild(wrapper);
+                
+                const inputs = wrapper.querySelectorAll('input');
+                inputs.forEach(input => {
+                    input.className = 'form-control modern-input';
+                    if (input.id.includes('jour')) {
+                        flatpickr(input, { 
+                            locale: "fr", 
+                            dateFormat: "Y-m-d", 
+                            altInput: true, 
+                            altFormat: "j F Y",
+                            disableMobile: "true"
+                        });
+                    } else if (input.id.includes('heure')) {
+                        flatpickr(input, { 
+                            enableTime: true, 
+                            noCalendar: true, 
+                            dateFormat: "H:i", 
+                            altInput: true,
+                            altFormat: "h:i K",
+                            time_24hr: false,
+                            minuteIncrement: 5,
+                            disableMobile: "true",
+                            onClose: function(selectedDates, dateStr, instance) {
+                                if (instance.element.id.includes('heureDebut')) {
+                                    calculateHeureFin(wrapper);
+                                }
+                            }
+                        });
+                    }
+                });
+
+                index++;
+                container.dataset.index = index;
+            }
+
+            addButton.addEventListener('click', addCreneau);
+
+            container.addEventListener('click', function(e) {
+                if (e.target.closest('.remove-creneau')) {
+                    e.target.closest('.creneau-item').remove();
+                }
+            });
+        }
+
+        // Global listeners
+        const dureeGlobal = document.querySelector('[id$="_dureeMinutes"]');
+        if (dureeGlobal) {
+            dureeGlobal.addEventListener('change', function() {
+                // Recalculate main slot
+                calculateHeureFin(null, true);
+                // Recalculate all collection slots
+                if (container) {
+                    const items = container.querySelectorAll('.creneau-item');
+                    items.forEach(item => calculateHeureFin(item));
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

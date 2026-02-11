@@ -36,7 +36,9 @@
                     <i class="fas fa-calendar-alt"></i>
                     Événements
                 </a>
-                <a href="{{ path('admin_consultations') }}" class="nav-link {{ app.request.attributes.get('_route') == 'admin_consultations' ? 'active' : '' }}">
+                <!-- LIGNE MODIFIÉE - Consultation CRUD -->
+                <a href="{{ path('app_admin_consultation_index') }}" 
+                   class="nav-link {{ app.request.attributes.get('_route') starts with 'app_admin_consultation' ? 'active' : '' }}">
                     <i class="fas fa-stethoscope"></i>
                     Consultations
                 </a>
