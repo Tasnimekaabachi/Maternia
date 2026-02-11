@@ -1,0 +1,57 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Nouvel événement - Administration{% endblock %}
+{% block page_title %}Créer un événement{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
+        <span>/</span>
+        <a href="{{ path('admin_evenements') }}">Événements & Catégories</a>
+        <span>/</span>
+        <a href="{{ path('app_event_index') }}">Événements</a>
+        <span>/</span>
+        <span class="current">Nouveau</span>
+    </div>
+{% endblock %}
+
+{% block header_actions %}
+    <a href="{{ path('app_event_index') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Retour
+    </a>
+{% endblock %}
+
+{% block content %}
+    <div class="admin-card">
+        <div class="admin-card-header p-4 border-bottom">
+            <h5 class="mb-0 fw-bold text-primary">
+                <i class="fas fa-plus-circle me-2"></i>Nouvel événement
+            </h5>
+        </div>
+        <div class="admin-card-body p-4">
+            {{ include('admin/event/_form.html.twig') }}
+        </div>
+        <div class="admin-card-footer p-4 border-top bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{{ path('app_event_index') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times me-1"></i> Annuler
+                </a>
+                <button type="submit" form="event-form" class="btn btn-primary admin-btn-primary">
+                    <i class="fas fa-check me-1"></i> Créer l'événement
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .admin-btn-primary {
+            background-color: #ec4899;
+            border-color: #ec4899;
+            color: white;
+        }
+        .admin-btn-primary:hover {
+            background-color: #be185d;
+            border-color: #be185d;
+        }
+    </style>
+{% endblock %}

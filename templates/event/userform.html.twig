@@ -1,0 +1,1055 @@
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{{ form_start(form, {'attr': {'class': 'event-form', 'id': 'event-form', 'novalidate': 'novalidate'}}) }}
+
+<div class="form-sections">
+    <!-- Section 1: Informations de base -->
+    <div class="form-section">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <h3>Informations de base</h3>
+        </div>
+        
+        <div class="section-content">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="form-group">
+                        {{ form_label(form.title, 'Titre de l\'événement', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.title, {'attr': {
+                            'class': 'form-control ' ~ (form.title.vars.valid ? '' : 'is-invalid'),
+                            'placeholder': 'Entrez le titre de votre événement'
+                        }}) }}
+                        <div class="form-hint">
+                            <i class="fas fa-lightbulb"></i>
+                            <span>Un titre clair et attractif qui donne envie</span>
+                        </div>
+                        {{ form_errors(form.title) }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.description, {'attr': {
+                    'class': 'form-control ' ~ (form.description.vars.valid ? '' : 'is-invalid'),
+                    'rows': 5,
+                    'placeholder': 'Décrivez votre événement en détail...'
+                }}) }}
+                <div class="form-hint with-counter">
+                    <i class="fas fa-align-left"></i>
+                    <span>Détails, programme, intervenants, informations importantes</span>
+                    <span class="char-counter">0/1000</span>
+                </div>
+                {{ form_errors(form.description) }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 2: Photos de l'événement -->
+    <div class="form-section">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="fas fa-images"></i>
+            </div>
+            <h3>Photos de l'événement</h3>
+        </div>
+        
+        <div class="section-content">
+            <!-- Hidden form field for selected image -->
+            {{ form_widget(form.selectedImage, {'attr': {'class': 'd-none', 'id': 'event_selectedImage'}}) }}
+            {{ form_errors(form.selectedImage) }}
+            
+            <!-- Image Gallery -->
+            {% if existingImages is defined and existingImages|length > 0 %}
+            <div class="form-group">
+                <label class="form-label">Sélectionnez une image</label>
+                
+                <div class="image-gallery-container">
+                    <!-- Gallery View -->
+                    <div class="image-gallery-view active" id="galleryView">
+                        <div class="gallery-grid">
+                            {% for image in existingImages %}
+                                <div class="gallery-item" data-image="{{ image }}">
+                                    <div class="gallery-card {% if form.selectedImage.vars.value is defined and form.selectedImage.vars.value == image %}selected{% endif %}">
+                                        <img src="{{ asset('img/events/' ~ image) }}" 
+                                             alt="{{ image }}"
+                                             class="gallery-image"
+                                             onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" fill=\"%23f0f0f0\"/><text x=\"50\" y=\"50\" text-anchor=\"middle\" dy=\".3em\" font-family=\"Arial\" font-size=\"10\" fill=\"%23999\">Image</text></svg>';">
+                                        <div class="gallery-overlay">
+                                            <button type="button" class="btn-select-image">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </div>
+                                        <div class="gallery-check">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Sélectionnez une image pour votre événement</span>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="no-images-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Aucune image disponible dans le dossier. Veuillez ajouter des images dans le dossier /public/img/.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Section 3: Date et heure -->
+    <div class="form-section">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <h3>Date et heure</h3>
+        </div>
+        
+        <div class="section-content">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.startAt.vars.id }}" class="form-label">
+                            <i class="fas fa-play-circle"></i>
+                            Date et heure de début
+                        </label>
+                        <div class="datetime-card">
+                            <div class="datetime-input-wrapper">
+                                {{ form_widget(form.startAt, {'attr': {
+                                    'class': 'form-control datetime-input ' ~ (form.startAt.vars.valid ? '' : 'is-invalid'),
+                                    'placeholder': 'YYYY-MM-DD HH:MM'
+                                }}) }}
+                                <button type="button" class="datetime-trigger" data-target="{{ form.startAt.vars.id }}">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </button>
+                            </div>
+                            <div class="datetime-preview" id="startAt-preview">
+                                <i class="fas fa-clock"></i>
+                                <span>Sélectionnez une date</span>
+                            </div>
+                        </div>
+                        {{ form_errors(form.startAt) }}
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.endAt.vars.id }}" class="form-label">
+                            <i class="fas fa-stop-circle"></i>
+                            Date et heure de fin
+                        </label>
+                        <div class="datetime-card">
+                            <div class="datetime-input-wrapper">
+                                {{ form_widget(form.endAt, {'attr': {
+                                    'class': 'form-control datetime-input ' ~ (form.endAt.vars.valid ? '' : 'is-invalid'),
+                                    'placeholder': 'YYYY-MM-DD HH:MM'
+                                }}) }}
+                                <button type="button" class="datetime-trigger" data-target="{{ form.endAt.vars.id }}">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </button>
+                            </div>
+                            <div class="datetime-preview" id="endAt-preview">
+                                <i class="fas fa-clock"></i>
+                                <span>Sélectionnez une date</span>
+                            </div>
+                        </div>
+                        {{ form_errors(form.endAt) }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="duration-display" id="duration-display">
+                <div class="duration-card">
+                    <div class="duration-icon">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <div class="duration-content">
+                        <span class="duration-label">Durée estimée :</span>
+                        <span class="duration-value" id="duration-value">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 4: Localisation -->
+    <div class="form-section">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <h3>Localisation</h3>
+        </div>
+        
+        <div class="section-content">
+            <div class="form-group">
+                {{ form_label(form.location, 'Lieu', {'label_attr': {'class': 'form-label'}}) }}
+                <div class="input-with-icon">
+                    {{ form_widget(form.location, {'attr': {
+                        'class': 'form-control ' ~ (form.location.vars.valid ? '' : 'is-invalid'),
+                        'placeholder': 'Adresse complète ou lien de visioconférence'
+                    }}) }}
+                    <i class="fas fa-search-location input-icon"></i>
+                </div>
+                <div class="form-hint">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Entrez une adresse physique ou un lien pour un événement en ligne</span>
+                </div>
+                {{ form_errors(form.location) }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 5: Catégorie de Eventment -->
+    <div class="form-section">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="fas fa-list"></i>
+            </div>
+            <h3>Catégorie de Eventment</h3>
+        </div>
+        
+        <div class="section-content">
+            <div class="form-group">
+                {{ form_label(form.eventCat, 'Sélectionnez une catégorie', {'label_attr': {'class': 'form-label'}}) }}
+                <div class="select-wrapper">
+                    {{ form_widget(form.eventCat, {'attr': {
+                        'class': 'form-select ' ~ (form.eventCat.vars.valid ? '' : 'is-invalid')
+                    }}) }}
+                    <i class="fas fa-chevron-down select-arrow"></i>
+                </div>
+                <div class="form-hint">
+                    <i class="fas fa-tags"></i>
+                    <span>Choisissez la catégorie qui correspond le mieux à votre événement</span>
+                </div>
+                {{ form_errors(form.eventCat) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ form_end(form) }}
+
+<style>
+/* Pink theme variables - Keeping original color scheme */
+:root {
+    --primary-pink: #ec4899;
+    --light-pink: #fce7f3;
+    --medium-pink: #fbcfe8;
+    --dark-pink: #be185d;
+    --error-red: #ef4444;
+    --error-light: #fee2e2;
+    --success-green: #10b981;
+    --text-color: #374151;
+    --border-color: #e5e7eb;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Image Gallery Styles */
+.image-gallery-container {
+    margin-top: 1rem;
+}
+
+.image-gallery-view.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Gallery Grid */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.gallery-item {
+    position: relative;
+}
+
+.gallery-card {
+    background: white;
+    border: 2px solid var(--light-pink);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+    cursor: pointer;
+    aspect-ratio: 1;
+}
+
+.gallery-card:hover {
+    border-color: var(--primary-pink);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.gallery-card.selected {
+    border-color: var(--primary-pink);
+    background: #fdf2f8;
+}
+
+.gallery-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gallery-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(236, 72, 153, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.gallery-card:hover .gallery-overlay {
+    opacity: 1;
+}
+
+.btn-select-image {
+    background: white;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-pink);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-select-image:hover {
+    background: var(--dark-pink);
+    color: white;
+    transform: scale(1.1);
+}
+
+.gallery-check {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: var(--success-green);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.3s ease;
+}
+
+.gallery-card.selected .gallery-check {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.image-filename {
+    font-size: 0.75rem;
+    color: var(--text-color);
+    margin-top: 0.5rem;
+    text-align: center;
+    word-break: break-all;
+    max-height: 2.5em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.no-images-message {
+    text-align: center;
+    padding: 2rem;
+    background: var(--light-pink);
+    border-radius: 8px;
+    border: 2px dashed var(--medium-pink);
+}
+
+.no-images-message i {
+    font-size: 2.5rem;
+    color: #f59e0b;
+    margin-bottom: 1rem;
+}
+
+.no-images-message p {
+    color: var(--text-color);
+    margin: 0;
+    font-weight: 500;
+}
+
+.d-none {
+    display: none !important;
+}
+
+/* Form Section Styling */
+.form-section {
+    background: white;
+    border: 2px solid var(--light-pink);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.form-section:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--medium-pink);
+}
+
+.form-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(135deg, var(--primary-pink), var(--dark-pink));
+}
+
+/* Section Header */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--light-pink);
+}
+
+.section-icon {
+    background: linear-gradient(135deg, var(--primary-pink), var(--dark-pink));
+    color: white;
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    box-shadow: 0 4px 8px rgba(236, 72, 153, 0.2);
+}
+
+.section-header h3 {
+    color: var(--dark-pink);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+/* Form Labels */
+.form-label {
+    color: var(--text-color);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: block;
+    font-size: 1rem;
+}
+
+.form-label i {
+    color: var(--primary-pink);
+    margin-right: 0.5rem;
+}
+
+/* Form Controls */
+.form-control, .form-select {
+    border: 2px solid var(--medium-pink);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+    color: var(--text-color);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-pink);
+    box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.15);
+    outline: none;
+}
+
+/* Custom Select */
+.select-wrapper {
+    position: relative;
+}
+
+.select-arrow {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-pink);
+    pointer-events: none;
+    transition: transform 0.3s ease;
+}
+
+.form-select:focus + .select-arrow {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+/* DateTime Picker */
+.datetime-card {
+    background: var(--light-pink);
+    border-radius: 10px;
+    padding: 1.25rem;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.datetime-card:hover {
+    border-color: var(--medium-pink);
+}
+
+.datetime-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.datetime-input {
+    flex: 1;
+    background: white !important;
+    border: 2px solid var(--medium-pink) !important;
+    padding-right: 3.5rem;
+}
+
+.datetime-trigger {
+    background: var(--primary-pink);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.datetime-trigger:hover {
+    background: var(--dark-pink);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(236, 72, 153, 0.3);
+}
+
+.datetime-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: white;
+    border-radius: 8px;
+    border: 2px solid var(--light-pink);
+    font-size: 0.95rem;
+}
+
+.datetime-preview i {
+    color: var(--primary-pink);
+    font-size: 1rem;
+}
+
+/* Duration Display */
+.duration-display {
+    margin-top: 1.5rem;
+}
+
+.duration-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--light-pink);
+    border-radius: 10px;
+    border: 2px solid var(--medium-pink);
+}
+
+.duration-icon {
+    background: linear-gradient(135deg, var(--primary-pink), var(--dark-pink));
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.duration-label {
+    color: var(--text-color);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.duration-value {
+    color: var(--dark-pink);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+/* Input with Icon */
+.input-with-icon {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-pink);
+}
+
+.input-with-icon .form-control {
+    padding-left: 2.75rem;
+}
+
+/* Form Hints */
+.form-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0;
+}
+
+.form-hint i {
+    color: var(--primary-pink);
+    font-size: 0.875rem;
+}
+
+.form-hint.with-counter {
+    justify-content: space-between;
+}
+
+.char-counter {
+    color: var(--text-color);
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+/* Error States */
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: var(--error-red);
+    background-image: none !important;
+    padding-right: 1rem;
+}
+
+.form-control.is-invalid:focus,
+.form-select.is-invalid:focus {
+    border-color: var(--error-red);
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
+}
+
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--error-red);
+    background: var(--error-light);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border-left: 3px solid var(--error-red);
+    animation: slideIn 0.3s ease;
+    font-weight: 500;
+}
+
+.invalid-feedback ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.invalid-feedback li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.invalid-feedback li::before {
+    content: "⚠️";
+    font-size: 0.875rem;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .event-form {
+        padding: 0;
+    }
+    
+    .form-section {
+        padding: 1.5rem;
+        border-radius: 10px;
+    }
+    
+    .datetime-input-wrapper {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .datetime-trigger {
+        width: 100%;
+        height: 42px;
+    }
+    
+    .datetime-input {
+        padding-right: 1rem;
+    }
+    
+    .section-header {
+        flex-wrap: wrap;
+    }
+    
+    .section-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 1.1rem;
+    }
+    
+    .gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 0.5rem;
+    }
+}
+
+/* Row spacing */
+.row {
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+}
+
+.row > [class*="col-"] {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+/* Make sure form controls are properly sized on mobile */
+@media (max-width: 576px) {
+    .form-control, .form-select {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+}
+</style>
+
+<!-- Include Flatpickr -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded - initializing form scripts');
+
+    // --- Image Gallery Logic (FIXED) ---
+    function initImageGallery() {
+        const galleryContainer = document.querySelector('.gallery-grid');
+        const selectedImageInput = document.getElementById('event_selectedImage');
+        
+        if (!galleryContainer) {
+            console.log('Gallery container not found');
+            return;
+        }
+        
+        if (!selectedImageInput) {
+            console.error('Selected Image Input field not found! ID: event_selectedImage');
+            return;
+        }
+
+        console.log('Initializing image gallery with input:', selectedImageInput.id);
+
+        // Use event delegation for better performance and reliability
+        galleryContainer.addEventListener('click', function(e) {
+            const galleryItem = e.target.closest('.gallery-item');
+            if (!galleryItem) return;
+
+            const imageName = galleryItem.dataset.image;
+            console.log('Clicked gallery item:', imageName);
+            
+            // Remove 'selected' class from all cards
+            document.querySelectorAll('.gallery-card').forEach(card => {
+                card.classList.remove('selected');
+                // Also force style update just in case
+                card.style.borderColor = ''; 
+                card.style.background = '';
+            });
+
+            // Add 'selected' class to clicked card
+            const card = galleryItem.querySelector('.gallery-card');
+            if (card) {
+                card.classList.add('selected');
+                // Force style update for immediate feedback
+                card.style.borderColor = 'var(--primary-pink)';
+                card.style.background = '#fdf2f8';
+            }
+
+            // Update hidden input
+            selectedImageInput.value = imageName;
+            console.log('Updated hidden input value to:', selectedImageInput.value);
+
+            // Trigger change event
+            selectedImageInput.dispatchEvent(new Event('change', { bubbles: true }));
+
+            // Hide error if present
+             const errorElement = document.querySelector('.invalid-feedback');
+            if (errorElement && errorElement.textContent.includes('image')) {
+                errorElement.style.display = 'none';
+            }
+        });
+
+        // Pre-select if value exists
+        if (selectedImageInput.value) {
+            console.log('Pre-selecting image:', selectedImageInput.value);
+            const itemToSelect = galleryContainer.querySelector(`.gallery-item[data-image="${selectedImageInput.value}"]`);
+            if (itemToSelect) {
+                const card = itemToSelect.querySelector('.gallery-card');
+                if (card) {
+                    card.classList.add('selected');
+                    card.style.borderColor = 'var(--primary-pink)';
+                    card.style.background = '#fdf2f8';
+                }
+            }
+        }
+    }
+
+    // Initialize Gallery independently
+    initImageGallery();
+
+    //Initialize Flatpickr with proper date format
+    const dateInputs = document.querySelectorAll('.datetime-input');
+    
+    dateInputs.forEach(input => {
+        const flatpickrInstance = flatpickr(input, {
+             enableTime: true,
+            dateFormat: "Y-m-d H:i", // Changed to match HTML5 datetime format
+            time_24hr: true,
+            locale: "fr",
+            minuteIncrement: 15,
+            disableMobile: false,
+            onChange: function(selectedDates, dateStr, instance) {
+                updateDateTimePreview(input, selectedDates[0]);
+                updateDuration();
+            }
+        });
+        
+        // Update preview on initialization
+        if (input.value) {
+            const date = new Date(input.value);
+            if (!isNaN(date.getTime())) {
+                updateDateTimePreview(input, date);
+            }
+        }
+        
+         // Make trigger button open Flatpickr
+        const triggerButton = input.closest('.datetime-input-wrapper').querySelector('.datetime-trigger');
+        if (triggerButton) {
+            triggerButton.addEventListener('click', function() {
+                flatpickrInstance.open();
+            });
+        }
+    });
+
+    // Update character counter for description
+    const descriptionInput = document.querySelector('[name*="description"]');
+    if (descriptionInput) {
+        const charCounter = descriptionInput.closest('.form-group').querySelector('.char-counter');
+        
+        descriptionInput.addEventListener('input', function() {
+            const length = this.value.length;
+            charCounter.textContent = `${length}/1000`;
+            
+            if (length > 1000) {
+                charCounter.style.color = 'var(--error-red)';
+            } else if (length > 800) {
+                charCounter.style.color = '#f59e0b';
+            } else {
+                charCounter.style.color = 'var(--text-color)';
+            }
+        });
+        
+        // Initial count
+        if (descriptionInput.value) {
+            charCounter.textContent = `${descriptionInput.value.length}/1000`;
+        }
+    }
+
+    
+    // Update duration display
+    function updateDuration() {
+        const startInput = document.querySelector('[name*="startAt"]');
+        const endInput = document.querySelector('[name*="endAt"]');
+        const durationValue = document.getElementById('duration-value');
+        
+        if (!startInput || !endInput || !durationValue || !startInput.value || !endInput.value) {
+            if (durationValue) {
+                durationValue.textContent = '--';
+                durationValue.style.color = 'var(--text-color)';
+            }
+            return;
+        }
+        
+        const startDate = new Date(startInput.value);
+        const endDate = new Date(endInput.value);
+        
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            durationValue.textContent = 'Date invalide';
+            durationValue.style.color = 'var(--error-red)';
+            return;
+        }
+        
+        if (endDate <= startDate) {
+            durationValue.textContent = 'Date de fin doit être après date de début';
+            durationValue.style.color = 'var(--error-red)';
+            return;
+        }
+        
+        const diffMs = endDate - startDate;
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        
+        let durationText = '';
+        if (diffDays > 0) {
+            durationText += `${diffDays} jour${diffDays > 1 ? 's' : ''} `;
+        }
+        if (diffHours > 0) {
+            durationText += `${diffHours} heure${diffHours > 1 ? 's' : ''} `;
+        }
+        if (diffMinutes > 0 && diffDays === 0) {
+            durationText += `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''}`;
+        }
+        
+        durationValue.textContent = durationText.trim() || 'Quelques minutes';
+        durationValue.style.color = 'var(--dark-pink)';
+    }
+    
+    // Update datetime preview
+    function updateDateTimePreview(input, date) {
+        const previewId = `${input.id}-preview`;
+        const previewElement = document.getElementById(previewId);
+        
+        if (!previewElement) return;
+        
+        const formatDate = (date) => {
+            const options = { 
+                weekday: 'short',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            return date.toLocaleDateString('fr-FR', options);
+        };
+        
+        const formattedDate = formatDate(date);
+        previewElement.querySelector('span').textContent = formattedDate;
+    }
+    
+    // Initialize duration display
+    updateDuration();
+    
+    // Show validation error for image selection if needed
+    const selectedImageError = document.querySelector('#event_selectedImage');
+    if (selectedImageError && selectedImageError.classList.contains('is-invalid')) {
+        console.log('Image selection validation error detected');
+        // Add red border to gallery container
+        const galleryContainer = document.querySelector('.image-gallery-container');
+        if (galleryContainer) {
+            galleryContainer.style.border = '2px solid var(--error-red)';
+            galleryContainer.style.borderRadius = '8px';
+            galleryContainer.style.padding = '1rem';
+        }
+    }
+    
+    // Form submission validation
+    const form = document.getElementById('event-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const selectedImageInput = document.getElementById('event_selectedImage');
+            
+            // Check if image is selected
+            if (!selectedImageInput || !selectedImageInput.value) {
+                e.preventDefault();
+                alert('Veuillez sélectionner une image pour l\'événement.');
+                
+                // Add visual feedback
+                const galleryContainer = document.querySelector('.image-gallery-container');
+                if (galleryContainer) {
+                    galleryContainer.style.border = '2px solid var(--error-red)';
+                    galleryContainer.style.borderRadius = '8px';
+                    galleryContainer.style.padding = '1rem';
+                    galleryContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                
+                return false;
+            }
+        });
+    }
+});
+</script>

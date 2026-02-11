@@ -1,0 +1,164 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}{{ event_cat.name }} - Détails{% endblock %}
+{% block page_title %}Détails de la catégorie{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
+        <span>/</span>
+        <a href="{{ path('admin_evenements') }}">Événements & Catégories</a>
+        <span>/</span>
+        <a href="{{ path('app_event_cat_index') }}">Catégories</a>
+        <span>/</span>
+        <span class="current">{{ event_cat.name }}</span>
+    </div>
+{% endblock %}
+
+{% block header_actions %}
+    <div class="d-flex gap-2">
+        <a href="{{ path('app_event_cat_index') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Retour
+        </a>
+        <a href="{{ path('app_event_cat_edit', {'id': event_cat.id}) }}" class="btn btn-primary admin-btn-primary">
+            <i class="fas fa-edit me-1"></i> Modifier
+        </a>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="row g-4">
+        {# Main Column - Category Details #}
+        <div class="col-lg-8">
+            <div class="admin-card">
+                <div class="admin-card-header p-4 border-bottom">
+                    <h5 class="mb-0 fw-bold text-primary">
+                        <i class="fas fa-tag me-2"></i>{{ event_cat.name }}
+                    </h5>
+                </div>
+                <div class="admin-card-body p-4">
+                    {# Description #}
+                    <div class="detail-section mb-4">
+                        <h6 class="detail-label">
+                            <i class="fas fa-align-left text-primary me-2"></i>Description
+                        </h6>
+                        <p class="detail-value">
+                            {{ event_cat.description ? event_cat.description : 'Aucune description' }}
+                        </p>
+                    </div>
+
+                    {# Events Count #}
+                    {% if event_cat.events is defined %}
+                        <div class="detail-section mb-4">
+                            <h6 class="detail-label">
+                                <i class="fas fa-calendar-alt text-primary me-2"></i>Événements associés
+                            </h6>
+                            <div class="detail-item">
+                                <span class="detail-item-label">Nombre total</span>
+                                <span class="detail-item-value">
+                                    <span class="badge bg-white text-primary border border-primary px-3 py-2 rounded-pill fs-5">
+                                        {{ event_cat.events|length }} événement{{ event_cat.events|length > 1 ? 's' : '' }}
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {# Timestamps #}
+                    {% if (event_cat.createdAt is defined and event_cat.createdAt) or (event_cat.updatedAt is defined and event_cat.updatedAt) %}
+                        <div class="detail-section">
+                            <h6 class="detail-label">
+                                <i class="fas fa-info-circle text-primary me-2"></i>Informations
+                            </h6>
+                            <div class="row g-3">
+                                {% if event_cat.createdAt is defined and event_cat.createdAt %}
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <span class="detail-item-label">Créée le</span>
+                                            <span class="detail-item-value">
+                                                <i class="fas fa-calendar me-1 text-muted"></i>
+                                                {{ event_cat.createdAt|date('d/m/Y') }}
+                                                <i class="fas fa-clock ms-2 me-1 text-muted"></i>
+                                                {{ event_cat.createdAt|date('H:i') }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if event_cat.updatedAt is defined and event_cat.updatedAt %}
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <span class="detail-item-label">Mise à jour le</span>
+                                            <span class="detail-item-value">
+                                                <i class="fas fa-calendar me-1 text-muted"></i>
+                                                {{ event_cat.updatedAt|date('d/m/Y') }}
+                                                <i class="fas fa-clock ms-2 me-1 text-muted"></i>
+                                                {{ event_cat.updatedAt|date('H:i') }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+    </div>
+
+    <style>
+        .admin-btn-primary {
+            background-color: #ec4899;
+            border-color: #ec4899;
+            color: white;
+        }
+        .admin-btn-primary:hover {
+            background-color: #be185d;
+            border-color: #be185d;
+        }
+
+        .detail-section {
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .detail-section:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .detail-label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.75rem;
+        }
+
+        .detail-value {
+            color: #4b5563;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .detail-item-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .detail-item-value {
+            font-size: 0.95rem;
+            color: #1f2937;
+        }
+    </style>
+{% endblock %}

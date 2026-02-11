@@ -1,0 +1,275 @@
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{{ form_start(form, {'attr': {'id': 'event-form', 'novalidate': 'novalidate'}}) }}
+
+<div class="row g-4">
+    {# Left Column #}
+    <div class="col-lg-8">
+        <div class="form-section mb-4">
+            <h6 class="form-section-title">
+                <i class="fas fa-info-circle text-primary me-2"></i>Informations générales
+            </h6>
+            
+            {% if form.title is defined %}
+                <div class="mb-3">
+                    {{ form_label(form.title, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                    {{ form_widget(form.title, {'attr': {'class': 'form-control', 'placeholder': 'Titre de l\'événement'}}) }}
+                    {{ form_errors(form.title) }}
+                </div>
+            {% endif %}
+
+            {% if form.description is defined %}
+                <div class="mb-3">
+                    {{ form_label(form.description, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                    {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 5, 'placeholder': 'Description détaillée de l\'événement'}}) }}
+                    {{ form_errors(form.description) }}
+                    <div class="form-text">Décrivez l'événement en détail pour informer les participants.</div>
+                </div>
+            {% endif %}
+
+            {% if form.location is defined %}
+                <div class="mb-3">
+                    {{ form_label(form.location, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                    <div class="input-group">
+                        <span class="input-group-text bg-white">
+                            <i class="fas fa-map-marker-alt text-danger"></i>
+                        </span>
+                        {{ form_widget(form.location, {'attr': {'class': 'form-control', 'placeholder': 'Adresse ou lieu de l\'événement'}}) }}
+                    </div>
+                    {{ form_errors(form.location) }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-section">
+            <h6 class="form-section-title">
+                <i class="fas fa-calendar-alt text-primary me-2"></i>Date et heure
+            </h6>
+            
+            <div class="row">
+                {% if form.startAt is defined %}
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(form.startAt, 'Date de début', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                        {{ form_widget(form.startAt, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.startAt) }}
+                    </div>
+                {% endif %}
+
+                {% if form.endAt is defined %}
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(form.endAt, 'Date de fin', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                        {{ form_widget(form.endAt, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.endAt) }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# Right Column #}
+    <div class="col-lg-4">
+        <div class="form-section mb-4">
+            <h6 class="form-section-title">
+                <i class="fas fa-tag text-primary me-2"></i>Catégorie
+            </h6>
+            
+            {% if form.eventCat is defined %}
+                <div class="mb-3">
+                    {{ form_label(form.eventCat, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                    {{ form_widget(form.eventCat, {'attr': {'class': 'form-select'}}) }}
+                    {{ form_errors(form.eventCat) }}
+                    <div class="form-text">Sélectionnez la catégorie appropriée.</div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-section">
+            <h6 class="form-section-title">
+                <i class="fas fa-image text-primary me-2"></i>Image de l'événement
+            </h6>
+            
+            {# Hidden field for the selected image #}
+            {{ form_widget(form.selectedImage, {'attr': {'class': 'd-none', 'id': 'event_selectedImage'}}) }}
+            
+            {% if existingImages is defined and existingImages|length > 0 %}
+                <div class="image-gallery-wrapper">
+                    <div class="image-gallery-grid">
+                        {% for image in existingImages %}
+                            <div class="gallery-item-admin" data-image="{{ image }}">
+                                <div class="gallery-item-inner">
+                                    <img src="{{ asset('img/events/' ~ image) }}" 
+                                         class="gallery-image" 
+                                         alt="{{ image }}">
+                                    <div class="gallery-overlay">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="form-text mt-2">
+                        <i class="fas fa-info-circle me-1"></i>Cliquez sur une image pour la sélectionner.
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Aucune image disponible dans le dossier /public/img/events/
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const galleryItems = document.querySelectorAll('.gallery-item-admin');
+    const hiddenInput = document.getElementById('event_selectedImage');
+    
+    if (galleryItems.length > 0 && hiddenInput) {
+        // Function to update visual selection
+        const updateSelection = (selectedValue) => {
+            galleryItems.forEach(item => {
+                const overlay = item.querySelector('.gallery-overlay');
+                
+                if (item.dataset.image === selectedValue) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        };
+
+        // Initialize selection if value exists
+        if (hiddenInput.value) {
+            updateSelection(hiddenInput.value);
+        }
+
+        // Add click handlers
+        galleryItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const imageName = this.dataset.image;
+                hiddenInput.value = imageName;
+                updateSelection(imageName);
+            });
+        });
+    }
+});
+</script>
+
+{{ form_end(form) }}
+
+<style>
+    /* Form Sections */
+    .form-section {
+        background: #fff;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .form-section-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #fce7f3;
+    }
+
+    /* Form Controls */
+    .form-label {
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #ec4899;
+        box-shadow: 0 0 0 0.2rem rgba(236, 72, 153, 0.15);
+    }
+
+    /* Image Gallery */
+    .image-gallery-wrapper {
+        background: #f9fafb;
+        padding: 1rem;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .image-gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    
+    .gallery-item-admin {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .gallery-item-inner {
+        position: relative;
+        border-radius: 6px;
+        overflow: hidden;
+        aspect-ratio: 1;
+        border: 2px solid transparent;
+        transition: all 0.2s ease;
+    }
+    
+    .gallery-item-admin:hover .gallery-item-inner {
+        border-color: #ec4899;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(236, 72, 153, 0.2);
+    }
+    
+    .gallery-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    
+    .gallery-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(236, 72, 153, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+    
+    .gallery-overlay i {
+        color: white;
+        font-size: 2rem;
+    }
+    
+    .gallery-item-admin.selected .gallery-overlay {
+        opacity: 1;
+    }
+    
+    .gallery-item-admin.selected .gallery-item-inner {
+        border-color: #ec4899;
+        box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.2);
+    }
+
+    /* Remove default Bootstrap validation icons */
+    .form-control.is-invalid,
+    .form-select.is-invalid {
+        background-image: none !important;
+        padding-right: 0.75rem !important;
+    }
+    
+    /* Input Group Styling */
+    .input-group-text {
+        border-color: #d1d5db;
+    }
+    
+    .input-group:focus-within .input-group-text {
+        border-color: #ec4899;
+    }
+</style>

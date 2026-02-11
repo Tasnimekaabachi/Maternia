@@ -1,51 +1,61 @@
 {% extends 'admin/base.html.twig' %}
 
-{% block title %}Événements{% endblock %}
-{% block page_title %}Événements{% endblock %}
+{% block title %}Événements & Catégories{% endblock %}
+{% block page_title %}Événements & Catégories{% endblock %}
 
 {% block breadcrumb %}
     <div class="admin-breadcrumb">
         <a href="{{ path('admin_dashboard') }}">Backoffice</a>
         <span>/</span>
-        <span>Événements</span>
+        <span>Événements & Catégories</span>
     </div>
-{% endblock %}
-
-{% block header_actions %}
-    <button type="button" class="btn btn-primary admin-btn-primary">
-        <i class="fas fa-plus me-1"></i> Créer un événement
-    </button>
 {% endblock %}
 
 {% block content %}
     <div class="admin-card">
-        <div class="admin-card-header">Événements dédiés aux mamans</div>
-        <div class="admin-card-body p-0">
-            <div class="table-responsive">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Titre</th>
-                            <th>Date</th>
-                            <th>Lieu</th>
-                            <th>Places</th>
-                            <th>Statut</th>
-                            <th width="120"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="6">
-                                <div class="admin-empty py-4">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    <p>Aucun événement pour le moment.</p>
-                                    <button type="button" class="btn btn-primary admin-btn-primary">Créer un événement</button>
+        <div class="admin-card-body">
+            <div class="text-center py-5">
+                <h3 class="mb-5">Sélectionnez une option</h3>
+                
+                <div class="row justify-content-center g-4">
+                    <div class="col-lg-4 col-md-6">
+                        <a href="{{ path('app_event_index') }}" class="text-decoration-none">
+                            <div class="p-5 text-center rounded-3 shadow-sm hover-shadow" 
+                                 style="background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%); border: 2px solid #f48fb1;">
+                                <div class="mb-4">
+                                    <i class="fas fa-calendar-alt fa-4x mb-3" style="color: #c2185b;"></i>
                                 </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                                <h4 class="mb-0" style="color: #880e4f;">Événements</h4>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6">
+                        <a href="{{ path('app_event_cat_index') }}" class="text-decoration-none">
+                            <div class="p-5 text-center rounded-3 shadow-sm hover-shadow" 
+                                 style="background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); border: 2px solid #ba68c8;">
+                                <div class="mb-4">
+                                    <i class="fas fa-tags fa-4x mb-3" style="color: #7b1fa2;"></i>
+                                </div>
+                                <h4 class="mb-0" style="color: #4a148c;">Catégories</h4>
+                            </div>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    
+    <style>
+        .hover-shadow {
+            transition: all 0.3s ease;
+        }
+        .hover-shadow:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+        }
+        .rounded-3 {
+            border-radius: 16px !important;
+        }
+    </style>
 {% endblock %}
