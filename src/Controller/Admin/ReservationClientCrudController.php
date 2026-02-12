@@ -15,9 +15,17 @@ use Symfony\Component\Routing\Attribute\Route;
 class ReservationClientCrudController extends AbstractController
 {
     #[Route('/', name: 'app_admin_reservation_client_index', methods: ['GET'])]
-    public function index(ReservationClientRepository $repository): Response
+    public function index(Request $request, ReservationClientRepository $repository): Response
     {
-        $reservations = $repository->findBy([], ['createdAt' => 'DESC']);
+        $sort = $request->query->get('sort', 'createdAt');
+        $direction = $request->query->get('direction', 'DESC');
+        
+        // Sécurisation du tri
+        $allowedSorts = ['createdAt', 'nomClient', 'dateReservation', 'statutReservation', 'reference'];
+        if (!in_array($sort, $allowedSorts)) { $sort = 'createdAt'; }
+        if (!in_array(strtoupper($direction), ['ASC', 'DESC'])) { $direction = 'DESC'; }
+
+        $reservations = $repository->findBy([], [$sort => $direction]);
         
         // Stats pour le plateau
         $stats = [
@@ -28,10 +36,36 @@ class ReservationClientCrudController extends AbstractController
             'maman' => count(array_filter($reservations, fn($r) => $r->getTypePatient() === 'MAMAN')),
         ];
 
+        // Données pour le graphique (6 derniers mois)
+        $chartData = $this->getChartData($repository);
+
         return $this->render('admin/reservation_client/index.html.twig', [
             'reservations' => $reservations,
             'stats' => $stats,
+            'chartData' => $chartData,
+            'currentSort' => $sort,
+            'currentDirection' => $direction,
         ]);
+    }
+
+    private function getChartData(ReservationClientRepository $repository): array
+    {
+        $data = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $date = new \DateTime("first day of -$i months");
+            $monthName = $date->format('M');
+            $count = count($repository->createQueryBuilder('r')
+                ->where('r.createdAt >= :start')
+                ->andWhere('r.createdAt <= :end')
+                ->setParameter('start', $date->modify('first day of this month')->setTime(0,0,0))
+                ->setParameter('end', (clone $date)->modify('last day of this month')->setTime(23,59,59))
+                ->getQuery()
+                ->getResult());
+            
+            $data['labels'][] = $monthName;
+            $data['values'][] = $count;
+        }
+        return $data;
     }
 
     #[Route('/new', name: 'app_admin_reservation_client_new', methods: ['GET', 'POST'])]
