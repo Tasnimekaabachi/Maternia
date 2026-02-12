@@ -148,7 +148,7 @@ final class CartController extends AbstractController
 
         $this->addFlash('success', 'Votre commande a été créée avec succès.');
 
-        return $this->redirectToRoute('app_commande_show', ['id' => $commande->getId()]);
+        // Rester sur la page panier après la validation
+        return $this->redirectToRoute('app_cart_show');
     }
 }
-

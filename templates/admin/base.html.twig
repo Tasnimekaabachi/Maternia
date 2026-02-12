@@ -28,9 +28,6 @@
                     <i class="fas fa-heart"></i>
                     Suivi grossesse
                 </a>
-                <a href="{{ path('app_produit_index') }}">Produits</a>
-                <a href="{{ path('app_commande_index') }}">Commandes</a>
-
                 <a href="{{ path('admin_marketplace') }}" class="nav-link {{ app.request.attributes.get('_route') == 'admin_marketplace' ? 'active' : '' }}">
                     <i class="fas fa-shopping-bag"></i>
                     Marketplace
@@ -41,20 +38,11 @@
                 </a>
                 <!-- Consultations (types de consultations) -->
                 {% set _route = app.request.attributes.get('_route') %}
+                {% set is_consultation_route = (_route starts with 'app_admin_consultation') or (_route starts with 'app_admin_reservation_client') %}
                 <a href="{{ path('app_admin_consultation_index') }}" 
-                   class="nav-link {{ (_route starts with 'app_admin_consultation') and (_route starts with 'app_admin_consultation_creneau') == false ? 'active' : '' }}">
+                   class="nav-link {{ is_consultation_route ? 'active' : '' }}">
                     <i class="fas fa-stethoscope"></i>
                     Consultations
-                </a>
-                <a href="{{ path('app_admin_consultation_creneau_index') }}" 
-                   class="nav-link {{ app.request.attributes.get('_route') starts with 'app_admin_consultation_creneau' ? 'active' : '' }}">
-                    <i class="fas fa-calendar-check"></i>
-                    Créneaux consultation
-                </a>
-                <a href="{{ path('app_admin_reservation_client_index') }}" 
-                   class="nav-link {{ app.request.attributes.get('_route') starts with 'app_admin_reservation_client' ? 'active' : '' }}">
-                    <i class="fas fa-user-clock"></i>
-                    Réservations clients
                 </a>
                 <a href="{{ path('admin_profil_bebe') }}" class="nav-link {{ app.request.attributes.get('_route') == 'admin_profil_bebe' ? 'active' : '' }}">
                     <i class="fas fa-baby"></i>
