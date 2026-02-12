@@ -1,0 +1,331 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Suivi - choix{% endblock %}
+{% block page_title %}Suivi : Maman ou Grossesse{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
+        <span>/</span>
+        <span>Suivi</span>
+    </div>
+{% endblock %}
+
+{% block header_actions %}{% endblock %}
+
+{% block content %}
+    <style>
+        .choice-hero {
+            text-align: center;
+            padding: 3rem 2rem 2rem;
+            background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+            border-radius: var(--radius-lg);
+            color: white;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 10px 25px rgba(236, 72, 153, 0.3);
+        }
+        .choice-hero-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .choice-hero h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+        .choice-hero p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .choice-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .choice-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        .choice-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--card-gradient-start), var(--card-gradient-end));
+        }
+        .choice-card.mamans {
+            --card-gradient-start: #ec4899;
+            --card-gradient-end: #f472b6;
+        }
+        .choice-card.grossesses {
+            --card-gradient-start: #3b82f6;
+            --card-gradient-end: #60a5fa;
+        }
+        .choice-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+            border-color: var(--card-gradient-start);
+        }
+        .choice-card-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .choice-card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+        .choice-card-description {
+            color: #6b7280;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        .choice-card-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: var(--radius);
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+        .choice-card-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 2rem;
+        }
+        .choice-card-features li {
+            padding: 0.5rem 0;
+            color: #4b5563;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .choice-card-features li::before {
+            content: '✓';
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+        .choice-btn {
+            width: 100%;
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        .choice-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+        .choice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            color: white;
+        }
+        .choice-btn:hover::before {
+            left: 100%;
+        }
+        .choice-btn i {
+            font-size: 1.1rem;
+        }
+        .info-banner {
+            background: #fce7f3;
+            border-left: 4px solid #ec4899;
+            padding: 1.25rem;
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+        }
+        .info-banner-icon {
+            color: #ec4899;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        .info-banner-content {
+            flex: 1;
+        }
+        .info-banner-title {
+            font-weight: 600;
+            color: #be185d;
+            margin-bottom: 0.25rem;
+        }
+        .info-banner-text {
+            color: #9f1239;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        @media (max-width: 768px) {
+            .choice-hero {
+                padding: 2rem 1.5rem 1.5rem;
+            }
+            .choice-hero h1 {
+                font-size: 1.5rem;
+            }
+            .choice-cards {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+
+    <div class="choice-hero">
+        <div class="choice-hero-icon">🎯</div>
+        <h1>Choisissez votre espace de travail</h1>
+        <p>Accédez rapidement aux données dont vous avez besoin pour un suivi optimal</p>
+    </div>
+
+    <div class="info-banner">
+        <div class="info-banner-icon">
+            <i class="fas fa-info-circle"></i>
+        </div>
+        <div class="info-banner-content">
+            <div class="info-banner-title">Système de suivi intégré</div>
+            <p class="info-banner-text">
+                Chaque grossesse est liée à une maman. Vous pouvez naviguer entre les deux vues pour un suivi complet.
+            </p>
+        </div>
+    </div>
+
+    <div class="choice-cards">
+        <div class="choice-card mamans">
+            <div class="choice-card-icon">
+                <i class="fas fa-user-female"></i>
+            </div>
+            <h2 class="choice-card-title">Suivi des mamans</h2>
+            <p class="choice-card-description">
+                Gérez les profils complets des mamans, leurs informations médicales, antécédents et mode de vie.
+            </p>
+            
+            <div class="choice-card-stats">
+                <div class="stat-item">
+                    <div class="stat-number">{{ total_mamans }}</div>
+                    <div class="stat-label">Mamans</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ grossesses_en_cours }}</div>
+                    <div class="stat-label">Enceintes</div>
+                </div>
+            </div>
+
+            <ul class="choice-card-features">
+                <li>Informations personnelles et médicales</li>
+                <li>Antécédents et allergies</li>
+                <li>Activités et mode de vie</li>
+                <li>Historique des consultations</li>
+            </ul>
+
+            <a href="{{ path('admin_maman_index') }}" class="choice-btn">
+                <i class="fas fa-arrow-right"></i>
+                <span>Accéder aux mamans</span>
+            </a>
+        </div>
+
+        <div class="choice-card grossesses">
+            <div class="choice-card-icon">
+                <i class="fas fa-baby"></i>
+            </div>
+            <h2 class="choice-card-title">Grossesses & bébés</h2>
+            <p class="choice-card-description">
+                Suivez l'évolution des grossesses, les dates clés, les bébés et toutes les informations de naissance.
+            </p>
+            
+            <div class="choice-card-stats">
+                <div class="stat-item">
+                    <div class="stat-number">{{ total_grossesses }}</div>
+                    <div class="stat-label">Grossesses</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ grossesses_en_cours }}</div>
+                    <div class="stat-label">En cours</div>
+                </div>
+            </div>
+
+            <ul class="choice-card-features">
+                <li>État d'avancement et trimestre</li>
+                <li>Dates clés et échéances</li>
+                <li>Suivi des symptômes</li>
+                <li>Informations sur les bébés</li>
+            </ul>
+
+            <a href="{{ path('admin_grosesse_index') }}" class="choice-btn">
+                <i class="fas fa-arrow-right"></i>
+                <span>Accéder aux grossesses</span>
+            </a>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grossesse #{{ grossesse.id }} - Maternia</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; color: #333; margin: 24px; max-width: 800px; }
+        .no-print { margin-bottom: 24px; }
+        .btn-pdf { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #FF1D8D; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .btn-pdf:hover { background: #ff5ba8; }
+        h1 { color: #4a7ba7; font-size: 1.5rem; border-bottom: 2px solid #4a7ba7; padding-bottom: 8px; margin-bottom: 20px; }
+        h2 { color: #374151; font-size: 1.1rem; margin-top: 20px; margin-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+        th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid #e5e7eb; }
+        th { background: #f8f9fb; font-weight: 600; color: #374151; width: 40%; }
+        .footer { margin-top: 32px; font-size: 12px; color: #6b7280; }
+        @media print {
+            .no-print { display: none !important; }
+            body { margin: 16px; font-size: 11px; }
+            h1 { font-size: 18px; }
+            h2 { font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print">
+        <button type="button" class="btn-pdf" onclick="window.print();">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+            Enregistrer en PDF
+        </button>
+        <p style="margin-top: 12px; color: #6b7280; font-size: 0.9rem;">Cliquez sur le bouton puis choisissez « Enregistrer au format PDF » dans la fenêtre d’impression.</p>
+    </div>
+
+    <h1>Maternia – Dossier grossesse #{{ grossesse.id }}</h1>
+    <p><strong>Généré le</strong> {{ "now"|date("d/m/Y à H:i") }}</p>
+
+    <h2>Informations grossesse</h2>
+    <table>
+        <tr><th>Statut</th><td>{{ grossesse.statutGrossesse ?? '—' }}</td></tr>
+        <tr><th>Type de grossesse</th><td>{{ grossesse.typeGrossesse ?? '—' }}</td></tr>
+        <tr><th>Nombre de bébés</th><td>{{ grossesse.nombreBebes ?? '—' }}</td></tr>
+        <tr><th>Semaine actuelle</th><td>{{ grossesse.semaineActuelle ?? '—' }}</td></tr>
+        <tr><th>Trimestre</th><td>{{ grossesse.trimestreActuel ?? '—' }}</td></tr>
+        <tr>
+            <th>Date début / DDR</th>
+            <td>
+                {% if grossesse.dateDebutGrossesse %}
+                    {{ grossesse.dateDebutGrossesse|date('d/m/Y') }}
+                {% elseif grossesse.dateDernieresRegles %}
+                    {{ grossesse.dateDernieresRegles|date('d/m/Y') }}
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+        </tr>
+        <tr><th>Date accouchement réelle</th><td>{{ grossesse.dateAccouchementReelle ? grossesse.dateAccouchementReelle|date('d/m/Y') : '—' }}</td></tr>
+        <tr><th>Poids actuel</th><td>{{ grossesse.poidsActuel is not null ? grossesse.poidsActuel ~ ' kg' : '—' }}</td></tr>
+        <tr><th>Symptômes</th><td>{{ grossesse.symptomes ?? '—' }}</td></tr>
+        <tr><th>Commentaire général</th><td>{{ grossesse.commentaireGeneral ?? '—' }}</td></tr>
+    </table>
+
+    <h2>Bébés</h2>
+    <table>
+        {% set bebesData = grossesse.bebes %}
+        {% if bebesData is iterable and bebesData|length > 0 %}
+            {% for bebe in bebesData %}
+                <tr><th>Bébé {{ loop.index }} – Prénom</th><td>{{ bebe.nom ?? '—' }}</td></tr>
+                <tr><th>Bébé {{ loop.index }} – Sexe</th><td>{{ bebe.sexe ?? '—' }}</td></tr>
+                <tr><th>Bébé {{ loop.index }} – Poids</th><td>{{ bebe.poids is defined and bebe.poids is not null ? bebe.poids ~ ' kg' : '—' }}</td></tr>
+                <tr><th>Bébé {{ loop.index }} – Taille</th><td>{{ bebe.taille is defined and bebe.taille is not null ? bebe.taille ~ ' cm' : '—' }}</td></tr>
+                <tr><th>Bébé {{ loop.index }} – État</th><td>{{ bebe.etat ?? '—' }}</td></tr>
+                {% if not loop.last %}
+                    <tr><td colspan="2" style="background:#f3f4f6;height:4px;"></td></tr>
+                {% endif %}
+            {% endfor %}
+        {% elseif grossesse.nomBebe %}
+            <tr><th>Prénom bébé</th><td>{{ grossesse.nomBebe }}</td></tr>
+            <tr><th>Sexe bébé</th><td>{{ grossesse.sexeBebe ?? '—' }}</td></tr>
+            <tr><th>Poids naissance</th><td>{{ grossesse.poidsNaissance is not null ? grossesse.poidsNaissance ~ ' kg' : '—' }}</td></tr>
+            <tr><th>Taille naissance</th><td>{{ grossesse.tailleNaissance is not null ? grossesse.tailleNaissance ~ ' cm' : '—' }}</td></tr>
+            <tr><th>État naissance</th><td>{{ grossesse.etatNaissance ?? '—' }}</td></tr>
+        {% else %}
+            <tr><td colspan="2">Aucune information bébé enregistrée.</td></tr>
+        {% endif %}
+    </table>
+
+    <h2>Maman liée</h2>
+    <table>
+        {% if grossesse.maman %}
+            <tr><th>ID Maman</th><td>#{{ grossesse.maman.id }}</td></tr>
+            <tr><th>Numéro d'urgence</th><td>+216 {{ grossesse.maman.numeroUrgence }}</td></tr>
+            <tr><th>Groupe sanguin</th><td>{{ grossesse.maman.groupeSanguin }}</td></tr>
+        {% else %}
+            <tr><td colspan="2">Aucune maman liée à cette grossesse.</td></tr>
+        {% endif %}
+    </table>
+
+    <h2>Informations système</h2>
+    <table>
+        <tr><th>ID</th><td>#{{ grossesse.id }}</td></tr>
+        <tr><th>Date de création</th><td>{{ grossesse.dateCreation ? grossesse.dateCreation|date('d/m/Y H:i') : '—' }}</td></tr>
+        <tr><th>Dernière mise à jour</th><td>{{ grossesse.dateMiseAJour ? grossesse.dateMiseAJour|date('d/m/Y H:i') : '—' }}</td></tr>
+    </table>
+
+    <div class="footer">Document généré par Maternia – Suivi grossesse & bébé – Confidentialité des données.</div>
+
+    <script>
+        if (window.location.hash === '#print') {
+            window.print();
+        }
+    </script>
+</body>
+</html>
+

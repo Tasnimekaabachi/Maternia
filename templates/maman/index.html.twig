@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Maman index{% endblock %}
+
+{% block body %}
+    <h1>Maman index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>NumeroUrgence</th>
+                <th>GroupeSanguin</th>
+                <th>Allergies</th>
+                <th>AntecedentsMedicaux</th>
+                <th>Poids</th>
+                <th>Taille</th>
+                <th>MaladiesChroniques</th>
+                <th>MedicamentsActuels</th>
+                <th>Fumeur</th>
+                <th>ConsommationAlcool</th>
+                <th>NiveauActivitePhysique</th>
+                <th>HabitudesAlimentaires</th>
+                <th>DateCreation</th>
+                <th>DateMiseAJour</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for maman in mamen %}
+            <tr>
+                <td>{{ maman.id }}</td>
+                <td>{{ maman.numeroUrgence }}</td>
+                <td>{{ maman.groupeSanguin }}</td>
+                <td>{{ maman.allergies }}</td>
+                <td>{{ maman.antecedentsMedicaux }}</td>
+                <td>{{ maman.poids }}</td>
+                <td>{{ maman.taille }}</td>
+                <td>{{ maman.maladiesChroniques }}</td>
+                <td>{{ maman.medicamentsActuels }}</td>
+                <td>{{ maman.fumeur ? 'Yes' : 'No' }}</td>
+                <td>{{ maman.consommationAlcool ? 'Yes' : 'No' }}</td>
+                <td>{{ maman.niveauActivitePhysique }}</td>
+                <td>{{ maman.habitudesAlimentaires }}</td>
+                <td>{{ maman.dateCreation ? maman.dateCreation|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ maman.dateMiseAJour ? maman.dateMiseAJour|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_maman_show', {'id': maman.id}) }}">show</a>
+                    <a href="{{ path('app_maman_edit', {'id': maman.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="16">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_maman_new') }}">Create new</a>
+{% endblock %}

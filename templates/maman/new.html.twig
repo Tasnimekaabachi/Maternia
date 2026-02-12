@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon suivi grossesse - Création{% endblock %}
+
+{% block body %}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1 class="mb-3 text-primary">Mon suivi de grossesse</h1>
+                <p class="text-muted mb-4">
+                    Première étape : complétez ces informations pour démarrer votre suivi personnalisé.
+                </p>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        {{ form_start(form) }}
+
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-calendar-alt me-2"></i>Dates de grossesse
+                            </h5>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    {{ form_row(form.dateDernieresRegles, {'label': 'Date des dernières règles'}) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.dateDebutGrossesse, {'label': 'Date de début (si connue)'}) }}
+                                </div>
+                            </div>
+
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-heart me-2"></i>Type de grossesse
+                            </h5>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    {{ form_row(form.statutGrossesse, {'label': 'Statut de la grossesse'}) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.typeGrossesse, {'label': 'Type de grossesse'}) }}
+                                </div>
+                            </div>
+
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-stethoscope me-2"></i>Votre santé actuelle
+                            </h5>
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    {{ form_row(form.poidsActuel, {'label': 'Poids actuel (kg)'}) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.indiceRisque, {'label': 'Indice de risque (optionnel)'}) }}
+                                </div>
+                                <div class="col-12">
+                                    {{ form_row(form.symptomes, {'label': 'Symptômes principaux'}) }}
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info small mb-3">
+                                Les informations sur l’accouchement et le bébé pourront être complétées plus tard,
+                                une fois votre accouchement réel connu.
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-2 mt-3">
+                                <button class="btn admin-btn-rose">
+                                    <i class="fas fa-check me-1"></i> Enregistrer mon suivi
+                                </button>
+                                <a href="{{ path('app_home') }}" class="btn btn-outline-secondary">
+                                    Annuler
+                                </a>
+                            </div>
+
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,9 +1,11 @@
-/* ===== Maternia Backoffice - Même style professionnel & moderne ===== */
+/* ===== Maternia Backoffice - Équilibre bleu (base) + rose (accent) ===== */
 :root {
     --admin-sidebar-width: 260px;
     --admin-header-height: 64px;
 }
 body.admin-body {
+    --admin-rose: #FF1D8D;
+    --admin-rose-soft: rgba(255, 29, 141, 0.08);
     background: var(--bs-surface);
     min-height: 100vh;
     font-family: 'Montserrat', sans-serif;
@@ -203,7 +205,153 @@ body.admin-body {
     margin-bottom: 1rem;
 }
 .admin-empty p { margin-bottom: 1rem; }
-/* Buttons */
+
+/* List toolbar (recherche + tri au-dessus du tableau) */
+.admin-card-list .admin-card-header {
+    border-bottom: 0;
+}
+.admin-list-toolbar {
+    padding: 1rem 1.25rem;
+    background: var(--bs-surface);
+    border-bottom: 1px solid var(--bs-border);
+}
+.admin-list-toolbar-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1rem;
+}
+.admin-list-toolbar-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+.admin-list-toolbar-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 0;
+}
+.admin-list-toolbar-select {
+    min-width: 120px;
+    border-radius: var(--radius);
+    border: 1px solid var(--bs-border);
+    font-size: 0.875rem;
+}
+.admin-list-toolbar-actions {
+    margin-left: auto;
+}
+.admin-list-toolbar-actions .btn {
+    border-radius: var(--radius);
+    font-weight: 600;
+}
+
+/* Stats cards (en bas) */
+.admin-card-stats .admin-card-header {
+    font-size: 0.9375rem;
+}
+.admin-card-stats-header {
+    background: var(--admin-rose-soft);
+    color: var(--admin-rose);
+}
+.admin-card-stats-header i {
+    color: var(--admin-rose);
+}
+.admin-stats-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.admin-stats-list li {
+    border-bottom: 1px solid var(--bs-border);
+}
+.admin-stats-list li:last-child {
+    border-bottom: 0;
+}
+.admin-stats-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--bs-primary);
+    background: rgba(74, 123, 167, 0.12);
+    border-radius: 6px;
+}
+
+/* Form */
+.admin-form .form-section {
+    margin-bottom: 1.75rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--bs-border);
+}
+.admin-form .form-section:last-of-type {
+    border-bottom: 0;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+.admin-form .form-section-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--bs-primary);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.admin-form .form-section-title i {
+    opacity: 0.9;
+}
+.admin-form .mb-3 label {
+    font-weight: 500;
+    color: #374151;
+    font-size: 0.9375rem;
+    margin-bottom: 0.35rem;
+}
+.admin-form .form-control,
+.admin-form .form-select {
+    border-radius: var(--radius);
+    border: 1px solid var(--bs-border);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9375rem;
+}
+.admin-form .form-control:focus,
+.admin-form .form-select:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 3px rgba(74, 123, 167, 0.15);
+}
+.admin-form .form-actions {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--bs-border);
+}
+.admin-form .invalid-feedback {
+    font-size: 0.8125rem;
+    margin-top: 0.25rem;
+}
+.admin-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+.admin-field-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+.admin-field-value {
+    font-size: 0.9375rem;
+    color: #1f2937;
+}
+.admin-field-value:empty::after { content: '—'; color: #9ca3af; }
+/* Buttons - bleu (équilibre avec accent rose ailleurs) */
 .admin-btn-primary {
     background: var(--bs-primary);
     color: #fff;
@@ -233,6 +381,58 @@ body.admin-body {
 .admin-btn-secondary:hover {
     background: #b0807d;
     color: #fff;
+}
+/* Boutons rose (Appliquer, Modifier, Annuler, PDF) */
+.admin-btn-rose {
+    background: var(--admin-rose);
+    color: #fff !important;
+    border: 0;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    transition: 0.2s ease;
+}
+.admin-btn-rose:hover {
+    background: #ff5ba8;
+    color: #fff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 29, 141, 0.3);
+}
+.btn-outline-rose {
+    color: var(--admin-rose) !important;
+    border: 2px solid var(--admin-rose);
+    background: transparent;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    transition: 0.2s ease;
+}
+.btn-outline-rose:hover {
+    background: var(--admin-rose-soft);
+    color: var(--admin-rose) !important;
+    border-color: var(--admin-rose);
+}
+/* Bloc actions sous Informations système (show maman) */
+.admin-show-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--bs-border);
+}
+.admin-show-actions .btn {
+    flex: 1 1 auto;
+    min-width: fit-content;
+}
+.admin-show-actions form {
+    flex: 1 1 auto;
+    min-width: fit-content;
+}
+.admin-show-actions form .btn {
+    margin: 0;
 }
 /* Badge */
 .admin-badge {

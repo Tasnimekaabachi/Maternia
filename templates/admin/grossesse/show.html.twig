@@ -1,0 +1,230 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Grossesse #{{ grossesse.id }}{% endblock %}
+{% block page_title %}Grossesse #{{ grossesse.id }}{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
+        <span>/</span>
+        <a href="{{ path('admin_grosesse_index') }}">Grossesses & bébés</a>
+        <span>/</span>
+        <span>Détail #{{ grossesse.id }}</span>
+    </div>
+{% endblock %}
+
+{% block header_actions %}
+    <a href="{{ path('admin_grosesse_index') }}" class="btn btn-outline-secondary me-2"><i class="fas fa-arrow-left me-1"></i> Retour à la liste</a>
+    <a href="{{ path('admin_grosesse_edit', { id: grossesse.id }) }}" class="btn btn-outline-primary"><i class="fas fa-edit me-1"></i> Modifier</a>
+    <a href="{{ path('admin_grosesse_pdf', { id: grossesse.id }) }}" class="btn btn-outline-primary" target="_blank"><i class="fas fa-file-pdf me-1"></i> PDF</a>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="admin-card mb-4">
+                <div class="admin-card-header"><i class="fas fa-heart me-2"></i> Informations grossesse</div>
+                <div class="admin-card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="admin-field">
+                                <span class="admin-field-label">Statut</span>
+                                <span class="admin-field-value">{{ grossesse.statutGrossesse }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="admin-field">
+                                <span class="admin-field-label">Type</span>
+                                <span class="admin-field-value">{{ grossesse.typeGrossesse }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="admin-field">
+                                <span class="admin-field-label">Nombre de bébés</span>
+                                <span class="admin-field-value">{{ grossesse.nombreBebes ?? '—' }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="admin-field">
+                                <span class="admin-field-label">Semaine actuelle</span>
+                                <span class="admin-field-value">{{ grossesse.semaineActuelle ?? '—' }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="admin-field">
+                                <span class="admin-field-label">Trimestre</span>
+                                <span class="admin-field-value">{{ grossesse.trimestreActuel ?? '—' }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="admin-field">
+                                <span class="admin-field-label">Poids actuel</span>
+                                <span class="admin-field-value">{{ grossesse.poidsActuel ?? '—' }} kg</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="admin-field">
+                                <span class="admin-field-label">Date début grossesse / DDR</span>
+                                <span class="admin-field-value">
+                                    {% if grossesse.dateDebutGrossesse %}
+                                        {{ grossesse.dateDebutGrossesse|date('d/m/Y') }}
+                                    {% elseif grossesse.dateDernieresRegles %}
+                                        {{ grossesse.dateDernieresRegles|date('d/m/Y') }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="admin-field">
+                                <span class="admin-field-label">Date accouchement réelle</span>
+                                <span class="admin-field-value">
+                                    {{ grossesse.dateAccouchementReelle ? grossesse.dateAccouchementReelle|date('d/m/Y') : '—' }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="admin-field">
+                                <span class="admin-field-label">Symptômes</span>
+                                <span class="admin-field-value">{{ grossesse.symptomes ?? '—' }}</span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="admin-field">
+                                <span class="admin-field-label">Commentaire général</span>
+                                <span class="admin-field-value">{{ grossesse.commentaireGeneral ?? '—' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-card mb-4">
+                <div class="admin-card-header"><i class="fas fa-baby me-2"></i> Bébés</div>
+                <div class="admin-card-body">
+                    {% set bebesData = grossesse.bebes %}
+                    {% if bebesData is iterable and bebesData|length > 0 %}
+                        <div class="row g-3">
+                            {% for bebe in bebesData %}
+                                <div class="col-md-6">
+                                    <div class="border rounded-3 p-3 h-100">
+                                        <div class="admin-field mb-2">
+                                            <span class="admin-field-label">Prénom</span>
+                                            <span class="admin-field-value">{{ bebe.nom ?? 'Bébé' }}</span>
+                                        </div>
+                                        <div class="admin-field mb-2">
+                                            <span class="admin-field-label">Sexe</span>
+                                            <span class="admin-field-value">
+                                                {% if bebe.sexe is defined %}
+                                                    {{ bebe.sexe == 'F' ? 'Fille' : (bebe.sexe == 'M' ? 'Garçon' : bebe.sexe) }}
+                                                {% else %}
+                                                    —
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="admin-field mb-2">
+                                            <span class="admin-field-label">Poids</span>
+                                            <span class="admin-field-value">
+                                                {% if bebe.poids is defined and bebe.poids is not null %}
+                                                    {{ bebe.poids }} kg
+                                                {% else %}
+                                                    —
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="admin-field mb-2">
+                                            <span class="admin-field-label">Taille</span>
+                                            <span class="admin-field-value">
+                                                {% if bebe.taille is defined and bebe.taille is not null %}
+                                                    {{ bebe.taille }} cm
+                                                {% else %}
+                                                    —
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="admin-field">
+                                            <span class="admin-field-label">État</span>
+                                            <span class="admin-field-value">{{ bebe.etat ?? '—' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% elseif grossesse.nomBebe %}
+                        <p>
+                            👶 {{ grossesse.nomBebe }}
+                            {% if grossesse.poidsNaissance %} ({{ grossesse.poidsNaissance }} kg){% endif %}
+                            {% if grossesse.tailleNaissance %} – {{ grossesse.tailleNaissance }} cm{% endif %}
+                            {% if grossesse.etatNaissance %} – {{ grossesse.etatNaissance }}{% endif %}
+                        </p>
+                    {% else %}
+                        <p class="text-muted mb-0">Aucune information bébé disponible.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="admin-card mb-4">
+                <div class="admin-card-header"><i class="fas fa-lightbulb me-2"></i> Alertes & conseils</div>
+                <div class="admin-card-body">
+                    {% if grossesse.statutGrossesse != 'terminee' %}
+                        {% if grossesse_conseil %}
+                            <p class="mb-1"><strong>Conseil grossesse :</strong></p>
+                            <p class="small mb-0">{{ grossesse_conseil }}</p>
+                        {% else %}
+                            <p class="text-muted mb-0 small">Aucun conseil spécifique pour cette grossesse.</p>
+                        {% endif %}
+                    {% else %}
+                        {% if bebe_age_mois is not null %}
+                            <p class="mb-1"><strong>Âge du bébé :</strong> {{ bebe_age_mois }} mois</p>
+                        {% endif %}
+                        {% if bebe_conseil %}
+                            <p class="mb-1"><strong>Conseil bébé :</strong></p>
+                            <p class="small mb-0">{{ bebe_conseil }}</p>
+                        {% else %}
+                            <p class="text-muted mb-0 small">Aucun conseil spécifique pour le bébé.</p>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="admin-card mb-4">
+                <div class="admin-card-header">Informations système</div>
+                <div class="admin-card-body">
+                    <div class="admin-field mb-2">
+                        <span class="admin-field-label">ID</span>
+                        <span class="admin-field-value">#{{ grossesse.id }}</span>
+                    </div>
+                    <div class="admin-field mb-2">
+                        <span class="admin-field-label">Maman liée</span>
+                        <span class="admin-field-value">
+                            {% if grossesse.maman %}
+                                Maman #{{ grossesse.maman.id }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="admin-field mb-2">
+                        <span class="admin-field-label">Date création</span>
+                        <span class="admin-field-value">
+                            {{ grossesse.dateCreation ? grossesse.dateCreation|date('d/m/Y H:i') : '—' }}
+                        </span>
+                    </div>
+                    <div class="admin-field mb-4">
+                        <span class="admin-field-label">Dernière mise à jour</span>
+                        <span class="admin-field-value">
+                            {{ grossesse.dateMiseAJour ? grossesse.dateMiseAJour|date('d/m/Y H:i') : '—' }}
+                        </span>
+                    </div>
+                    <div class="admin-show-actions">
+                        {{ include('admin/grossesse/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

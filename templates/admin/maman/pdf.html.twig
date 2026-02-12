@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Profil maman #{{ maman.id }} - Maternia</title>
+    <style>
+        body { font-family: DejaVu Sans, sans-serif; font-size: 11px; color: #333; margin: 20px; }
+        h1 { color: #4a7ba7; font-size: 18px; border-bottom: 2px solid #4a7ba7; padding-bottom: 8px; margin-bottom: 20px; }
+        h2 { color: #374151; font-size: 13px; margin-top: 18px; margin-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+        th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #e5e7eb; }
+        th { background: #f8f9fb; font-weight: 600; color: #374151; width: 40%; }
+        .footer { margin-top: 24px; font-size: 9px; color: #6b7280; }
+    </style>
+</head>
+<body>
+    <h1>Maternia – Profil maman #{{ maman.id }}</h1>
+    <p><strong>Généré le</strong> {{ "now"|date("d/m/Y à H:i") }}</p>
+
+    <h2>Contact & santé</h2>
+    <table>
+        <tr><th>Numéro d'urgence</th><td>+216 {{ maman.numeroUrgence }}</td></tr>
+        <tr><th>Groupe sanguin</th><td>{{ maman.groupeSanguin }}</td></tr>
+        <tr><th>Taille</th><td>{{ maman.taille }} cm</td></tr>
+        <tr><th>Poids</th><td>{{ maman.poids ?? '—' }} kg</td></tr>
+        {% if maman.imc %}
+        <tr><th>IMC</th><td>{{ maman.imc }} ({{ maman.imcCategorie }})</td></tr>
+        {% endif %}
+    </table>
+
+    <h2>Antécédents & traitements</h2>
+    <table>
+        <tr><th>Allergies</th><td>{{ maman.allergies ?? '—' }}</td></tr>
+        <tr><th>Antécédents médicaux</th><td>{{ maman.antecedentsMedicaux ?? '—' }}</td></tr>
+        <tr><th>Maladies chroniques</th><td>{{ maman.maladiesChroniques ?? '—' }}</td></tr>
+        <tr><th>Médicaments actuels</th><td>{{ maman.medicamentsActuels ?? '—' }}</td></tr>
+    </table>
+
+    <h2>Mode de vie</h2>
+    <table>
+        <tr><th>Fumeuse</th><td>{{ maman.fumeur ? 'Oui' : 'Non' }}</td></tr>
+        <tr><th>Consommation alcool</th><td>{{ maman.consommationAlcool ? 'Oui' : 'Non' }}</td></tr>
+        <tr><th>Niveau d'activité physique</th><td>{{ maman.niveauActivitePhysique }}</td></tr>
+        <tr><th>Habitudes alimentaires</th><td>{{ maman.habitudesAlimentaires }}</td></tr>
+    </table>
+
+    <h2>Informations système</h2>
+    <table>
+        <tr><th>ID</th><td>#{{ maman.id }}</td></tr>
+        <tr><th>Date de création</th><td>{{ maman.dateCreation ? maman.dateCreation|date('d/m/Y H:i') : '—' }}</td></tr>
+        <tr><th>Dernière mise à jour</th><td>{{ maman.dateMiseAJour ? maman.dateMiseAJour|date('d/m/Y H:i') : '—' }}</td></tr>
+    </table>
+
+    <div class="footer">Document généré par Maternia – Suivi grossesse – Confidentialité des données.</div>
+</body>
+</html>
