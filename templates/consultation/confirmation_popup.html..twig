@@ -1,0 +1,183 @@
+<!-- Pop-up de confirmation -->
+<div id="confirmationPopup" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <!-- En-tête -->
+            <div class="modal-header bg-gradient-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Réservation confirmée !
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            
+            <!-- Corps -->
+            <div class="modal-body text-center py-4">
+                <!-- Animation check -->
+                <div class="checkmark-circle mb-4">
+                    <div class="background"></div>
+                    <div class="checkmark draw"></div>
+                </div>
+                
+                <!-- Message -->
+                <h4 class="text-primary mb-3">Félicitations !</h4>
+                <p class="mb-4">Votre rendez-vous a été réservé avec succès.</p>
+                
+                <!-- Détails -->
+                <div class="alert alert-light border-primary mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Référence :</span>
+                        <strong class="text-primary" id="referenceNumber">RDV-XXXXXXXX</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Médecin :</span>
+                        <strong id="doctorName">Dr. Nom</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Date :</span>
+                        <strong id="appointmentDate">JJ/MM/AAAA HH:MM</strong>
+                    </div>
+                </div>
+                
+                <!-- Boutons d'action -->
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" onclick="window.print()">
+                        <i class="fas fa-print me-2"></i>Imprimer la confirmation
+                    </button>
+                    <button class="btn btn-outline-primary" id="sendEmailBtn">
+                        <i class="fas fa-envelope me-2"></i>Envoyer par email
+                    </button>
+                    <button class="btn btn-light" data-bs-dismiss="modal">
+                        <i class="fas fa-calendar-alt me-2"></i>Prendre un autre RDV
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Pied de page -->
+            <div class="modal-footer bg-light">
+                <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Un email de confirmation vous a été envoyé.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Animation de check */
+.checkmark-circle {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.checkmark-circle .background {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #0d6efd;
+    position: absolute;
+}
+
+.checkmark-circle .checkmark {
+    border-radius: 5px;
+}
+
+.checkmark-circle .checkmark.draw:after {
+    animation-delay: 100ms;
+    animation-duration: 1s;
+    animation-timing-function: ease;
+    animation-name: checkmark;
+    transform: scaleX(-1) rotate(135deg);
+    animation-fill-mode: forwards;
+}
+
+.checkmark-circle .checkmark:after {
+    opacity: 1;
+    height: 40px;
+    width: 20px;
+    transform-origin: left top;
+    border-right: 5px solid white;
+    border-top: 5px solid white;
+    content: '';
+    left: 20px;
+    top: 40px;
+    position: absolute;
+}
+
+@keyframes checkmark {
+    0% {
+        height: 0;
+        width: 0;
+        opacity: 1;
+    }
+    20% {
+        height: 0;
+        width: 20px;
+        opacity: 1;
+    }
+    40% {
+        height: 40px;
+        width: 20px;
+        opacity: 1;
+    }
+    100% {
+        height: 40px;
+        width: 20px;
+        opacity: 1;
+    }
+}
+
+/* Dégradé bleu-rose */
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #e83e8c 100%) !important;
+}
+</style>
+
+<script>
+// Afficher le pop-up automatiquement s'il y a un message flash
+document.addEventListener('DOMContentLoaded', function() {
+    // Vérifier s'il y a un message flash de succès
+    const successAlert = document.querySelector('.alert-success');
+    if (successAlert) {
+        // Extraire les informations du message
+        const message = successAlert.textContent;
+        
+        // Chercher la référence dans le message
+        const refMatch = message.match(/RDV-[A-Z0-9]+/);
+        if (refMatch) {
+            document.getElementById('referenceNumber').textContent = refMatch[0];
+        }
+        
+        // Afficher le pop-up après un court délai
+        setTimeout(function() {
+            const popup = new bootstrap.Modal(document.getElementById('confirmationPopup'));
+            popup.show();
+        }, 500);
+    }
+    
+    // Gestion de l'envoi d'email
+    document.getElementById('sendEmailBtn').addEventListener('click', function() {
+        const btn = this;
+        const originalText = btn.innerHTML;
+        
+        // Simuler l'envoi
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Envoi en cours...';
+        btn.disabled = true;
+        
+        setTimeout(function() {
+            btn.innerHTML = '<i class="fas fa-check me-2"></i>Email envoyé !';
+            btn.className = 'btn btn-success';
+            
+            setTimeout(function() {
+                btn.innerHTML = originalText;
+                btn.className = 'btn btn-outline-primary';
+                btn.disabled = false;
+            }, 2000);
+        }, 1500);
+    });
+});
+</script>

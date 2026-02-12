@@ -1,0 +1,562 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Gestion des consultations{% endblock %}
+{% block page_title %}Consultations & créneaux{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* DESIGN PREMIUM FÉMININ & ÉLÉGANT */
+    :root {
+        --primary-pink: #FF8AAB;
+        --soft-pink: #FFD1DC;
+        --deep-pink: #FF5C8D;
+        --rose-gold: #E5A29D;
+        --lavender: #E1BEE7;
+        --glass-white: rgba(255, 255, 255, 0.95);
+        --gradient-feminine: linear-gradient(135deg, #FF8AAB 0%, #E1BEE7 100%);
+        --gradient-soft: linear-gradient(135deg, #FFF5F5 0%, #FCE4EC 100%);
+        --gradient-stat-1: linear-gradient(135deg, #FF8AAB 0%, #FFB6C1 100%);
+        --gradient-stat-2: linear-gradient(135deg, #81D4FA 0%, #B3E5FC 100%);
+        --gradient-stat-3: linear-gradient(135deg, #A5D6A7 0%, #C8E6C9 100%);
+    }
+
+    .index-container {
+        background: var(--gradient-soft);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    /* STATS CARDS */
+    .stat-card-premium {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        border: 1px solid #FCE4EC;
+        box-shadow: 0 10px 25px rgba(255, 138, 171, 0.05);
+        transition: all 0.3s ease;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .stat-card-premium .label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #A0A0A0; margin-bottom: 0.25rem; }
+    .stat-card-premium .value { font-size: 1.8rem; font-weight: 800; color: #4A4A4A; }
+    .stat-card-premium .icon-bg { position: absolute; right: -10px; bottom: -10px; font-size: 3rem; opacity: 0.05; transform: rotate(-15deg); }
+
+    /* RECHERCHE & TRIS (DESIGN SPÉCIFIQUE) */
+    .search-box { position: relative; display: flex; align-items: center; }
+    .search-box i { position: absolute; left: 12px; color: #9ca3af; font-size: 0.85rem; }
+    .search-input {
+        border: 2px solid #e5e7eb;
+        border-radius: 25px;
+        padding: 6px 14px 6px 34px;
+        font-size: 0.85rem;
+        width: 180px;
+        transition: all 0.3s;
+        outline: none;
+        background: #fafbfc;
+    }
+    .search-input:focus { border-color: var(--primary-pink); width: 240px; background: white; }
+
+    .sort-group { display: flex; gap: 4px; }
+    .sort-btn {
+        border: 2px solid #e5e7eb;
+        background: white;
+        border-radius: 8px;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: #6b7280;
+    }
+    .sort-btn:hover { border-color: var(--primary-pink); color: var(--primary-pink); }
+    .sort-btn.active { background: var(--gradient-feminine); color: white; border-color: transparent; }
+    .sort-arrow { font-size: 0.7rem; }
+
+    /* TABS */
+    .consult-switch { display: flex; justify-content: center; margin: 2rem 0; }
+    .consult-switch-inner { background: white; padding: 0.4rem; border-radius: 50px; display: inline-flex; gap: 0.5rem; border: 1px solid #FCE4EC; }
+    .switch-tab { padding: 0.6rem 1.5rem; border-radius: 50px; border: none; background: transparent; font-weight: 700; color: #666; cursor: pointer; }
+    .switch-tab.active { background: var(--gradient-feminine); color: white; }
+
+    /* CARD & TABLE */
+    .admin-card { background: white; border-radius: 24px; border: 1px solid #FCE4EC; overflow: hidden; box-shadow: 0 15px 35px rgba(255, 138, 171, 0.05); }
+    .admin-card-header { padding: 1.25rem 2rem; border-bottom: 1px solid #FCE4EC; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    
+    .premium-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .premium-table th { 
+        background: #FDF2F8; padding: 1.25rem 1rem; font-size: 0.75rem; 
+        color: #db2777; text-transform: uppercase; letter-spacing: 1px;
+        border-bottom: 2px solid #FBCFE8 !important; border-right: 1px solid #FBCFE8 !important;
+    }
+    .premium-table th:last-child { border-right: none; }
+    .premium-table td { 
+        padding: 1.25rem 1rem; border-bottom: 1px solid #FBCFE8 !important; 
+        border-right: 1px solid #FBCFE8 !important; vertical-align: middle; 
+    }
+    .premium-table td:last-child { border-right: none; }
+    .premium-table tr:hover { background-color: #FFF5F7; }
+
+    /* ACTIONS & BADGES */
+    .btn-action-circle { width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: white; border: 1px solid #FCE4EC; transition: 0.2s; text-decoration: none; }
+    .btn-action-circle:hover { background: #FDF2F8; transform: scale(1.1); }
+    
+    .badge-bebe { background: #E3F2FD; color: #1E88E5; padding: 4px 12px; border-radius: 50px; font-weight: 600; font-size: 0.75rem; border: 1px solid #BBDEFB; }
+    .badge-maman { background: #FCE4EC; color: #D81B60; padding: 4px 12px; border-radius: 50px; font-weight: 600; font-size: 0.75rem; border: 1px solid #F8BBD0; }
+    .badge-les-deux { background: #F3E5F5; color: #8E24AA; padding: 4px 12px; border-radius: 50px; font-weight: 600; font-size: 0.75rem; border: 1px solid #E1BEE7; }
+
+    .btn-feminine { background: var(--gradient-feminine); color: white; border-radius: 50px; padding: 0.6rem 1.2rem; font-weight: 700; border: none; font-size: 0.9rem; box-shadow: 0 5px 15px rgba(255, 138, 171, 0.2); }
+    .btn-feminine:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 138, 171, 0.3); color: white; }
+
+    /* SPECIFIC COLUMN STYLES */
+    .img-preview {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        object-fit: cover;
+        border: 2px solid white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .icon-view {
+        width: 40px;
+        height: 40px;
+        background: #FDF2F8;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-pink);
+        font-size: 1.2rem;
+        box-shadow: inset 0 2px 4px rgba(255, 138, 171, 0.1);
+    }
+    .desc-text {
+        max-width: 250px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        font-size: 0.8rem;
+        color: #666;
+        line-height: 1.4;
+    }
+
+    /* QUICK NAV TABS */
+    .quick-nav-tabs {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 2.5rem;
+        background: white;
+        padding: 0.6rem;
+        border-radius: 50px;
+        border: 1px solid #FCE4EC;
+        box-shadow: 0 10px 30px rgba(255, 138, 171, 0.08);
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .quick-nav-link {
+        padding: 0.7rem 1.5rem;
+        border-radius: 50px;
+        text-decoration: none;
+        color: #718096;
+        font-weight: 700;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+    .quick-nav-link i { font-size: 0.9rem; }
+    .quick-nav-link:hover { background: #FFF5F7; color: var(--deep-pink); }
+    .quick-nav-link.active {
+        background: var(--gradient-feminine);
+        color: white;
+        box-shadow: 0 5px 15px rgba(255, 138, 171, 0.3);
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% endblock %}
+
+{% block header_actions %}
+<div class="d-flex gap-2">
+    <button onclick="exportPDF()" class="btn btn-outline-danger" style="border-radius: 8px; font-weight: 600; padding: 0.5rem 1rem;">
+        <i class="fas fa-file-pdf me-1"></i> PDF
+    </button>
+    <a href="{{ path('app_admin_consultation_new') }}" class="btn btn-feminine">
+        <i class="fas fa-plus me-1"></i> Nouvelle consultation
+    </a>
+    <a href="{{ path('app_admin_consultation_creneau_new') }}" class="btn btn-outline-primary" style="border-radius: 50px; padding: 0.6rem 1.2rem; border-color: var(--primary-pink); color: var(--primary-pink); font-weight: 700;">
+        <i class="fas fa-calendar-plus me-2"></i> Nouveau créneau
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="index-container">
+    <div class="container">
+        <!-- Quick Navigation -->
+        <div class="quick-nav-tabs">
+            <a href="{{ path('app_admin_reservation_client_index') }}" class="quick-nav-link">
+                <i class="fas fa-calendar-check"></i> Réservations
+            </a>
+            <a href="{{ path('app_admin_consultation_index') }}" class="quick-nav-link active">
+                <i class="fas fa-stethoscope"></i> Consultations
+            </a>
+            <a href="{{ path('app_admin_consultation_creneau_index') }}" class="quick-nav-link">
+                <i class="fas fa-clock"></i> Créneaux
+            </a>
+        </div>
+
+        {# STATS #}
+        {% set total = consultations|length %}
+        {% set actives = consultations|filter(c => c.statut)|length %}
+        {% set count_bebe = consultations|filter(c => c.pour == 'BEBE')|length %}
+        {% set count_maman = consultations|filter(c => c.pour == 'MAMAN')|length %}
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card-premium">
+                    <div class="label">Total consultations</div>
+                    <div class="value">{{ total }}</div>
+                    <div class="icon-bg"><i class="fas fa-stethoscope"></i></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-premium" style="border-bottom: 3px solid #4CAF50;">
+                    <div class="label" style="color: #4CAF50;">Actives</div>
+                    <div class="value">{{ actives }}</div>
+                    <div class="icon-bg"><i class="fas fa-check-circle"></i></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-premium" style="border-bottom: 3px solid #2196F3;">
+                    <div class="label" style="color: #2196F3;">👶 Bébé</div>
+                    <div class="value">{{ count_bebe }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-premium" style="border-bottom: 3px solid #E91E63;">
+                    <div class="label" style="color: #E91E63;">🤰 Maman</div>
+                    <div class="value">{{ count_maman }}</div>
+                </div>
+            </div>
+        </div>
+
+        {# GRAPHES (DESIGN RECHERCHÉ) #}
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="admin-card p-4">
+                    <h6 class="fw-bold mb-4 d-flex align-items-center">
+                        <i class="fas fa-chart-pie me-2" style="color: var(--primary-pink);"></i>Répartition par public
+                    </h6>
+                    <div style="height: 200px; position: relative;">
+                        <canvas id="chartPour"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="admin-card p-4">
+                    <h6 class="fw-bold mb-4 d-flex align-items-center">
+                        <i class="fas fa-toggle-on me-2" style="color: var(--primary-pink);"></i>Statut de disponibilité
+                    </h6>
+                    <div style="height: 200px; position: relative;">
+                        <canvas id="chartStatut"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="admin-card p-4">
+                    <h6 class="fw-bold mb-4 d-flex align-items-center">
+                        <i class="fas fa-list-ol me-2" style="color: var(--primary-pink);"></i>Top catégories actives
+                    </h6>
+                    <div class="d-flex flex-column gap-3">
+                        {% for c in consultations|filter(c => c.statut)|slice(0, 5) %}
+                        <div class="d-flex justify-content-between align-items-center p-2 rounded-3 hover-bg-light" style="transition: 0.2s; background: #fafbfc;">
+                            <span class="small fw-bold">{{ c.categorie }}</span>
+                            <span class="badge {% if c.pour == 'BEBE' %}badge-bebe{% elseif c.pour == 'MAMAN' %}badge-maman{% else %}badge-les-deux{% endif %}">{{ c.pour|replace({'LES_DEUX': 'LES DEUX'}) }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-consultations" class="consult-section active">
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h5 class="mb-0 fw-bold">Liste des consultations</h5>
+                    <div class="d-flex gap-3 align-items-center">
+                        {# RECHERCHE CÔTÉ SERVEUR #}
+                        <form action="{{ path('app_admin_consultation_index') }}" method="get" class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="search" name="q" id="searchConsult" class="search-input" placeholder="Rechercher (catégorie, description…)" value="{{ searchTerm|default('') }}">
+                        </form>
+                        {% if searchTerm %}
+                            <a href="{{ path('app_admin_consultation_index') }}" class="btn btn-sm btn-outline-secondary">Effacer</a>
+                        {% endif %}
+                        {# TRI AVEC FLÈCHES #}
+                        <div class="sort-group">
+                            <button class="sort-btn active" onclick="sortRows('ordre', this)" title="Trier par ordre">
+                                <span class="fw-bold">#</span> <i class="fas fa-arrow-up sort-arrow"></i>
+                            </button>
+                            <button class="sort-btn" onclick="sortRows('categorie', this)" title="Trier par catégorie">
+                                <span class="fw-bold">A</span> <i class="fas fa-arrow-up sort-arrow"></i>
+                            </button>
+                            <button class="sort-btn" onclick="sortRows('pour', this)" title="Trier par public cible">
+                                <i class="fas fa-users"></i> <i class="fas fa-arrow-up sort-arrow"></i>
+                            </button>
+                        </div>
+                        <span class="badge bg-danger rounded-pill px-3">{{ total }}</span>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table premium-table" id="consultTable">
+                        <thead>
+                            <tr>
+                                <th width="60">Ordre</th>
+                                <th width="80">Icon</th>
+                                <th>Catégorie</th>
+                                <th>Pour</th>
+                                <th>Image</th>
+                                <th>Description</th>
+                                <th width="100">Statut</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="consultBody">
+                            {% for c in consultations %}
+                            <tr class="consult-row" 
+                                data-categorie="{{ c.categorie|lower }}" 
+                                data-ordre="{{ c.ordreAffichage }}" 
+                                data-pour="{{ c.pour|lower }}">
+                                <td class="text-center"><span class="fw-bold" style="color: var(--primary-pink);">#{{ c.ordreAffichage }}</span></td>
+                                <td>
+                                    <div class="icon-view">
+                                        <i class="{{ c.icon ?: 'fas fa-stethoscope' }}"></i>
+                                    </div>
+                                </td>
+                                <td><span class="fw-bold">{{ c.categorie }}</span></td>
+                                <td>
+                                    {% if c.pour == 'BEBE' %}<span class="badge-bebe">👶 Bébé</span>
+                                    {% elseif c.pour == 'MAMAN' %}<span class="badge-maman">🤰 Maman</span>
+                                    {% else %}<span class="badge-les-deux">👨‍👩‍👧 Les deux</span>{% endif %}
+                                </td>
+                                <td>
+                                    {% if c.image %}
+                                        <img src="{{ asset('uploads/consultations/' ~ c.image) }}" class="img-preview" alt="{{ c.categorie }}" onerror="this.src='https://placehold.co/60x60?text=No+Img'">
+                                    {% else %}
+                                        <div class="img-preview bg-light d-flex align-items-center justify-content-center text-muted">
+                                            <i class="fas fa-image"></i>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="desc-text" title="{{ c.description }}">
+                                        {{ c.description ?: 'Aucune description disponible.' }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge {% if c.statut %}bg-success{% else %}bg-secondary{% endif %} rounded-pill px-3 py-2" style="font-size: 0.65rem; font-weight: 700;">
+                                        {{ c.statut ? 'ACTIF' : 'INACTIF' }}
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="{{ path('app_admin_consultation_show', {'id': c.id}) }}" class="btn-action-circle" title="Voir"><i class="fas fa-eye text-info"></i></a>
+                                        <a href="{{ path('app_admin_consultation_edit', {'id': c.id}) }}" class="btn-action-circle" title="Éditer"><i class="fas fa-pen text-warning"></i></a>
+                                        <button class="btn-action-circle" title="Supprimer" onclick="confirmDeleteConsultation('{{ path('app_admin_consultation_delete', {'id': c.id}) }}', '{{ csrf_token('delete' ~ c.id) }}', this.closest('tr'))"><i class="fas fa-trash text-danger"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# PDF HIDDEN #}
+<div id="pdfContent" style="display: none;">
+    <div style="padding: 40px; font-family: sans-serif;">
+        <h1 style="color: #FF8AAB; text-align: center;">MATERNIA - Liste des Consultations</h1>
+        <hr style="border: 1px solid #FFD1DC;">
+        <p style="text-align: right; color: #666;">Généré le: {{ "now"|date("d/m/Y H:i") }}</p>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 30px; font-size: 10px;">
+            <thead>
+                <tr style="background: #FDF2F8; border-bottom: 2px solid #FFD1DC;">
+                    <th style="padding: 10px; text-align: left; border: 1px solid #F3E5F5;">Ordre</th>
+                    <th style="padding: 10px; text-align: left; border: 1px solid #F3E5F5;">Catégorie</th>
+                    <th style="padding: 10px; text-align: left; border: 1px solid #F3E5F5;">Icône</th>
+                    <th style="padding: 10px; text-align: left; border: 1px solid #F3E5F5;">Public</th>
+                    <th style="padding: 10px; text-align: left; border: 1px solid #F3E5F5;">Description</th>
+                    <th style="padding: 10px; text-align: left; border: 1px solid #F3E5F5;">Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in consultations %}
+                <tr style="border-bottom: 1px solid #F3E5F5;">
+                    <td style="padding: 10px; border: 1px solid #F3E5F5;">#{{ c.ordreAffichage }}</td>
+                    <td style="padding: 10px; border: 1px solid #F3E5F5; font-weight: bold;">{{ c.categorie }}</td>
+                    <td style="padding: 10px; border: 1px solid #F3E5F5; font-family: monospace;">{{ c.icon }}</td>
+                    <td style="padding: 10px; border: 1px solid #F3E5F5;">{{ c.pour == 'BEBE' ? '👶 Bébé' : (c.pour == 'MAMAN' ? '🤰 Maman' : '👨‍👩‍👧 Les deux') }}</td>
+                    <td style="padding: 10px; border: 1px solid #F3E5F5; max-width: 250px;">{{ c.description }}</td>
+                    <td style="padding: 10px; border: 1px solid #F3E5F5;">
+                        <span style="color: {{ c.statut ? '#2E7D32' : '#D32F2F' }}; font-weight: bold;">
+                            {{ c.statut ? 'ACTIF' : 'INACTIF' }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // RECHERCHE INSTANTANÉE
+    const searchConsult = document.getElementById('searchConsult');
+    if (searchConsult) {
+        searchConsult.addEventListener('input', function() {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('.consult-row').forEach(row => {
+                const matches = row.textContent.toLowerCase().includes(q);
+                row.style.display = matches ? '' : 'none';
+            });
+        });
+    }
+
+    // TRI AVEC FLÈCHES
+    function sortRows(key, btn) {
+         const body = document.getElementById('consultBody');
+         const rows = Array.from(body.querySelectorAll('.consult-row'));
+         let dir = btn.dataset.dir || 'asc';
+         
+         if (btn.classList.contains('active')) {
+             dir = dir === 'asc' ? 'desc' : 'asc';
+         }
+         
+         document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+         btn.classList.add('active');
+         
+         rows.sort((a, b) => {
+             let valA = a.dataset[key];
+             let valB = b.dataset[key];
+             if (key === 'ordre') { valA = parseInt(valA); valB = parseInt(valB); }
+             if (dir === 'asc') return valA > valB ? 1 : -1;
+             return valA < valB ? 1 : -1;
+         });
+         
+         rows.forEach(r => body.appendChild(r));
+         btn.dataset.dir = dir;
+         btn.querySelector('.sort-arrow').className = dir === 'asc' ? 'fas fa-arrow-up sort-arrow' : 'fas fa-arrow-down sort-arrow';
+    }
+
+    // CHARTS INITIALIZATION
+    document.addEventListener('DOMContentLoaded', function() {
+        // Chart Pour (Public)
+        new Chart(document.getElementById('chartPour'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Bébé', 'Maman', 'Les deux'],
+                datasets: [{
+                    data: [{{ count_bebe }}, {{ count_maman }}, {{ total - count_bebe - count_maman }}],
+                    backgroundColor: ['#4A90E2', '#FF69B4', '#E1BEE7'],
+                    borderColor: '#ffffff',
+                    borderWidth: 4,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { size: 11, weight: '600' } } }
+                },
+                cutout: '75%'
+            }
+        });
+
+        // Chart Statut (Actives)
+        new Chart(document.getElementById('chartStatut'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Actives', 'Inactives'],
+                datasets: [{
+                    data: [{{ actives }}, {{ total - actives }}],
+                    backgroundColor: ['#4CAF50', '#B0BEC5'],
+                    borderColor: '#ffffff',
+                    borderWidth: 4,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { size: 11, weight: '600' } } }
+                },
+                cutout: '75%'
+            }
+        });
+    });
+
+    // EXPORT PDF
+    function exportPDF() {
+        const element = document.getElementById('pdfContent');
+        element.style.display = 'block';
+        const opt = {
+            margin: 10,
+            filename: 'maternia_consultations.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().from(element).set(opt).save().then(() => {
+            element.style.display = 'none';
+        });
+    }
+
+    // DELETE CONFIRMATION
+    function confirmDeleteConsultation(url, token, row) {
+        Swal.fire({
+            title: '⚠️ Attention',
+            text: "Supprimer cette catégorie supprimera tous les créneaux qui y sont rattachés. Continuer ?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#FF5C8D',
+            cancelButtonColor: '#B0B0B0',
+            confirmButtonText: 'Oui, supprimer',
+            cancelButtonText: 'Annuler',
+            borderRadius: '24px'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const formData = new FormData();
+                formData.append('_token', token);
+                fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {'X-Requested-With': 'XMLHttpRequest'}
+                }).then(response => response.json()).then(data => {
+                    if (data.success) {
+                        row.classList.add('animate__animated', 'animate__fadeOutRight');
+                        setTimeout(() => row.remove(), 500);
+                        Swal.fire({ title: '✨ Supprimé !', icon: 'success', timer: 1500, showConfirmButton: false });
+                    } else {
+                        Swal.fire({ title: 'Erreur', text: data.message || 'Erreur lors de la suppression', icon: 'error' });
+                    }
+                }).catch(err => {
+                    Swal.fire({ title: 'Erreur', text: 'Une erreur imprévue est survenue.', icon: 'error' });
+                });
+            }
+        });
+    }
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+{% endblock %}

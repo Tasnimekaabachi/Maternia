@@ -36,9 +36,22 @@
                     <i class="fas fa-calendar-alt"></i>
                     Événements
                 </a>
-                <a href="{{ path('admin_consultations') }}" class="nav-link {{ app.request.attributes.get('_route') == 'admin_consultations' ? 'active' : '' }}">
+                <!-- Consultations (types de consultations) -->
+                {% set _route = app.request.attributes.get('_route') %}
+                <a href="{{ path('app_admin_consultation_index') }}" 
+                   class="nav-link {{ (_route starts with 'app_admin_consultation') and (_route starts with 'app_admin_consultation_creneau') == false ? 'active' : '' }}">
                     <i class="fas fa-stethoscope"></i>
                     Consultations
+                </a>
+                <a href="{{ path('app_admin_consultation_creneau_index') }}" 
+                   class="nav-link {{ app.request.attributes.get('_route') starts with 'app_admin_consultation_creneau' ? 'active' : '' }}">
+                    <i class="fas fa-calendar-check"></i>
+                    Créneaux consultation
+                </a>
+                <a href="{{ path('app_admin_reservation_client_index') }}" 
+                   class="nav-link {{ app.request.attributes.get('_route') starts with 'app_admin_reservation_client' ? 'active' : '' }}">
+                    <i class="fas fa-user-clock"></i>
+                    Réservations clients
                 </a>
                 <a href="{{ path('admin_profil_bebe') }}" class="nav-link {{ app.request.attributes.get('_route') == 'admin_profil_bebe' ? 'active' : '' }}">
                     <i class="fas fa-baby"></i>
