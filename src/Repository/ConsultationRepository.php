@@ -71,6 +71,34 @@ class ConsultationRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /** Recherche dans catégorie + description (page publique, consultations actives uniquement) */
+    public function searchActive(?string $term): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->where('c.statut = :statut')
+            ->setParameter('statut', true)
+            ->orderBy('c.ordreAffichage', 'ASC')
+            ->addOrderBy('c.categorie', 'ASC');
+        if ($term !== null && trim($term) !== '') {
+            $qb->andWhere('c.categorie LIKE :term OR c.description LIKE :term')
+                ->setParameter('term', '%' . trim($term) . '%');
+        }
+        return $qb->getQuery()->getResult();
+    }
+
+    /** Recherche dans catégorie + description (backoffice, toutes les consultations) */
+    public function searchAll(?string $term): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->orderBy('c.ordreAffichage', 'ASC')
+            ->addOrderBy('c.categorie', 'ASC');
+        if ($term !== null && trim($term) !== '') {
+            $qb->where('c.categorie LIKE :term OR c.description LIKE :term')
+                ->setParameter('term', '%' . trim($term) . '%');
+        }
+        return $qb->getQuery()->getResult();
+    }
+
     public function findByStatut(bool $statut): array
     {
         return $this->createQueryBuilder('c')

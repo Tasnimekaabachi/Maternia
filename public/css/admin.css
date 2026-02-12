@@ -166,6 +166,15 @@ body.admin-body {
     border-color: rgba(74, 123, 167, 0.25);
 }
 
+.admin-stat-link {
+    color: inherit;
+    cursor: pointer;
+}
+
+.admin-stat-link:hover {
+    color: inherit;
+}
+
 .admin-stat-value {
     font-size: 1.75rem;
     font-weight: 700;

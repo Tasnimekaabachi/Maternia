@@ -9,51 +9,51 @@
         --primary-pink: #FF8AAB;
         --soft-pink: #FFD1DC;
         --deep-pink: #FF5C8D;
+        --primary-blue: #4A90E2;
         --gradient-feminine: linear-gradient(135deg, #FF8AAB 0%, #E1BEE7 100%);
-        --gradient-soft: linear-gradient(135deg, #FFF5F5 0%, #FCE4EC 100%);
-        --glass-white: rgba(255, 255, 255, 0.95);
+        --gradient-soft: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
     }
 
-    .form-container { background: var(--gradient-soft); min-height: 100vh; padding: 3rem 0; }
+    .form-container { background: var(--gradient-soft); min-height: 100vh; padding: 2rem 0; }
     
     .glass-card {
-        background: var(--glass-white); backdrop-filter: blur(15px);
-        border-radius: 30px; border: 1px solid white; overflow: hidden;
-        box-shadow: 0 25px 50px rgba(255, 138, 171, 0.15);
+        background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+        border-radius: 24px; border: 1px solid rgba(255,255,255,0.2);
+        box-shadow: 0 20px 40px rgba(255, 138, 171, 0.1); overflow: hidden;
     }
 
     .header-gradient {
-        background: var(--gradient-feminine); padding: 3rem; color: white; text-align: center;
-        position: relative;
+        background: var(--gradient-feminine); padding: 2.5rem; color: white;
+        position: relative; overflow: hidden;
     }
 
-    .section-container { padding: 3rem; }
+    .section-container { padding: 2rem; }
     
     .section-title {
-        font-weight: 800; color: #4A4A4A; font-size: 1.25rem; margin-bottom: 2rem;
+        font-weight: 700; color: #333; font-size: 1.1rem; margin-bottom: 1.5rem;
         display: flex; align-items: center; gap: 10px;
     }
-    .section-title::after {
-        content: ''; flex: 1; height: 2px; background: #FCE4EC; border-radius: 10px;
-    }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: #eee; }
 
-    .modern-input-group { margin-bottom: 1.5rem; }
-    .form-label { font-weight: 700; color: #6D6D6D; margin-bottom: 0.5rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .modern-input-group { margin-bottom: 1.25rem; }
     
     .form-control, .form-select {
-        border-radius: 14px; border: 2px solid #F3E5F5; padding: 0.8rem 1.2rem;
-        transition: all 0.3s; background: #FFFFFF; font-size: 0.95rem;
+        border-radius: 12px; border: 2px solid #edf2f7; padding: 0.75rem 1rem;
+        transition: all 0.3s; background: #fff; font-size: 0.9rem;
     }
     .form-control:focus, .form-select:focus {
-        border-color: var(--primary-pink); box-shadow: 0 0 0 4px rgba(255, 138, 171, 0.1); outline: none;
+        border-color: var(--primary-pink); box-shadow: 0 0 0 3px rgba(255, 138, 171, 0.1); outline: none;
     }
 
-    .btn-feminine {
+    .btn-save-modern {
         background: var(--gradient-feminine); color: white; border-radius: 50px;
-        padding: 1rem 3rem; font-weight: 800; border: none; transition: 0.3s;
-        text-transform: uppercase; letter-spacing: 1px;
+        padding: 0.8rem 2.5rem; font-weight: 700; border: none; transition: 0.3s;
     }
-    .btn-feminine:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(255, 138, 171, 0.4); color: white; }
+    .btn-save-modern:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,138,171,0.3); color: white; }
+    
+    .input-icon-wrapper { position: relative; }
+    .input-icon-wrapper i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--primary-pink); }
+    .input-icon-wrapper .form-control, .input-icon-wrapper .form-select { padding-left: 2.8rem; }
 </style>
 {% endblock %}
 
@@ -61,47 +61,124 @@
 <div class="form-container">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-9">
+            <div class="col-lg-10 col-xl-8">
                 <div class="glass-card">
-                    <div class="header-gradient">
-                        <i class="fas fa-calendar-alt fa-3x mb-3"></i>
-                        <h2 class="fw-bold mb-1">{{ reservation.id ? 'Modifier la réservation' : 'Nouvelle réservation' }}</h2>
-                        <p class="mb-0 opacity-75">#{{ reservation.reference }}</p>
+                    <div class="header-gradient d-flex align-items-center gap-4">
+                        <div class="bg-white text-pink rounded-pill p-3" style="width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-calendar-check fa-2x"></i>
+                        </div>
+                        <div>
+                            <h2 class="fw-bold mb-0">{{ reservation.id ? 'Modifier la réservation' : 'Nouveau rendez-vous' }}</h2>
+                            <p class="mb-0 opacity-80">Réf: #{{ reservation.reference }}</p>
+                        </div>
                     </div>
 
                     <div class="section-container">
-                        {{ form_start(form, {'attr': {'class': 'form-modern'}}) }}
+                        {{ form_start(form, {'attr': {'class': 'form-modern', 'novalidate': 'novalidate'}}) }}
+                            
+                            {% if not form.vars.valid %}
+                                <div class="alert alert-danger mb-4 shadow-sm border-0" style="border-radius: 12px; border-left: 5px solid #dc3545 !important;">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-exclamation-triangle me-3 fa-lg"></i>
+                                        <div>
+                                            <h6 class="fw-bold mb-1">Attention</h6>
+                                            <p class="mb-0 small">Veuillez corriger les erreurs ci-dessous pour enregistrer.</p>
+                                        </div>
+                                    </div>
+                                    {{ form_errors(form) }}
+                                </div>
+                            {% endif %}
                             
                             <div class="section-title">
-                                <i class="fas fa-user-circle text-pink"></i> Informations Patient
+                                <i class="fas fa-user-edit"></i> Informations du Patient
                             </div>
-                            <div class="row">
-                                <div class="col-md-6 modern-input-group">{{ form_row(form.nomClient) }}</div>
-                                <div class="col-md-6 modern-input-group">{{ form_row(form.prenomClient) }}</div>
-                                <div class="col-md-6 modern-input-group">{{ form_row(form.emailClient) }}</div>
-                                <div class="col-md-6 modern-input-group">{{ form_row(form.telephoneClient) }}</div>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Nom</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="fas fa-user"></i>
+                                        {{ form_widget(form.nomClient) }}
+                                    </div>
+                                    <div class="text-danger small mt-1">{{ form_errors(form.nomClient) }}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Prénom</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="fas fa-user"></i>
+                                        {{ form_widget(form.prenomClient) }}
+                                    </div>
+                                    <div class="text-danger small mt-1">{{ form_errors(form.prenomClient) }}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Email</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="fas fa-envelope"></i>
+                                        {{ form_widget(form.emailClient) }}
+                                    </div>
+                                    <div class="text-danger small mt-1">{{ form_errors(form.emailClient) }}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Téléphone</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="fas fa-phone"></i>
+                                        {{ form_widget(form.telephoneClient) }}
+                                    </div>
+                                    <div class="text-danger small mt-1">{{ form_errors(form.telephoneClient) }}</div>
+                                </div>
                             </div>
 
-                            <div class="section-title mt-4">
-                                <i class="fas fa-notes-medical text-pink"></i> Détails & Statut
+                            <div class="section-title">
+                                <i class="fas fa-clock"></i> Créneau & Type
                             </div>
-                            <div class="row">
-                                <div class="col-md-4 modern-input-group">{{ form_row(form.typePatient) }}</div>
-                                <div class="col-md-4 modern-input-group">{{ form_row(form.moisGrossesse) }}</div>
-                                <div class="col-md-4 modern-input-group">{{ form_row(form.dateNaissanceBebe) }}</div>
-                                <div class="col-md-6 modern-input-group">{{ form_row(form.statutReservation) }}</div>
-                                <div class="col-md-12 modern-input-group">{{ form_row(form.notes) }}</div>
-                            </div>
-                            
-                            <div class="text-center mt-5">
-                                <button type="submit" class="btn btn-feminine">
-                                    <i class="fas fa-check-circle me-2"></i> {{ reservation.id ? 'Mettre à jour' : 'Créer la réservation' }}
-                                </button>
-                                <div class="mt-4">
-                                    <a href="{{ path('app_admin_reservation_client_index') }}" class="text-muted text-decoration-none fw-bold">
-                                        <i class="fas fa-times-circle me-1"></i> Annuler et retourner
-                                    </a>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-12">
+                                    <label class="form-label small fw-bold">Sélectionner le Créneau (Médecin & Date) *</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="fas fa-user-md"></i>
+                                        {{ form_widget(form.consultationCreneau) }}
+                                    </div>
+                                    <div class="text-danger small mt-1">{{ form_errors(form.consultationCreneau) }}</div>
                                 </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Public Cible</label>
+                                    {{ form_widget(form.typePatient) }}
+                                    <div class="text-danger small mt-1">{{ form_errors(form.typePatient) }}</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Mois Grossesse</label>
+                                    {{ form_widget(form.moisGrossesse) }}
+                                    <div class="text-danger small mt-1">{{ form_errors(form.moisGrossesse) }}</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Date Naissance Bébé</label>
+                                    {{ form_widget(form.dateNaissanceBebe) }}
+                                    <div class="text-danger small mt-1">{{ form_errors(form.dateNaissanceBebe) }}</div>
+                                </div>
+                            </div>
+
+                            <div class="section-title">
+                                <i class="fas fa-info-circle"></i> Statut & Notes
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Statut de Réservation</label>
+                                    {{ form_widget(form.statutReservation) }}
+                                    <div class="text-danger small mt-1">{{ form_errors(form.statutReservation) }}</div>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label small fw-bold">Notes Internes</label>
+                                    {{ form_widget(form.notes) }}
+                                    <div class="text-danger small mt-1">{{ form_errors(form.notes) }}</div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 pt-4 border-top d-flex justify-content-end gap-3 align-items-center">
+                                <a href="{{ path('app_admin_reservation_client_index') }}" class="text-muted fw-bold me-2">
+                                    Annuler
+                                </a>
+                                <button type="submit" class="btn btn-save-modern">
+                                    <i class="fas fa-check-circle me-2"></i> {{ reservation.id ? 'Enregistrer les modifications' : 'Créer le rendez-vous' }}
+                                </button>
                             </div>
                         {{ form_end(form) }}
                     </div>

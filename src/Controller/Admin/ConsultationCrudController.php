@@ -15,10 +15,14 @@ use Symfony\Component\Routing\Attribute\Route;
 class ConsultationCrudController extends AbstractController
 {
     #[Route('/', name: 'app_admin_consultation_index', methods: ['GET'])]
-    public function index(ConsultationRepository $consultationRepository): Response
+    public function index(Request $request, ConsultationRepository $consultationRepository): Response
     {
+        $searchTerm = $request->query->get('q');
+        $consultations = $consultationRepository->searchAll($searchTerm);
+
         return $this->render('admin/consultation_crud/index.html.twig', [
-            'consultations' => $consultationRepository->findAllOrdered(),
+            'consultations' => $consultations,
+            'searchTerm' => $searchTerm ? trim($searchTerm) : null,
         ]);
     }
 

@@ -21,6 +21,35 @@
 <!-- Consultation Categories -->
 <div class="container py-5">
 
+    {# Barre de recherche simple #}
+    <form action="{{ path('app_consultations') }}" method="get" class="mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="input-group consult-search-bar">
+                    <span class="input-group-text bg-white border-end-0"><i class="fa fa-search text-muted"></i></span>
+                    <input type="search" name="q" value="{{ searchTerm|default('') }}"
+                           class="form-control border-start-0" placeholder="Rechercher une consultation (ex. échographie, pédiatre...)"
+                           aria-label="Rechercher">
+                    <button type="submit" class="btn btn-primary px-4">Rechercher</button>
+                    {% if searchTerm %}
+                        <a href="{{ path('app_consultations') }}" class="btn btn-outline-secondary">Effacer</a>
+                    {% endif %}
+                </div>
+                {% if searchTerm is not null and searchTerm != '' %}
+                    <p class="text-muted small mt-2 mb-0 text-center">
+                        {{ searchResultCount|default(0) }} résultat(s) pour « {{ searchTerm|e }} »
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+
+    {% if searchTerm and (consultationsMaman|length == 0 and consultationsBebe|length == 0) %}
+    <div class="text-center py-5">
+        <p class="text-muted mb-3">Aucune consultation ne correspond à « {{ searchTerm|e }} ».</p>
+        <a href="{{ path('app_consultations') }}" class="btn btn-outline-primary">Voir toutes les consultations</a>
+    </div>
+    {% else %}
     <!-- Pour les mamans -->
     {% if consultationsMaman|length > 0 %}
     <div class="mb-5">
@@ -120,6 +149,7 @@
         </div>
     </div>
     {% endif %}
+    {% endif %}
 </div>
 
 <style>
@@ -203,6 +233,12 @@
 .consult-accent-deux {
     background: linear-gradient(90deg, #cd9cf2, #a18cd1);
 }
+
+/* RECHERCHE */
+.consult-search-bar .input-group-text { border-radius: 50px 0 0 50px; }
+.consult-search-bar .form-control { border-radius: 0; }
+.consult-search-bar .form-control:focus { box-shadow: none; border-color: #ced4da; }
+.consult-search-bar .btn { border-radius: 0 50px 50px 0; }
 
 /* GENERAL STYLES */
 .consult-header-icon { font-size: 2.2rem; line-height: 1; }

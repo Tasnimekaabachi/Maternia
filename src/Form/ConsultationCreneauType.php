@@ -17,6 +17,8 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints\File;
 
 class ConsultationCreneauType extends AbstractType
 {
@@ -35,10 +37,18 @@ class ConsultationCreneauType extends AbstractType
                 'label' => 'Nom du médecin',
                 'attr' => ['maxlength' => 100]
             ])
-            ->add('photoMedecin', TextType::class, [
-                'label' => 'Photo du médecin (fichier ou URL)',
+            ->add('photoFile', FileType::class, [
+                'label' => 'Photo du médecin',
                 'required' => false,
-                'attr' => ['maxlength' => 255]
+                'mapped' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '2M',
+                        'mimeTypes' => ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+                        'mimeTypesMessage' => 'Veuillez envoyer une image (JPEG, PNG, WebP ou GIF).',
+                    ]),
+                ],
+                'attr' => ['accept' => 'image/*'],
             ])
             ->add('descriptionMedecin', TextareaType::class, [
                 'label' => 'Description du médecin',
@@ -105,11 +115,6 @@ class ConsultationCreneauType extends AbstractType
                 'attr' => ['class' => 'creneaux-collection'],
                 'prototype' => true,
                 'prototype_name' => '__name__',
-            ])
-            // CHAMPS CLIENT (Via ReservationClient)
-            ->add('reservation', ReservationClientType::class, [
-                'label' => 'Détails de la réservation',
-                'required' => false,
             ]);
     }
 

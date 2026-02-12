@@ -85,11 +85,13 @@ class ReservationClientCrudController extends AbstractController
 
             $this->addFlash('success', 'Réservation créée avec succès.');
             return $this->redirectToRoute('app_admin_reservation_client_index');
+        } elseif ($form->isSubmitted()) {
+            $this->addFlash('error', 'Le formulaire contient des erreurs. Veuillez les corriger.');
         }
 
         return $this->render('admin/reservation_client/new.html.twig', [
             'reservation' => $reservation,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -105,6 +107,8 @@ class ReservationClientCrudController extends AbstractController
 
             $this->addFlash('success', 'Réservation mise à jour avec succès.');
             return $this->redirectToRoute('app_admin_reservation_client_index');
+        } elseif ($form->isSubmitted()) {
+            $this->addFlash('error', 'Échec de la mise à jour. Veuillez vérifier les erreurs du formulaire.');
         }
 
         return $this->render('admin/reservation_client/edit.html.twig', [

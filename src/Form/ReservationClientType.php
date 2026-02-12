@@ -10,8 +10,12 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Entity\ConsultationCreneau;
+use App\Entity\Consultation;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Doctrine\ORM\EntityRepository;
 
 class ReservationClientType extends AbstractType
 {
@@ -69,6 +73,34 @@ class ReservationClientType extends AbstractType
                 'label' => 'Notes internes',
                 'required' => false,
                 'attr' => ['class' => 'form-control', 'rows' => 4, 'placeholder' => 'Notes ou observations...']
+            ])
+            ->add('consultationCreneau', EntityType::class, [
+                'class' => ConsultationCreneau::class,
+                'label' => 'Créneau Horaire *',
+                'query_builder' => function (EntityRepository $er) use ($options) {
+                    $reservation = $options['data'] ?? null;
+                    $qb = $er->createQueryBuilder('c')
+                        ->leftJoin('c.reservation', 'r')
+                        ->where('r.id IS NULL');
+
+                    if ($reservation && $reservation->getId()) {
+                        $qb->orWhere('r.id = :current_res_id')
+                           ->setParameter('current_res_id', $reservation->getId());
+                    }
+
+                    return $qb->orderBy('c.dateDebut', 'ASC');
+                },
+                'choice_label' => function (ConsultationCreneau $creneau) {
+                    return sprintf(
+                        'Dr. %s - %s (%s à %s)',
+                        $creneau->getNomMedecin(),
+                        $creneau->getJour() ? $creneau->getJour()->format('d/m/Y') : '',
+                        $creneau->getHeureDebut() ? $creneau->getHeureDebut()->format('H:i') : '',
+                        $creneau->getHeureFin() ? $creneau->getHeureFin()->format('H:i') : ''
+                    );
+                },
+                'placeholder' => 'Sélectionnez un créneau disponible',
+                'attr' => ['class' => 'form-select']
             ]);
     }
 

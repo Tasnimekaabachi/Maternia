@@ -1,6 +1,11 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Modifier la consultation{% endblock %}
+{% block page_title %}Modifier : {{ consultation.categorie }}{% endblock %}
+
 {% block stylesheets %}
 <style>
-    /* RÉCUPÉRATION DES STYLES VIBRANTS DE LA PAGE 'NEW' */
+    /* DESIGN ULTRA MODERNE ET PROFESSIONNEL SYNCHRONISÉ AVEC NEW.HTML.TWIG */
     :root {
         --primary-blue: #4A90E2;
         --light-blue: #87CEEB;
@@ -8,167 +13,294 @@
         --pink: #FF69B4;
         --soft-pink: #FFB6C1;
         --lavender: #E6E6FA;
+        --mint: #98FF98;
+        --peach: #FFDAB9;
         --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--pink) 100%);
+        --gradient-soft: linear-gradient(135deg, var(--light-blue) 0%, var(--soft-pink) 100%);
+        --gradient-baby: linear-gradient(135deg, var(--baby-blue) 0%, var(--lavender) 100%);
+    }
+
+    .new-consultation-container {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
     }
 
     .glass-card {
         background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
         border-radius: 24px;
         border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 20px 40px rgba(74, 144, 226, 0.1);
+        box-shadow: 0 20px 40px rgba(74, 144, 226, 0.15),
+                    0 10px 20px rgba(255, 105, 180, 0.1);
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+
+    .header-gradient {
+        background: var(--gradient-primary);
+        position: relative;
         overflow: hidden;
     }
 
-    .admin-card-header {
-        background: var(--gradient-primary);
-        color: white;
-        padding: 1.5rem 2rem;
-        font-weight: 700;
-        font-size: 1.2rem;
+    .header-gradient::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3-3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+        opacity: 0.1;
     }
 
+    .section-container { padding: 2.5rem; }
+    .section-title {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-bottom: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .section-title::before {
+        content: '';
+        position: absolute;
+        left: 0; top: 0; bottom: 0; width: 6px;
+        background: var(--gradient-primary);
+        border-radius: 3px;
+    }
+
+    /* INPUT STYLES MODERNES */
     .modern-input {
         border: 2px solid transparent;
         background: linear-gradient(white, white) padding-box,
                     linear-gradient(135deg, var(--light-blue), var(--soft-pink)) border-box;
         border-radius: 15px;
-        padding: 0.8rem 1.2rem;
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
         transition: all 0.3s ease;
     }
 
-    /* RADIO BUTTONS CUSTOM */
     .target-option {
         position: relative;
-        border: 2px solid #F3F4F6;
+        border: 2px solid transparent;
         background: white;
-        border-radius: 18px;
-        padding: 1rem;
+        border-radius: 20px;
+        padding: 1.5rem;
         cursor: pointer;
         transition: all 0.3s ease;
-        text-align: center;
+        overflow: hidden;
     }
 
-    .target-option:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-
     .target-option input[type="radio"]:checked + .option-content {
-        background: linear-gradient(135deg, rgba(74, 144, 226, 0.05) 0%, rgba(255, 105, 180, 0.05) 100%);
-        border: 2px solid var(--primary-blue);
+        background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(255, 105, 180, 0.1) 100%);
+        border-color: var(--primary-blue);
+        transform: scale(1.02);
     }
 
     .target-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        margin: 0 auto 0.5rem auto;
+        width: 70px;height: 70px;
+        border-radius: 20px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2rem; margin-bottom: 1rem;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
     }
-    .target-icon.baby { background: #E3F2FD; }
-    .target-icon.maman { background: #FCE4EC; }
-    .target-icon.both { background: #F3E5F5; }
 
-    .btn-save-modern {
-        background: var(--gradient-primary);
-        color: white;
-        border: none;
-        padding: 0.8rem 2rem;
-        border-radius: 50px;
-        font-weight: 700;
-        box-shadow: 0 10px 20px rgba(74, 144, 226, 0.2);
+    .target-icon.baby { background: linear-gradient(135deg, var(--light-blue), var(--baby-blue)); }
+    .target-icon.maman { background: linear-gradient(135deg, var(--pink), var(--soft-pink)); }
+    .target-icon.both { background: linear-gradient(135deg, var(--primary-blue), var(--lavender)); }
+
+    .btn-modern { padding: 1rem 2.5rem; border-radius: 50px; font-weight: 600; font-size: 1.1rem; border: none; transition: all 0.3s ease; }
+    .btn-primary-modern { background: var(--gradient-primary); color: white; box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3); }
+    .btn-secondary-modern { background: white; color: var(--primary-blue); border: 2px solid var(--primary-blue); }
+
+    .preview-container {
+        background: white; border-radius: 20px; padding: 2rem;
+        border: 2px dashed var(--light-blue); transition: all 0.3s ease;
     }
+    .icon-preview-large { font-size: 4rem; margin-bottom: 1rem; transition: all 0.3s ease; }
+    .image-preview-placeholder {
+        width: 100%; height: 150px; background: linear-gradient(135deg, var(--baby-blue), var(--lavender));
+        border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: white;
+    }
+
+    .input-with-icon { position: relative; }
+    .input-with-icon i { position: absolute; left: 1.5rem; top: 50%; transform: translateY(-50%); color: var(--primary-blue); z-index: 2; }
+    .input-with-icon input { padding-left: 3.5rem; }
+
+    .fade-in { animation: fadeIn 0.5s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 {% endblock %}
 
-{% block content %}
-    <div class="glass-card mt-4">
-        <div class="admin-card-header">
-            <i class="fas fa-edit me-2"></i> Modifier : {{ consultation.categorie }}
-        </div>
-        <div class="p-4">
-            {{ form_start(form) }}
-                {# FIX: setRendered pour éviter override #}
-                {% do form.pour.setRendered() %}
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">🏠 Accueil</a>
+        <span class="mx-2">›</span>
+        <a href="{{ path('app_admin_consultation_index') }}">📋 Consultations</a>
+        <span class="mx-2">›</span>
+        <span class="text-primary fw-bold">✏️ Modifier</span>
+    </div>
+{% endblock %}
 
-                <div class="row g-4">
-                    <div class="col-md-12 mb-3">
-                        <label class="form-label fw-bold">Nom de la Catégorie</label>
-                        {{ form_widget(form.categorie, {'attr': {'class': 'form-control modern-input'}}) }}
+{% block content %}
+<div class="new-consultation-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <div class="glass-card fade-in">
+                    <!-- HEADER MODIFIER -->
+                    <div class="header-gradient text-white py-5 position-relative">
+                        <div class="container ps-5">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-white text-primary rounded-3 p-3 me-3" style="width: 60px; height:60px; display:flex; align-items:center; justify-content:center;">
+                                    <i class="fas fa-edit fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h1 class="display-6 fw-bold mb-1">Modifier la Consultation</h1>
+                                    <p class="lead mb-0 opacity-90">{{ consultation.categorie }}</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- PUBLIC CIBLE CUSTOM (MATCHING NEW UI) -->
-                    <div class="col-md-12 mb-4">
-                        <label class="form-label fw-bold d-block mb-3 text-center">Public Cible</label>
-                        <div class="row g-3">
-                            {% for choice in form.pour.vars.choices %}
-                            <div class="col-md-4">
-                                <label class="target-option d-block">
-                                    <input type="radio" 
-                                           name="{{ form.pour.vars.full_name }}" 
-                                           value="{{ choice.value }}"
-                                           {{ form.pour.vars.value == choice.value ? 'checked' : '' }}
-                                           class="d-none">
-                                    <div class="option-content p-3 rounded-3">
-                                        <div class="target-icon {% if choice.value == 'BEBE' %}baby{% elseif choice.value == 'MAMAN' %}maman{% else %}both{% endif %}">
-                                            {% if choice.value == 'BEBE' %}👶{% elseif choice.value == 'MAMAN' %}🤰{% else %}👨‍👩‍👧{% endif %}
+                    <div class="section-container">
+                        {{ form_start(form, {'attr': {'class': 'form-modern', 'novalidate': 'novalidate'}}) }}
+                        
+                        {% do form.pour.setRendered() %}
+                        
+                        <!-- SECTION 1: INFORMATIONS PRINCIPALES -->
+                        <div class="mb-5">
+                            <h3 class="section-title">Informations Principales</h3>
+                            <div class="row g-4">
+                                <div class="col-md-12">
+                                    <label class="form-label fw-bold">Nom de la Catégorie</label>
+                                    <div class="input-with-icon">
+                                        <i class="fas fa-tag"></i>
+                                        {{ form_widget(form.categorie, {'attr': {'class': 'form-control modern-input'}}) }}
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label fw-bold">Description</label>
+                                    <div class="input-with-icon">
+                                        <i class="fas fa-align-left"></i>
+                                        {{ form_widget(form.description, {'attr': {'class': 'form-control modern-input', 'rows': 4}}) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 2: PUBLIC CIBLE -->
+                        <div class="mb-5">
+                            <h3 class="section-title">Public Cible</h3>
+                            <div class="row g-4">
+                                {% for choice in form.pour.vars.choices %}
+                                <div class="col-md-4">
+                                    <label class="target-option d-block">
+                                        <input type="radio" 
+                                               name="{{ form.pour.vars.full_name }}" 
+                                               value="{{ choice.value }}"
+                                               {{ form.pour.vars.value == choice.value ? 'checked' : '' }}
+                                               class="d-none">
+                                        <div class="option-content text-center p-4 rounded-3">
+                                            <div class="target-icon {% if choice.value == 'BEBE' %}baby{% elseif choice.value == 'MAMAN' %}maman{% else %}both{% endif %} mx-auto mb-3">
+                                                {% if choice.value == 'BEBE' %}👶{% elseif choice.value == 'MAMAN' %}🤰{% else %}👨‍👩‍👧{% endif %}
+                                            </div>
+                                            <h5 class="fw-bold mb-0">{% if choice.value == 'BEBE' %}Bébé{% elseif choice.value == 'MAMAN' %}Maman{% else %}Les Deux{% endif %}</h5>
                                         </div>
-                                        <div class="fw-bold small">
-                                            {% if choice.value == 'BEBE' %}Bébé{% elseif choice.value == 'MAMAN' %}Maman{% else %}Les Deux{% endif %}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- SECTION 3: CONFIGURATION STYLE NEW -->
+                        <div class="mb-5">
+                            <h3 class="section-title">Configuration & Apparence</h3>
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="preview-container h-100">
+                                        <label class="form-label fw-bold mb-3 d-flex align-items-center">
+                                            <i class="fas fa-sort-numeric-down text-primary me-2"></i>Ordre & Icône
+                                        </label>
+                                        <div class="mb-3">
+                                            {{ form_widget(form.ordreAffichage, {'attr': {'class': 'form-control modern-input mb-3'}}) }}
+                                            {{ form_widget(form.icon, {'attr': {'class': 'form-control modern-input', 'placeholder': 'fas fa-baby...'}}) }}
+                                        </div>
+                                        <div class="text-center mt-3">
+                                            <i id="iconPreview" class="icon-preview-large text-primary"></i>
                                         </div>
                                     </div>
-                                </label>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="row g-4 mt-2">
-                    <div class="col-md-12">
-                         <label class="form-label fw-bold">Description</label>
-                         {{ form_widget(form.description, {'attr': {'class': 'form-control modern-input', 'rows': 4}}) }}
-                    </div>
-
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Fichier Image</label>
-                        {{ form_widget(form.image, {'attr': {'class': 'form-control modern-input', 'placeholder': 'img.jpg'}}) }}
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Icône FontAwesome</label>
-                        {{ form_widget(form.icon, {'attr': {'class': 'form-control modern-input'}}) }}
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Position (Ordre)</label>
-                        {{ form_widget(form.ordreAffichage, {'attr': {'class': 'form-control modern-input'}}) }}
-                    </div>
-                </div>
-
-                <div class="d-flex align-items-center gap-4 mt-5 p-3 rounded-3" style="background: #fafbfc;">
-                    <div class="form-check form-switch p-0 d-flex align-items-center gap-3">
-                        <label class="fw-bold m-0">Statut de visibilité</label>
-                        <div class="status-section">
-                            {{ form_widget(form.statut, {
-                                'label': false,
-                                'attr': {'class': 'status-checkbox', 'id': 'consultation_statut_edit'}
-                            }) }}
-                            <div class="status-toggle-group" style="scale: 0.85;">
-                                <label class="status-toggle-item toggle-active" for="consultation_statut_edit">ACTIF</label>
-                                <label class="status-toggle-item toggle-inactive" for="consultation_statut_edit">OFF</label>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="preview-container h-100">
+                                        <label class="form-label fw-bold mb-3 d-flex align-items-center">
+                                            <i class="fas fa-image text-pink me-2"></i>Image d'Illustration
+                                        </label>
+                                        {{ form_widget(form.image, {'attr': {'class': 'form-control modern-input mb-3', 'placeholder': 'img.jpg'}}) }}
+                                        <div class="image-preview-placeholder" id="imagePreview">
+                                            <i class="fas fa-camera"></i>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
+                        <!-- VISIBILITÉ -->
+                        <div class="p-3 rounded-4 mb-5" style="background: rgba(74, 144, 226, 0.05);">
+                            <div class="d-flex align-items-center gap-3">
+                                <i class="fas fa-eye text-primary"></i>
+                                <label class="fw-bold m-0">Conserver cette consultation active et visible</label>
+                                <div class="ms-auto status-section">
+                                    {{ form_widget(form.statut, {'attr': {'class': 'status-checkbox', 'id': 'consultation_statut'}}) }}
+                                    <div class="status-toggle-group" style="scale: 0.85;">
+                                        <label class="status-toggle-item toggle-active" for="consultation_statut">OUI</label>
+                                        <label class="status-toggle-item toggle-inactive" for="consultation_statut">NON</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 pt-4 border-top d-flex justify-content-end gap-3">
+                             <a href="{{ path('app_admin_consultation_index') }}" class="btn btn-secondary-modern btn-modern">Annuler</a>
+                             <button type="submit" class="btn btn-primary-modern btn-modern">
+                                <i class="fas fa-save me-2"></i> Enregistrer les modifications
+                             </button>
+                        </div>
+
+                        {{ form_end(form) }}
                     </div>
                 </div>
-                
-                <div class="mt-5 pt-4 border-top">
-                    <button type="submit" class="btn btn-save-modern">
-                        <i class="fas fa-magic me-2"></i> Enregistrer les modifications
-                    </button>
-                    <a href="{{ path('app_admin_consultation_index') }}" class="btn btn-light ms-3" style="border-radius: 50px;">
-                        Annuler
-                    </a>
-                </div>
-            {{ form_end(form) }}
+            </div>
         </div>
     </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const iconInput = document.getElementById('{{ form.icon.vars.id }}');
+        const iconPreview = document.getElementById('iconPreview');
+        const imageInput = document.getElementById('{{ form.image.vars.id }}');
+        const imagePreview = document.getElementById('imagePreview');
+
+        const updateIcon = () => {
+            const val = iconInput.value.trim();
+            iconPreview.className = (val || 'fas fa-stethoscope') + ' icon-preview-large';
+        };
+
+        const updateImage = () => {
+            const val = imageInput.value.trim();
+            if(val) {
+                imagePreview.innerHTML = `<i class="fas fa-file-image"></i><div class="mt-2 small text-white">${val}</div>`;
+                imagePreview.style.background = 'linear-gradient(135deg, var(--primary-blue), var(--pink))';
+            } else {
+                imagePreview.innerHTML = '<i class="fas fa-camera"></i>';
+                imagePreview.style.background = '';
+            }
+        };
+
+        iconInput.addEventListener('input', updateIcon);
+        imageInput.addEventListener('input', updateImage);
+        updateIcon();
+        updateImage();
+    });
+</script>
 {% endblock %}

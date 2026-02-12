@@ -192,7 +192,7 @@
         min-height: 480px;
         background: white;
         border-radius: 20px;
-        overflow: hidden;
+        overflow: visible;
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         box-shadow: 
             0 10px 30px rgba(30, 41, 59, 0.08),
@@ -211,16 +211,16 @@
         border-color: transparent;
     }
 
-    /* HEADER CARTE - DÉGRADÉ BLEU CIEL */
+    /* HEADER CARTE - DÉGRADÉ BLEU CIEL (hauteur pour que la photo ne soit pas coupée) */
     .card-header {
         background: var(--blue-light);
-        height: 140px;
+        height: 100px;
         position: relative;
         display: flex;
-        align-items: center;
+        align-items: flex-end;
         justify-content: center;
         padding: 0 20px;
-        overflow: hidden;
+        overflow: visible;
         flex-shrink: 0;
     }
 
@@ -236,7 +236,7 @@
             radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.3) 0%, transparent 50%);
     }
 
-    /* PHOTO MÉDECIN SYMÉTRIQUE */
+    /* ============ PHOTO MÉDECIN - CERCLE ENTIER VISIBLE, À CHEVAL HEADER/BODY ============ */
     .doctor-photo-container {
         position: absolute;
         top: 100%;
@@ -244,101 +244,102 @@
         transform: translate(-50%, -50%);
         width: 120px;
         height: 120px;
-        z-index: 2;
+        z-index: 10;
+        pointer-events: none;
     }
 
     .photo-frame {
         width: 100%;
         height: 100%;
         border-radius: 50%;
-        background: white;
+        background: linear-gradient(145deg, #ffffff, #f0f9ff);
         padding: 5px;
-        box-shadow: 
-            0 15px 35px rgba(0, 0, 0, 0.15),
-            0 10px 20px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2), 0 0 0 3px rgba(255, 255, 255, 0.9);
         transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
     }
 
     .doctor-card:hover .photo-frame {
         transform: scale(1.05);
-        box-shadow: 
-            0 20px 40px rgba(0, 0, 0, 0.2),
-            0 15px 30px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25), 0 0 0 4px rgba(255, 255, 255, 0.95);
     }
 
     .doctor-photo {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        object-position: center top;
         border-radius: 50%;
-        border: 3px solid white;
+        display: block;
     }
 
     .photo-placeholder {
         width: 100%;
         height: 100%;
         border-radius: 50%;
-        background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+        background: linear-gradient(135deg, #c8e7ff, #9ad0f5);
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 3px solid white;
     }
 
     .photo-placeholder i {
-        font-size: 2.2rem;
-        color: #0ea5e9;
+        font-size: 3rem;
+        color: #0369a1;
+        text-shadow: 0 2px 10px rgba(3, 105, 161, 0.3);
     }
 
     .status-dot {
         position: absolute;
-        bottom: 10px;
-        right: 10px;
+        bottom: 2px;
+        right: 2px;
         width: 16px;
         height: 16px;
         background: #10b981;
         border: 2px solid white;
         border-radius: 50%;
-        box-shadow: 0 3px 10px rgba(16, 185, 129, 0.3);
-        animation: pulse 2s infinite;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+        z-index: 5;
+        pointer-events: none;
     }
 
     @keyframes pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.1); }
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.15); opacity: 0.9; }
     }
 
     /* CORPS DE LA CARTE - DIMENSIONS FIXES */
     .card-body {
-        padding: 70px 20px 20px;
+        padding: 70px 20px 16px;
         text-align: center;
         flex: 1;
         display: flex;
         flex-direction: column;
-        min-height: 250px;
+        min-height: 220px;
     }
 
     .doctor-name {
-        font-size: 1.3rem;
+        font-size: 1.25rem;
         font-weight: 700;
         color: #1e293b;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
         line-height: 1.3;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+        min-height: 1.5em;
+        word-break: break-word;
     }
 
     .doctor-specialty {
         display: inline-block;
-        padding: 6px 16px;
+        padding: 6px 14px;
         background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
         color: #0c4a6e;
         font-size: 0.85rem;
         font-weight: 600;
         border-radius: 50px;
-        margin-bottom: 20px;
+        margin-bottom: 12px;
         border: 1px solid #bae6fd;
         width: fit-content;
         margin-left: auto;
@@ -347,14 +348,15 @@
 
     .doctor-description {
         color: #64748b;
-        font-size: 0.9rem;
-        line-height: 1.6;
-        margin-bottom: 25px;
+        font-size: 0.875rem;
+        line-height: 1.55;
+        margin-bottom: 16px;
         flex: 1;
         display: -webkit-box;
         -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
         overflow: hidden;
+        word-break: break-word;
     }
 
     /* INFORMATIONS COMPLÉMENTAIRES */
@@ -372,6 +374,10 @@
         gap: 6px;
         color: #64748b;
         font-size: 0.85rem;
+        background: #f8fafc;
+        padding: 5px 12px;
+        border-radius: 50px;
+        border: 1px solid #f1f5f9;
     }
 
     .meta-item i {
@@ -537,6 +543,170 @@
         margin: 0;
     }
 
+    /* ============ NOUVEAUX STYLES - RECHERCHE ET TRI ============ */
+    .filter-tools {
+        margin: -20px auto 40px;
+        max-width: 1000px;
+        position: relative;
+        z-index: 50;
+    }
+
+    .filter-container {
+        background: white;
+        border-radius: 50px;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 15px 35px rgba(30, 41, 59, 0.12);
+        border: 1px solid #f1f5f9;
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.98);
+        flex-wrap: wrap;
+    }
+
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 20px;
+        border-right: 1px solid #e2e8f0;
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .filter-group:last-child {
+        border-right: none;
+    }
+
+    .filter-icon {
+        color: #4dabf7;
+        font-size: 1.1rem;
+    }
+
+    .filter-select, .filter-input {
+        width: 100%;
+        padding: 10px 0;
+        border: none;
+        background: transparent;
+        font-size: 0.95rem;
+        color: #1e293b;
+        outline: none;
+        font-weight: 500;
+    }
+
+    .filter-select {
+        cursor: pointer;
+    }
+
+    .filter-input::placeholder {
+        color: #94a3b8;
+        font-weight: 400;
+    }
+
+    .search-btn {
+        background: var(--blue-medium);
+        color: white;
+        border: none;
+        padding: 14px 32px;
+        border-radius: 50px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+
+    .search-btn:hover {
+        background: var(--blue-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(30, 58, 138, 0.2);
+    }
+
+    .active-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+        justify-content: center;
+    }
+
+    .filter-tag {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 50px;
+        padding: 8px 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.9rem;
+        color: #1e293b;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .filter-tag i {
+        color: #4dabf7;
+    }
+
+    .remove-filter {
+        color: #94a3b8;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .remove-filter:hover {
+        color: #ef4444;
+    }
+
+    .sort-indicator {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: #64748b;
+        font-size: 0.9rem;
+        cursor: pointer;
+        padding: 8px 16px;
+        border-radius: 50px;
+        transition: all 0.2s;
+    }
+
+    .sort-indicator:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+
+    .sort-indicator.active {
+        color: #4dabf7;
+        font-weight: 600;
+        background: #e6f7ff;
+    }
+
+    .results-count {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #64748b;
+        font-size: 0.95rem;
+        padding: 10px;
+        background: white;
+        border-radius: 50px;
+        display: inline-block;
+        padding: 10px 30px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    }
+
+    .results-count strong {
+        color: #1e293b;
+        font-size: 1.2rem;
+        margin: 0 5px;
+    }
+
+    .results-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 30px;
+    }
+
     /* ANIMATIONS */
     @keyframes fadeInUp {
         from {
@@ -596,6 +766,27 @@
     }
 
     @media (max-width: 768px) {
+        .filter-container {
+            flex-direction: column;
+            border-radius: 24px;
+        }
+        
+        .filter-group {
+            width: 100%;
+            border-right: none;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .filter-group:last-child {
+            border-bottom: none;
+        }
+        
+        .search-btn {
+            width: 100%;
+            justify-content: center;
+            margin-top: 8px;
+        }
+        
         .dynamic-header {
             padding: 60px 0;
             border-radius: 0 0 30px 30px;
@@ -626,12 +817,12 @@
         }
 
         .doctor-photo-container {
-            width: 100px;
-            height: 100px;
+            width: 110px;
+            height: 110px;
         }
 
         .card-body {
-            padding: 60px 20px 20px;
+            padding: 70px 20px 20px;
         }
 
         .stats-container {
@@ -690,18 +881,12 @@
         .doctor-card {
             min-height: 440px;
         }
+        
+        .doctor-photo-container {
+            width: 100px;
+            height: 100px;
+        }
     }
-
-    /* UTILITAIRES */
-    .text-center { text-align: center; }
-    .mb-1 { margin-bottom: 0.5rem; }
-    .mb-2 { margin-bottom: 1rem; }
-    .mb-3 { margin-bottom: 1.5rem; }
-    .mb-4 { margin-bottom: 2rem; }
-    .mt-1 { margin-top: 0.5rem; }
-    .mt-2 { margin-top: 1rem; }
-    .mt-3 { margin-top: 1.5rem; }
-    .mt-4 { margin-top: 2rem; }
 </style>
 
 <!-- HEADER DYNAMIQUE MIXTE -->
@@ -761,19 +946,88 @@
             </p>
         </div>
 
+        <!-- ============ NOUVEAU: OUTILS DE RECHERCHE ET TRI ============ -->
+        <div class="filter-tools">
+            <div class="filter-container">
+                <!-- Recherche par nom/spécialité -->
+                <div class="filter-group">
+                    <i class="fas fa-search filter-icon"></i>
+                    <input type="text" id="searchInput" class="filter-input" placeholder="Rechercher un médecin..." autocomplete="off">
+                </div>
+                
+                <!-- Filtre par spécialité -->
+                <div class="filter-group">
+                    <i class="fas fa-stethoscope filter-icon"></i>
+                    <select id="specialtyFilter" class="filter-select">
+                        <option value="all">Toutes spécialités</option>
+                        {% set specialties = [] %}
+                        {% for medecin in medecins %}
+                            {% if medecin.specialiteMedecin and medecin.specialiteMedecin not in specialties %}
+                                {% set specialties = specialties|merge([medecin.specialiteMedecin]) %}
+                                <option value="{{ medecin.specialiteMedecin|lower|replace({' ': '_'}) }}">{{ medecin.specialiteMedecin }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Filtre par disponibilité -->
+                <div class="filter-group">
+                    <i class="fas fa-clock filter-icon"></i>
+                    <select id="availabilityFilter" class="filter-select">
+                        <option value="all">Tous</option>
+                        <option value="available">Disponible</option>
+                        <option value="busy">Complet</option>
+                    </select>
+                </div>
+                
+                <!-- Bouton de recherche -->
+                <button id="searchButton" class="search-btn">
+                    <i class="fas fa-filter"></i>
+                    Filtrer
+                </button>
+            </div>
+            
+            <!-- Filtres actifs -->
+            <div class="active-filters" id="activeFilters"></div>
+            
+            <!-- Options de tri -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                <div style="display: flex; gap: 10px;">
+                    <div class="sort-indicator active" data-sort="name">
+                        <i class="fas fa-sort-alpha-down"></i> Nom
+                    </div>
+                    <div class="sort-indicator" data-sort="specialty">
+                        <i class="fas fa-sort"></i> Spécialité
+                    </div>
+                    <div class="sort-indicator" data-sort="rating">
+                        <i class="fas fa-star"></i> Note
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Compteur de résultats -->
+            <div class="results-wrapper">
+                <div class="results-count" id="resultsCount">
+                    <strong id="visibleCount">{{ medecins|length }}</strong> spécialistes affichés sur <strong id="totalCount">{{ medecins|length }}</strong>
+                </div>
+            </div>
+        </div>
+
         {% if medecins|length > 0 %}
             <!-- GRID SYMÉTRIQUE DES MÉDECINS - VERSION OPTIMISÉE -->
-            <div class="doctors-grid">
+            <div class="doctors-grid" id="doctorsGrid">
                 {% for medecin in medecins %}
-                    <div class="doctor-card animate-card">
-                        <!-- Header avec dégradé bleu ciel -->
+                    <div class="doctor-card animate-card"
+                         data-name="{{ medecin.nomMedecin|lower }}"
+                         data-specialty="{{ medecin.specialiteMedecin is defined and medecin.specialiteMedecin ? medecin.specialiteMedecin|lower|replace({' ': '_'}) : '' }}"
+                         data-availability="available"
+                         data-rating="4.8">
                         <div class="card-header">
-                            <!-- Photo du médecin -->
                             <div class="doctor-photo-container">
                                 <div class="photo-frame">
-                                    {% if medecin.photoMedecin %}
-                                        <img src="{{ asset('uploads/medecins/' ~ medecin.photoMedecin) }}" 
-                                             alt="{{ medecin.nomMedecin }}" 
+                                    {% if medecin.photoMedecin is defined and medecin.photoMedecin and medecin.photoMedecin|trim != '' %}
+                                        <img src="{{ medecin.photoMedecin starts with 'http' ? medecin.photoMedecin : asset('uploads/medecins/' ~ medecin.photoMedecin) }}"
+                                             alt="{{ medecin.nomMedecin }}"
                                              class="doctor-photo"
                                              loading="lazy">
                                     {% else %}
@@ -781,8 +1035,8 @@
                                             <i class="fas fa-user-md"></i>
                                         </div>
                                     {% endif %}
-                                    <div class="status-dot" title="Disponible"></div>
                                 </div>
+                                <span class="status-dot" title="Disponible" aria-hidden="true"></span>
                             </div>
                         </div>
 
@@ -899,9 +1153,41 @@
     </div>
 </main>
 
-<!-- ANIMATION DYNAMIQUE OPTIMISÉE -->
+<!-- ============ NOUVEAU: SCRIPT DE RECHERCHE ET TRI AVEC PHOTOS FIXÉES ============ -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // ============ PHOTOS - FIXÉES ET PERMANENTES ============
+        // Forcer l'affichage de TOUTES les photos immédiatement
+        const forceImages = () => {
+            document.querySelectorAll('.doctor-photo-container, .photo-frame, .doctor-photo, .photo-placeholder').forEach(el => {
+                if (el) {
+                    el.style.display = 'flex';
+                    el.style.visibility = 'visible';
+                    el.style.opacity = '1';
+                    el.style.zIndex = '100';
+                }
+            });
+            
+            // Chargement immédiat des images
+            document.querySelectorAll('.doctor-photo').forEach(img => {
+                if (img.dataset.src) {
+                    img.src = img.dataset.src;
+                }
+                img.style.display = 'block !important';
+                img.style.visibility = 'visible !important';
+                img.style.opacity = '1 !important';
+            });
+        };
+        
+        // Exécuter immédiatement
+        forceImages();
+        
+        // Réappliquer après chaque chargement
+        setTimeout(forceImages, 100);
+        setTimeout(forceImages, 500);
+        setInterval(forceImages, 2000); // Garder les photos visibles en permanence
+        
+        // ============ ANIMATIONS EXISTANTES ============
         // Animation des cartes au scroll
         const observerOptions = {
             threshold: 0.1,
@@ -956,30 +1242,243 @@
             });
         });
 
-        // Chargement paresseux des images
-        if ('loading' in HTMLImageElement.prototype) {
-            const images = document.querySelectorAll('img[loading="lazy"]');
-            images.forEach(img => {
-                img.src = img.dataset.src;
-            });
-        } else {
-            // Fallback pour les navigateurs qui ne supportent pas loading="lazy"
-            const lazyImages = [].slice.call(document.querySelectorAll('img[data-src]'));
-            let lazyImageObserver = new IntersectionObserver(function(entries, observer) {
-                entries.forEach(function(entry) {
-                    if (entry.isIntersecting) {
-                        let lazyImage = entry.target;
-                        lazyImage.src = lazyImage.dataset.src;
-                        lazyImage.classList.remove('lazy');
-                        lazyImageObserver.unobserve(lazyImage);
+        // ============ NOUVELLES FONCTIONNALITÉS: RECHERCHE ET TRI ============
+        
+        // Éléments DOM
+        const searchInput = document.getElementById('searchInput');
+        const specialtyFilter = document.getElementById('specialtyFilter');
+        const availabilityFilter = document.getElementById('availabilityFilter');
+        const searchButton = document.getElementById('searchButton');
+        const activeFilters = document.getElementById('activeFilters');
+        const sortIndicators = document.querySelectorAll('.sort-indicator');
+        const doctorsGrid = document.getElementById('doctorsGrid');
+        const visibleCountSpan = document.getElementById('visibleCount');
+        const totalCountSpan = document.getElementById('totalCount');
+        
+        // Variables d'état
+        let currentSort = 'name';
+        let currentSortDirection = 'asc';
+        
+        // Fonction pour normaliser le texte de recherche
+        function normalizeText(text) {
+            if (!text) return '';
+            return text.toString().toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Enlever accents
+                .replace(/[^a-z0-9]/g, '');
+        }
+        
+        // Fonction pour mettre à jour les filtres actifs
+        function updateActiveFilters() {
+            let filters = [];
+            const searchValue = searchInput.value.trim();
+            const specialtyValue = specialtyFilter.value;
+            const availabilityValue = availabilityFilter.value;
+            
+            if (searchValue) {
+                filters.push(`<span class="filter-tag"><i class="fas fa-search"></i> "${searchValue}" <i class="fas fa-times remove-filter" data-filter="search"></i></span>`);
+            }
+            
+            if (specialtyValue !== 'all') {
+                const specialtyOption = specialtyFilter.querySelector(`option[value="${specialtyValue}"]`);
+                filters.push(`<span class="filter-tag"><i class="fas fa-stethoscope"></i> ${specialtyOption.textContent} <i class="fas fa-times remove-filter" data-filter="specialty"></i></span>`);
+            }
+            
+            if (availabilityValue !== 'all') {
+                const availabilityText = availabilityValue === 'available' ? 'Disponible' : 'Complet';
+                filters.push(`<span class="filter-tag"><i class="fas fa-clock"></i> ${availabilityText} <i class="fas fa-times remove-filter" data-filter="availability"></i></span>`);
+            }
+            
+            activeFilters.innerHTML = filters.join('');
+            
+            // Ajouter les événements de suppression
+            document.querySelectorAll('.remove-filter').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const filterType = this.dataset.filter;
+                    
+                    if (filterType === 'search') {
+                        searchInput.value = '';
+                    } else if (filterType === 'specialty') {
+                        specialtyFilter.value = 'all';
+                    } else if (filterType === 'availability') {
+                        availabilityFilter.value = 'all';
                     }
+                    
+                    applyFilters();
                 });
             });
-
-            lazyImages.forEach(function(lazyImage) {
-                lazyImageObserver.observe(lazyImage);
+        }
+        
+        // Fonction principale de filtrage
+        function applyFilters() {
+            const searchTerm = normalizeText(searchInput.value.trim());
+            const specialtyValue = specialtyFilter.value;
+            const availabilityValue = availabilityFilter.value;
+            
+            let visibleCount = 0;
+            
+            // Filtrer les cartes
+            document.querySelectorAll('.doctor-card').forEach(card => {
+                const cardName = normalizeText(card.dataset.name);
+                const cardSpecialty = card.dataset.specialty;
+                const cardAvailability = card.dataset.availability;
+                
+                let showCard = true;
+                
+                // Filtre par recherche
+                if (searchTerm) {
+                    if (!cardName.includes(searchTerm)) {
+                        showCard = false;
+                    }
+                }
+                
+                // Filtre par spécialité
+                if (showCard && specialtyValue !== 'all') {
+                    if (cardSpecialty !== specialtyValue) {
+                        showCard = false;
+                    }
+                }
+                
+                // Filtre par disponibilité
+                if (showCard && availabilityValue !== 'all') {
+                    if (cardAvailability !== availabilityValue) {
+                        showCard = false;
+                    }
+                }
+                
+                // Afficher ou masquer la carte
+                if (showCard) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Mettre à jour le compteur
+            const total = document.querySelectorAll('.doctor-card').length;
+            if (visibleCountSpan) visibleCountSpan.textContent = visibleCount;
+            if (totalCountSpan) totalCountSpan.textContent = total;
+            
+            updateActiveFilters();
+            sortCards(currentSort, currentSortDirection);
+            
+            // Forcer l'affichage des photos après filtrage
+            setTimeout(forceImages, 50);
+        }
+        
+        // Fonction de tri
+        function sortCards(sortType, direction = 'asc') {
+            currentSort = sortType;
+            
+            // Mettre à jour l'affichage des indicateurs de tri
+            sortIndicators.forEach(ind => {
+                ind.classList.remove('active');
+            });
+            const activeIndicator = document.querySelector(`.sort-indicator[data-sort="${sortType}"]`);
+            if (activeIndicator) activeIndicator.classList.add('active');
+            
+            const grid = document.getElementById('doctorsGrid');
+            if (!grid) return;
+            
+            const cards = Array.from(grid.querySelectorAll('.doctor-card'));
+            
+            // Filtrer seulement les cartes visibles pour le tri
+            const visibleCards = cards.filter(card => card.style.display !== 'none');
+            
+            // Trier les cartes visibles
+            visibleCards.sort((a, b) => {
+                let valA, valB;
+                
+                switch(sortType) {
+                    case 'name':
+                        valA = a.dataset.name;
+                        valB = b.dataset.name;
+                        break;
+                    case 'specialty':
+                        valA = a.dataset.specialty || '';
+                        valB = b.dataset.specialty || '';
+                        break;
+                    case 'rating':
+                        valA = parseFloat(a.dataset.rating) || 0;
+                        valB = parseFloat(b.dataset.rating) || 0;
+                        break;
+                    default:
+                        valA = a.dataset.name;
+                        valB = b.dataset.name;
+                }
+                
+                if (direction === 'asc') {
+                    if (valA < valB) return -1;
+                    if (valA > valB) return 1;
+                    return 0;
+                } else {
+                    if (valA > valB) return -1;
+                    if (valA < valB) return 1;
+                    return 0;
+                }
+            });
+            
+            // Réorganiser le DOM
+            visibleCards.forEach(card => {
+                grid.appendChild(card);
+            });
+            
+            // Forcer l'affichage des photos après tri
+            setTimeout(forceImages, 50);
+        }
+        
+        // Événements de recherche et filtrage
+        if (searchButton) searchButton.addEventListener('click', applyFilters);
+        
+        // Recherche en temps réel (avec debounce)
+        let debounceTimer;
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(applyFilters, 300);
             });
         }
+        
+        if (specialtyFilter) specialtyFilter.addEventListener('change', applyFilters);
+        if (availabilityFilter) availabilityFilter.addEventListener('change', applyFilters);
+        
+        // Événements de tri
+        sortIndicators.forEach(indicator => {
+            indicator.addEventListener('click', function() {
+                const sortType = this.dataset.sort;
+                
+                // Inverser la direction si on clique sur le même tri
+                if (currentSort === sortType) {
+                    currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+                    
+                    // Changer l'icône
+                    const icon = this.querySelector('i');
+                    if (icon) {
+                        if (currentSortDirection === 'asc') {
+                            icon.className = sortType === 'name' ? 'fas fa-sort-alpha-down' : 
+                                            (sortType === 'rating' ? 'fas fa-star' : 'fas fa-sort');
+                        } else {
+                            icon.className = sortType === 'name' ? 'fas fa-sort-alpha-up' : 
+                                            (sortType === 'rating' ? 'fas fa-star' : 'fas fa-sort');
+                        }
+                    }
+                } else {
+                    currentSortDirection = 'asc';
+                }
+                
+                sortCards(sortType, currentSortDirection);
+            });
+        });
+        
+        // Initialisation
+        updateActiveFilters();
+        
+        // Forcer l'affichage des photos après chaque interaction
+        document.addEventListener('click', forceImages);
+        document.addEventListener('scroll', forceImages);
+        
+        console.log('Recherche, tri et photos permanentes activés !');
     });
 </script>
 {% endblock %}

@@ -9,6 +9,8 @@ use App\Repository\ConsultationCreneauRepository;
 use App\Repository\ConsultationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -18,9 +20,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ConsultationCreneauCrudController extends AbstractController
 {
     #[Route('/', name: 'app_admin_consultation_creneau_index', methods: ['GET'])]
-    public function index(ConsultationCreneauRepository $creneauRepository, ConsultationRepository $consultationRepository): Response
+    public function index(Request $request, ConsultationCreneauRepository $creneauRepository, ConsultationRepository $consultationRepository): Response
     {
-        $creneaux = $creneauRepository->findAllOrdered();
+        $searchTerm = $request->query->get('q');
+        $creneaux = $creneauRepository->searchAllOrdered($searchTerm);
         
         // --- STATISTIQUES "WAW" ---
         $stats = [
@@ -63,6 +66,7 @@ class ConsultationCreneauCrudController extends AbstractController
             'stats' => $stats,
             'parJourLabels' => array_keys($stats['parJour']),
             'parJourValues' => array_values($stats['parJour']),
+            'searchTerm' => $searchTerm ? trim($searchTerm) : null,
         ]);
     }
 
@@ -74,6 +78,27 @@ class ConsultationCreneauCrudController extends AbstractController
             'Saturday' => 'Samedi'
         ];
         return $days[$date->format('l')] ?? $date->format('l');
+    }
+
+    private function processPhotoUpload(?UploadedFile $file): ?string
+    {
+        if (!$file instanceof UploadedFile || !$file->isValid()) {
+            return null;
+        }
+        $projectDir = $this->getParameter('kernel.project_dir');
+        $uploadDir = $projectDir . '/public/uploads/medecins';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+        $ext = $file->guessExtension() ?: $file->getClientOriginalExtension() ?: 'jpg';
+        $safeName = preg_replace('/[^a-zA-Z0-9_-]/', '', pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) ?: 'photo';
+        $fileName = $safeName . '_' . uniqid('', true) . '.' . strtolower($ext);
+        try {
+            $file->move($uploadDir, $fileName);
+            return $fileName;
+        } catch (FileException $e) {
+            return null;
+        }
     }
 
     #[Route('/new', name: 'app_admin_consultation_creneau_new', methods: ['GET', 'POST'])]
@@ -93,6 +118,15 @@ class ConsultationCreneauCrudController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Upload photo médecin : enregistrement physique + nom en BDD
+            $photoFile = $form->get('photoFile')->getData();
+            if ($photoFile) {
+                $photoFileName = $this->processPhotoUpload($photoFile);
+                if ($photoFileName) {
+                    $consultationCreneau->setPhotoMedecin($photoFileName);
+                }
+            }
+
             // Récupérer la collection de créneaux horaires
             $creneauxHoraires = $form->get('creneauxHoraires')->getData();
             $creneauxCrees = 0;
@@ -175,6 +209,15 @@ class ConsultationCreneauCrudController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Upload photo médecin si un nouveau fichier est envoyé
+            $photoFile = $form->get('photoFile')->getData();
+            if ($photoFile) {
+                $photoFileName = $this->processPhotoUpload($photoFile);
+                if ($photoFileName) {
+                    $consultationCreneau->setPhotoMedecin($photoFileName);
+                }
+            }
+
             // Processing existing slot
             $consultationCreneau->setUpdatedAt(new \DateTime());
             
