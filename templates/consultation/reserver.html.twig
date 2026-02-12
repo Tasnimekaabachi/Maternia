@@ -862,7 +862,7 @@ textarea.form-control {
                     </div>
 
                     <!-- 📝 Formulaire de réservation compact -->
-                    {{ form_start(form, {'attr': {'id': 'reservationForm'}}) }}
+                    {{ form_start(form, {'attr': {'id': 'reservationForm', 'novalidate': 'novalidate'}}) }}
                     
                     <div class="form-section">
                         <h3 class="section-title">
@@ -870,7 +870,7 @@ textarea.form-control {
                         </h3>
                         
                         <div class="form-grid">
-                            <div class="form-group">
+                            <div class="form-group" id="group_prenom">
                                 <label class="form-label required">Prénom</label>
                                 <div class="input-wrapper">
                                     <i class="fas fa-user input-icon"></i>
@@ -879,9 +879,10 @@ textarea.form-control {
                                         'placeholder': 'Votre prénom'
                                     }}) }}
                                 </div>
+                                <div class="error-feedback text-danger small mt-1" style="display: none;"></div>
                             </div>
                             
-                            <div class="form-group">
+                            <div class="form-group" id="group_nom">
                                 <label class="form-label required">Nom</label>
                                 <div class="input-wrapper">
                                     <i class="fas fa-user input-icon"></i>
@@ -890,9 +891,10 @@ textarea.form-control {
                                         'placeholder': 'Votre nom'
                                     }}) }}
                                 </div>
+                                <div class="error-feedback text-danger small mt-1" style="display: none;"></div>
                             </div>
                             
-                            <div class="form-group">
+                            <div class="form-group" id="group_email">
                                 <label class="form-label required">Email</label>
                                 <div class="input-wrapper">
                                     <i class="fas fa-envelope input-icon"></i>
@@ -901,17 +903,19 @@ textarea.form-control {
                                         'placeholder': 'votre@email.com'
                                     }}) }}
                                 </div>
+                                <div class="error-feedback text-danger small mt-1" style="display: none;"></div>
                             </div>
                             
-                            <div class="form-group">
+                            <div class="form-group" id="group_telephone">
                                 <label class="form-label required">Téléphone</label>
                                 <div class="input-wrapper">
                                     <i class="fas fa-phone input-icon"></i>
                                     {{ form_widget(form.telephone, {'attr': {
                                         'class': 'form-control',
-                                        'placeholder': '06 12 34 56 78'
+                                        'placeholder': 'Ex: 12345678'
                                     }}) }}
                                 </div>
+                                <div class="error-feedback text-danger small mt-1" style="display: none;"></div>
                             </div>
                         </div>
                     </div>
@@ -922,7 +926,7 @@ textarea.form-control {
     </h3>
     
     <!-- 👥 Sélection du patient - SOLUTION DÉFINITIVE -->
-    <div class="selection-group">
+    <div class="selection-group" id="group_typePatient">
         <label class="selection-label required">Pour qui ?</label>
         <div class="options-grid">
             <div class="option-card" data-choice="MAMAN">
@@ -944,13 +948,14 @@ textarea.form-control {
                        class="visually-hidden">
             </div>
         </div>
+        <div class="error-feedback text-danger small mt-2 text-center" style="display: none;"></div>
         <!-- Input caché pour Symfony -->
         {{ form_widget(form.typePatient, {'attr': {'style': 'display: none;'}}) }}
     </div>
     
     <!-- 📅 Champs conditionnels -->
     <div id="mamanFields" class="conditional-fields" style="display: none;">
-        <div class="form-group">
+        <div class="form-group" id="group_moisGrossesse">
             <label class="form-label">Mois de grossesse</label>
             <div class="input-wrapper">
                 <i class="fas fa-baby input-icon"></i>
@@ -959,11 +964,12 @@ textarea.form-control {
                     'placeholder': 'Exemple : 6'
                 }}) }}
             </div>
+            <div class="error-feedback text-danger small mt-1" style="display: none;"></div>
         </div>
     </div>
     
     <div id="bebeFields" class="conditional-fields" style="display: none;">
-        <div class="form-group">
+        <div class="form-group" id="group_dateNaissanceBebe">
             <label class="form-label">Date de naissance du bébé</label>
             <div class="input-wrapper">
                 <i class="fas fa-birthday-cake input-icon"></i>
@@ -972,13 +978,12 @@ textarea.form-control {
                     'placeholder': 'JJ/MM/AAAA'
                 }}) }}
             </div>
+            <div class="error-feedback text-danger small mt-1" style="display: none;"></div>
         </div>
     </div>
     
-
-    
     <!-- 📝 Notes -->
-    <div class="form-group textarea-group">
+    <div class="form-group textarea-group" id="group_notes">
         <label class="form-label">Notes supplémentaires</label>
         <div class="input-wrapper">
             <i class="fas fa-edit input-icon" style="top: 20px;"></i>
@@ -988,6 +993,7 @@ textarea.form-control {
                 'rows': 4
             }}) }}
         </div>
+        <div class="error-feedback text-danger small mt-1" style="display: none;"></div>
     </div>
 </div>
                     <!-- CSRF Token -->
@@ -1263,22 +1269,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnCloseModal = document.getElementById('btnCloseModal');
 
     btnReserver.addEventListener('click', async function() {
-        // Validation
-        if (!validateForm()) {
-            // Effet visuel d'erreur
-            btnReserver.style.background = 'linear-gradient(135deg, #EF4444 0%, #F87171 100%)';
-            btnReserver.innerHTML = '<i class="fas fa-exclamation-circle"></i> Formulaire incomplet';
-            
-            setTimeout(() => {
-                btnReserver.style.background = '';
-                btnReserver.innerHTML = '<i class="fas fa-calendar-check"></i> Confirmer la réservation';
-            }, 2000);
-            return;
-        }
+        // Reset des erreurs précédentes
+        document.querySelectorAll('.error-feedback').forEach(el => {
+            el.style.display = 'none';
+            el.textContent = '';
+        });
+        document.querySelectorAll('.form-control').forEach(el => {
+            el.style.borderColor = '';
+            el.style.boxShadow = '';
+        });
 
         // Affichage du chargement
         loading.style.display = 'flex';
-        btnReserver.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Traitement en cours...';
         btnReserver.disabled = true;
 
         try {
@@ -1297,45 +1299,71 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (data.success) {
                 // SUCCÈS
-                setTimeout(() => {
-                    loading.style.display = 'none';
-                    btnReserver.disabled = false;
-                    btnReserver.innerHTML = '<i class="fas fa-calendar-check"></i> Confirmer la réservation';
-                    
-                    // Mise à jour du modal
-                    document.getElementById('referenceNumber').textContent = data.reference;
-                    document.getElementById('patientNameModal').textContent = data.patientName;
-                    
-                    // Affichage du modal
-                    overlay.style.display = 'flex';
-                    
-                    // Confettis
-                    createConfettiRain();
-                    
-                    // Son de succès
-                    playSuccessSound();
-                    
-                }, 1500);
-
+                loading.style.display = 'none';
+                document.getElementById('referenceNumber').textContent = data.reference;
+                document.getElementById('patientNameModal').textContent = data.patientName;
+                overlay.style.display = 'flex';
+                createConfettiRain();
+                playSuccessSound();
             } else {
-                // ÉCHEC
+                // ÉCHEC (Erreurs PHP)
                 loading.style.display = 'none';
                 btnReserver.disabled = false;
-                btnReserver.innerHTML = '<i class="fas fa-calendar-check"></i> Confirmer la réservation';
                 
-                alert('❌ ' + (data.message || 'Erreur lors de la réservation. Veuillez réessayer.'));
+                if (data.errors) {
+                    // Affichage des erreurs PHP sous chaque champ
+                    for (const [field, message] of Object.entries(data.errors)) {
+                        // Mapper les noms de champs Symfony vers les IDs du DOM
+                        const fieldIdMap = {
+                            'prenom': 'prenom',
+                            'nom': 'nom',
+                            'email': 'email',
+                            'telephone': 'telephone',
+                            'typePatient': 'typePatient',
+                            'moisGrossesse': 'moisGrossesse',
+                            'dateNaissanceBebe': 'dateNaissanceBebe'
+                        };
+                        
+                        const domId = fieldIdMap[field] || field;
+                        const group = document.getElementById('group_' + domId);
+                        
+                        if (group) {
+                            const feedback = group.querySelector('.error-feedback');
+                            const input = group.querySelector('.form-control');
+                            
+                            if (feedback) {
+                                feedback.textContent = message;
+                                feedback.style.display = 'block';
+                            }
+                            if (input) {
+                                input.style.borderColor = '#EF4444';
+                                input.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+                            }
+                        }
+                    }
+                    
+                    // Alerte générale
+                    btnReserver.style.background = 'linear-gradient(135deg, #EF4444 0%, #F87171 100%)';
+                    btnReserver.innerHTML = '<i class="fas fa-exclamation-circle"></i> Erreurs détectées';
+                    setTimeout(() => {
+                        btnReserver.style.background = '';
+                        btnReserver.innerHTML = '<i class="fas fa-calendar-check"></i> Confirmer la réservation';
+                    }, 2000);
+                } else {
+                    alert('❌ ' + (data.message || 'Erreur lors de la réservation. Veuillez réessayer.'));
+                }
             }
 
         } catch (error) {
-            // ERREUR
             loading.style.display = 'none';
             btnReserver.disabled = false;
-            btnReserver.innerHTML = '<i class="fas fa-calendar-check"></i> Confirmer la réservation';
-            
             console.error('Erreur:', error);
-            alert('⚠️ Erreur de connexion. Veuillez vérifier votre connexion internet et réessayer.');
+            alert('⚠️ Une erreur est survenue lors de la communication avec le serveur.');
         }
     });
+
+    // Fermer validateForm function definition as well to avoid errors if called
+    function validateForm() { return true; }
 
     // Fermeture du modal
     btnCloseModal.addEventListener('click', function() {
