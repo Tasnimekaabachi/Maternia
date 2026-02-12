@@ -1,0 +1,270 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Suivi grossesse - Étape 2
+{% endblock %}
+
+{% if form is defined %}
+{% form_theme form _self %}
+{% endif %}
+
+{# Rendu des champs comme la page Maman (grand, propre) #}
+{% block form_row %}
+    <div class="mb-3">
+        {{ form_label(form) }}
+        {{ form_widget(form, {'attr': {'class': 'form-control form-control-lg'}}) }}
+        {% if form.vars.help is defined and form.vars.help %}
+            <div class="form-text">{{ form.vars.help }}</div>
+        {% endif %}
+        {{ form_errors(form) }}
+    </div>
+{% endblock %}
+{% block checkbox_row %}
+    <div class="mb-3">
+        <div class="form-check">
+            {{ form_widget(form, {'attr': {'class': 'form-check-input'}}) }}
+            {{ form_label(form, null, {'label_attr': {'class': 'form-check-label'}}) }}
+        </div>
+        {{ form_errors(form) }}
+    </div>
+{% endblock %}
+
+{% block body %}
+    {# Hero similaire à la page maman (propre & rassurant) #}
+    <div class="container-fluid py-5 hero-header wow fadeIn" data-wow-delay="0.1s">
+        <div class="container py-5">
+            <div class="row g-5">
+                <div class="col-lg-9 col-md-12">
+                    <h1 class="mb-3 text-primary">Mon suivi grossesse</h1>
+                    <h2 class="mb-4 display-6 text-white">Étape 2 : informations de grossesse</h2>
+                    <p class="lead text-white mb-0">Ces informations permettent de calculer automatiquement votre semaine, trimestre et date prévue.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="py-5 wow fadeIn" data-wow-delay="0.1s">
+        <div class="container py-5">
+
+            {# Stepper / pagination simple entre Maman (étape 1) et Grossesse (étape 2) #}
+            <div class="d-flex flex-wrap align-items-center justify-content-center mb-4">
+                <a href="{{ path('app_suivi_grossesse_show', { id: maman.id }) }}"
+                   class="btn btn-outline-primary me-2 mb-2 btn-border-radius">
+                    <span class="fw-bold me-1">1.</span> Profil maman
+                </a>
+                <button type="button" class="btn btn-primary mb-2 btn-border-radius" disabled>
+                    <span class="fw-bold me-1">2.</span> Suivi grossesse
+                </button>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-9">
+                    <div class="border border-primary rounded-3 bg-light p-4 p-lg-5 shadow-sm">
+                        <h4 class="text-primary mb-4 border-bottom border-primary border-2 d-inline-block p-2 title-border-radius">
+                            {% if is_new %}Créer mon suivi de grossesse{% else %}Mettre à jour mon suivi de grossesse{% endif %}
+                        </h4>
+
+                        {# Message global si le formulaire a été soumis mais contient des erreurs #}
+                        {% if form.vars.submitted and not form.vars.valid %}
+                            <div class="alert alert-danger">
+                                Certaines informations ne sont pas valides. Merci de corriger les champs indiqués en rouge puis de réessayer.
+                                {{ form_errors(form) }}
+                            </div>
+                        {% endif %}
+
+                        {{ form_start(form, {'attr': {'id': 'grossesseForm'}}) }}
+
+                            <h5 class="text-primary mb-3"><i class="fas fa-calendar-alt me-2"></i>Début de grossesse</h5>
+                            {{ form_row(form.connaitDDR) }}
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6" id="fieldDDR">
+                                    {{ form_row(form.dateDernieresRegles) }}
+                                </div>
+                                <div class="col-md-6" id="fieldDebut">
+                                    {{ form_row(form.dateDebutGrossesse) }}
+                                </div>
+                            </div>
+
+                            <h5 class="text-primary mb-3"><i class="fas fa-heart me-2"></i>Suivi</h5>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    {{ form_row(form.statutGrossesse) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.typeGrossesse) }}
+                                </div>
+                                <div class="col-md-6" id="fieldNombreBebes">
+                                    {{ form_row(form.nombreBebes) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.poidsActuel) }}
+                                </div>
+                                <div class="col-12">
+                                    {{ form_row(form.symptomes) }}
+                                </div>
+                                <div class="col-12">
+                                    {{ form_row(form.commentaireGeneral) }}
+                                </div>
+                            </div>
+
+                            <div id="sectionBebe">
+                                <h5 class="text-primary mb-3"><i class="fas fa-baby me-2"></i>Naissance & bébé</h5>
+                                <div class="alert alert-info small mb-3">
+                                    Cette section s’affiche uniquement si le statut est <strong>Terminée</strong>.
+                                </div>
+                                <div id="singleBabyFields" class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        {{ form_row(form.dateAccouchementReelle) }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form_row(form.nomBebe) }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form_row(form.sexeBebe) }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form_row(form.etatNaissance) }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form_row(form.poidsNaissance) }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form_row(form.tailleNaissance) }}
+                                    </div>
+                                </div>
+
+                                {% if form.bebes is defined %}
+                                    <div id="bebesCollectionWrapper" class="mt-3">
+                                        <h6 class="text-primary mb-2"><i class="fas fa-baby-carriage me-2"></i>Bébés de la grossesse</h6>
+                                        <p class="small text-muted mb-2">
+                                            Pour une grossesse multiple, les bébés seront listés ici. Le nombre de blocs est synchronisé avec le champ
+                                            <strong>Nombre de bébés</strong>.
+                                        </p>
+                                        <div id="bebesCollection"
+                                             data-prototype="{{ form_row(form.bebes.vars.prototype)|e('html_attr') }}"
+                                             data-index="{{ form.bebes|length }}">
+                                            {% for bebeForm in form.bebes %}
+                                                <div class="border rounded-3 p-3 mb-2 bebe-item bg-white shadow-sm">
+                                                    {{ form_row(bebeForm) }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-2 mt-3">
+                                <button class="btn btn-primary px-4 py-3 btn-border-radius">
+                                    <i class="fas fa-check me-1"></i>
+                                    {% if is_new %}Enregistrer mon suivi{% else %}Mettre à jour{% endif %}
+                                </button>
+                                <a href="{{ path('app_suivi_grossesse_show', { id: maman.id }) }}"
+                                   class="btn btn-outline-secondary px-4 py-3 btn-border-radius">
+                                    Revenir au profil maman
+                                </a>
+                            </div>
+
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        (function () {
+            const form = document.getElementById('grossesseForm');
+            if (!form) return;
+
+            // Les IDs Symfony ne suivent pas forcément l'id HTML du <form>.
+            // On sélectionne donc les champs par leur name.
+            const connaitDDR = form.querySelector('[name$="[connaitDDR]"]');
+            const statut = form.querySelector('[name$="[statutGrossesse]"]');
+            const type = form.querySelector('[name$="[typeGrossesse]"]');
+            const nombreBebesInput = form.querySelector('[name$="[nombreBebes]"]');
+
+            const fieldDDR = document.getElementById('fieldDDR');
+            const fieldDebut = document.getElementById('fieldDebut');
+            const sectionBebe = document.getElementById('sectionBebe');
+            const fieldNombreBebes = document.getElementById('fieldNombreBebes');
+            const singleBabyFields = document.getElementById('singleBabyFields');
+            const bebesWrapper = document.getElementById('bebesCollectionWrapper');
+            const bebesList = document.getElementById('bebesCollection');
+
+            let bebesIndex = bebesList ? parseInt(bebesList.getAttribute('data-index') || bebesList.children.length || 0, 10) : 0;
+
+            function addBebeForm() {
+                if (!bebesList) return;
+                const prototype = bebesList.getAttribute('data-prototype');
+                if (!prototype) return;
+                const newFormHtml = prototype.replace(/__name__/g, String(bebesIndex));
+                const wrapper = document.createElement('div');
+                wrapper.className = 'border rounded-3 p-3 mb-2 bebe-item bg-white shadow-sm';
+                wrapper.innerHTML = newFormHtml;
+                bebesList.appendChild(wrapper);
+                bebesIndex++;
+            }
+
+            function syncBebesWithNombre() {
+                if (!type || type.value !== 'multiple') {
+                    return;
+                }
+                if (!nombreBebesInput || !bebesList) {
+                    return;
+                }
+                let desired = parseInt(nombreBebesInput.value || '0', 10);
+                if (isNaN(desired) || desired < 2) {
+                    desired = 2;
+                }
+                if (desired > 5) {
+                    desired = 5;
+                }
+                let current = bebesList.querySelectorAll('.bebe-item').length;
+
+                while (current < desired) {
+                    addBebeForm();
+                    current++;
+                }
+                while (current > desired) {
+                    const last = bebesList.querySelector('.bebe-item:last-of-type');
+                    if (!last) break;
+                    bebesList.removeChild(last);
+                    current--;
+                }
+            }
+
+            function toggleDDR() {
+                const useDDR = connaitDDR && connaitDDR.checked;
+                if (fieldDDR) fieldDDR.style.display = useDDR ? '' : 'none';
+                if (fieldDebut) fieldDebut.style.display = useDDR ? 'none' : '';
+            }
+
+            function toggleBebe() {
+                const isTerminee = statut && statut.value === 'terminee';
+                if (sectionBebe) sectionBebe.style.display = isTerminee ? '' : 'none';
+            }
+
+            function toggleMultiple() {
+                const isMultiple = type && type.value === 'multiple';
+                if (fieldNombreBebes) fieldNombreBebes.style.display = isMultiple ? '' : 'none';
+                if (bebesWrapper) bebesWrapper.style.display = isMultiple ? '' : 'none';
+                if (singleBabyFields) singleBabyFields.style.display = isMultiple ? 'none' : '';
+                if (isMultiple) {
+                    syncBebesWithNombre();
+                }
+            }
+
+            if (connaitDDR) connaitDDR.addEventListener('change', toggleDDR);
+            if (statut) statut.addEventListener('change', toggleBebe);
+            if (type) type.addEventListener('change', toggleMultiple);
+            if (nombreBebesInput) nombreBebesInput.addEventListener('change', syncBebesWithNombre);
+
+            toggleDDR();
+            toggleBebe();
+            toggleMultiple();
+            syncBebesWithNombre();
+        })();
+    </script>
+{% endblock %}
+

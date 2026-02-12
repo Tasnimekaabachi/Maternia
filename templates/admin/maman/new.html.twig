@@ -1,0 +1,27 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Nouvelle maman{% endblock %}
+{% block page_title %}Nouvelle maman{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
+        <span>/</span>
+        <a href="{{ path('admin_suivi_grossesse') }}">Suivi grossesse</a>
+        <span>/</span>
+        <span>Nouvelle maman</span>
+    </div>
+{% endblock %}
+
+{% block header_actions %}
+    <a href="{{ path('admin_suivi_grossesse') }}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i> Retour à la liste</a>
+{% endblock %}
+
+{% block content %}
+    <div class="admin-card">
+        <div class="admin-card-header">Créer un profil maman</div>
+        <div class="admin-card-body">
+            {{ include('admin/maman/_form.html.twig', { button_label: 'Enregistrer' }) }}
+        </div>
+    </div>
+{% endblock %}

@@ -124,21 +124,42 @@ h4, h5, h6, .h4, .h5, .h6 {
 /*** Button End ***/
 
 
-/*** Topbar Start ***/
+/*** Topbar Start – barre contact/email compacte et professionnelle ***/
 .topbar {
-    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    border-radius: 0 0 var(--radius) var(--radius);
     box-shadow: var(--shadow-sm);
 }
+.topbar-compact {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+}
 .topbar .top-info {
-    font-size: 0.9rem;
+    font-size: inherit;
     font-weight: 500;
     font-family: 'Montserrat', sans-serif;
     display: flex;
     align-items: center;
+    gap: 1rem;
+}
+.topbar .top-info .topbar-item {
+    display: inline-flex;
+    align-items: center;
+    color: rgba(255,255,255,0.95);
+}
+.topbar .top-info .topbar-item a:hover {
+    opacity: 0.9;
+    text-decoration: underline !important;
 }
 .topbar .top-link a {
-    margin-right: 8px;
+    margin-right: 6px;
     transition: 0.2s ease;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
 }
 .topbar .top-link a:hover {
     background: rgba(255,255,255,0.2) !important;

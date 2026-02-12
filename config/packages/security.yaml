@@ -5,14 +5,11 @@ security:
     
     # Fournisseur utilisateur (très simple pour commencer)
     providers:
-        simple_provider:
-            memory:
-                users:
-                    # Vous pouvez créer un utilisateur simple si besoin
-                    # admin:
-                    #     password: '$2y$13$YourHashedPasswordHere'
-                    #     roles: ['ROLE_ADMIN']
-    
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
     firewalls:
         # Désactive la sécurité pour les fichiers de développement
         dev:
@@ -22,11 +19,29 @@ security:
         # Firewall principal - DÉSACTIVÉ pour toutes les routes
         main:
             lazy: true
-            provider: simple_provider
-            # Désactive complètement la sécurité
-            security: false
-    
-    # Contrôle d'accès - TOUTES LES ROUTES SONT PUBLIQUES
+            provider: app_user_provider
+            custom_authenticator: App\Security\LoginFormAuthenticator
+            logout:
+                path: app_logout
+                # where to redirect after logout
+                # target: app_any_route
+
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /
+                # by default, the feature is enabled by checking a checkbox in the
+                # login form, uncomment the following line to always enable it.
+                #always_remember_me: true
+
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#the-firewall
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
     access_control:
         # - { path: ^/, roles: PUBLIC_ACCESS }  # Pas besoin car security: false
         # - { path: ^/admin, roles: PUBLIC_ACCESS }

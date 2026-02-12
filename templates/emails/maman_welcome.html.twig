@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenue chez Maternia</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+            padding: 40px 30px;
+            text-align: center;
+            color: white;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .header .icon {
+            font-size: 42px;
+            margin-bottom: 15px;
+        }
+        .content {
+            padding: 32px 26px 36px;
+        }
+        .welcome-text {
+            font-size: 18px;
+            color: #ec4899;
+            font-weight: 600;
+            margin-bottom: 18px;
+        }
+        .id-box {
+            background: linear-gradient(135deg, #fce7f3 0%, #f3e5f5 100%);
+            border-left: 4px solid #ec4899;
+            padding: 18px 20px;
+            border-radius: 8px;
+            margin: 22px 0;
+        }
+        .id-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #be185d;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+        .id-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ec4899;
+            font-family: 'Courier New', monospace;
+        }
+        .info-box {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 18px 20px;
+            margin: 18px 0 22px;
+        }
+        .info-row {
+            display: flex;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #6b7280;
+            width: 160px;
+            flex-shrink: 0;
+            font-size: 13px;
+        }
+        .info-value {
+            color: #111827;
+            font-size: 13px;
+        }
+        .footer {
+            background: #f9fafb;
+            padding: 24px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #ec4899;
+            text-decoration: none;
+        }
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                margin: 0;
+                border-radius: 0;
+            }
+            .header, .content {
+                padding: 24px 18px;
+            }
+            .info-row {
+                flex-direction: column;
+            }
+            .info-label {
+                width: 100%;
+                margin-bottom: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="header">
+        <div class="icon">👶</div>
+        <h1>Bienvenue chez Maternia</h1>
+    </div>
+
+    <div class="content">
+        <p class="welcome-text">Bonjour chère maman,</p>
+
+        <p>Nous sommes ravis de vous accueillir sur la plateforme Maternia. Votre profil de suivi a été créé avec succès.</p>
+
+        <div class="id-box">
+            <div class="id-label">Votre identifiant Maternia</div>
+            <div class="id-value">#{{ maman.id }}</div>
+        </div>
+
+        <p><strong>Conservez bien cet identifiant</strong> : il permet à l’équipe médicale et à la plateforme de retrouver votre dossier rapidement.</p>
+
+        <div class="info-box">
+            <div class="info-row">
+                <span class="info-label">Numéro d'urgence</span>
+                <span class="info-value">+216 {{ maman.numeroUrgence }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Groupe sanguin</span>
+                <span class="info-value">{{ maman.groupeSanguin }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Email enregistré</span>
+                <span class="info-value">{{ maman.email ?? '—' }}</span>
+            </div>
+        </div>
+
+        <p style="margin-top: 20px;">
+            Vous pouvez à tout moment revenir sur Maternia pour compléter vos informations, suivre votre grossesse et consulter vos conseils santé.
+        </p>
+
+        <p style="color: #6b7280; font-size: 14px; margin-top: 24px;">
+            Avec toute notre bienveillance,<br>
+            <strong style="color: #ec4899;">L'équipe Maternia</strong>
+        </p>
+    </div>
+
+    <div class="footer">
+        <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+        <p>© {{ "now"|date('Y') }} Maternia - Tous droits réservés</p>
+    </div>
+</div>
+</body>
+</html>
+

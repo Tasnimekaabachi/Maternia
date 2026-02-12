@@ -1,10 +1,12 @@
-/* ===== Maternia Backoffice - Même style professionnel & moderne ===== */
+/* ===== Maternia Backoffice - Équilibre bleu (base) + rose (accent) ===== */
 :root {
     --admin-sidebar-width: 260px;
     --admin-header-height: 64px;
 }
 
 body.admin-body {
+    --admin-rose: #FF1D8D;
+    --admin-rose-soft: rgba(255, 29, 141, 0.08);
     background: var(--bs-surface);
     min-height: 100vh;
     font-family: 'Montserrat', sans-serif;
@@ -254,12 +256,154 @@ body.admin-body {
     color: var(--bs-border);
     margin-bottom: 1rem;
 }
+.admin-empty p { margin-bottom: 1rem; }
 
-.admin-empty p {
-    margin-bottom: 1rem;
+/* List toolbar (recherche + tri au-dessus du tableau) */
+.admin-card-list .admin-card-header {
+    border-bottom: 0;
+}
+.admin-list-toolbar {
+    padding: 1rem 1.25rem;
+    background: var(--bs-surface);
+    border-bottom: 1px solid var(--bs-border);
+}
+.admin-list-toolbar-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1rem;
+}
+.admin-list-toolbar-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+.admin-list-toolbar-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 0;
+}
+.admin-list-toolbar-select {
+    min-width: 120px;
+    border-radius: var(--radius);
+    border: 1px solid var(--bs-border);
+    font-size: 0.875rem;
+}
+.admin-list-toolbar-actions {
+    margin-left: auto;
+}
+.admin-list-toolbar-actions .btn {
+    border-radius: var(--radius);
+    font-weight: 600;
 }
 
-/* Buttons */
+/* Stats cards (en bas) */
+.admin-card-stats .admin-card-header {
+    font-size: 0.9375rem;
+}
+.admin-card-stats-header {
+    background: var(--admin-rose-soft);
+    color: var(--admin-rose);
+}
+.admin-card-stats-header i {
+    color: var(--admin-rose);
+}
+.admin-stats-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.admin-stats-list li {
+    border-bottom: 1px solid var(--bs-border);
+}
+.admin-stats-list li:last-child {
+    border-bottom: 0;
+}
+.admin-stats-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--bs-primary);
+    background: rgba(74, 123, 167, 0.12);
+    border-radius: 6px;
+}
+
+/* Form */
+.admin-form .form-section {
+    margin-bottom: 1.75rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--bs-border);
+}
+.admin-form .form-section:last-of-type {
+    border-bottom: 0;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+.admin-form .form-section-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--bs-primary);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.admin-form .form-section-title i {
+    opacity: 0.9;
+}
+.admin-form .mb-3 label {
+    font-weight: 500;
+    color: #374151;
+    font-size: 0.9375rem;
+    margin-bottom: 0.35rem;
+}
+.admin-form .form-control,
+.admin-form .form-select {
+    border-radius: var(--radius);
+    border: 1px solid var(--bs-border);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9375rem;
+}
+.admin-form .form-control:focus,
+.admin-form .form-select:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 3px rgba(74, 123, 167, 0.15);
+}
+.admin-form .form-actions {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--bs-border);
+}
+.admin-form .invalid-feedback {
+    font-size: 0.8125rem;
+    margin-top: 0.25rem;
+}
+.admin-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+.admin-field-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+.admin-field-value {
+    font-size: 0.9375rem;
+    color: #1f2937;
+}
+.admin-field-value:empty::after { content: '—'; color: #9ca3af; }
+/* Buttons - bleu (équilibre avec accent rose ailleurs) */
 .admin-btn-primary {
     background: var(--bs-primary);
     color: #fff;
@@ -293,7 +437,58 @@ body.admin-body {
     background: #b0807d;
     color: #fff;
 }
-
+/* Boutons rose (Appliquer, Modifier, Annuler, PDF) */
+.admin-btn-rose {
+    background: var(--admin-rose);
+    color: #fff !important;
+    border: 0;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    transition: 0.2s ease;
+}
+.admin-btn-rose:hover {
+    background: #ff5ba8;
+    color: #fff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 29, 141, 0.3);
+}
+.btn-outline-rose {
+    color: var(--admin-rose) !important;
+    border: 2px solid var(--admin-rose);
+    background: transparent;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    transition: 0.2s ease;
+}
+.btn-outline-rose:hover {
+    background: var(--admin-rose-soft);
+    color: var(--admin-rose) !important;
+    border-color: var(--admin-rose);
+}
+/* Bloc actions sous Informations système (show maman) */
+.admin-show-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--bs-border);
+}
+.admin-show-actions .btn {
+    flex: 1 1 auto;
+    min-width: fit-content;
+}
+.admin-show-actions form {
+    flex: 1 1 auto;
+    min-width: fit-content;
+}
+.admin-show-actions form .btn {
+    margin: 0;
+}
 /* Badge */
 .admin-badge {
     display: inline-block;
@@ -329,235 +524,6 @@ body.admin-body {
         transform: translateX(-100%);
         transition: transform 0.3s ease;
     }
-
-    .admin-sidebar.open {
-        transform: translateX(0);
-    }
-
-    .admin-main {
-        margin-left: 0;
-    }
-}
-
-/* public/css/admin.css - AJOUTEZ CES LIGNES */
-
-/* Couleur rose pour MAMAN */
-.bg-pink {
-    background-color: #e83e8c !important;
-    color: white !important;
-}
-
-/* S'assurer que toutes les classes sont bien appliquées */
-.badge.bg-info,
-.badge.bg-danger,
-.badge.bg-primary,
-.badge.bg-pink,
-.badge.bg-success,
-.badge.bg-warning,
-.badge.bg-secondary {
-    padding: 0.5em 0.8em !important;
-    font-size: 0.85em !important;
-    font-weight: 600 !important;
-    border-radius: 0.375rem !important;
-    display: inline-block !important;
-    line-height: 1 !important;
-}
-
-/* S'assurer que le texte est blanc sur fond coloré */
-.badge.bg-info,
-.badge.bg-danger,
-.badge.bg-primary,
-.badge.bg-pink,
-.badge.bg-success {
-    color: white !important;
-}
-
-/* BADGES ÉLÉGANTS AVEC EMOJIS */
-
-/* Style commun pour tous les badges */
-.badge-style {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: white;
-    border-radius: 50px;
-    border: none;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* BEBE - Bleu océan */
-.badge-bebe {
-    background: linear-gradient(135deg, #22d3ee, #3b82f6);
-    position: relative;
-    overflow: hidden;
-}
-
-/* MAMAN - Rose corail */
-.badge-maman {
-    background: linear-gradient(135deg, #fb7185, #db2777);
-    position: relative;
-    overflow: hidden;
-}
-
-/* LES DEUX - Violet royal */
-.badge-les-deux {
-    background: linear-gradient(135deg, #a855f7, #7c3aed);
-    position: relative;
-    overflow: hidden;
-}
-
-/* Effet de brillance */
-.badge-bebe::after,
-.badge-maman::after,
-.badge-les-deux::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    border-radius: 50px;
-    opacity: 0.5;
-}
-
-/* Emojis plus grands */
-.badge-style span.emoji {
-    font-size: 1.2rem;
-}
-
-/* Version minimaliste sans cadre */
-.badge-simple {
-    background: none !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0.4rem 0.8rem !important;
-}
-
-/* BEBE simple */
-.badge-bebe.badge-simple {
-    color: #3b82f6 !important;
-    background: rgba(59, 130, 246, 0.1) !important;
-}
-
-/* MAMAN simple */
-.badge-maman.badge-simple {
-    color: #db2777 !important;
-    background: rgba(219, 39, 119, 0.1) !important;
-}
-
-/* LES DEUX simple */
-.badge-les-deux.badge-simple {
-    color: #7c3aed !important;
-    background: rgba(124, 58, 237, 0.1) !important;
-}
-
-/* ===== MODERN SEGMENTED TOGGLE (Logical & Clear) ===== */
-.status-toggle-group {
-    display: inline-flex;
-    background: #f1f5f9;
-    padding: 4px;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    position: relative;
-    gap: 4px;
-}
-
-.status-toggle-item {
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #64748b;
-    border: 1px solid transparent;
-}
-
-.status-toggle-item i {
-    font-size: 1rem;
-}
-
-/* Logic via Hidden Checkbox Sibling */
-.status-checkbox {
-    display: none;
-}
-
-/* INACTIVE state styling (when checkbox is NOT checked) */
-.status-checkbox:not(:checked)~.status-toggle-group .toggle-inactive {
-    background: white;
-    color: #ef4444;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    border-color: rgba(239, 68, 68, 0.1);
-}
-
-/* ACTIVE state styling (when checkbox IS checked) */
-.status-checkbox:checked~.status-toggle-group .toggle-active {
-    background: #22c55e;
-    color: white;
-    box-shadow: 0 2px 6px rgba(34, 197, 94, 0.2);
-}
-
-/* Feedback text visibility */
-.status-checkbox:checked~.status-feedback-container .status-text-active {
-    display: inline;
-}
-
-.status-checkbox:not(:checked)~.status-feedback-container .status-text-active {
-    display: none;
-}
-
-.status-checkbox:checked~.status-feedback-container .status-text-inactive {
-    display: none;
-}
-
-.status-checkbox:not(:checked)~.status-feedback-container .status-text-inactive {
-    display: inline;
-}
-
-/* Pulse Dot */
-.status-feedback-container {
-    display: flex;
-    align-items: center;
-    margin-top: 12px;
-}
-
-.status-pulse {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    margin-right: 10px;
-    display: inline-block;
-}
-
-.status-checkbox:checked~.status-feedback-container .status-pulse {
-    background: #22c55e;
-    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
-    animation: pulse-green 2s infinite;
-}
-
-.status-checkbox:not(:checked)~.status-feedback-container .status-pulse {
-    background: #ef4444;
-}
-
-@keyframes pulse-green {
-    0% {
-        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
-    }
-
-    70% {
-        box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
-    }
-
-    100% {
-        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
-    }
+    .admin-sidebar.open { transform: translateX(0); }
+    .admin-main { margin-left: 0; }
 }

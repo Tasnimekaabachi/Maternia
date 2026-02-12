@@ -1,0 +1,514 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {% if mode|default('create') == 'show' %}Mon suivi grossesse - Maternia
+    {% elseif mode == 'edit' %}Modifier mon suivi - Maternia
+    {% else %}Mon profil maman - Maternia{% endif %}
+{% endblock %}
+
+{% if form is defined %}
+{% form_theme form _self %}
+{% endif %}
+{% block form_row %}
+    {% set hasErrors = form_errors(form) is not empty %}
+    {% set classes = 'form-control form-control-lg' ~ (hasErrors ? ' is-invalid' : '') %}
+    <div class="mb-3">
+        {{ form_label(form) }}
+        {{ form_widget(form, {'attr': {'class': classes}}) }}
+        {% if form.vars.help is defined and form.vars.help %}
+            <div class="form-text">{{ form.vars.help }}</div>
+        {% endif %}
+        {% if hasErrors %}
+            <div class="invalid-feedback d-block">
+                {{ form_errors(form) }}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+{% block checkbox_row %}
+    <div class="mb-3">
+        <div class="form-check">
+            {{ form_widget(form, {'attr': {'class': 'form-check-input'}}) }}
+            {{ form_label(form, null, {'label_attr': {'class': 'form-check-label'}}) }}
+        </div>
+        {{ form_errors(form) }}
+    </div>
+{% endblock %}
+
+{% block body %}
+    {% if mode|default('create') == 'show' %}
+        {# ——— MODE AFFICHAGE (dashboard) ——— #}
+        <div class="container-fluid py-5 hero-header wow fadeIn" data-wow-delay="0.1s">
+            <div class="container py-5">
+                <div class="row g-5">
+                    <div class="col-lg-8 col-md-12">
+                        <h1 class="mb-3 text-primary">Mon suivi grossesse</h1>
+                        <h2 class="mb-4 display-6 text-white">Votre dashboard santé</h2>
+                        <p class="lead text-white mb-0">Consultez vos informations et suivez vos indicateurs à tout moment.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="py-5 wow fadeIn" data-wow-delay="0.1s">
+            <div class="container py-5">
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Accueil</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('app_suivi_grossesse_creer') }}">Mon suivi</a></li>
+                        <li class="breadcrumb-item active">Mon profil</li>
+                    </ol>
+                </nav>
+
+                {% if imc_alerte|default(false) %}
+                    <div class="alert alert-danger border-2 d-flex align-items-start mb-4" role="alert">
+                        <i class="fas fa-exclamation-triangle fa-2x me-3 mt-1"></i>
+                        <div class="flex-grow-1">
+                            <h5 class="alert-heading mb-2">Attention : IMC à risque</h5>
+                            <p class="mb-2">Votre IMC ({{ imc }}) indique un risque pour votre santé pendant la grossesse. Nous vous recommandons de prendre rendez-vous avec un nutritionniste ou votre sage-femme dès que possible.</p>
+                            <a href="{{ path('app_appointment') }}" class="btn btn-danger btn-sm">Prendre rendez-vous</a>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {# Résumé grossesse (pour confirmer que ça s'est bien enregistré) #}
+                        <div class="border border-primary rounded-3 bg-light p-4 mb-4 shadow-sm">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                                <h4 class="text-primary mb-0"><i class="fas fa-baby-carriage me-2"></i> Suivi de grossesse</h4>
+                                <a href="{{ path('app_maman_grossesse_edit', { id: maman.id }) }}" class="btn admin-btn-rose btn-sm">
+                                    <i class="fas fa-edit me-1"></i> Modifier grossesse
+                                </a>
+                            </div>
+                            <hr class="my-3">
+
+                            {% if grossesse %}
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-4">
+                                        <span class="text-muted small d-block">Semaine actuelle</span>
+                                        <strong>{{ grossesse.semaineActuelle ?? '—' }}</strong>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <span class="text-muted small d-block">Trimestre</span>
+                                        <strong>{{ grossesse.trimestreActuel ?? '—' }}</strong>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <span class="text-muted small d-block">Accouchement prévu</span>
+                                        <strong>
+                                            {% if grossesse.dateAccouchementPrevue %}
+                                                {{ grossesse.dateAccouchementPrevue|date('d/m/Y') }}
+                                            {% else %}
+                                                —
+                                            {% endif %}
+                                        </strong>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <span class="text-muted small d-block">Poids actuel (grossesse)</span>
+                                        <strong>{{ grossesse.poidsActuel is not null ? grossesse.poidsActuel ~ ' kg' : '—' }}</strong>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <span class="text-muted small d-block">Statut</span>
+                                        <strong>{{ grossesse.statutGrossesse ?? '—' }}</strong>
+                                    </div>
+                                    <div class="col-12">
+                                        <span class="text-muted small d-block">Symptômes</span>
+                                        <span>{{ grossesse.symptomes ?: '—' }}</span>
+                                    </div>
+                                </div>
+
+                                <hr class="my-3">
+
+                                {# Bandeau d'information selon le trimestre de grossesse #}
+                                {% set trimestre = grossesse.trimestreActuel ?? null %}
+                                {% if trimestre %}
+                                    <div class="mb-3">
+                                        {% if trimestre == 1 %}
+                                            <div class="alert alert-success border-success border-2 mb-0">
+                                                <strong>🟢 Vous êtes dans le 1er trimestre de grossesse.</strong><br>
+                                                <span class="small text-muted">Cette phase correspond au début du développement du bébé.</span>
+                                            </div>
+                                        {% elseif trimestre == 2 %}
+                                            <div class="alert alert-warning border-warning border-2 mb-0">
+                                                <strong>🟠 Début du 2ème trimestre.</strong><br>
+                                                <span class="small text-muted">La grossesse évolue positivement. Pensez à planifier votre consultation de suivi.</span>
+                                            </div>
+                                        {% else %}
+                                            <div class="alert alert-danger border-danger border-2 mb-0">
+                                                <strong>🔴 Bienvenue au 3ème trimestre.</strong><br>
+                                                <span class="small text-muted">Préparez votre suivi final et les examens avant l’accouchement.</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+
+                                {% if grossesse.statutGrossesse != 'terminee' %}
+                                    <div class="row g-3">
+                                        {% if grossesse_alertes is defined and grossesse_alertes|length > 0 %}
+                                            <div class="col-md-6">
+                                                <h6 class="text-danger mb-2"><i class="fas fa-exclamation-triangle me-1"></i> Alertes maman</h6>
+                                                <ul class="small mb-0 ps-3">
+                                                    {% for alerte in grossesse_alertes %}
+                                                        <li>{{ alerte }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        {% endif %}
+                                        {% if grossesse_conseil is defined and grossesse_conseil %}
+                                            <div class="col-md-6">
+                                                <h6 class="text-primary mb-2"><i class="fas fa-lightbulb me-1"></i> Conseil grossesse</h6>
+                                                <p class="small mb-0">{{ grossesse_conseil }}</p>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% elseif bebe_age_mois is defined and bebe_age_mois is not null %}
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <span class="text-muted small d-block">Âge du bébé</span>
+                                            <strong>{{ bebe_age_mois }} mois</strong>
+                                        </div>
+                                        {% if bebe_conseil is defined and bebe_conseil %}
+                                            <div class="col-md-8">
+                                                <h6 class="text-primary mb-2"><i class="fas fa-baby me-1"></i> Conseil bébé</h6>
+                                                <p class="small mb-0">{{ bebe_conseil }}</p>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <p class="mb-0 text-muted">Aucune grossesse enregistrée pour le moment. Cliquez sur « Mon suivi de grossesse » pour la compléter.</p>
+                            {% endif %}
+                        </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-6">
+                        <div class="d-grid d-md-flex gap-2">
+                            <a href="#informations-maman" class="btn btn-outline-primary">
+                                <i class="fas fa-user me-1"></i> Mes informations maman
+                            </a>
+                            <a href="{{ path('app_maman_grossesse_edit', { id: maman.id }) }}" class="btn admin-btn-rose">
+                                <i class="fas fa-baby-carriage me-1"></i> Mon suivi de grossesse
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4" id="informations-maman">
+                    <div class="col-lg-8">
+                        <div class="border border-primary rounded-3 bg-light p-4 mb-4 shadow-sm">
+                            <h4 class="text-primary mb-3"><i class="fas fa-phone-alt me-2"></i> Informations grossesse & contact</h4>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <span class="text-muted small d-block">Numéro d'urgence</span>
+                                    <strong>+216 {{ maman.numeroUrgence }}</strong>
+                                </div>
+                                <div class="col-md-6">
+                                    <span class="text-muted small d-block">Groupe sanguin</span>
+                                    <strong>{{ maman.groupeSanguin }}</strong>
+                                </div>
+                                <div class="col-md-6">
+                                    <span class="text-muted small d-block">Taille</span>
+                                    <strong>{{ maman.taille }} cm</strong>
+                                </div>
+                                <div class="col-md-6">
+                                    <span class="text-muted small d-block">Poids</span>
+                                    <strong>{{ maman.poids }} kg</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border border-primary rounded-3 bg-light p-4 mb-4 shadow-sm">
+                            <h4 class="text-primary mb-3"><i class="fas fa-file-medical me-2"></i> Informations santé</h4>
+                            <div class="mb-3">
+                                <span class="text-muted small d-block">Allergies</span>
+                                <span>{{ maman.allergies ?: 'Aucune indiquée' }}</span>
+                            </div>
+                            <div class="mb-3">
+                                <span class="text-muted small d-block">Antécédents médicaux</span>
+                                <span>{{ maman.antecedentsMedicaux ?: 'Aucun indiqué' }}</span>
+                            </div>
+                            <div class="mb-3">
+                                <span class="text-muted small d-block">Maladies chroniques</span>
+                                <span>{{ maman.maladiesChroniques ?: 'Aucune indiquée' }}</span>
+                            </div>
+                            <div>
+                                <span class="text-muted small d-block">Médicaments actuels</span>
+                                <span>{{ maman.medicamentsActuels ?: 'Aucun indiqué' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="border border-primary rounded-3 bg-light p-4 mb-4 shadow-sm">
+                            <h4 class="text-primary mb-3"><i class="fas fa-heartbeat me-2"></i> Mode de vie & bien-être</h4>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <span class="text-muted small d-block">Fumeuse</span>
+                                    <strong>{{ maman.fumeur ? 'Oui' : 'Non' }}</strong>
+                                </div>
+                                <div class="col-md-6">
+                                    <span class="text-muted small d-block">Consommation d'alcool</span>
+                                    <strong>{{ maman.consommationAlcool ? 'Oui' : 'Non' }}</strong>
+                                </div>
+                                <div class="col-12">
+                                    <span class="text-muted small d-block">Niveau d'activité physique</span>
+                                    <strong>{{ maman.niveauActivitePhysique }}</strong>
+                                </div>
+                                <div class="col-12">
+                                    <span class="text-muted small d-block">Habitudes alimentaires</span>
+                                    <span>{{ maman.habitudesAlimentaires ?: '—' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="border rounded-3 p-4 mb-4 shadow-sm bg-light {{ imc_alerte|default(false) ? 'border-danger' : 'border-primary' }}">
+                            <h5 class="text-primary mb-3"><i class="fas fa-weight me-2"></i> Votre IMC</h5>
+                            {% if imc is defined and imc is not null %}
+                                <p class="mb-1 display-6 fw-bold text-dark">{{ imc }}</p>
+                                <p class="mb-0 text-body">{{ imc_categorie|default('') }}</p>
+                                <p class="mt-2 small mb-0 {{ imc_alerte|default(false) ? 'text-danger fw-semibold' : 'text-body-secondary' }}">
+                                    {% if imc_alerte|default(false) %}
+                                        IMC à risque — consultez un professionnel.
+                                    {% else %}
+                                        IMC calculé automatiquement à partir de votre taille et poids.
+                                    {% endif %}
+                                </p>
+                            {% else %}
+                                <p class="text-body-secondary mb-0">Indisponible (taille ou poids manquant).</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="border border-primary rounded-3 bg-light p-4 shadow-sm conseils-sante-card mb-4">
+                            <h5 class="text-primary mb-4 pb-2 border-bottom border-2 border-primary">
+                                <i class="fas fa-lightbulb me-2"></i> Conseils santé
+                            </h5>
+                            <div class="conseils-list">
+                                {% for conseil in conseils|default([]) %}
+                                    <div class="conseil-item d-flex align-items-start mb-3 p-3 rounded-3 bg-white border border-primary border-opacity-25">
+                                        <span class="conseil-icon flex-shrink-0 rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px;">
+                                            <i class="fas fa-check small"></i>
+                                        </span>
+                                        <span class="conseil-text small lh-base">{{ conseil }}</span>
+                                    </div>
+                                {% else %}
+                                    <div class="conseil-item d-flex align-items-start p-3 rounded-3 bg-white border border-primary border-opacity-25">
+                                        <span class="conseil-icon flex-shrink-0 rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px;">
+                                            <i class="fas fa-heart small"></i>
+                                        </span>
+                                        <span class="conseil-text small text-muted lh-base">Continuez à prendre soin de vous.</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="{{ path('app_suivi_grossesse_edit', { id: maman.id }) }}" class="btn btn-primary btn-sm flex-grow-1 flex-lg-grow-0 px-3 py-2 btn-border-radius">
+                                <i class="fas fa-edit me-1"></i> Modifier
+                            </a>
+                            <a href="{{ path('app_appointment') }}" class="btn btn-primary btn-sm flex-grow-1 flex-lg-grow-0 px-3 py-2 btn-border-radius">
+                                <i class="fas fa-calendar-check me-1"></i> Rendez-vous
+                            </a>
+                            <form method="post" action="{{ path('app_suivi_grossesse_delete', { id: maman.id }) }}" class="d-inline flex-grow-1 flex-lg-grow-0" onsubmit="return confirm('Êtes-vous sûre de vouloir supprimer votre profil ? Cette action est irréversible.');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ maman.id) }}">
+                                <button type="submit" class="btn btn-outline-danger btn-sm w-100 px-3 py-2 btn-border-radius">
+                                    <i class="fas fa-trash-alt me-1"></i> Supprimer
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    {% elseif mode == 'edit' %}
+        {# ——— MODE ÉDITION ——— #}
+        <div class="container-fluid py-5 hero-header wow fadeIn" data-wow-delay="0.1s">
+            <div class="container py-5">
+                <div class="row g-5">
+                    <div class="col-lg-8 col-md-12">
+                        <h1 class="mb-3 text-primary">Modifier mon profil</h1>
+                        <h2 class="mb-4 display-6 text-white">Mettez à jour vos informations</h2>
+                        <p class="lead text-white mb-0">Les données sont enregistrées de manière confidentielle.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="py-5 wow fadeIn" data-wow-delay="0.1s">
+            <div class="container py-5">
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Accueil</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('app_suivi_grossesse_show', { id: maman.id }) }}">Mon suivi</a></li>
+                        <li class="breadcrumb-item active">Modifier</li>
+                    </ol>
+                </nav>
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-9">
+                        <div class="border border-primary rounded-3 bg-light p-4 p-lg-5 shadow-sm">
+                            {{ form_start(form, {'attr': {'class': 'needs-validation'}, 'attr': {'novalidate': 'novalidate'}}) }}
+                            <div class="mb-4">
+                                <h5 class="text-primary mb-3">Contact & santé</h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            {{ form_label(form.numeroUrgence) }}
+                                            <div class="input-group">
+                                                <span class="input-group-text">+216</span>
+                                                {{ form_widget(form.numeroUrgence, {'attr': {'class': 'form-control', 'placeholder': '9 12 34 56 78'}}) }}
+                                            </div>
+                                            {{ form_errors(form.numeroUrgence) }}
+                                        </div>
+                                        <div class="mb-3">
+                                            {{ form_row(form.email) }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">{{ form_row(form.groupeSanguin) }}</div>
+                                    <div class="col-md-6">{{ form_row(form.taille) }}</div>
+                                    <div class="col-md-6">{{ form_row(form.poids) }}</div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <h5 class="text-primary mb-3">Antécédents & traitements</h5>
+                                <div class="row g-3">
+                                    <div class="col-12">{{ form_row(form.allergies) }}</div>
+                                    <div class="col-12">{{ form_row(form.antecedentsMedicaux) }}</div>
+                                    <div class="col-12">{{ form_row(form.maladiesChroniques) }}</div>
+                                    <div class="col-12">{{ form_row(form.medicamentsActuels) }}</div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <h5 class="text-primary mb-3">Mode de vie</h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">{{ form_row(form.fumeur) }}</div>
+                                    <div class="col-md-6">{{ form_row(form.consommationAlcool) }}</div>
+                                    <div class="col-12">{{ form_row(form.niveauActivitePhysique) }}</div>
+                                    <div class="col-12">{{ form_row(form.habitudesAlimentaires) }}</div>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary px-5 py-3 btn-border-radius"><i class="fas fa-check me-2"></i>Enregistrer</button>
+                                <a href="{{ path('app_suivi_grossesse_show', { id: maman.id }) }}" class="btn btn-outline-secondary px-4 py-3 btn-border-radius">Annuler</a>
+                            </div>
+                            {{ form_end(form) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    {% elseif profilEnregistre|default(false) %}
+        {# ——— MODE SUCCÈS (après création) ——— #}
+        <div class="container-fluid py-5 hero-header wow fadeIn" data-wow-delay="0.1s">
+            <div class="container py-5">
+                <div class="row g-5">
+                    <div class="col-lg-7 col-md-12">
+                        <h1 class="mb-3 text-primary">Merci</h1>
+                        <h1 class="mb-5 display-1 text-white">Votre profil a été enregistré</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <section class="py-5 wow fadeIn" data-wow-delay="0.1s">
+            <div class="container py-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center">
+                        <div class="border border-primary rounded-3 bg-light p-5">
+                            <div class="mb-4">
+                                <i class="fas fa-check-circle fa-5x text-primary"></i>
+                            </div>
+                            <h2 class="mb-3">Vos informations ont bien été enregistrées</h2>
+                            <p class="text-muted mb-4">L'équipe Maternia pourra utiliser ces données pour vous accompagner dans votre suivi de grossesse.</p>
+                            {% if imc is defined and imc is not null %}
+                                <div class="mb-4 p-4 rounded-3 {{ imc_alerte|default(false) ? 'bg-danger bg-opacity-10 border border-danger' : 'bg-primary bg-opacity-10 border border-primary' }}">
+                                    <h5 class="mb-2">Votre indice de masse corporelle (IMC)</h5>
+                                    <p class="mb-1 fs-5"><strong>{{ imc }}</strong> — {{ imc_categorie }}</p>
+                                    <p class="mb-0 {{ imc_alerte|default(false) ? 'text-danger fw-semibold' : 'text-success' }}">{{ imc_message }}</p>
+                                    {% if imc_alerte|default(false) %}
+                                        <p class="mt-2 mb-0 small">Nous vous recommandons de prendre rendez-vous avec un nutritionniste dès que possible.</p>
+                                        <a href="{{ path('app_appointment') }}" class="btn btn-danger btn-sm mt-2">Prendre rendez-vous</a>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                            <p class="text-muted mb-4">Vous pouvez à tout moment prendre rendez-vous ou consulter les autres services.</p>
+                            <a href="{{ path('app_home') }}" class="btn btn-primary px-5 py-3 btn-border-radius me-2">Retour à l'accueil</a>
+                            <a href="{{ path('app_appointment') }}" class="btn btn-outline-primary px-5 py-3 btn-border-radius">Prendre rendez-vous</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    {% else %}
+        {# ——— MODE CRÉATION ——— #}
+        <div class="container-fluid py-5 hero-header wow fadeIn" data-wow-delay="0.1s">
+            <div class="container py-5">
+                <div class="row g-5">
+                    <div class="col-lg-8 col-md-12">
+                        <h1 class="mb-3 text-primary">Mon profil maman</h1>
+                        <h1 class="mb-4 display-1 text-white">Complétez votre profil</h1>
+                        <p class="lead text-white mb-0">Ces informations permettent à l'équipe Maternia de mieux vous accompagner tout au long de votre grossesse.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <section class="py-5 wow fadeIn" data-wow-delay="0.1s">
+            <div class="container py-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-9">
+                        <div class="border border-primary rounded-3 bg-light p-4 p-lg-5 shadow-sm">
+                            <h4 class="text-primary mb-4 border-bottom border-primary border-2 d-inline-block p-2 title-border-radius">Vos informations</h4>
+                            <p class="text-muted mb-4">Tous les champs marqués d'un <span class="text-primary">*</span> sont obligatoires. Les données sont enregistrées de manière confidentielle.</p>
+                            <div class="alert alert-info py-2 mb-4 small"><i class="fas fa-info-circle me-2"></i><strong>Déjà un profil ?</strong> Après enregistrement, vous recevrez un lien personnel (ex. <code>/suivi_grossesse/1</code>). Conservez-le pour consulter ou modifier vos informations à tout moment.</div>
+                            {{ form_start(form, {'attr': {'class': 'needs-validation'}, 'attr': {'novalidate': 'novalidate'}}) }}
+                            <div class="mb-4">
+                                <h5 class="text-primary mb-3">Contact & santé</h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            {{ form_label(form.numeroUrgence) }}
+                                            <div class="input-group input-group-lg">
+                                                <span class="input-group-text">+216</span>
+                                                {{ form_widget(form.numeroUrgence, {'attr': {'class': 'form-control form-control-lg', 'placeholder': '9 12 34 56 78', 'maxlength': 11}}) }}
+                                            </div>
+                                            <div class="form-text">8 chiffres, commençant par 2, 4, 5 ou 9</div>
+                                            {{ form_errors(form.numeroUrgence) }}
+                                        </div>
+                                        <div class="mb-3">
+                                            {{ form_row(form.email) }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">{{ form_row(form.groupeSanguin) }}</div>
+                                    <div class="col-md-6">{{ form_row(form.taille) }}</div>
+                                    <div class="col-md-6">{{ form_row(form.poids) }}</div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <h5 class="text-primary mb-3">Antécédents & traitements</h5>
+                                <div class="row g-3">
+                                    <div class="col-12">{{ form_row(form.allergies) }}</div>
+                                    <div class="col-12">{{ form_row(form.antecedentsMedicaux) }}</div>
+                                    <div class="col-12">{{ form_row(form.maladiesChroniques) }}</div>
+                                    <div class="col-12">{{ form_row(form.medicamentsActuels) }}</div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <h5 class="text-primary mb-3">Mode de vie</h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">{{ form_row(form.fumeur) }}</div>
+                                    <div class="col-md-6">{{ form_row(form.consommationAlcool) }}</div>
+                                    <div class="col-12">{{ form_row(form.niveauActivitePhysique) }}</div>
+                                    <div class="col-12">{{ form_row(form.habitudesAlimentaires) }}</div>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary px-5 py-3 btn-border-radius"><i class="fas fa-check me-2"></i>Enregistrer mon profil</button>
+                                <a href="{{ path('app_home') }}" class="btn btn-outline-secondary px-4 py-3 btn-border-radius">Annuler</a>
+                            </div>
+                            {{ form_end(form) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+{% endblock %}

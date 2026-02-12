@@ -1,0 +1,33 @@
+{# templates/admin/user/_form.html.twig #}
+{{ form_start(form) }}
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Nom</label>
+            {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Prénom</label>
+            {{ form_widget(form.prenom, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">Email</label>
+        {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Type Maternia</label>
+            {{ form_widget(form.type, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Rôles Système</label>
+            {{ form_widget(form.roles, {'attr': {'class': 'form-select'}}) }}
+        </div>
+    </div>
+
+    <button class="btn btn-primary w-100 py-2 mt-3">
+        {{ button_label|default('Enregistrer les modifications') }}
+    </button>
+{{ form_end(form) }}

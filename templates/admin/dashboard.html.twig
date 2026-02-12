@@ -14,39 +14,50 @@
 {% block content %}
 
     <div class="admin-stats">
+
+        {# ===== Suivi Grossesse ===== #}
         <div class="admin-stat">
-            <div class="admin-stat-value">{{ nbProduits }}</div>
+            <div class="admin-stat-value">{{ suivis_grossesse_actifs|default(0) }}</div>
+            <div class="admin-stat-label">Suivis grossesse actifs</div>
+        </div>
+
+        <div class="admin-stat">
+            <div class="admin-stat-value">{{ total_grossesses|default(0) }}</div>
+            <div class="admin-stat-label">Grossesses</div>
+        </div>
+
+        <div class="admin-stat">
+            <div class="admin-stat-value">{{ total_mamans|default(0) }}</div>
+            <div class="admin-stat-label">Mamans</div>
+        </div>
+
+        {# ===== Marketplace ===== #}
+        <div class="admin-stat">
+            <div class="admin-stat-value">{{ nbProduits|default(0) }}</div>
             <div class="admin-stat-label">Produits marketplace</div>
         </div>
 
         <div class="admin-stat">
-            <div class="admin-stat-value">{{ eventCount }}</div>
+            <div class="admin-stat-value">{{ eventCount|default(0) }}</div>
             <div class="admin-stat-label">Événements</div>
         </div>
 
         <div class="admin-stat">
             <div class="admin-stat-value">
-                {{ nbCommandesAttente + nbCommandesValidees + nbCommandesAnnulees }}
+                {{ (nbCommandesAttente|default(0))
+                 + (nbCommandesValidees|default(0))
+                 + (nbCommandesAnnulees|default(0)) }}
             </div>
             <div class="admin-stat-label">Commandes totales</div>
         </div>
 
         <div class="admin-stat">
-            <div class="admin-stat-value">{{ nbCommandesValidees }}</div>
-            <div class="admin-stat-label">Commandes validées</div>
-        </div>
-
-        <div class="admin-stat">
-            <div class="admin-stat-value">{{ nbCommandesAttente }}</div>
-            <div class="admin-stat-label">En attente</div>
-        </div>
-
-        <div class="admin-stat">
             <div class="admin-stat-value">
-                {{ chiffreAffaires|number_format(2, ',', ' ') }} TND
+                {{ chiffreAffaires|default(0)|number_format(2, ',', ' ') }} TND
             </div>
             <div class="admin-stat-label">Chiffre d'affaires</div>
         </div>
+
     </div>
 
     {# ===== Top Products Stats Grid ===== #}
@@ -54,19 +65,27 @@
         <h6 class="text-muted small text-uppercase fw-bold mb-3 ms-1">
             <i class="fas fa-chart-line me-2 text-primary"></i>Produits les plus commandés
         </h6>
+
         <div class="admin-stats">
-            {% if topProduits is not empty %}
+            {% if topProduits|default([]) is not empty %}
                 {% for row in topProduits %}
                     <div class="admin-stat">
                         <div class="d-flex align-items-center justify-content-between mb-2">
-                            <div class="admin-stat-value" style="font-size: 1.5rem;">{{ row.nb }}</div>
-                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                            <div class="admin-stat-value" style="font-size: 1.5rem;">
+                                {{ row.nb }}
+                            </div>
+
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center"
+                                 style="width: 35px; height: 35px;">
                                 <i class="fas fa-box-open text-primary small"></i>
                             </div>
                         </div>
-                        <div class="admin-stat-label text-dark fw-bold text-truncate" title="{{ row.produit }}">
+
+                        <div class="admin-stat-label text-dark fw-bold text-truncate"
+                             title="{{ row.produit }}">
                             {{ row.produit }}
                         </div>
+
                         <div class="text-muted small">Ventes totales</div>
                     </div>
                 {% endfor %}
@@ -83,11 +102,6 @@
     <div class="admin-card">
         <div class="admin-card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
             <span>Activité récente</span>
-
-            <div class="d-flex gap-2">
-                <a href="{{ path('app_event_index') }}"
-                   class="btn btn-sm btn-outline-secondary">Tous les événements</a>
-            </div>
         </div>
 
         <div class="admin-card-body p-0">
@@ -96,12 +110,21 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="bg-light">
                             <tr>
-                                <th class="ps-4 border-0 small text-uppercase text-muted fw-bold" style="width: 50px;">Type</th>
-                                <th class="border-0 small text-uppercase text-muted fw-bold">Détails</th>
-                                <th class="border-0 small text-uppercase text-muted fw-bold">Date</th>
-                                <th class="border-0 text-end pe-4 small text-uppercase text-muted fw-bold">Action</th>
+                                <th class="ps-4 border-0 small text-uppercase text-muted fw-bold" style="width: 50px;">
+                                    Type
+                                </th>
+                                <th class="border-0 small text-uppercase text-muted fw-bold">
+                                    Détails
+                                </th>
+                                <th class="border-0 small text-uppercase text-muted fw-bold">
+                                    Date
+                                </th>
+                                <th class="border-0 text-end pe-4 small text-uppercase text-muted fw-bold">
+                                    Action
+                                </th>
                             </tr>
                         </thead>
+
                         <tbody>
                             {% for item in recent_activity %}
                                 <tr>
@@ -112,8 +135,8 @@
                                                 <i class="fas {{ item.icon }} text-primary small"></i>
                                             </div>
 
-                                            <span class="badge {{ item.badge_class }} rounded-pill small fw-medium">
-                                                {{ item.badge_text }}
+                                            <span class="badge {{ item.badge_class|default('bg-light') }} rounded-pill small fw-medium">
+                                                {{ item.badge_text|default('Activité') }}
                                             </span>
                                         </div>
                                     </td>
@@ -124,10 +147,12 @@
                                     </td>
 
                                     <td class="small text-muted">
-                                        {% if item.type == 'product' or item.type == 'commande' %}
+                                        {% if item.type is defined and item.type == 'product' %}
                                             Récemment
-                                        {% else %}
+                                        {% elseif item.date is defined %}
                                             {{ item.date|date('d/m/Y') }} à {{ item.date|date('H:i') }}
+                                        {% else %}
+                                            —
                                         {% endif %}
                                     </td>
 
@@ -153,6 +178,9 @@
         .bg-info-light { background-color: #e0f2fe; color: #0369a1; }
         .bg-warning-light { background-color: #fef3c7; color: #92400e; }
         .bg-success-light { background-color: #dcfce7; color: #15803d; }
+        .bg-purple-light { background-color: #f3e8ff; color: #7e22ce; }
+        .bg-secondary-light { background-color: #f3f4f6; color: #374151; }
+        .bg-indigo-light { background-color: #e0e7ff; color: #4338ca; }
 
         .btn-pink {
             background-color: #ec4899;

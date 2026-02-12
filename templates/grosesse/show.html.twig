@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Grosesse{% endblock %}
+
+{% block body %}
+    <h1>Grosesse</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ grosesse.id }}</td>
+            </tr>
+            <tr>
+                <th>DateDernieresRegles</th>
+                <td>{{ grosesse.dateDernieresRegles ? grosesse.dateDernieresRegles|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>DateDebutGrossesse</th>
+                <td>{{ grosesse.dateDebutGrossesse ? grosesse.dateDebutGrossesse|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>StatutGrossesse</th>
+                <td>{{ grosesse.statutGrossesse }}</td>
+            </tr>
+            <tr>
+                <th>TypeGrossesse</th>
+                <td>{{ grosesse.typeGrossesse }}</td>
+            </tr>
+            <tr>
+                <th>PoidsActuel</th>
+                <td>{{ grosesse.poidsActuel }}</td>
+            </tr>
+            <tr>
+                <th>Symptomes</th>
+                <td>{{ grosesse.symptomes }}</td>
+            </tr>
+            <tr>
+                <th>IndiceRisque</th>
+                <td>{{ grosesse.indiceRisque }}</td>
+            </tr>
+            <tr>
+                <th>DateAccouchementReelle</th>
+                <td>{{ grosesse.dateAccouchementReelle ? grosesse.dateAccouchementReelle|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>NombreBebes</th>
+                <td>{{ grosesse.nombreBebes }}</td>
+            </tr>
+            <tr>
+                <th>NomBebe</th>
+                <td>{{ grosesse.nomBebe }}</td>
+            </tr>
+            <tr>
+                <th>SexeBebe</th>
+                <td>{{ grosesse.sexeBebe }}</td>
+            </tr>
+            <tr>
+                <th>PoidsNaissance</th>
+                <td>{{ grosesse.poidsNaissance }}</td>
+            </tr>
+            <tr>
+                <th>TailleNaissance</th>
+                <td>{{ grosesse.tailleNaissance }}</td>
+            </tr>
+            <tr>
+                <th>EtatNaissance</th>
+                <td>{{ grosesse.etatNaissance }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_grosesse_index') }}">back to list</a>
+
+    <a href="{{ path('app_grosesse_edit', {'id': grosesse.id}) }}">edit</a>
+
+    {{ include('grosesse/_delete_form.html.twig') }}
+{% endblock %}

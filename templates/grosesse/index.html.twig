@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Grosesse index{% endblock %}
+
+{% block body %}
+    <h1>Grosesse index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Maman</th>
+                <th>DateDernieresRegles</th>
+                <th>DateDebutGrossesse</th>
+                <th>StatutGrossesse</th>
+                <th>TypeGrossesse</th>
+                <th>PoidsActuel</th>
+                <th>Symptomes</th>
+                <th>IndiceRisque</th>
+                <th>DateAccouchementReelle</th>
+                <th>NombreBebes</th>
+                <th>NomBebe</th>
+                <th>SexeBebe</th>
+                <th>PoidsNaissance</th>
+                <th>TailleNaissance</th>
+                <th>EtatNaissance</th>
+                <th>Bébés (liste)</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for grosesse in grosesses %}
+            <tr>
+                <td>{{ grosesse.id }}</td>
+                <td>
+                    {% if grosesse.maman %}
+                        Maman #{{ grosesse.maman.id }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+                <td>{{ grosesse.dateDernieresRegles ? grosesse.dateDernieresRegles|date('Y-m-d') : '' }}</td>
+                <td>{{ grosesse.dateDebutGrossesse ? grosesse.dateDebutGrossesse|date('Y-m-d') : '' }}</td>
+                <td>{{ grosesse.statutGrossesse }}</td>
+                <td>{{ grosesse.typeGrossesse }}</td>
+                <td>{{ grosesse.poidsActuel }}</td>
+                <td>{{ grosesse.symptomes }}</td>
+                <td>{{ grosesse.indiceRisque }}</td>
+                <td>{{ grosesse.dateAccouchementReelle ? grosesse.dateAccouchementReelle|date('Y-m-d') : '' }}</td>
+                <td>{{ grosesse.nombreBebes }}</td>
+                <td>{{ grosesse.nomBebe }}</td>
+                <td>{{ grosesse.sexeBebe }}</td>
+                <td>{{ grosesse.poidsNaissance }}</td>
+                <td>{{ grosesse.tailleNaissance }}</td>
+                <td>{{ grosesse.etatNaissance }}</td>
+                <td>
+                    {% if grosesse.bebes is not empty %}
+                        {% for bebe in grosesse.bebes %}
+                            👶 {{ bebe.nom ?? 'Bébé' }}
+                            {% if bebe.poids is defined and bebe.poids is not null %}
+                                ({{ bebe.poids }} kg)
+                            {% endif %}
+                            <br>
+                        {% endfor %}
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ path('app_grosesse_show', {'id': grosesse.id}) }}">show</a>
+                    <a href="{{ path('app_grosesse_edit', {'id': grosesse.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="16">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_grosesse_new') }}">Create new</a>
+{% endblock %}

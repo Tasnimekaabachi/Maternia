@@ -1,0 +1,65 @@
+{{ form_start(form, { attr: { class: 'admin-form' } }) }}
+
+<div class="form-section">
+    <h3 class="form-section-title"><i class="fas fa-phone-alt"></i> Contact & santé</h3>
+    <div class="row g-3">
+        <div class="col-md-6">
+            {{ form_row(form.numeroUrgence) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.groupeSanguin) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.taille) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.poids) }}
+        </div>
+    </div>
+</div>
+
+<div class="form-section">
+    <h3 class="form-section-title"><i class="fas fa-file-medical"></i> Antécédents & traitements</h3>
+    <div class="row g-3">
+        <div class="col-12">
+            {{ form_row(form.allergies) }}
+        </div>
+        <div class="col-12">
+            {{ form_row(form.antecedentsMedicaux) }}
+        </div>
+        <div class="col-12">
+            {{ form_row(form.maladiesChroniques) }}
+        </div>
+        <div class="col-12">
+            {{ form_row(form.medicamentsActuels) }}
+        </div>
+    </div>
+</div>
+
+<div class="form-section">
+    <h3 class="form-section-title"><i class="fas fa-heartbeat"></i> Mode de vie</h3>
+    <div class="row g-3">
+        <div class="col-md-6">
+            {{ form_row(form.fumeur) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.consommationAlcool) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.niveauActivitePhysique) }}
+        </div>
+        <div class="col-12">
+            {{ form_row(form.habitudesAlimentaires) }}
+        </div>
+    </div>
+</div>
+
+<div class="form-actions d-flex flex-wrap align-items-center gap-2">
+    <button type="submit" class="btn admin-btn-rose">
+        <i class="fas fa-check me-1"></i> {{ button_label|default('Enregistrer') }}
+    </button>
+    <a href="{{ path('admin_suivi_grossesse') }}" class="btn btn-outline-rose">Annuler</a>
+</div>
+
+{{ form_widget(form._token) }}
+{{ form_end(form, {'render_rest': false}) }}

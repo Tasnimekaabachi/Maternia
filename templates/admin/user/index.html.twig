@@ -1,0 +1,121 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Gestion des Utilisatrices</h2>
+        <a href="{{ path('admin_user_new') }}" class="btn btn-success shadow-sm">
+            <i class="fas fa-plus"></i> Ajouter
+        </a>
+    </div>
+    <div class="d-flex gap-2">
+    <a href="{{ path('admin_user_pdf', app.request.query.all) }}" class="btn btn-outline-danger shadow-sm">
+        <i class="fas fa-file-pdf"></i> Exporter PDF
+    </a>
+</div>
+
+    {# Barre de Recherche #}
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-body">
+            <form method="get" id="search-form" class="d-flex gap-2">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="fas fa-search text-muted"></i>
+                    </span>
+                    <input type="text" 
+                           id="search-input" 
+                           name="q" 
+                           value="{{ last_query }}" 
+                           class="form-control border-start-0" 
+                           placeholder="Recherche instantanée (nom, email...)"
+                           autocomplete="off">
+                </div>
+                <a href="{{ path('admin_user_index') }}" class="btn btn-outline-secondary">Réinitialiser</a>
+            </form>
+        </div>
+    </div>
+    
+    {# Conteneur du Tableau (pour la mise à jour AJAX) #}
+    <div id="table-container" class="position-relative">
+        <table class="table table-hover bg-white shadow-sm rounded overflow-hidden">
+            <thead class="table-light">
+                <tr>
+                    <th><a href="{{ path('admin_user_index', {sort: 'id', direction: app.request.get('direction') == 'ASC' ? 'DESC' : 'ASC', q: last_query}) }}" class="text-dark text-decoration-none">ID ↕</a></th>
+                    <th><a href="{{ path('admin_user_index', {sort: 'nom', direction: app.request.get('direction') == 'ASC' ? 'DESC' : 'ASC', q: last_query}) }}" class="text-dark text-decoration-none">Nom ↕</a></th>
+                    <th><a href="{{ path('admin_user_index', {sort: 'prenom', direction: app.request.get('direction') == 'ASC' ? 'DESC' : 'ASC', q: last_query}) }}" class="text-dark text-decoration-none">Prénom ↕</a></th>
+                    <th><a href="{{ path('admin_user_index', {sort: 'email', direction: app.request.get('direction') == 'ASC' ? 'DESC' : 'ASC', q: last_query}) }}" class="text-dark text-decoration-none">Email ↕</a></th>
+                    <th>Type</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td><strong>{{ user.nom }}</strong></td>
+                    <td>{{ user.prenom }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <span class="badge {{ user.type == 'ADMIN' ? 'bg-danger' : 'bg-success' }}">
+                            {{ user.type }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{{ path('admin_user_edit', {'id': user.id}) }}" class="btn btn-sm btn-warning">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" class="text-center py-4">Aucune utilisatrice trouvée.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        
+        {# Spinner de chargement discret #}
+        <div id="search-spinner" class="spinner-border spinner-border-sm text-primary position-absolute top-0 end-0 m-3 d-none" role="status">
+            <span class="visually-hidden">Chargement...</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search-input');
+        const tableContainer = document.getElementById('table-container');
+        const spinner = document.getElementById('search-spinner');
+        let timeout = null;
+
+        searchInput.addEventListener('keyup', function() {
+            clearTimeout(timeout);
+            spinner.classList.remove('d-none'); // Affiche le spinner
+
+            timeout = setTimeout(function() {
+                const query = searchInput.value;
+                const url = new URL(window.location.href);
+                url.searchParams.set('q', query);
+
+                fetch(url, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newTable = doc.getElementById('table-container').innerHTML;
+                    
+                    tableContainer.innerHTML = newTable;
+                    window.history.pushState({}, '', url); // Met à jour l'URL sans recharger
+                    spinner.classList.add('d-none'); // Cache le spinner
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    spinner.classList.add('d-none');
+                });
+            }, 300); // Délai de 300ms pour ne pas surcharger le serveur
+        });
+    });
+</script>
+{% endblock %}
