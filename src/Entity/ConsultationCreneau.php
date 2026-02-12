@@ -34,12 +34,10 @@ class ConsultationCreneau
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $specialiteMedecin = null;
 
-    #[ORM\Column(nullable: true)]
-    #[Assert\NotNull(message: "La date de début est requise.")]
+    #[ORM\Column]
     private ?\DateTime $dateDebut = null;
 
-    #[ORM\Column(nullable: true)]
-    #[Assert\NotNull(message: "La date de fin est requise.")]
+    #[ORM\Column]
     private ?\DateTime $dateFin = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
@@ -56,7 +54,6 @@ class ConsultationCreneau
     private ?ReservationClient $reservation = null;
 
     #[ORM\Column(length: 20)]
-    #[Assert\NotBlank(message: "Le statut est obligatoire.")]
     private ?string $statutReservation = null;
 
     #[ORM\Column(nullable: true)]
@@ -205,8 +202,7 @@ class ConsultationCreneau
     {
         if ($this->jour) {
             if ($this->heureDebut) {
-                // Créer un nouvel objet DateTime à partir du jour et de l'heure
-                $dtDebut = \DateTime::createFromInterface($this->jour);
+                $dtDebut = clone $this->jour;
                 $dtDebut->setTime(
                     (int) $this->heureDebut->format('H'),
                     (int) $this->heureDebut->format('i'),
@@ -215,8 +211,7 @@ class ConsultationCreneau
                 $this->dateDebut = $dtDebut;
             }
             if ($this->heureFin) {
-                // Créer un nouvel objet DateTime à partir du jour et de l'heure
-                $dtFin = \DateTime::createFromInterface($this->jour);
+                $dtFin = clone $this->jour;
                 $dtFin->setTime(
                     (int) $this->heureFin->format('H'),
                     (int) $this->heureFin->format('i'),
@@ -232,10 +227,10 @@ class ConsultationCreneau
         return $this->reservation;
     }
 
-    public function setReservation(?ReservationClient $reservation): static
+    public function setReservation(ReservationClient $reservation): static
     {
         // set the owning side of the relation if necessary
-        if ($reservation && $reservation->getConsultationCreneau() !== $this) {
+        if ($reservation->getConsultationCreneau() !== $this) {
             $reservation->setConsultationCreneau($this);
         }
 
