@@ -1081,7 +1081,7 @@
 
                         <!-- Footer avec bouton fixe -->
                         <div class="card-footer">
-                            <a href="{{ path('app_medecin_creneaux', {'medecin': medecin.nomMedecin|url_encode}) }}" 
+                            <a href="{{ path('app_medecin_creneaux', {'medecin': medecin.nomMedecin}) }}" 
                                class="appointment-btn">
                                 <i class="fas fa-calendar-check"></i>
                                 Prendre Rendez-vous
@@ -1107,7 +1107,7 @@
                 </a>
             </div>
         {% endif %}
-
+ 
         <!-- BADGES DE CONFIANCE -->
         <div class="trust-badges">
             <div class="trust-badge">
@@ -1119,7 +1119,7 @@
                     Tous nos médecins sont diplômés et certifiés par les autorités de santé.
                 </p>
             </div>
-
+ 
             <div class="trust-badge">
                 <div class="badge-icon">
                     <i class="fas fa-clock"></i>
@@ -1129,7 +1129,7 @@
                     Des créneaux adaptés à votre emploi du temps, même en soirée.
                 </p>
             </div>
-
+ 
             <div class="trust-badge">
                 <div class="badge-icon">
                     <i class="fas fa-shield-alt"></i>
@@ -1139,7 +1139,7 @@
                     Vos informations médicales sont cryptées et protégées.
                 </p>
             </div>
-
+ 
             <div class="trust-badge">
                 <div class="badge-icon">
                     <i class="fas fa-heart"></i>
@@ -1152,7 +1152,7 @@
         </div>
     </div>
 </main>
-
+ 
 <!-- ============ NOUVEAU: SCRIPT DE RECHERCHE ET TRI AVEC PHOTOS FIXÉES ============ -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -1161,21 +1161,18 @@
         const forceImages = () => {
             document.querySelectorAll('.doctor-photo-container, .photo-frame, .doctor-photo, .photo-placeholder').forEach(el => {
                 if (el) {
-                    el.style.display = 'flex';
-                    el.style.visibility = 'visible';
-                    el.style.opacity = '1';
+                    el.style.setProperty('display', 'flex', 'important');
+                    el.style.setProperty('visibility', 'visible', 'important');
+                    el.style.setProperty('opacity', '1', 'important');
                     el.style.zIndex = '100';
                 }
             });
             
             // Chargement immédiat des images
             document.querySelectorAll('.doctor-photo').forEach(img => {
-                if (img.dataset.src) {
-                    img.src = img.dataset.src;
-                }
-                img.style.display = 'block !important';
-                img.style.visibility = 'visible !important';
-                img.style.opacity = '1 !important';
+                img.style.setProperty('display', 'block', 'important');
+                img.style.setProperty('visibility', 'visible', 'important');
+                img.style.setProperty('opacity', '1', 'important');
             });
         };
         

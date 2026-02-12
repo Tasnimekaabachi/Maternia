@@ -239,63 +239,86 @@
                         {% do form.heureDebut.setRendered() %}
                         {% do form.heureFin.setRendered() %}
 
+                        {# Affichage des erreurs globales #}
+                        {% if not form.vars.valid %}
+                            <div class="alert alert-danger rounded-pill px-4 mb-4 border-0 shadow-sm">
+                                <i class="fas fa-exclamation-circle me-2"></i> Certaines informations sont incorrectes ou manquantes :
+                                <ul class="mb-0 mt-2 small">
+                                {% for child in form.children %}
+                                    {% for error in child.vars.errors %}
+                                        <li><strong>{{ child.vars.label|default(child.vars.name) }}</strong> : {{ error.message }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.vars.errors %}
+                                    <li>{{ error.message }}</li>
+                                {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
                         <div class="mb-5">
                             <h3 class="section-title">Informations du Médecin & Consultation</h3>
                             <div class="doctor-card">
                                 <div class="row g-4">
                                     <div class="col-md-12">
-                                        <label class="form-label">Type de Consultation *</label>
+                                        <label class="form-label" for="{{ form.consultation.vars.id }}">Type de Consultation *</label>
                                         <div class="input-with-icon">
                                             <i class="fas fa-stethoscope"></i>
                                             {{ form_widget(form.consultation, {'attr': {'class': 'form-select modern-input'}}) }}
                                         </div>
+                                        <div class="text-danger small mt-1">{{ form_errors(form.consultation) }}</div>
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label class="form-label">Nom du Médecin *</label>
+                                        <label class="form-label" for="{{ form.nomMedecin.vars.id }}">Nom du Médecin *</label>
                                         <div class="input-with-icon">
                                             <i class="fas fa-user-md"></i>
                                             {{ form_widget(form.nomMedecin, {'attr': {'class': 'form-control modern-input', 'placeholder': 'Dr. Jean Dupont'}}) }}
                                         </div>
+                                        <div class="text-danger small mt-1">{{ form_errors(form.nomMedecin) }}</div>
                                     </div>
                                     
                                     <div class="col-md-6">
-                                        <label class="form-label">Spécialité</label>
+                                        <label class="form-label" for="{{ form.specialiteMedecin.vars.id }}">Spécialité</label>
                                         <div class="input-with-icon">
                                             <i class="fas fa-award"></i>
                                             {{ form_widget(form.specialiteMedecin, {'attr': {'class': 'form-control modern-input', 'placeholder': 'Gynécologue, Pédiatre...'}}) }}
                                         </div>
+                                        <div class="text-danger small mt-1">{{ form_errors(form.specialiteMedecin) }}</div>
                                     </div>
 
                                     <div class="col-md-12">
-                                        {{ form_label(form.photoFile) }}
+                                        <label class="form-label" for="{{ form.photoFile.vars.id }}">Photo du médecin</label>
                                         <div class="input-with-icon">
                                             <i class="fas fa-image"></i>
                                             {{ form_widget(form.photoFile, {'attr': {'class': 'form-control modern-input'}}) }}
                                         </div>
-                                        {{ form_help(form.photoFile) }}
-                                        {{ form_errors(form.photoFile) }}
+                                        <div class="text-danger small mt-1">{{ form_errors(form.photoFile) }}</div>
                                     </div>
 
                                     <div class="col-md-12">
-                                        <label class="form-label">Description du Médecin</label>
+                                        <label class="form-label" for="{{ form.descriptionMedecin.vars.id }}">Description du Médecin</label>
                                         <div class="input-with-icon">
                                             <i class="fas fa-align-left" style="top: 20px; transform: none;"></i>
                                             {{ form_widget(form.descriptionMedecin, {'attr': {'class': 'form-control modern-input', 'rows': '3', 'placeholder': 'Notes sur le médecin...'}}) }}
                                         </div>
+                                        <div class="text-danger small mt-1">{{ form_errors(form.descriptionMedecin) }}</div>
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label class="form-label">Durée par défaut (min)</label>
+                                        <label class="form-label" for="{{ form.dureeMinutes.vars.id }}">Durée par défaut (min)</label>
                                         {{ form_widget(form.dureeMinutes, {'attr': {'class': 'form-control modern-input'}}) }}
+                                        <div class="text-danger small mt-1">{{ form_errors(form.dureeMinutes) }}</div>
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="form-label">Nombre de places</label>
+                                        <label class="form-label" for="{{ form.nombrePlaces.vars.id }}">Nombre de places</label>
                                         {{ form_widget(form.nombrePlaces, {'attr': {'class': 'form-control modern-input'}}) }}
+                                        <div class="text-danger small mt-1">{{ form_errors(form.nombrePlaces) }}</div>
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="form-label">Statut initial</label>
+                                        <label class="form-label" for="{{ form.statutReservation.vars.id }}">Statut initial</label>
                                         {{ form_widget(form.statutReservation, {'attr': {'class': 'form-select modern-input'}}) }}
+                                        <div class="text-danger small mt-1">{{ form_errors(form.statutReservation) }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -308,6 +331,7 @@
                                  data-prototype="{{ form_widget(form.creneauxHoraires.vars.prototype)|e('html_attr') }}" 
                                  data-index="{{ form.creneauxHoraires|length }}">
                             </div>
+                            <div class="text-danger small mt-1">{{ form_errors(form.creneauxHoraires) }}</div>
                             
                             <div class="add-btn-wrapper mt-3">
                                 <p class="text-muted small mb-3">Ajoutez un ou plusieurs horaires spécifiques pour ce médecin</p>

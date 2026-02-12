@@ -34,10 +34,12 @@ class ConsultationCreneau
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $specialiteMedecin = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
+    #[Assert\NotNull(message: "La date de début est requise.")]
     private ?\DateTime $dateDebut = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
+    #[Assert\NotNull(message: "La date de fin est requise.")]
     private ?\DateTime $dateFin = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
@@ -54,6 +56,7 @@ class ConsultationCreneau
     private ?ReservationClient $reservation = null;
 
     #[ORM\Column(length: 20)]
+    #[Assert\NotBlank(message: "Le statut est obligatoire.")]
     private ?string $statutReservation = null;
 
     #[ORM\Column(nullable: true)]
@@ -202,20 +205,22 @@ class ConsultationCreneau
     {
         if ($this->jour) {
             if ($this->heureDebut) {
-                $dtDebut = clone $this->jour;
+                // Créer un nouvel objet DateTime à partir du jour et de l'heure
+                $dtDebut = \DateTime::createFromInterface($this->jour);
                 $dtDebut->setTime(
-                    (int)$this->heureDebut->format('H'),
-                    (int)$this->heureDebut->format('i'),
-                    (int)$this->heureDebut->format('s')
+                    (int) $this->heureDebut->format('H'),
+                    (int) $this->heureDebut->format('i'),
+                    (int) $this->heureDebut->format('s')
                 );
                 $this->dateDebut = $dtDebut;
             }
             if ($this->heureFin) {
-                $dtFin = clone $this->jour;
+                // Créer un nouvel objet DateTime à partir du jour et de l'heure
+                $dtFin = \DateTime::createFromInterface($this->jour);
                 $dtFin->setTime(
-                    (int)$this->heureFin->format('H'),
-                    (int)$this->heureFin->format('i'),
-                    (int)$this->heureFin->format('s')
+                    (int) $this->heureFin->format('H'),
+                    (int) $this->heureFin->format('i'),
+                    (int) $this->heureFin->format('s')
                 );
                 $this->dateFin = $dtFin;
             }
@@ -227,10 +232,10 @@ class ConsultationCreneau
         return $this->reservation;
     }
 
-    public function setReservation(ReservationClient $reservation): static
+    public function setReservation(?ReservationClient $reservation): static
     {
         // set the owning side of the relation if necessary
-        if ($reservation->getConsultationCreneau() !== $this) {
+        if ($reservation && $reservation->getConsultationCreneau() !== $this) {
             $reservation->setConsultationCreneau($this);
         }
 
@@ -298,6 +303,6 @@ class ConsultationCreneau
 
         return $this;
     }
-    
+
 
 }

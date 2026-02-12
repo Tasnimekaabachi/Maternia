@@ -28,10 +28,14 @@ class ConsultationController extends AbstractController
         $searchTerm = $request->query->get('q');
         $consultations = $consultationRepo->searchActive($searchTerm);
 
-        $consultationsMaman = array_filter($consultations, fn($c) =>
+        $consultationsMaman = array_filter(
+            $consultations,
+            fn($c) =>
             $c->getPour() === 'MAMAN' || $c->getPour() === 'LES_DEUX'
         );
-        $consultationsBebe = array_filter($consultations, fn($c) =>
+        $consultationsBebe = array_filter(
+            $consultations,
+            fn($c) =>
             $c->getPour() === 'BEBE' || $c->getPour() === 'LES_DEUX'
         );
 
@@ -64,13 +68,13 @@ class ConsultationController extends AbstractController
         ]);
     }
 
-    #[Route('/medecin/{medecin}/creneaux', name: 'app_medecin_creneaux')]
+    #[Route('/medecin/{medecin}/creneaux', name: 'app_medecin_creneaux', requirements: ['medecin' => '.+'])]
     public function creneaux(
-        string $medecin, 
+        string $medecin,
         ConsultationCreneauRepository $creneauRepo
     ): Response {
-        $medecinNom = urldecode($medecin);
-        
+        $medecinNom = $medecin;
+
         $creneaux = $creneauRepo->createQueryBuilder('cc')
             ->where('cc.nomMedecin = :medecin')
             ->andWhere('cc.statutReservation = :statut')
@@ -99,10 +103,19 @@ class ConsultationController extends AbstractController
             $creneauxParDate[$dateKey]['creneaux'][] = $creneau;
         }
 
+        // Récupérer les infos du médecin (photo, spécialité) depuis un des créneaux
+        $doctorInfo = $creneauRepo->createQueryBuilder('cc')
+            ->select('MAX(cc.photoMedecin) as photo, MAX(cc.specialiteMedecin) as specialty, MAX(cc.descriptionMedecin) as description')
+            ->where('cc.nomMedecin = :medecin')
+            ->setParameter('medecin', $medecinNom)
+            ->getQuery()
+            ->getOneOrNullResult();
+
         return $this->render('consultation/creneaux.html.twig', [
             'medecin' => $medecinNom,
             'consultation' => $consultation,
             'creneauxParDate' => $creneauxParDate,
+            'doctorInfo' => $doctorInfo,
         ]);
     }
 
@@ -132,10 +145,10 @@ class ConsultationController extends AbstractController
             if ($form->isValid()) {
                 // Récupérer les données
                 $data = $form->getData();
-                
+
                 // MARQUER LE CRÉNEAU COMME INDISPONIBLE
                 $creneau->setStatutReservation('RESERVE');
-                
+
                 // Créer la réservation client
                 $reservation = new \App\Entity\ReservationClient();
                 $reservation->setConsultationCreneau($creneau);
@@ -144,13 +157,13 @@ class ConsultationController extends AbstractController
                 $reservation->setEmailClient($data['email']);
                 $reservation->setTelephoneClient($data['telephone']);
                 $reservation->setTypePatient($data['typePatient']);
-                
+
                 if ($data['typePatient'] === 'MAMAN') {
                     $reservation->setMoisGrossesse($data['moisGrossesse']);
                 } elseif ($data['typePatient'] === 'BEBE') {
                     $reservation->setDateNaissanceBebe($data['dateNaissanceBebe']);
                 }
-                
+
                 $reservation->setStatutReservation('CONFIRME');
                 $reservation->setDateReservation(new \DateTime());
                 $reference = 'RDV-' . strtoupper(uniqid());
@@ -159,12 +172,12 @@ class ConsultationController extends AbstractController
                 $reservation->setNotes($data['notes'] ?? null);
                 $reservation->setCreatedAt(new \DateTimeImmutable());
                 $reservation->setUpdatedAt(new \DateTimeImmutable());
-                
+
                 // Lier et sauvegarder
                 $creneau->setReservation($reservation);
                 $entityManager->persist($reservation);
                 $entityManager->flush();
-                
+
                 // Réponse AJAX
                 if ($request->isXmlHttpRequest()) {
                     return $this->json([
@@ -175,7 +188,7 @@ class ConsultationController extends AbstractController
                         'redirectUrl' => $this->generateUrl('app_reservation_confirmation', ['id' => $creneau->getId()])
                     ]);
                 }
-                
+
                 return $this->redirectToRoute('app_reservation_confirmation', ['id' => $creneau->getId()]);
             } else {
                 // Si le formulaire n'est pas valide et que c'est de l'AJAX
@@ -223,7 +236,7 @@ class ConsultationController extends AbstractController
     ): Response {
         // Pour tester, utilisez un email fixe
         $email = $request->getSession()->get('user_email', 'test@example.com');
-        
+
         $creneauxReserves = $creneauRepo->createQueryBuilder('c')
             ->join('c.reservation', 'r')
             ->where('r.emailClient = :email')

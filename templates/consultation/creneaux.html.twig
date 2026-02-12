@@ -876,8 +876,25 @@
 
         <!-- Titre Principal -->
         <div class="main-title-container">
+            <div class="doctor-header-profile mb-4">
+                <div class="photo-frame mx-auto" style="width: 150px; height: 150px; padding: 6px; box-shadow: 0 15px 35px rgba(0,0,0,0.2);">
+                    {% if doctorInfo.photo is defined and doctorInfo.photo and doctorInfo.photo|trim != '' %}
+                        <img src="{{ doctorInfo.photo starts with 'http' ? doctorInfo.photo : asset('uploads/medecins/' ~ doctorInfo.photo) }}" 
+                             alt="{{ medecin }}" class="doctor-photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    {% else %}
+                        <div class="photo-placeholder" style="width: 100%; height: 100%; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-user-md" style="font-size: 4rem; color: var(--blue-accent);"></i>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
             <h1 class="title-gradient">Dr. {{ medecin }}</h1>
             <p class="title-subtitle">
+                {% if doctorInfo.specialty %}
+                    <span class="doctor-specialty-badge" style="background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 50px; font-weight: 600; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.3); margin-bottom: 15px; display: inline-block;">
+                        {{ doctorInfo.specialty }}
+                    </span><br>
+                {% endif %}
                 {% if consultation %}
                     {{ consultation.description }}
                 {% else %}
@@ -1024,11 +1041,17 @@
                                 <!-- Header avec dégradé bleu ciel -->
                                 <div class="card-header">
                                     <!-- Icône horaire -->
+                                    <!-- Photo médecin (remplace l'icône générique) -->
                                     <div class="time-icon-container">
-                                        <div class="time-frame">
-                                            <div class="time-placeholder">
-                                                <i class="fas fa-clock"></i>
-                                            </div>
+                                        <div class="time-frame" style="overflow: hidden; padding: 3px;">
+                                            {% if doctorInfo.photo is defined and doctorInfo.photo and doctorInfo.photo|trim != '' %}
+                                                <img src="{{ doctorInfo.photo starts with 'http' ? doctorInfo.photo : asset('uploads/medecins/' ~ doctorInfo.photo) }}" 
+                                                     alt="{{ medecin }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                                            {% else %}
+                                                <div class="time-placeholder">
+                                                    <i class="fas fa-clock"></i>
+                                                </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
