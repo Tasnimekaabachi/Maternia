@@ -373,9 +373,11 @@
                         </div>
                     </div>
 
-                    <!-- FORMULAIRE -->
                     <div class="section-container">
                         {{ form_start(form, {'attr': {'class': 'form-modern', 'novalidate': 'novalidate'}}) }}
+                        
+                        {# On marque 'pour' comme rendu pour éviter qu'il ne soit ajouté à nouveau à la fin du formulaire par form_end, ce qui écraserait la sélection manuelle #}
+                        {% do form.pour.setRendered() %}
                         
                         <!-- SECTION 1: INFORMATIONS PRINCIPALES -->
                         <div class="mb-5 fade-in" style="animation-delay: 0.1s">
