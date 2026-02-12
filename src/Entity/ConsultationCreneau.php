@@ -204,18 +204,18 @@ class ConsultationCreneau
             if ($this->heureDebut) {
                 $dtDebut = clone $this->jour;
                 $dtDebut->setTime(
-                    (int) $this->heureDebut->format('H'),
-                    (int) $this->heureDebut->format('i'),
-                    (int) $this->heureDebut->format('s')
+                    (int)$this->heureDebut->format('H'),
+                    (int)$this->heureDebut->format('i'),
+                    (int)$this->heureDebut->format('s')
                 );
                 $this->dateDebut = $dtDebut;
             }
             if ($this->heureFin) {
                 $dtFin = clone $this->jour;
                 $dtFin->setTime(
-                    (int) $this->heureFin->format('H'),
-                    (int) $this->heureFin->format('i'),
-                    (int) $this->heureFin->format('s')
+                    (int)$this->heureFin->format('H'),
+                    (int)$this->heureFin->format('i'),
+                    (int)$this->heureFin->format('s')
                 );
                 $this->dateFin = $dtFin;
             }
@@ -298,6 +298,6 @@ class ConsultationCreneau
 
         return $this;
     }
-
+    
 
 }
