@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ReservationClientRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ReservationClientRepository::class)]
 class ReservationClient
@@ -19,18 +20,33 @@ class ReservationClient
     private ?ConsultationCreneau $consultationCreneau = null;
 
     #[ORM\Column(length: 100)]
+    #[Assert\NotBlank(message: "Le nom est obligatoire.")]
     private ?string $nomClient = null;
 
     #[ORM\Column(length: 100)]
+    #[Assert\NotBlank(message: "Le prénom est obligatoire.")]
     private ?string $prenomClient = null;
 
     #[ORM\Column(length: 100)]
+    #[Assert\NotBlank(message: "L'email est obligatoire.")]
+    #[Assert\Email(message: "Veuillez entrer un email valide.")]
     private ?string $emailClient = null;
 
     #[ORM\Column(length: 20)]
+    #[Assert\NotBlank(message: "Le numéro de téléphone est obligatoire.")]
+    #[Assert\Length(
+        min: 8,
+        max: 8,
+        exactMessage: "Le numéro de téléphone doit comporter exactement {{ limit }} chiffres."
+    )]
+    #[Assert\Regex(
+        pattern: "/^[0-9]{8}$/",
+        message: "Le numéro de téléphone doit contenir uniquement 8 chiffres."
+    )]
     private ?string $telephoneClient = null;
 
     #[ORM\Column(length: 20)]
+    #[Assert\NotBlank(message: "Le type de patient est obligatoire.")]
     private ?string $typePatient = null;
 
     #[ORM\Column(nullable: true)]

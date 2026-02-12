@@ -129,54 +129,70 @@ class ConsultationController extends AbstractController
         $form = $this->createForm(ReservationType::class);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Récupérer les données
-            $data = $form->getData();
-            
-            // MARQUER LE CRÉNEAU COMME INDISPONIBLE
-            $creneau->setStatutReservation('RESERVE');
-            
-            // Créer la réservation client
-            $reservation = new \App\Entity\ReservationClient();
-            $reservation->setConsultationCreneau($creneau);
-            $reservation->setNomClient($data['nom']);
-            $reservation->setPrenomClient($data['prenom']);
-            $reservation->setEmailClient($data['email']);
-            $reservation->setTelephoneClient($data['telephone']);
-            $reservation->setTypePatient($data['typePatient']);
-            
-            if ($data['typePatient'] === 'MAMAN') {
-                $reservation->setMoisGrossesse($data['moisGrossesse']);
-            } elseif ($data['typePatient'] === 'BEBE') {
-                $reservation->setDateNaissanceBebe($data['dateNaissanceBebe']);
-            }
-            
-            $reservation->setStatutReservation('CONFIRME');
-            $reservation->setDateReservation(new \DateTime());
-            $reference = 'RDV-' . strtoupper(uniqid());
-            $reservation->setReference($reference);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                // Récupérer les données
+                $data = $form->getData();
+                
+                // MARQUER LE CRÉNEAU COMME INDISPONIBLE
+                $creneau->setStatutReservation('RESERVE');
+                
+                // Créer la réservation client
+                $reservation = new \App\Entity\ReservationClient();
+                $reservation->setConsultationCreneau($creneau);
+                $reservation->setNomClient($data['nom']);
+                $reservation->setPrenomClient($data['prenom']);
+                $reservation->setEmailClient($data['email']);
+                $reservation->setTelephoneClient($data['telephone']);
+                $reservation->setTypePatient($data['typePatient']);
+                
+                if ($data['typePatient'] === 'MAMAN') {
+                    $reservation->setMoisGrossesse($data['moisGrossesse']);
+                } elseif ($data['typePatient'] === 'BEBE') {
+                    $reservation->setDateNaissanceBebe($data['dateNaissanceBebe']);
+                }
+                
+                $reservation->setStatutReservation('CONFIRME');
+                $reservation->setDateReservation(new \DateTime());
+                $reference = 'RDV-' . strtoupper(uniqid());
+                $reservation->setReference($reference);
 
-            $reservation->setNotes($data['notes'] ?? null);
-            $reservation->setCreatedAt(new \DateTimeImmutable());
-            $reservation->setUpdatedAt(new \DateTimeImmutable());
-            
-            // Lier et sauvegarder
-            $creneau->setReservation($reservation);
-            $entityManager->persist($reservation);
-            $entityManager->flush();
-            
-            // Réponse AJAX
-            if ($request->isXmlHttpRequest()) {
-                return $this->json([
-                    'success' => true,
-                    'message' => 'Réservation confirmée!',
-                    'reference' => $reference,
-                    'patientName' => $data['prenom'] . ' ' . $data['nom'],
-                    'redirectUrl' => $this->generateUrl('app_reservation_confirmation', ['id' => $creneau->getId()])
-                ]);
+                $reservation->setNotes($data['notes'] ?? null);
+                $reservation->setCreatedAt(new \DateTimeImmutable());
+                $reservation->setUpdatedAt(new \DateTimeImmutable());
+                
+                // Lier et sauvegarder
+                $creneau->setReservation($reservation);
+                $entityManager->persist($reservation);
+                $entityManager->flush();
+                
+                // Réponse AJAX
+                if ($request->isXmlHttpRequest()) {
+                    return $this->json([
+                        'success' => true,
+                        'message' => 'Réservation confirmée!',
+                        'reference' => $reference,
+                        'patientName' => $data['prenom'] . ' ' . $data['nom'],
+                        'redirectUrl' => $this->generateUrl('app_reservation_confirmation', ['id' => $creneau->getId()])
+                    ]);
+                }
+                
+                return $this->redirectToRoute('app_reservation_confirmation', ['id' => $creneau->getId()]);
+            } else {
+                // Si le formulaire n'est pas valide et que c'est de l'AJAX
+                if ($request->isXmlHttpRequest()) {
+                    $errors = [];
+                    foreach ($form->getErrors(true) as $error) {
+                        $fieldName = $error->getOrigin()->getName();
+                        $errors[$fieldName] = $error->getMessage();
+                    }
+                    return $this->json([
+                        'success' => false,
+                        'message' => 'Le formulaire contient des erreurs.',
+                        'errors' => $errors
+                    ], 400);
+                }
             }
-            
-            return $this->redirectToRoute('app_reservation_confirmation', ['id' => $creneau->getId()]);
         }
 
         // Afficher le formulaire

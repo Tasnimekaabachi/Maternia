@@ -20,22 +20,18 @@ class ReservationClientType extends AbstractType
         $builder
             ->add('nomClient', TextType::class, [
                 'label' => 'Nom du patient',
-                'required' => false,
                 'attr' => ['class' => 'form-control']
             ])
             ->add('prenomClient', TextType::class, [
                 'label' => 'Prénom du patient',
-                'required' => false,
                 'attr' => ['class' => 'form-control']
             ])
             ->add('emailClient', EmailType::class, [
                 'label' => 'Email',
-                'required' => false,
                 'attr' => ['class' => 'form-control']
             ])
             ->add('telephoneClient', TextType::class, [
                 'label' => 'Téléphone',
-                'required' => false,
                 'attr' => ['class' => 'form-control']
             ])
             ->add('typePatient', ChoiceType::class, [

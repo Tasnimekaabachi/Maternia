@@ -23,25 +23,18 @@ class ReservationType extends AbstractType
         $builder
             ->add('nom', TextType::class, [
                 'label' => 'Nom',
-                'constraints' => [new NotBlank(['message' => 'Le nom est obligatoire'])],
                 'attr' => ['class' => 'form-control']
             ])
             ->add('prenom', TextType::class, [
                 'label' => 'Prénom',
-                'constraints' => [new NotBlank(['message' => 'Le prénom est obligatoire'])],
                 'attr' => ['class' => 'form-control']
             ])
             ->add('email', EmailType::class, [
                 'label' => 'Email',
-                'constraints' => [
-                    new NotBlank(['message' => 'L\'email est obligatoire']),
-                    new Email(['message' => 'Veuillez entrer un email valide'])
-                ],
                 'attr' => ['class' => 'form-control']
             ])
             ->add('telephone', TelType::class, [
                 'label' => 'Téléphone',
-                'constraints' => [new NotBlank(['message' => 'Le téléphone est obligatoire'])],
                 'attr' => ['class' => 'form-control']
             ])
             ->add('typePatient', ChoiceType::class, [
