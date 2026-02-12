@@ -142,6 +142,40 @@
         color: #666;
         line-height: 1.4;
     }
+
+    /* QUICK NAV TABS */
+    .quick-nav-tabs {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 2.5rem;
+        background: white;
+        padding: 0.6rem;
+        border-radius: 50px;
+        border: 1px solid #FCE4EC;
+        box-shadow: 0 10px 30px rgba(255, 138, 171, 0.08);
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .quick-nav-link {
+        padding: 0.7rem 1.5rem;
+        border-radius: 50px;
+        text-decoration: none;
+        color: #718096;
+        font-weight: 700;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+    .quick-nav-link i { font-size: 0.9rem; }
+    .quick-nav-link:hover { background: #FFF5F7; color: var(--deep-pink); }
+    .quick-nav-link.active {
+        background: var(--gradient-feminine);
+        color: white;
+        box-shadow: 0 5px 15px rgba(255, 138, 171, 0.3);
+    }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -165,6 +199,19 @@
 {% block content %}
 <div class="index-container">
     <div class="container">
+        <!-- Quick Navigation -->
+        <div class="quick-nav-tabs">
+            <a href="{{ path('app_admin_reservation_client_index') }}" class="quick-nav-link">
+                <i class="fas fa-calendar-check"></i> Réservations
+            </a>
+            <a href="{{ path('app_admin_consultation_index') }}" class="quick-nav-link active">
+                <i class="fas fa-stethoscope"></i> Consultations
+            </a>
+            <a href="{{ path('app_admin_consultation_creneau_index') }}" class="quick-nav-link">
+                <i class="fas fa-clock"></i> Créneaux
+            </a>
+        </div>
+
         {# STATS #}
         {% set total = consultations|length %}
         {% set actives = consultations|filter(c => c.statut)|length %}
@@ -236,15 +283,6 @@
                         {% endfor %}
                     </div>
                 </div>
-            </div>
-        </div>
-
-        {# SWITCH #}
-        <div class="consult-switch">
-            <div class="consult-switch-inner">
-                <button class="switch-tab active" data-target="consultations">Consultations</button>
-                <button class="switch-tab" data-target="creneaux">Derniers Créneaux</button>
-                <button class="switch-tab" data-target="reservations">Rendez-vous</button>
             </div>
         </div>
 
@@ -338,38 +376,6 @@
                 </div>
             </div>
         </div>
-
-        {# SECTION CRÉNEAUX REDIRECTION #}
-        <div id="section-creneaux" class="consult-section" style="display: none;">
-             <div class="admin-card p-5 text-center">
-                <div class="mb-4">
-                    <i class="fas fa-calendar-check fa-4x" style="color: var(--primary-pink); opacity: 0.5;"></i>
-                </div>
-                <h4>Gestion des disponibilités</h4>
-                <p class="text-muted mb-4 mx-auto" style="max-width: 500px;">
-                    Gérez les créneaux horaires spécifiques (dates et heures) pour chaque type de consultation.
-                </p>
-                <a href="{{ path('app_admin_consultation_creneau_index') }}" class="btn btn-feminine px-5 py-3">
-                    <i class="fas fa-arrow-right me-2"></i> Accéder aux créneaux
-                </a>
-             </div>
-        </div>
-
-        {# SECTION RÉSERVATIONS REDIRECTION #}
-        <div id="section-reservations" class="consult-section" style="display: none;">
-             <div class="admin-card p-5 text-center">
-                <div class="mb-4">
-                    <i class="fas fa-book-medical fa-4x" style="color: #E1BEE7; opacity: 0.8;"></i>
-                </div>
-                <h4>Journal de réservations</h4>
-                <p class="text-muted mb-4 mx-auto" style="max-width: 500px;">
-                    Consultez et gérez les rendez-vous pris par vos patientes. Suivez les inscriptions et vérifiez les détails des patients.
-                </p>
-                <a href="{{ path('app_admin_reservation_client_index') }}" class="btn btn-feminine px-5 py-3" style="background: linear-gradient(135deg, #E1BEE7 0%, #FF8AAB 100%);">
-                    <i class="fas fa-calendar-alt me-2"></i> Voir tous les rendez-vous
-                </a>
-             </div>
-        </div>
     </div>
 </div>
 
@@ -411,17 +417,6 @@
 </div>
 
 <script>
-    // TABS SWITCH
-    document.querySelectorAll('.switch-tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-            document.querySelectorAll('.switch-tab').forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            document.querySelectorAll('.consult-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.consult-section').forEach(s => s.style.display = 'none');
-            document.getElementById('section-' + this.dataset.target).style.display = 'block';
-        });
-    });
-
     // RECHERCHE INSTANTANÉE
     document.getElementById('searchConsult').addEventListener('keyup', function() {
         const q = this.value.toLowerCase();
