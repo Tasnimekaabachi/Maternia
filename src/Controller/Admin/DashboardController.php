@@ -13,9 +13,20 @@ use Symfony\Component\Routing\Attribute\Route;
 final class DashboardController extends AbstractController
 {
     #[Route('', name: 'dashboard', methods: ['GET'])]
-    public function dashboard(): Response
+    public function dashboard(MamanRepository $mamanRepository, GrosesseRepository $grosesseRepository): Response
     {
-        return $this->render('admin/dashboard.html.twig');
+        $totalMamans = $mamanRepository->count([]);
+        $totalGrossesses = $grosesseRepository->count([]);
+        $statsStatut = $grosesseRepository->getStatsByStatut();
+
+        // On considère "suivis grossesse actifs" = grossesses en cours + à risque
+        $suivisActifs = ($statsStatut['enCours'] ?? 0) + ($statsStatut['aRisque'] ?? 0);
+
+        return $this->render('admin/dashboard.html.twig', [
+            'total_mamans' => $totalMamans,
+            'total_grossesses' => $totalGrossesses,
+            'suivis_grossesse_actifs' => $suivisActifs,
+        ]);
     }
 
     #[Route('/suivi', name: 'suivi', methods: ['GET'])]
