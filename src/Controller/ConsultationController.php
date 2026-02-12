@@ -23,33 +23,32 @@ class ConsultationController extends AbstractController
     }
 
     #[Route('/consultations', name: 'app_consultations')]
-    public function index(ConsultationRepository $consultationRepo): Response
+    public function index(Request $request, ConsultationRepository $consultationRepo): Response
     {
-        $consultations = $consultationRepo->findBy(
-            ['statut' => true], 
-            ['ordreAffichage' => 'ASC']
-        );
-        
-        $consultationsMaman = array_filter($consultations, fn($c) => 
+        $searchTerm = $request->query->get('q');
+        $consultations = $consultationRepo->searchActive($searchTerm);
+
+        $consultationsMaman = array_filter($consultations, fn($c) =>
             $c->getPour() === 'MAMAN' || $c->getPour() === 'LES_DEUX'
         );
-        
-        $consultationsBebe = array_filter($consultations, fn($c) => 
+        $consultationsBebe = array_filter($consultations, fn($c) =>
             $c->getPour() === 'BEBE' || $c->getPour() === 'LES_DEUX'
         );
 
         return $this->render('consultation/index.html.twig', [
             'consultationsMaman' => $consultationsMaman,
             'consultationsBebe' => $consultationsBebe,
+            'searchTerm' => $searchTerm ? trim($searchTerm) : null,
+            'searchResultCount' => \count($consultations),
         ]);
     }
 
     #[Route('/consultation/{id}/medecins', name: 'app_consultation_medecins')]
     public function medecins(Consultation $consultation, ConsultationCreneauRepository $creneauRepo): Response
     {
-        // Récupérer les médecins UNIQUES pour cette consultation
+        // Récupérer les médecins UNIQUES pour cette consultation (une photo par médecin via MAX)
         $medecins = $creneauRepo->createQueryBuilder('cc')
-            ->select('cc.nomMedecin', 'cc.descriptionMedecin', 'cc.photoMedecin', 'cc.specialiteMedecin')
+            ->select('cc.nomMedecin', 'MAX(cc.descriptionMedecin) AS descriptionMedecin', 'MAX(cc.photoMedecin) AS photoMedecin', 'MAX(cc.specialiteMedecin) AS specialiteMedecin')
             ->where('cc.consultation = :consultation')
             ->andWhere('cc.dateDebut > :now')
             ->setParameter('consultation', $consultation)

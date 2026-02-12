@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Repository\ConsultationCreneauRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -9,10 +10,18 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin', name: 'admin_')]
 final class DashboardController extends AbstractController
 {
+    public function __construct(
+        private readonly ConsultationCreneauRepository $consultationCreneauRepository
+    ) {
+    }
+
     #[Route('', name: 'dashboard', methods: ['GET'])]
     public function dashboard(): Response
     {
-        return $this->render('admin/dashboard.html.twig');
+        return $this->render('admin/dashboard.html.twig', [
+            'creneaux_ce_mois' => $this->consultationCreneauRepository->countCeMois(),
+            'creneaux_recents' => $this->consultationCreneauRepository->findRecents(5),
+        ]);
     }
 
     // Supprimez la route consultations existante car maintenant

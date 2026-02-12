@@ -263,11 +263,19 @@
                                     </div>
 
                                     <div class="col-md-12">
-                                        <label class="form-label">Photo du Médecin (URL ou nom de fichier)</label>
+                                        {{ form_label(form.photoFile) }}
+                                        {% if creneau.photoMedecin %}
+                                            <p class="small text-muted mb-2">
+                                                <strong>Photo actuelle :</strong>
+                                                <img src="{{ asset('uploads/medecins/' ~ creneau.photoMedecin) }}" alt="" class="rounded ms-2" style="max-height: 60px; width: auto;">
+                                            </p>
+                                        {% endif %}
                                         <div class="input-with-icon">
                                             <i class="fas fa-image"></i>
-                                            {{ form_widget(form.photoMedecin, {'attr': {'class': 'form-control modern-input'}}) }}
+                                            {{ form_widget(form.photoFile, {'attr': {'class': 'form-control modern-input'}}) }}
                                         </div>
+                                        <small class="text-muted">Laisser vide pour conserver la photo actuelle.</small>
+                                        {{ form_errors(form.photoFile) }}
                                     </div>
 
                                     <div class="col-md-12">
@@ -322,17 +330,6 @@
                                 </button>
                             </div>
                         </div>
-
-                        {% if creneau.statutReservation == 'RESERVE' or creneau.reservation %}
-                        <div class="mb-4">
-                            <h3 class="section-title">Détails de la réservation</h3>
-                            <div class="p-4 rounded-4 bg-white border">
-                                {{ form_widget(form.reservation) }}
-                            </div>
-                        </div>
-                        {% else %}
-                             {% do form.reservation.setRendered() %}
-                        {% endif %}
 
                         <div class="mt-5 pt-4 border-top d-flex justify-content-between">
                             <a href="{{ path('app_admin_consultation_creneau_index') }}" class="btn btn-light btn-modern">

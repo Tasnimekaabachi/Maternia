@@ -291,11 +291,14 @@
                 <div class="admin-card-header">
                     <h5 class="mb-0 fw-bold">Liste des consultations</h5>
                     <div class="d-flex gap-3 align-items-center">
-                        {# RECHERCHE SPÉCIFIQUE #}
-                        <div class="search-box">
+                        {# RECHERCHE CÔTÉ SERVEUR #}
+                        <form action="{{ path('app_admin_consultation_index') }}" method="get" class="search-box">
                             <i class="fas fa-search"></i>
-                            <input type="text" id="searchConsult" class="search-input" placeholder="Rechercher...">
-                        </div>
+                            <input type="search" name="q" id="searchConsult" class="search-input" placeholder="Rechercher (catégorie, description…)" value="{{ searchTerm|default('') }}">
+                        </form>
+                        {% if searchTerm %}
+                            <a href="{{ path('app_admin_consultation_index') }}" class="btn btn-sm btn-outline-secondary">Effacer</a>
+                        {% endif %}
                         {# TRI AVEC FLÈCHES #}
                         <div class="sort-group">
                             <button class="sort-btn active" onclick="sortRows('ordre', this)" title="Trier par ordre">
@@ -304,8 +307,8 @@
                             <button class="sort-btn" onclick="sortRows('categorie', this)" title="Trier par catégorie">
                                 <span class="fw-bold">A</span> <i class="fas fa-arrow-up sort-arrow"></i>
                             </button>
-                            <button class="sort-btn" onclick="sortRows('date', this)" title="Trier par date">
-                                <i class="fas fa-calendar-alt"></i> <i class="fas fa-arrow-down sort-arrow"></i>
+                            <button class="sort-btn" onclick="sortRows('pour', this)" title="Trier par public cible">
+                                <i class="fas fa-users"></i> <i class="fas fa-arrow-up sort-arrow"></i>
                             </button>
                         </div>
                         <span class="badge bg-danger rounded-pill px-3">{{ total }}</span>
@@ -330,7 +333,7 @@
                             <tr class="consult-row" 
                                 data-categorie="{{ c.categorie|lower }}" 
                                 data-ordre="{{ c.ordreAffichage }}" 
-                                data-date="{{ c.createdAt|date('Y-m-d') }}">
+                                data-pour="{{ c.pour|lower }}">
                                 <td class="text-center"><span class="fw-bold" style="color: var(--primary-pink);">#{{ c.ordreAffichage }}</span></td>
                                 <td>
                                     <div class="icon-view">
@@ -418,19 +421,26 @@
 
 <script>
     // RECHERCHE INSTANTANÉE
-    document.getElementById('searchConsult').addEventListener('keyup', function() {
-        const q = this.value.toLowerCase();
-        document.querySelectorAll('.consult-row').forEach(row => {
-            const matches = row.textContent.toLowerCase().includes(q);
-            row.style.display = matches ? '' : 'none';
+    const searchConsult = document.getElementById('searchConsult');
+    if (searchConsult) {
+        searchConsult.addEventListener('input', function() {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('.consult-row').forEach(row => {
+                const matches = row.textContent.toLowerCase().includes(q);
+                row.style.display = matches ? '' : 'none';
+            });
         });
-    });
+    }
 
     // TRI AVEC FLÈCHES
     function sortRows(key, btn) {
          const body = document.getElementById('consultBody');
          const rows = Array.from(body.querySelectorAll('.consult-row'));
          let dir = btn.dataset.dir || 'asc';
+         
+         if (btn.classList.contains('active')) {
+             dir = dir === 'asc' ? 'desc' : 'asc';
+         }
          
          document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
          btn.classList.add('active');
@@ -444,9 +454,8 @@
          });
          
          rows.forEach(r => body.appendChild(r));
-         const nextDir = dir === 'asc' ? 'desc' : 'asc';
-         btn.dataset.dir = nextDir;
-         btn.querySelector('.sort-arrow').className = dir === 'asc' ? 'fas fa-arrow-down sort-arrow' : 'fas fa-arrow-up sort-arrow';
+         btn.dataset.dir = dir;
+         btn.querySelector('.sort-arrow').className = dir === 'asc' ? 'fas fa-arrow-up sort-arrow' : 'fas fa-arrow-down sort-arrow';
     }
 
     // CHARTS INITIALIZATION

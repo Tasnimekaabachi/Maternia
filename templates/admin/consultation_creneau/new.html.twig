@@ -238,7 +238,6 @@
                         {% do form.jour.setRendered() %}
                         {% do form.heureDebut.setRendered() %}
                         {% do form.heureFin.setRendered() %}
-                        {% do form.reservation.setRendered() %}
 
                         <div class="mb-5">
                             <h3 class="section-title">Informations du Médecin & Consultation</h3>
@@ -269,11 +268,13 @@
                                     </div>
 
                                     <div class="col-md-12">
-                                        <label class="form-label">Photo du Médecin (URL ou nom de fichier)</label>
+                                        {{ form_label(form.photoFile) }}
                                         <div class="input-with-icon">
                                             <i class="fas fa-image"></i>
-                                            {{ form_widget(form.photoMedecin, {'attr': {'class': 'form-control modern-input', 'placeholder': 'photo.jpg'}}) }}
+                                            {{ form_widget(form.photoFile, {'attr': {'class': 'form-control modern-input'}}) }}
                                         </div>
+                                        {{ form_help(form.photoFile) }}
+                                        {{ form_errors(form.photoFile) }}
                                     </div>
 
                                     <div class="col-md-12">

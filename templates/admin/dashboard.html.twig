@@ -25,10 +25,10 @@
             <div class="admin-stat-value">0</div>
             <div class="admin-stat-label">Événements à venir</div>
         </div>
-        <div class="admin-stat">
-            <div class="admin-stat-value">0</div>
-            <div class="admin-stat-label">Rendez-vous ce mois</div>
-        </div>
+        <a href="{{ path('app_admin_consultation_creneau_index') }}" class="admin-stat admin-stat-link text-decoration-none">
+            <div class="admin-stat-value">{{ creneaux_ce_mois|default(0) }}</div>
+            <div class="admin-stat-label">Créneaux ce mois</div>
+        </a>
         <div class="admin-stat">
             <div class="admin-stat-value">0</div>
             <div class="admin-stat-label">Profils bébé</div>
@@ -36,13 +36,30 @@
     </div>
 
     <div class="admin-card">
-        <div class="admin-card-header">Activité récente</div>
+        <div class="admin-card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <span>Activité récente</span>
+            <a href="{{ path('app_admin_consultation_creneau_index') }}" class="btn btn-sm btn-outline-primary">Créneaux</a>
+        </div>
         <div class="admin-card-body">
-            <div class="admin-empty">
-                <i class="fas fa-inbox text-muted"></i>
-                <p class="mb-0">Aucune activité récente pour le moment.</p>
-                <small>Les données s’afficheront ici une fois les gestions utilisées.</small>
-            </div>
+            {% if creneaux_recents|default([])|length > 0 %}
+                <ul class="list-unstyled mb-0">
+                    {% for creneau in creneaux_recents %}
+                        <li class="d-flex align-items-center justify-content-between py-2 border-bottom border-light">
+                            <div>
+                                <span class="fw-medium">{{ creneau.nomMedecin }}</span>
+                                <span class="text-muted small ms-2">{{ creneau.dateDebut|date('d/m H:i') }}</span>
+                            </div>
+                            <a href="{{ path('app_admin_consultation_creneau_show', { id: creneau.id }) }}" class="text-primary small">Voir</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="admin-empty">
+                    <i class="fas fa-calendar-check text-muted"></i>
+                    <p class="mb-0">Aucun créneau récent.</p>
+                    <a href="{{ path('app_admin_consultation_creneau_index') }}" class="small">Gérer les créneaux</a>
+                </div>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

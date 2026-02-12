@@ -348,12 +348,27 @@
                 <h5 class="mb-0 fw-bold">Gestion des rendez-vous</h5>
                 <div class="d-flex gap-3 align-items-center">
                     <span class="text-muted small">{{ stats.total }} créneaux programmés</span>
-                    {# RECHERCHE #}
-                    <div class="search-box">
+                <div class="d-flex gap-3 align-items-center">
+                    <form action="{{ path('app_admin_consultation_creneau_index') }}" method="get" class="search-box">
                         <i class="fas fa-search"></i>
-                        <input type="text" id="creneauSearch" class="search-input" placeholder="Rechercher...">
+                        <input type="search" name="q" id="creneauSearch" class="search-input" placeholder="Médecin, type de consultation…" value="{{ searchTerm|default('') }}">
+                    </form>
+                    {% if searchTerm %}
+                        <a href="{{ path('app_admin_consultation_creneau_index') }}" class="btn btn-sm btn-outline-secondary">Effacer</a>
+                    {% endif %}
+                    {# TRI AVEC FLÈCHES #}
+                    <div class="sort-group">
+                        <button class="sort-btn active" onclick="sortRows('date', this)" title="Trier par date">
+                            <i class="fas fa-calendar-alt"></i> <i class="fas fa-arrow-down sort-arrow"></i>
+                        </button>
+                        <button class="sort-btn" onclick="sortRows('medecin', this)" title="Trier par médecin">
+                            <i class="fas fa-user-md"></i> <i class="fas fa-arrow-up sort-arrow"></i>
+                        </button>
+                        <button class="sort-btn" onclick="sortRows('places', this)" title="Trier par places">
+                            <i class="fas fa-users"></i> <i class="fas fa-arrow-up sort-arrow"></i>
+                        </button>
                     </div>
-                    <span class="badge bg-danger rounded-pill px-3">{{ stats.total }}</span>
+                </div>
                 </div>
             </div>
             <div class="table-responsive">
@@ -372,7 +387,10 @@
                     </thead>
                     <tbody>
                         {% for creneau in creneaux %}
-                        <tr class="creneau-row">
+                        <tr class="creneau-row"
+                            data-date="{{ creneau.jour ? creneau.jour|date('Y-m-d') : (creneau.dateDebut ? creneau.dateDebut|date('Y-m-d') : '') }}"
+                            data-medecin="{{ creneau.nomMedecin|lower }}"
+                            data-places="{{ creneau.nombrePlaces ?: 1 }}">
                             <td>
                                 <div class="doctor-profile">
                                     <div class="pdp-wrapper">
@@ -485,8 +503,6 @@
 </div>
 
 <script>
-    // ... (rest of search/sort scripts) ...
-    
     // PDF Landscape Update
     function exportPDF() {
         const element = document.getElementById('pdfContent');
@@ -498,6 +514,42 @@
             html2canvas: { scale: 2 },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
         }).save().then(() => element.style.display = 'none');
+    }
+
+    // SEARCH
+    const creneauSearch = document.getElementById('creneauSearch');
+    if (creneauSearch) {
+        creneauSearch.addEventListener('input', function() {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('.creneau-row').forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        });
+    }
+
+    // TRI AVEC FLÈCHES
+    function sortRows(key, btn) {
+        const body = document.querySelector('#slotsTable tbody');
+        const rows = Array.from(body.querySelectorAll('.creneau-row'));
+        let dir = btn.dataset.dir || 'asc';
+        if (btn.classList.contains('active')) {
+            dir = dir === 'asc' ? 'desc' : 'asc';
+        }
+        
+        document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        rows.sort((a, b) => {
+            let valA = a.dataset[key];
+            let valB = b.dataset[key];
+            if (key === 'places') { valA = parseInt(valA); valB = parseInt(valB); }
+            if (dir === 'asc') return valA > valB ? 1 : -1;
+            return valA < valB ? 1 : -1;
+        });
+        
+        rows.forEach(r => body.appendChild(r));
+        btn.dataset.dir = dir;
+        btn.querySelector('.sort-arrow').className = dir === 'asc' ? 'fas fa-arrow-up sort-arrow' : 'fas fa-arrow-down sort-arrow';
     }
 
     // DELETE
