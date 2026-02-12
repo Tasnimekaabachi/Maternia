@@ -98,26 +98,60 @@
             </div>
 
             {{ form_start(registrationForm) }}
+                {{ form_errors(registrationForm) }}
                 <div class="row g-3">
                     <div class="col-6">
                         <label class="label-custom">Nom</label>
                         {{ form_widget(registrationForm.nom, {'attr': {'class': 'form-control', 'placeholder': 'Nom'}}) }}
+                        <div class="text-danger small mt-1">{{ form_errors(registrationForm.nom) }}</div>
                     </div>
                     <div class="col-6">
                         <label class="label-custom">Prénom</label>
                         {{ form_widget(registrationForm.prenom, {'attr': {'class': 'form-control', 'placeholder': 'Prénom'}}) }}
+                        <div class="text-danger small mt-1">{{ form_errors(registrationForm.prenom) }}</div>
                     </div>
                 </div>
+
+                {# Catch-all for hidden errors (DEBUG) #}
+                {% if not registrationForm.vars.valid %}
+                    {% for child in registrationForm.children %}
+                        {% for error in child.vars.errors %}
+                            <div class="alert alert-warning py-2 px-3 small rounded-pill mb-1 border-0 shadow-sm" style="font-size: 0.75rem;">
+                                <i class="fas fa-search me-1"></i> {{ child.vars.label|default(child.vars.name) }} : {{ error.message }}
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                {% endif %}
 
                 <div class="mt-4">
                     <label class="label-custom">Email</label>
                     {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'placeholder': 'Email'}}) }}
+                    <div class="text-danger small mt-1">{{ form_errors(registrationForm.email) }}</div>
                 </div>
 
                 <div class="mt-4">
                     <label class="label-custom">Mot de passe</label>
                     {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'placeholder': '••••••••'}}) }}
+                    <div class="text-danger small mt-1">{{ form_errors(registrationForm.plainPassword) }}</div>
                 </div>
+
+                <div class="mt-4">
+                    <div class="form-check custom-checkbox d-flex align-items-start p-0">
+                        <div class="me-3 mt-1">
+                            {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input ms-0'}}) }}
+                        </div>
+                        <label class="form-check-label text-muted" for="{{ registrationForm.agreeTerms.vars.id }}" style="font-size: 0.85rem; line-height: 1.4;">
+                            En m'inscrivant, j'accepte les 
+                            <a href="#" class="text-primary fw-bold text-decoration-none border-bottom border-primary border-2 pb-0">conditions d'utilisation</a> 
+                            et la <a href="#" class="text-primary fw-bold text-decoration-none border-bottom border-primary border-2 pb-0">politique de confidentialité</a> de Maternia.
+                        </label>
+                    </div>
+                </div>
+                {% if registrationForm.agreeTerms.vars.errors|length > 0 %}
+                    <div class="invalid-feedback d-block small mt-1 ps-2">
+                        <i class="fas fa-exclamation-triangle me-1"></i> Veuillez accepter les conditions.
+                    </div>
+                {% endif %}
 
                 <button type="submit" class="btn btn-register w-100 mt-5">
                     CRÉER MON COMPTE <i class="fas fa-arrow-right ms-2"></i>
