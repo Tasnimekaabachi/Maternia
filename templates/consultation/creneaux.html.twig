@@ -3,636 +3,318 @@
 {% block title %}Disponibilités - Dr. {{ medecin }} - Maternia{% endblock %}
 
 {% block body %}
-{# === THEME CONFIGURATION === #}
-{% set theme = {
-    'primary': {
-        'gradient': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        'light': '#f3f4f6',
-        'text': '#4c1d95',
-        'accent': '#8b5cf6',
-        'hover': '#7c3aed'
-    },
-    'maman': {
-        'gradient': 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-        'light': '#fdf2f8',
-        'text': '#9d174d',
-        'accent': '#ec4899',
-        'hover': '#db2777'
-    },
-    'bebe': {
-        'gradient': 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-        'light': '#eff6ff',
-        'text': '#1e40af',
-        'accent': '#3b82f6',
-        'hover': '#2563eb'
-    },
-    'mixte': {
-        'gradient': 'linear-gradient(135deg, #d299c2 0%, #fef9d7 100%)',
-        'light': '#faf5ff',
-        'text': '#5b21b6',
-        'accent': '#a78bfa',
-        'hover': '#8b5cf6'
-    }
-} %}
-
-{% set current_theme = theme.primary %}
-{% if consultation %}
-    {% if consultation.pour == 'MAMAN' %}
-        {% set current_theme = theme.maman %}
-    {% elseif consultation.pour == 'BEBE' %}
-        {% set current_theme = theme.bebe %}
-    {% elseif consultation.pour == 'LES_DEUX' %}
-        {% set current_theme = theme.mixte %}
-    {% endif %}
-{% endif %}
+{# === THÈME ROSE MATERNIA (D'après medecins.html.twig et screenshot) === #}
+{% set pink_gradient = 'linear-gradient(135deg, #89f7fe 0%, #66a6ff 40%, #fdcbf1 70%, #ff9a9e 100%)' %}
+{% set pink_accent = '#e91e63' %}
+{% set pink_light = '#fce4ec' %}
 
 <style>
     :root {
-        --theme-gradient: {{ current_theme.gradient }};
-        --theme-light: {{ current_theme.light }};
-        --theme-text: {{ current_theme.text }};
-        --theme-accent: {{ current_theme.accent }};
-        --theme-hover: {{ current_theme.hover }};
+        --pink-gradient: {{ pink_gradient }};
+        --pink-accent: {{ pink_accent }};
+        --pink-light: {{ pink_light }};
+        --card-shadow: 0 10px 30px rgba(0,0,0,0.08);
     }
 
     body {
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        min-height: 100vh;
+        background: #f8fafc;
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
-    /* HEADER ELEGANT */
-    .hero-elegant {
-        background: var(--theme-gradient);
-        padding: 80px 0 100px;
+    /* HEADER DYNAMIQUE (Copié de medecins.html.twig) */
+    .dynamic-header {
+        background: var(--pink-gradient);
+        padding: 30px 0; /* Réduit comme demandé */
         position: relative;
         overflow: hidden;
-        margin-bottom: -60px;
+        border-radius: 0 0 30px 30px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         color: white;
     }
-    
-    .hero-elegant::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" preserveAspectRatio="none"><path d="M0,50 Q250,0 500,50 T1000,50 V100 H0 Z" fill="white"/></svg>');
-        background-size: 100% auto;
-        background-position: bottom;
-        background-repeat: no-repeat;
-        opacity: 0.1;
+
+    .breadcrumb-modern {
+        display: inline-flex;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(5px);
+        border-radius: 50px;
+        padding: 8px 16px;
+        margin-bottom: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        font-size: 0.85rem;
     }
 
-    .breadcrumb-sleek {
-        display: inline-flex;
-        align-items: center;
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(10px);
-        border-radius: 50px;
-        padding: 8px 20px;
-        margin-bottom: 25px;
-        font-size: 0.9rem;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    .breadcrumb-sleek a {
+    .breadcrumb-modern a {
         color: white;
         text-decoration: none;
         font-weight: 500;
-        transition: opacity 0.3s;
-        opacity: 0.9;
+        display: flex; align-items: center; gap: 6px;
     }
-    .breadcrumb-sleek a:hover { 
-        opacity: 1; 
-        text-decoration: none;
-    }
-    .breadcrumb-divider {
-        margin: 0 12px;
-        color: rgba(255, 255, 255, 0.6);
-        font-size: 0.8rem;
-    }
-    .breadcrumb-current {
-        font-weight: 600;
-        color: white;
-        opacity: 1;
-    }
+    .breadcrumb-separator { color: rgba(255, 255, 255, 0.7); margin: 0 8px; }
 
-    .page-title-elegant {
-        font-size: 2.8rem;
+    .main-title {
+        font-size: 2.5rem;
         font-weight: 800;
         margin-bottom: 10px;
-        letter-spacing: -0.5px;
-        background: linear-gradient(to right, white, rgba(255, 255, 255, 0.9));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        color: white; /* Titre en BLANC */
     }
 
-    .medecin-elegant {
-        font-size: 1.2rem;
-        font-weight: 400;
-        opacity: 0.95;
-        display: flex;
+    .doctor-info-badge {
+        display: inline-flex;
         align-items: center;
-        justify-content: center;
-        gap: 12px;
-        margin-top: 20px;
-    }
-    .medecin-elegant i {
-        font-size: 1.4rem;
+        gap: 10px;
         background: rgba(255, 255, 255, 0.2);
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        padding: 6px 18px;
+        border-radius: 50px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        font-weight: 600;
+        font-size: 0.95rem;
     }
 
-    /* DATE SECTION */
-    .date-section-elegant {
-        margin-bottom: 60px;
-        position: relative;
+    /* DATE SECTION (Exactement comme le screenshot) */
+    .date-section {
+        margin-bottom: 40px;
+        margin-top: 40px;
     }
-    
-    .date-header-elegant {
+
+    .date-card-header {
+        background: white;
+        border-radius: 15px;
+        padding: 15px 25px;
         display: flex;
         align-items: center;
         gap: 20px;
-        margin-bottom: 30px;
-        padding: 20px 30px;
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-        border-left: 5px solid var(--theme-accent);
+        margin-bottom: 25px;
+        box-shadow: var(--card-shadow);
+        border-left: 8px solid var(--pink-accent); /* Bordure épaisse rose */
+        position: relative;
     }
-    
-    .date-icon {
-        width: 50px;
-        height: 50px;
-        background: var(--theme-light);
-        border-radius: 12px;
+
+    .calendar-icon-circle {
+        width: 45px;
+        height: 45px;
+        background: var(--pink-light);
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--theme-accent);
-        font-size: 1.2rem;
+        color: var(--pink-accent);
+        font-size: 1.1rem;
     }
-    
-    .date-content {
-        flex: 1;
-    }
-    
-    .date-title-elegant {
+
+    .date-info h2 {
         font-size: 1.5rem;
         font-weight: 700;
-        color: #1f2937;
-        margin-bottom: 5px;
+        color: #1e293b;
+        margin-bottom: 2px;
     }
-    
+
     .date-meta {
         display: flex;
         align-items: center;
         gap: 15px;
-        font-size: 0.9rem;
-        color: #6b7280;
-    }
-    
-    .slot-count {
-        background: var(--theme-light);
-        color: var(--theme-text);
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-weight: 600;
         font-size: 0.85rem;
+        color: #64748b;
     }
 
-    /* MODERN CARD GRID */
-    .slots-grid-modern {
+    .badge-pink-light {
+        background: var(--pink-light);
+        color: var(--pink-accent);
+        padding: 2px 12px;
+        border-radius: 20px;
+        font-weight: 700;
+    }
+
+    /* SLOTS GRID */
+    .slots-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 25px;
-        padding: 0 10px;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
     }
 
-    /* ELEGANT CARD DESIGN */
-    .card-elegant {
+    /* FLASH CARD SLOT (Exactement comme le screenshot) */
+    .flash-card {
         background: white;
-        border-radius: 24px;
-        padding: 25px 20px;
-        position: relative;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        border: 1px solid rgba(0, 0, 0, 0.05);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04);
-        overflow: hidden;
+        border-radius: 20px;
+        padding: 30px 20px;
+        text-align: center;
+        box-shadow: var(--card-shadow);
+        transition: transform 0.3s ease;
+        border: 1px solid #f1f5f9;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        aspect-ratio: 1/1;
-    }
-    
-    .card-elegant::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: var(--theme-gradient);
-        opacity: 0;
-        transition: opacity 0.3s;
-    }
-    
-    .card-elegant:hover {
-        transform: translateY(-10px) scale(1.02);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        border-color: rgba(0, 0, 0, 0.1);
-    }
-    
-    .card-elegant:hover::before {
-        opacity: 1;
-    }
-    
-    .card-elegant.unavailable {
-        opacity: 0.5;
-        background: #f9fafb;
-    }
-    
-    .card-elegant.unavailable:hover {
-        transform: none;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04);
-        cursor: not-allowed;
+        gap: 12px;
     }
 
-    /* CARD CONTENT */
-    .time-elegant {
-        font-size: 2.2rem;
-        font-weight: 800;
-        color: #111827;
-        margin-bottom: 5px;
+    .flash-card:hover { transform: translateY(-5px); }
+
+    .time-hero {
+        font-size: 3rem;
+        font-weight: 900;
+        color: #1e293b;
         letter-spacing: -1px;
-        font-feature-settings: "tnum";
+        line-height: 1;
     }
-    
-    .period {
+    .time-hero span { color: #94a3b8; font-weight: 500; }
+
+    .period-text {
         font-size: 0.9rem;
-        color: #9ca3af;
-        margin-bottom: 20px;
-        font-weight: 500;
+        font-weight: 700;
+        color: #94a3b8;
+        letter-spacing: 1px;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
     }
-    
+
     .duration-badge {
-        background: var(--theme-light);
-        color: var(--theme-text);
-        padding: 6px 16px;
-        border-radius: 15px;
+        background: var(--pink-light);
+        color: var(--pink-accent);
+        padding: 5px 15px;
+        border-radius: 50px;
         font-size: 0.85rem;
-        font-weight: 600;
-        margin-bottom: 25px;
-        display: inline-flex;
+        font-weight: 700;
+        display: flex;
         align-items: center;
         gap: 6px;
     }
-    
-    .duration-badge i {
-        font-size: 0.8rem;
-    }
 
-    /* BUTTON STYLES */
-    .btn-elegant {
-        display: block;
+    .btn-reserve-pink {
         width: 100%;
-        padding: 12px 0;
-        border-radius: 15px;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.3s;
+        background: linear-gradient(to right, #f06292, #e91e63);
+        color: white;
         border: none;
-        cursor: pointer;
-        font-size: 0.95rem;
-        letter-spacing: 0.3px;
-        text-transform: uppercase;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .btn-elegant.available {
-        background: linear-gradient(to right, var(--theme-accent), var(--theme-hover));
-        color: white;
-        box-shadow: 0 4px 15px rgba(var(--theme-accent-rgb), 0.3);
-    }
-    
-    .btn-elegant.available:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(var(--theme-accent-rgb), 0.4);
-    }
-    
-    .btn-elegant.unavailable {
-        background: #f3f4f6;
-        color: #9ca3af;
-        cursor: not-allowed;
-    }
-
-    /* EMPTY STATE */
-    .empty-state-elegant {
-        text-align: center;
-        padding: 80px 30px;
-        background: white;
-        border-radius: 30px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.05);
-        max-width: 600px;
-        margin: 60px auto;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .empty-state-elegant::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 6px;
-        background: var(--theme-gradient);
-    }
-    
-    .empty-icon-elegant {
-        font-size: 4rem;
-        color: var(--theme-light);
-        margin-bottom: 30px;
-        opacity: 0.5;
-    }
-    
-    .empty-title {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: #1f2937;
-        margin-bottom: 15px;
-    }
-    
-    .empty-subtitle {
-        color: #6b7280;
-        font-size: 1.1rem;
-        margin-bottom: 30px;
-        line-height: 1.6;
-    }
-    
-    .btn-return {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        padding: 14px 32px;
-        background: var(--theme-gradient);
-        color: white;
+        padding: 14px;
         border-radius: 15px;
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 0.9rem;
         text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+        box-shadow: 0 5px 15px rgba(233, 30, 99, 0.3);
     }
-    
-    .btn-return:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+
+    .btn-reserve-pink:hover {
+        background: linear-gradient(to right, #ec407a, #d81b60);
+        box-shadow: 0 8px 20px rgba(233, 30, 99, 0.4);
         color: white;
     }
 
-    /* ANIMATIONS */
-    .fade-in-up {
-        opacity: 0;
-        transform: translateY(30px);
-        animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    }
-    
-    @keyframes fadeInUp {
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .stagger-delay > * {
-        animation-delay: calc(var(--i) * 0.1s);
-    }
-
-    /* RESPONSIVE */
-    @media (max-width: 768px) {
-        .page-title-elegant {
-            font-size: 2.2rem;
-        }
-        
-        .slots-grid-modern {
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 20px;
-        }
-        
-        .time-elegant {
-            font-size: 1.8rem;
-        }
-        
-        .date-header-elegant {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 15px;
-            padding: 20px;
-        }
-    }
-
-    /* SCROLL ANIMATION */
-    .scroll-reveal {
-        opacity: 0;
-        transform: translateY(20px);
-        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    .scroll-reveal.visible {
-        opacity: 1;
-        transform: translateY(0);
+    .btn-reserve-pink.disabled {
+        background: #f1f5f9;
+        color: #94a3b8;
+        box-shadow: none;
+        cursor: not-allowed;
     }
 </style>
 
-<!-- ELEGANT HEADER SECTION -->
-<div class="hero-elegant">
-    <div class="container position-relative">
-        <!-- Sleek Breadcrumb -->
-        <div class="breadcrumb-sleek fade-in-up" style="animation-delay: 0.1s">
-            <a href="{{ path('app_consultations') }}">Consultations</a>
-            {% if consultation %}
-            <span class="breadcrumb-divider">›</span>
-            <a href="{{ path('app_consultation_medecins', {'id': consultation.id}) }}">
-                {{ consultation.categorie }}
+<!-- HEADER -->
+<header class="dynamic-header">
+    <div class="container text-center">
+        <div class="breadcrumb-modern">
+            <a href="{{ path('app_consultations') }}">
+                <i class="fas fa-stethoscope"></i> Consultations
             </a>
+            {% if consultation %}
+                <span class="breadcrumb-separator">›</span>
+                <a href="{{ path('app_consultation_medecins', {'id': consultation.id}) }}">
+                    {{ consultation.categorie }}
+                </a>
             {% endif %}
-            <span class="breadcrumb-divider">›</span>
-            <span class="breadcrumb-current">Créneaux disponibles</span>
+            <span class="breadcrumb-separator">›</span>
+            <span>Créneaux</span>
         </div>
 
-        <!-- Page Title -->
-        <h1 class="page-title-elegant fade-in-up" style="animation-delay: 0.2s">
-            Choisissez votre horaire
-        </h1>
-        
-        <!-- Doctor Info -->
-        <div class="medecin-elegant fade-in-up" style="animation-delay: 0.3s">
+        <h1 class="main-title">Choisissez votre horaire</h1>
+
+        <div class="doctor-info-badge">
             <i class="fas fa-user-md"></i>
             <span>Dr. {{ medecin }}</span>
             {% if consultation %}
-            <span class="text-white-50">•</span>
-            <span>{{ consultation.categorie }}</span>
+                <span style="opacity: 0.5; margin: 0 10px;">•</span>
+                <span>{{ consultation.categorie }}</span>
             {% endif %}
         </div>
     </div>
-</div>
+</header>
 
-<!-- MAIN CONTENT -->
-<div class="container py-5 mt-5">
+<main class="container">
     {% if creneauxParDate|length > 0 %}
-        <div class="stagger-delay">
         {% for date, data in creneauxParDate %}
-        <div class="date-section-elegant fade-in-up" style="--i: {{ loop.index }}">
-            <!-- Date Header -->
-            <div class="date-header-elegant">
-                <div class="date-icon">
-                    <i class="far fa-calendar-alt"></i>
+            <div class="date-section">
+                <!-- Date Header Card (Screenshot Style) -->
+                <div class="date-card-header">
+                    <div class="calendar-icon-circle">
+                        <i class="far fa-calendar-alt"></i>
+                    </div>
+                    <div class="date-info">
+                        <h2>
+                            {{ data.date|date('l d F')|trans({
+                                'Monday': 'Lundi', 'Tuesday': 'Mardi', 'Wednesday': 'Mercredi', 'Thursday': 'Jeudi',
+                                'Friday': 'Vendredi', 'Saturday': 'Samedi', 'Sunday': 'Dimanche',
+                                'January': 'Janvier', 'February': 'Février', 'March': 'Mars', 'April': 'Avril',
+                                'May': 'Mai', 'June': 'Juin', 'July': 'Juillet', 'August': 'Août',
+                                'September': 'Septembre', 'October': 'Octobre', 'November': 'Novembre', 'December': 'Décembre'
+                            }) }}
+                        </h2>
+                        <div class="date-meta">
+                            <span class="badge-pink-light">
+                                <i class="far fa-clock me-1"></i> {{ data.creneaux|length }} créneaux
+                            </span>
+                            <span><i class="far fa-calendar-alt me-1"></i> {{ data.date|date('d/m/Y') }}</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="date-content">
-                    <div class="date-title-elegant">
-                        {{ data.date|date('l d F')|trans({
-                            'Monday': 'Lundi', 'Tuesday': 'Mardi', 'Wednesday': 'Mercredi', 'Thursday': 'Jeudi',
-                            'Friday': 'Vendredi', 'Saturday': 'Samedi', 'Sunday': 'Dimanche',
-                            'January': 'Janvier', 'February': 'Février', 'March': 'Mars', 'April': 'Avril',
-                            'May': 'Mai', 'June': 'Juin', 'July': 'Juillet', 'August': 'Août',
-                            'September': 'Septembre', 'October': 'Octobre', 'November': 'Novembre', 'December': 'Décembre'
-                        }) }}
-                    </div>
-                    <div class="date-meta">
-                        <span class="slot-count">
-                            <i class="far fa-clock me-1"></i>
-                            {{ data.creneaux|length }} créneaux
-                        </span>
-                        <span class="text-muted">
-                            <i class="far fa-calendar me-1"></i>
-                            {{ data.date|date('d/m/Y') }}
-                        </span>
-                    </div>
+
+                <!-- Slots Grid -->
+                <div class="slots-grid">
+                    {% for creneau in data.creneaux %}
+                        <div class="flash-card">
+                            <div class="time-hero">
+                                {{ creneau.dateDebut|date('H') }}<span>h</span>{{ creneau.dateDebut|date('i') }}
+                            </div>
+                            
+                            <div class="period-text">
+                                {{ creneau.dateDebut|date('H') < 12 ? 'MATIN' : 'APRÈS-MIDI' }}
+                            </div>
+
+                            <div class="duration-badge">
+                                <i class="far fa-clock"></i>
+                                {% set diff = creneau.dateFin.diff(creneau.dateDebut) %}
+                                {% if diff.h > 0 %}{{ diff.h }}h{% endif %}{% if diff.i > 0 %}{{ diff.i }}min{% endif %}
+                            </div>
+
+                            {% if creneau.statutReservation == 'DISPONIBLE' %}
+                                <a href="{{ path('app_creneau_reserver', {'id': creneau.id}) }}" class="btn-reserve-pink">
+                                    <i class="fas fa-calendar-check-o"></i> RÉSERVER
+                                </a>
+                            {% else %}
+                                <div class="btn-reserve-pink disabled">
+                                    <i class="fas fa-times-circle"></i> COMPLET
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
-            
-            <!-- Time Slots Grid -->
-            <div class="slots-grid-modern">
-                {% for creneau in data.creneaux %}
-                <div class="card-elegant scroll-reveal {% if creneau.statutReservation != 'DISPONIBLE' %}unavailable{% endif %}" 
-                     style="animation-delay: {{ loop.index * 0.05 }}s">
-                    <!-- Time Display -->
-                    <div class="time-elegant">
-                        {{ creneau.dateDebut|date('H') }}<span class="text-muted">h</span>{{ creneau.dateDebut|date('i') }}
-                    </div>
-                    
-                    <!-- Period (AM/PM) -->
-                    <div class="period">
-                        {{ creneau.dateDebut|date('A') == 'AM' ? 'matin' : 'après-midi' }}
-                    </div>
-                    
-                    <!-- Duration -->
-                    <div class="duration-badge">
-                        <i class="far fa-hourglass"></i>
-                        {% set diff = creneau.dateFin.diff(creneau.dateDebut) %}
-                        {% if diff.h > 0 %}{{ diff.h }}h{% endif %}{% if diff.i > 0 %}{{ diff.i }}min{% endif %}
-                    </div>
-                    
-                    <!-- Action Button -->
-                    <div class="mt-auto w-100">
-                        {% if creneau.statutReservation == 'DISPONIBLE' %}
-                            <a href="{{ path('app_creneau_reserver', {'id': creneau.id}) }}" 
-                               class="btn-elegant available"
-                               data-bs-toggle="tooltip" 
-                               data-bs-placement="top"
-                               title="Réserver ce créneau">
-                                <i class="far fa-calendar-check me-2"></i>
-                                Réserver
-                            </a>
-                        {% else %}
-                            <button class="btn-elegant unavailable" disabled>
-                                <i class="far fa-calendar-times me-2"></i>
-                                Complet
-                            </button>
-                        {% endif %}
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
         {% endfor %}
-        </div>
     {% else %}
-        <!-- Empty State -->
-        <div class="empty-state-elegant fade-in-up">
-            <div class="empty-icon-elegant">
-                <i class="far fa-calendar-times"></i>
-            </div>
-            <h3 class="empty-title">Aucune disponibilité actuelle</h3>
-            <p class="empty-subtitle">
-                Dr. {{ medecin }} n'a pas de créneaux disponibles pour le moment.<br>
-                Nous vous invitons à consulter nos autres spécialistes ou à revenir ultérieurement.
+        <div class="text-center py-5">
+            <i class="far fa-calendar-times" style="font-size: 4rem; color: #cbd5e1; margin-bottom: 20px; display: block;"></i>
+            <h3>Aucun créneau disponible</h3>
+            <p style="color: #64748b; margin-bottom: 25px;">
+                Dr. {{ medecin }} n'a pas de disponibilités pour le moment.
             </p>
-            <a href="{{ path('app_consultations') }}" class="btn-return">
-                <i class="fas fa-arrow-left me-1"></i>
-                Explorer les consultations
+            <a href="{{ path('app_consultations') }}" class="btn-reserve-pink" style="display: inline-flex; width: auto; padding: 12px 30px;">
+                RETOUR AUX CONSULTATIONS
             </a>
         </div>
     {% endif %}
-</div>
-
-<script>
-// Scroll reveal animation
-document.addEventListener('DOMContentLoaded', function() {
-    const scrollReveals = document.querySelectorAll('.scroll-reveal');
-    
-    const revealOnScroll = () => {
-        scrollReveals.forEach(element => {
-            const elementTop = element.getBoundingClientRect().top;
-            const windowHeight = window.innerHeight;
-            
-            if (elementTop < windowHeight - 100) {
-                element.classList.add('visible');
-            }
-        });
-    };
-    
-    // Initial check
-    revealOnScroll();
-    
-    // Check on scroll
-    window.addEventListener('scroll', revealOnScroll);
-    
-    // Initialize tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-    
-    // Add hover effect to cards
-    const cards = document.querySelectorAll('.card-elegant:not(.unavailable)');
-    cards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            const time = this.querySelector('.time-elegant');
-            if (time) {
-                time.style.color = 'var(--theme-hover)';
-            }
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            const time = this.querySelector('.time-elegant');
-            if (time) {
-                time.style.color = '';
-            }
-        });
-    });
-});
-</script>
+</main>
 
 {% endblock %}
