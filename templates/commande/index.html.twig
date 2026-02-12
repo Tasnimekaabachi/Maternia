@@ -1,0 +1,98 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Commandes{% endblock %}
+{% block page_title %}Commandes{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
+        <span>/</span>
+        <span>Commandes</span>
+    </div>
+{% endblock %}
+
+{% block header_actions %}
+    <a href="{{ path('app_commande_export') }}" class="btn btn-outline-secondary me-2">
+        <i class="fas fa-file-csv me-1"></i> Exporter CSV
+    </a>
+    <a href="{{ path('app_commande_new') }}" class="btn btn-primary admin-btn-primary">
+        <i class="fas fa-plus me-1"></i> Nouvelle commande
+    </a>
+{% endblock %}
+
+{% block content %}
+    <div class="admin-card">
+        <div class="admin-card-header">Liste des commandes</div>
+        <div class="admin-card-body p-0">
+            <div class="p-3 border-bottom">
+                <form method="get" action="{{ path('app_commande_index') }}" class="row g-2 align-items-center">
+                    <div class="col-md-4">
+                        <input
+                            type="text"
+                            name="q"
+                            class="form-control"
+                            placeholder="Rechercher par statut (En attente, Validée, Annulée)..."
+                            value="{{ searchTerm ?? '' }}"
+                        >
+                    </div>
+                    <div class="col-md-4">
+                        <select name="sort" class="form-select">
+                            <option value="">Tri par défaut (date desc.)</option>
+                            <option value="date_asc" {{ sort == 'date_asc' ? 'selected' : '' }}>Date croissante</option>
+                            <option value="date_desc" {{ sort == 'date_desc' ? 'selected' : '' }}>Date décroissante</option>
+                            <option value="total_asc" {{ sort == 'total_asc' ? 'selected' : '' }}>Total croissant</option>
+                            <option value="total_desc" {{ sort == 'total_desc' ? 'selected' : '' }}>Total décroissant</option>
+                            <option value="status_asc" {{ sort == 'status_asc' ? 'selected' : '' }}>Statut A → Z</option>
+                            <option value="status_desc" {{ sort == 'status_desc' ? 'selected' : '' }}>Statut Z → A</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-filter me-1"></i> Filtrer
+                        </button>
+                        <a href="{{ path('app_commande_index') }}" class="btn btn-outline-secondary">
+                            Réinitialiser
+                        </a>
+                    </div>
+                </form>
+            </div>
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Date de commande</th>
+                            <th>Statut</th>
+                            <th>Total</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for commande in commandes %}
+                        <tr>
+                            <td>{{ commande.id }}</td>
+                            <td>{{ commande.dateCommande ? commande.dateCommande|date('Y-m-d H:i:s') : '' }}</td>
+                            <td>{{ commande.statut }}</td>
+                            <td>{{ commande.total }}</td>
+                            <td class="d-flex gap-1">
+                                <a href="{{ path('app_commande_show', {'id': commande.id}) }}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ path('app_commande_edit', {'id': commande.id}) }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4">
+                                Aucune commande pour le moment.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

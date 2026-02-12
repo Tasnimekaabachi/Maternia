@@ -1,0 +1,9 @@
+{{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
+    {{ form_errors(form) }}
+    {{ form_row(form.dateCommande) }}
+    {{ form_row(form.statut) }}
+    {{ form_row(form.total) }}
+    {{ form_row(form.produits) }}
+    {{ form_rest(form) }}
+    <button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+{{ form_end(form) }}

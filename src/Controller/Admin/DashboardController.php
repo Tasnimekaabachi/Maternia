@@ -3,10 +3,12 @@
 namespace App\Controller\Admin;
 
 use App\Repository\ConsultationCreneauRepository;
+use App\Repository\CommandeRepository;
+use App\Repository\ProduitRepository;
+use App\Repository\EventRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Repository\EventRepository;
 
 #[Route('/admin', name: 'admin_')]
 final class DashboardController extends AbstractController
@@ -17,32 +19,66 @@ final class DashboardController extends AbstractController
     }
 
     #[Route('', name: 'dashboard', methods: ['GET'])]
-    public function dashboard(EventRepository $eventRepository): Response
-    {
+    public function dashboard(
+        EventRepository $eventRepository,
+        ProduitRepository $produitRepository,
+        CommandeRepository $commandeRepository
+    ): Response {
+
+        // ===== Marketplace Stats =====
+        $nbProduits = $produitRepository->count([]);
+        $nbCommandesAttente = $commandeRepository->countByStatut('En attente');
+        $nbCommandesValidees = $commandeRepository->countByStatut('Validée');
+        $nbCommandesAnnulees = $commandeRepository->countByStatut('Annulée');
+        $chiffreAffaires = $commandeRepository->chiffreAffairesValidees();
+        $topProduits = $commandeRepository->topProduitsCommandes(5);
+
+        // ===== Events =====
         $eventCount = $eventRepository->count([]);
 
-        // Fetch recent items
+        // Fetch recent items (guaranteeing a mix of types)
         $recentCreneaux = $this->consultationCreneauRepository->findBy([], ['id' => 'DESC'], 10);
         $recentEvents = $eventRepository->findBy([], ['id' => 'DESC'], 10);
+        $recentProduits = $produitRepository->findBy([], ['id' => 'DESC'], 10);
+        $recentCommandes = $commandeRepository->findBy([], ['id' => 'DESC'], 10);
 
-        $activity = [];
+        $activityLists = [
+            'commande' => [],
+            'product' => [],
+            'event' => [],
+            'creneau' => []
+        ];
 
-        foreach ($recentCreneaux as $c) {
-            $activity[] = [
-                'type' => 'creneau',
-                'title' => $c->getNomMedecin(),
-                'context' => $c->getSpecialiteMedecin() ?: $c->getConsultation()->getCategorie(),
-                'date' => $c->getDateDebut(),
-                'url' => $this->generateUrl('app_admin_consultation_creneau_show', ['id' => $c->getId()]),
-                'icon' => 'fa-stethoscope',
-                'badge_text' => 'Créneau',
-                'badge_class' => 'bg-info-light',
-                'id' => $c->getId() // Used for sorting
+        foreach ($recentCommandes as $com) {
+            $activityLists['commande'][] = [
+                'type' => 'commande',
+                'title' => 'Commande #' . $com->getId(),
+                'context' => $com->getStatut() . ' - ' . number_format($com->getTotal(), 2) . ' TND',
+                'date' => $com->getDateCommande(),
+                'url' => '#',
+                'icon' => 'fa-shopping-cart',
+                'badge_text' => 'Commande',
+                'badge_class' => 'bg-success-light',
+                'id' => $com->getId()
+            ];
+        }
+
+        foreach ($recentProduits as $p) {
+            $activityLists['product'][] = [
+                'type' => 'product',
+                'title' => $p->getNom(),
+                'context' => 'Stock: ' . $p->getStock() . ' - ' . number_format($p->getPrix(), 2) . ' TND',
+                'date' => new \DateTime(),
+                'url' => $this->generateUrl('app_produit_show', ['id' => $p->getId()]),
+                'icon' => 'fa-box',
+                'badge_text' => 'Produit',
+                'badge_class' => 'bg-warning-light',
+                'id' => $p->getId()
             ];
         }
 
         foreach ($recentEvents as $e) {
-            $activity[] = [
+            $activityLists['event'][] = [
                 'type' => 'event',
                 'title' => $e->getTitle(),
                 'context' => $e->getEventCat()->getName(),
@@ -51,43 +87,76 @@ final class DashboardController extends AbstractController
                 'icon' => 'fa-calendar-alt',
                 'badge_text' => 'Événement',
                 'badge_class' => 'bg-pink-light',
-                'id' => $e->getId() // Used for sorting
+                'id' => $e->getId()
             ];
         }
 
-        // Sort by ID DESC (most recently added first)
-        // Note: For a real app, adding a createdAt column to both would be better
-        usort($activity, fn($a, $b) => $b['id'] <=> $a['id']);
+        foreach ($recentCreneaux as $c) {
+            $activityLists['creneau'][] = [
+                'type' => 'creneau',
+                'title' => $c->getNomMedecin(),
+                'context' => $c->getSpecialiteMedecin() ?: $c->getConsultation()->getCategorie(),
+                'date' => $c->getDateDebut(),
+                'url' => $this->generateUrl(
+                    'app_admin_consultation_creneau_show',
+                    ['id' => $c->getId()]
+                ),
+                'icon' => 'fa-stethoscope',
+                'badge_text' => 'Créneau',
+                'badge_class' => 'bg-info-light',
+                'id' => $c->getId()
+            ];
+        }
 
-        // Final result limited to 10
-        $activity = array_slice($activity, 0, 10);
+        // Interleave the lists to ensure relative recency visibility
+        $activity = [];
+        $maxCount = max(
+            count($activityLists['commande']),
+            count($activityLists['product']),
+            count($activityLists['event']),
+            count($activityLists['creneau'])
+        );
+
+        for ($i = 0; $i < $maxCount; $i++) {
+            if (isset($activityLists['commande'][$i]))
+                $activity[] = $activityLists['commande'][$i];
+            if (isset($activityLists['product'][$i]))
+                $activity[] = $activityLists['product'][$i];
+            if (isset($activityLists['event'][$i]))
+                $activity[] = $activityLists['event'][$i];
+            if (isset($activityLists['creneau'][$i]))
+                $activity[] = $activityLists['creneau'][$i];
+
+            if (count($activity) >= 12)
+                break;
+        }
 
         return $this->render('admin/dashboard.html.twig', [
+            // Marketplace
+            'nbProduits' => $nbProduits,
+            'nbCommandesAttente' => $nbCommandesAttente,
+            'nbCommandesValidees' => $nbCommandesValidees,
+            'nbCommandesAnnulees' => $nbCommandesAnnulees,
+            'chiffreAffaires' => $chiffreAffaires,
+            'topProduits' => $topProduits,
+
+            // Existing dashboard data
             'eventCount' => $eventCount,
             'creneaux_ce_mois' => $this->consultationCreneauRepository->countCeMois(),
             'recent_activity' => $activity,
         ]);
     }
 
-    // Supprimez la route consultations existante car maintenant
-    // elle sera gérée par le CRUDController
-    // #[Route('/consultations', name: 'consultations', methods: ['GET'])]
-    // public function consultations(): Response
-    // {
-    //     return $this->render('admin/consultations.html.twig');
-    // }
-
-    // Gardez les autres routes...
     #[Route('/suivi-grossesse', name: 'suivi_grossesse', methods: ['GET'])]
     public function suiviGrossesse(): Response
     {
         return $this->render('admin/suivi_grossesse.html.twig');
     }
 
-    #[Route('/marketplace', name: 'marketplace', methods: ['GET'])]
-    public function marketplace(): Response
+    #[Route('/marketplace-legacy', name: 'marketplace_legacy', methods: ['GET'])]
+    public function marketplaceLegacy(): Response
     {
-        return $this->render('admin/marketplace.html.twig');
+        return $this->redirectToRoute('admin_marketplace');
     }
 
     #[Route('/evenements', name: 'evenements', methods: ['GET'])]

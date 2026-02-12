@@ -1,0 +1,52 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Détail commande{% endblock %}
+{% block page_title %}Commande n°{{ commande.id }}{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
+        <span>/</span>
+        <a href="{{ path('app_commande_index') }}">Commandes</a>
+        <span>/</span>
+        <span>Détail</span>
+    </div>
+{% endblock %}
+
+{% block header_actions %}
+    <a href="{{ path('app_commande_index') }}" class="btn btn-outline-secondary me-2">
+        <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+    </a>
+    <a href="{{ path('app_commande_edit', {'id': commande.id}) }}" class="btn btn-primary admin-btn-primary me-2">
+        <i class="fas fa-edit me-1"></i> Modifier
+    </a>
+    {{ include('commande/_delete_form.html.twig') }}
+{% endblock %}
+
+{% block content %}
+    <div class="admin-card">
+        <div class="admin-card-header">Informations de la commande</div>
+        <div class="admin-card-body">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <th>ID</th>
+                        <td>{{ commande.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Date de commande</th>
+                        <td>{{ commande.dateCommande ? commande.dateCommande|date('Y-m-d H:i:s') : '' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Statut</th>
+                        <td>{{ commande.statut }}</td>
+                    </tr>
+                    <tr>
+                        <th>Total</th>
+                        <td>{{ commande.total }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

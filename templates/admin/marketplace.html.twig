@@ -24,47 +24,98 @@
 {% endblock %}
 
 {% block header_actions %}
-    <button type="button" class="btn btn-primary admin-btn-primary">
+    <a href="{{ path('app_commande_index') }}" class="btn btn-outline-primary me-2">
+        <i class="fas fa-list me-1"></i> Voir les commandes
+    </a>
+    <a href="{{ path('app_commande_export') }}" class="btn btn-outline-secondary me-2">
+        <i class="fas fa-file-csv me-1"></i> Exporter commandes CSV
+    </a>
+    <a href="{{ path('admin_produit_export') }}" class="btn btn-outline-secondary me-2">
+        <i class="fas fa-file-csv me-1"></i> Exporter produits CSV
+    </a>
+    <a href="{{ path('admin_produit_add') }}" class="btn btn-primary admin-btn-primary">
         <i class="fas fa-plus me-1"></i> Ajouter un produit
-    </button>
+    </a>
 {% endblock %}
 
 {% block content %}
-    <div class="admin-card">
-        <div class="admin-card-header d-flex justify-content-between align-items-center">
-            <span>Produits & services</span>
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="adminSearch" class="search-input" placeholder="Rechercher...">
-            </div>
+<div class="admin-card">
+    <div class="admin-card-header">Produits & services</div>
+    <div class="admin-card-body p-0">
+        <div class="p-3 border-bottom">
+            <form method="get" action="{{ path('admin_marketplace') }}" class="row g-2 align-items-center">
+                <div class="col-md-4">
+                    <input
+                        type="text"
+                        name="q"
+                        class="form-control"
+                        placeholder="Rechercher un produit..."
+                        value="{{ searchTerm ?? '' }}"
+                    >
+                </div>
+                <div class="col-md-4">
+                    <select name="sort" class="form-select">
+                        <option value="">Tri par défaut</option>
+                        <option value="price_asc" {{ sort == 'price_asc' ? 'selected' : '' }}>Prix croissant</option>
+                        <option value="price_desc" {{ sort == 'price_desc' ? 'selected' : '' }}>Prix décroissant</option>
+                        <option value="name_asc" {{ sort == 'name_asc' ? 'selected' : '' }}>Nom A → Z</option>
+                        <option value="name_desc" {{ sort == 'name_desc' ? 'selected' : '' }}>Nom Z → A</option>
+                    </select>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-filter me-1"></i> Filtrer
+                    </button>
+                    <a href="{{ path('admin_marketplace') }}" class="btn btn-outline-secondary">
+                        Réinitialiser
+                    </a>
+                </div>
+            </form>
         </div>
-        <div class="admin-card-body p-0">
-            <div class="table-responsive">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Produit / Service</th>
-                            <th>Catégorie</th>
-                            <th>Prix</th>
-                            <th>Statut</th>
-                            <th width="120"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="5">
-                                <div class="admin-empty py-4">
-                                    <i class="fas fa-shopping-bag"></i>
-                                    <p>Aucun produit ou service pour le moment.</p>
-                                    <button type="button" class="btn btn-primary admin-btn-primary">Ajouter un produit</button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                <tr>
+                    <th>Produit / Service</th>
+                    <th>Description</th>
+                    <th>Prix</th>
+                    <th>Stock</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for produit in produits %}
+                    <tr>
+                        <td>{{ produit.nom }}</td>
+                        <td>{{ produit.description }}</td>
+                        <td>{{ produit.prix }} DT</td>
+                        <td>{{ produit.stock }}</td>
+                        <td class="d-flex gap-1">
+                            <a href="{{ path('admin_produit_edit', {id: produit.id}) }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="post" action="{{ path('admin_produit_delete', {id: produit.id}) }}" style="display:inline-block" onsubmit="return confirm('Supprimer ce produit ?')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_admin_produit' ~ produit.id) }}">
+                                <button class="btn btn-sm btn-danger" type="submit">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4">
+                            Aucun produit ou service pour le moment.
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
 {% endblock %}
 
 {% block javascripts %}

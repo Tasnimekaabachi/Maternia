@@ -12,37 +12,84 @@
 {% endblock %}
 
 {% block content %}
+
     <div class="admin-stats">
         <div class="admin-stat">
-            <div class="admin-stat-value">0</div>
-            <div class="admin-stat-label">Suivis grossesse actifs</div>
-        </div>
-        <div class="admin-stat">
-            <div class="admin-stat-value">0</div>
+            <div class="admin-stat-value">{{ nbProduits }}</div>
             <div class="admin-stat-label">Produits marketplace</div>
         </div>
+
         <div class="admin-stat">
             <div class="admin-stat-value">{{ eventCount }}</div>
-            <div class="admin-stat-label">Événements à venir</div>
+            <div class="admin-stat-label">Événements</div>
         </div>
-        <a href="{{ path('app_admin_consultation_creneau_index') }}" class="admin-stat admin-stat-link text-decoration-none">
-            <div class="admin-stat-value">{{ creneaux_ce_mois|default(0) }}</div>
-            <div class="admin-stat-label">Créneaux ce mois</div>
-        </a>
+
         <div class="admin-stat">
-            <div class="admin-stat-value">0</div>
-            <div class="admin-stat-label">Profils bébé</div>
+            <div class="admin-stat-value">
+                {{ nbCommandesAttente + nbCommandesValidees + nbCommandesAnnulees }}
+            </div>
+            <div class="admin-stat-label">Commandes totales</div>
+        </div>
+
+        <div class="admin-stat">
+            <div class="admin-stat-value">{{ nbCommandesValidees }}</div>
+            <div class="admin-stat-label">Commandes validées</div>
+        </div>
+
+        <div class="admin-stat">
+            <div class="admin-stat-value">{{ nbCommandesAttente }}</div>
+            <div class="admin-stat-label">En attente</div>
+        </div>
+
+        <div class="admin-stat">
+            <div class="admin-stat-value">
+                {{ chiffreAffaires|number_format(2, ',', ' ') }} TND
+            </div>
+            <div class="admin-stat-label">Chiffre d'affaires</div>
         </div>
     </div>
 
+    {# ===== Top Products Stats Grid ===== #}
+    <div class="mb-2">
+        <h6 class="text-muted small text-uppercase fw-bold mb-3 ms-1">
+            <i class="fas fa-chart-line me-2 text-primary"></i>Produits les plus commandés
+        </h6>
+        <div class="admin-stats">
+            {% if topProduits is not empty %}
+                {% for row in topProduits %}
+                    <div class="admin-stat">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div class="admin-stat-value" style="font-size: 1.5rem;">{{ row.nb }}</div>
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                <i class="fas fa-box-open text-primary small"></i>
+                            </div>
+                        </div>
+                        <div class="admin-stat-label text-dark fw-bold text-truncate" title="{{ row.produit }}">
+                            {{ row.produit }}
+                        </div>
+                        <div class="text-muted small">Ventes totales</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="admin-card w-100 p-4 text-center text-muted">
+                    <i class="fas fa-chart-bar mb-2 fa-2x opacity-25"></i>
+                    <p class="mb-0">Aucune commande validée pour le moment.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# ===== Recent Activity Card ===== #}
     <div class="admin-card">
         <div class="admin-card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
             <span>Activité récente</span>
+
             <div class="d-flex gap-2">
-                <a href="{{ path('app_admin_consultation_creneau_index') }}" class="btn btn-sm btn-outline-primary">Créneaux</a>
-                <a href="{{ path('app_event_index') }}" class="btn btn-sm btn-outline-secondary">Événements</a>
+                <a href="{{ path('app_event_index') }}"
+                   class="btn btn-sm btn-outline-secondary">Tous les événements</a>
             </div>
         </div>
+
         <div class="admin-card-body p-0">
             {% if recent_activity|default([])|length > 0 %}
                 <div class="table-responsive">
@@ -51,7 +98,7 @@
                             <tr>
                                 <th class="ps-4 border-0 small text-uppercase text-muted fw-bold" style="width: 50px;">Type</th>
                                 <th class="border-0 small text-uppercase text-muted fw-bold">Détails</th>
-                                <th class="border-0 small text-uppercase text-muted fw-bold">Date de l'événement</th>
+                                <th class="border-0 small text-uppercase text-muted fw-bold">Date</th>
                                 <th class="border-0 text-end pe-4 small text-uppercase text-muted fw-bold">Action</th>
                             </tr>
                         </thead>
@@ -60,25 +107,30 @@
                                 <tr>
                                     <td class="ps-4">
                                         <div class="d-flex align-items-center gap-2">
-                                            <div class="activity-icon-sq bg-light border rounded d-flex align-items-center justify-content-center" 
-                                                 title="{{ item.badge_text }}" style="width: 32px; height: 32px; min-width: 32px;">
+                                            <div class="activity-icon-sq bg-light border rounded d-flex align-items-center justify-content-center"
+                                                 style="width: 32px; height: 32px;">
                                                 <i class="fas {{ item.icon }} text-primary small"></i>
                                             </div>
-                                            <span class="badge {{ item.badge_class }} rounded-pill small fw-medium" style="font-size: 0.7rem;">
+
+                                            <span class="badge {{ item.badge_class }} rounded-pill small fw-medium">
                                                 {{ item.badge_text }}
                                             </span>
                                         </div>
                                     </td>
+
                                     <td>
                                         <div class="fw-bold text-dark">{{ item.title }}</div>
                                         <div class="text-muted small">{{ item.context }}</div>
                                     </td>
-                                    <td>
-                                        <div class="small text-muted">
-                                            <i class="far fa-calendar-alt me-1"></i>
+
+                                    <td class="small text-muted">
+                                        {% if item.type == 'product' or item.type == 'commande' %}
+                                            Récemment
+                                        {% else %}
                                             {{ item.date|date('d/m/Y') }} à {{ item.date|date('H:i') }}
-                                        </div>
+                                        {% endif %}
                                     </td>
+
                                     <td class="text-end pe-4">
                                         <a href="{{ item.url }}" class="btn btn-sm btn-pink">Voir</a>
                                     </td>
@@ -95,18 +147,23 @@
             {% endif %}
         </div>
     </div>
-    
+
     <style>
         .bg-pink-light { background-color: #fce7f3; color: #be185d; }
         .bg-info-light { background-color: #e0f2fe; color: #0369a1; }
+        .bg-warning-light { background-color: #fef3c7; color: #92400e; }
+        .bg-success-light { background-color: #dcfce7; color: #15803d; }
+
         .btn-pink {
             background-color: #ec4899;
             color: white;
             border: none;
         }
+
         .btn-pink:hover {
             background-color: #be185d;
             color: white;
         }
     </style>
+
 {% endblock %}
