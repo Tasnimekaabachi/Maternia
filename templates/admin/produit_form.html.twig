@@ -1,0 +1,32 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Produit{% endblock %}
+{% block page_title %}Ajouter / Modifier un produit{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
+        <span>/</span>
+        <a href="{{ path('admin_marketplace') }}">Marketplace</a>
+        <span>/</span>
+        <span>Produit</span>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="admin-card">
+        <div class="admin-card-header">Formulaire produit</div>
+        <div class="admin-card-body">
+            {{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
+                {{ form_errors(form) }}
+                {{ form_row(form.nom) }}
+                {{ form_row(form.description) }}
+                {{ form_row(form.prix) }}
+                {{ form_row(form.stock) }}
+
+                <button class="btn btn-primary mt-3">Enregistrer</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}
+

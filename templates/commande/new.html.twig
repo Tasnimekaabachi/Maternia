@@ -1,0 +1,29 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Nouvelle commande{% endblock %}
+{% block page_title %}Nouvelle commande{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
+        <span>/</span>
+        <a href="{{ path('app_commande_index') }}">Commandes</a>
+        <span>/</span>
+        <span>Nouvelle commande</span>
+    </div>
+{% endblock %}
+
+{% block header_actions %}
+    <a href="{{ path('app_commande_index') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+    </a>
+{% endblock %}
+
+{% block content %}
+    <div class="admin-card">
+        <div class="admin-card-header">Créer une commande</div>
+        <div class="admin-card-body">
+            {{ include('commande/_form.html.twig') }}
+        </div>
+    </div>
+{% endblock %}

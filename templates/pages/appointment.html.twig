@@ -22,42 +22,49 @@
                         <h4 class="text-primary mb-4 border-bottom border-primary border-2 d-inline-block p-2 title-border-radius">Formulaire de rendez-vous</h4>
                         <p class="text-muted mb-4">Remplissez le formulaire ci-dessous pour demander un rendez-vous. Nous vous recontacterons pour confirmer la date et l’heure.</p>
 
-                        <form action="#" method="post" class="needs-validation" novalidate>
+                        {{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label for="nom" class="form-label">Nom <span class="text-primary">*</span></label>
-                                    <input type="text" class="form-control form-control-lg" id="nom" name="nom" required placeholder="Votre nom">
+                                    {{ form_row(form.nom, {
+                                        label: 'Nom',
+                                        row_attr: { class: 'mb-3' }
+                                    }) }}
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="prenom" class="form-label">Prénom <span class="text-primary">*</span></label>
-                                    <input type="text" class="form-control form-control-lg" id="prenom" name="prenom" required placeholder="Votre prénom">
+                                    {{ form_row(form.prenom, {
+                                        label: 'Prénom',
+                                        row_attr: { class: 'mb-3' }
+                                    }) }}
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="email" class="form-label">Email <span class="text-primary">*</span></label>
-                                    <input type="email" class="form-control form-control-lg" id="email" name="email" required placeholder="exemple@email.fr">
+                                    {{ form_row(form.email, {
+                                        label: 'Email',
+                                        row_attr: { class: 'mb-3' }
+                                    }) }}
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="telephone" class="form-label">Téléphone <span class="text-primary">*</span></label>
-                                    <input type="tel" class="form-control form-control-lg" id="telephone" name="telephone" required placeholder="06 12 34 56 78">
+                                    {{ form_row(form.telephone, {
+                                        label: 'Téléphone',
+                                        row_attr: { class: 'mb-3' }
+                                    }) }}
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="date_souhaitee" class="form-label">Date souhaitée</label>
-                                    <input type="date" class="form-control form-control-lg" id="date_souhaitee" name="date_souhaitee">
+                                    {{ form_row(form.dateSouhaitee, {
+                                        label: 'Date souhaitée',
+                                        row_attr: { class: 'mb-3' }
+                                    }) }}
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="type_consultation" class="form-label">Type de consultation</label>
-                                    <select class="form-select form-select-lg" id="type_consultation" name="type_consultation">
-                                        <option value="">Choisir...</option>
-                                        <option value="suivi_grossesse">Suivi de grossesse</option>
-                                        <option value="consultation_postnatale">Consultation postnatale</option>
-                                        <option value="allaitement">Conseil allaitement</option>
-                                        <option value="bilan">Bilan</option>
-                                        <option value="autre">Autre</option>
-                                    </select>
+                                    {{ form_row(form.typeConsultation, {
+                                        label: 'Type de consultation',
+                                        row_attr: { class: 'mb-3' }
+                                    }) }}
                                 </div>
                                 <div class="col-12">
-                                    <label for="message" class="form-label">Message</label>
-                                    <textarea class="form-control form-control-lg" id="message" name="message" rows="4" placeholder="Précisez si besoin le motif de votre rendez-vous ou vos disponibilités..."></textarea>
+                                    {{ form_row(form.message, {
+                                        label: 'Message',
+                                        row_attr: { class: 'mb-3' }
+                                    }) }}
                                 </div>
                                 <div class="col-12 mt-4">
                                     <button type="submit" class="btn btn-primary px-5 py-3 btn-border-radius">
@@ -65,7 +72,7 @@
                                     </button>
                                 </div>
                             </div>
-                        </form>
+                        {{ form_end(form) }}
                     </div>
                 </div>
             </div>
