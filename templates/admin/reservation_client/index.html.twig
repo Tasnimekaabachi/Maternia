@@ -1,0 +1,185 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Gestion des Rendez-vous{% endblock %}
+{% block page_title %}Rendez-vous clients{% endblock %}
+
+{% block stylesheets %}
+<style>
+    :root {
+        --primary-pink: #FF8AAB;
+        --soft-pink: #FFD1DC;
+        --deep-pink: #FF5C8D;
+        --gradient-feminine: linear-gradient(135deg, #FF8AAB 0%, #E1BEE7 100%);
+        --gradient-soft: linear-gradient(135deg, #FFF5F5 0%, #FCE4EC 100%);
+    }
+
+    .index-container { background: var(--gradient-soft); min-height: 100vh; padding: 2rem 0; }
+    
+    .stat-card-premium {
+        background: white; border-radius: 20px; padding: 1.5rem; text-align: center;
+        border: 1px solid #FCE4EC; box-shadow: 0 10px 25px rgba(255, 138, 171, 0.05);
+        position: relative; overflow: hidden; transition: 0.3s;
+    }
+    .stat-card-premium .label { font-size: 0.75rem; font-weight: 700; color: #A0A0A0; text-transform: uppercase; }
+    .stat-card-premium .value { font-size: 1.8rem; font-weight: 800; color: #4A4A4A; }
+
+    .admin-card { background: white; border-radius: 24px; border: 1px solid #FCE4EC; overflow: hidden; box-shadow: 0 15px 35px rgba(255, 138, 171, 0.05); }
+    .admin-card-header { padding: 1.25rem 2rem; border-bottom: 1px solid #FCE4EC; display: flex; justify-content: space-between; align-items: center; }
+
+    .premium-table { width: 100%; }
+    .premium-table th { background: #FDF2F8; padding: 1rem; font-size: 0.7rem; color: #db2777; text-transform: uppercase; }
+    .premium-table td { padding: 1rem; border-bottom: 1px solid #F3E5F5; font-size: 0.85rem; }
+
+    .badge-status { padding: 4px 12px; border-radius: 50px; font-weight: 700; font-size: 0.7rem; }
+    .status-confirmed { background: #E8F5E9; color: #2E7D32; }
+    .status-pending { background: #FFF3E0; color: #E65100; }
+
+    .btn-feminine { background: var(--gradient-feminine); color: white; border-radius: 50px; padding: 0.6rem 1.5rem; font-weight: 700; border: none; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% endblock %}
+
+{% block header_actions %}
+    <a href="{{ path('app_admin_reservation_client_new') }}" class="btn btn-feminine">
+        <i class="fas fa-plus me-2"></i> Nouveau Rendez-vous
+    </a>
+{% endblock %}
+
+{% block content %}
+<div class="index-container">
+    <div class="container">
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card-premium">
+                    <div class="label">Total RDV</div>
+                    <div class="value">{{ stats.total }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-premium">
+                    <div class="label">Confirmés</div>
+                    <div class="value text-success">{{ stats.confirmed }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-premium">
+                    <div class="label">En attente</div>
+                    <div class="value text-warning">{{ stats.pending }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-premium">
+                    <div class="label">Bébés / Mamans</div>
+                    <div class="value">{{ stats.bebe }} / {{ stats.maman }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h5 class="mb-0 fw-bold">Journal des réservations</h5>
+                <div class="d-flex gap-2">
+                    <input type="text" id="searchRdv" class="form-control form-control-sm rounded-pill px-3" placeholder="Rechercher...">
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table premium-table">
+                    <thead>
+                        <tr>
+                            <th>Référence</th>
+                            <th>Patient</th>
+                            <th>Contact</th>
+                            <th>Type</th>
+                            <th>Détails</th>
+                            <th>Statut</th>
+                            <th>Date RDV</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rdvBody">
+                        {% for r in reservations %}
+                        <tr class="rdv-row">
+                            <td><span class="fw-bold text-primary">#{{ r.reference }}</span></td>
+                            <td>
+                                <div class="fw-bold">{{ r.nomClient }} {{ r.prenomClient }}</div>
+                                <small class="text-muted text-uppercase" style="font-size: 0.65rem;">{{ r.typePatient }}</small>
+                            </td>
+                            <td>
+                                <div class="small"><i class="fas fa-envelope me-1 opacity-50"></i> {{ r.emailClient }}</div>
+                                <div class="small"><i class="fas fa-phone me-1 opacity-50"></i> {{ r.telephoneClient }}</div>
+                            </td>
+                            <td>
+                                {% if r.typePatient == 'BEBE' %}
+                                    <span class="badge bg-info text-white rounded-pill">👶 Bébé</span>
+                                {% else %}
+                                    <span class="badge bg-secondary text-white rounded-pill">🤰 Maman</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if r.moisGrossesse %}
+                                    <small>Grossesse: {{ r.moisGrossesse }} mois</small>
+                                {% elseif r.dateNaissanceBebe %}
+                                    <small>Né le: {{ r.dateNaissanceBebe|date('d/m/Y') }}</small>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge-status {{ r.statutReservation == 'CONFIRME' ? 'status-confirmed' : 'status-pending' }}">
+                                    {{ r.statutReservation }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="fw-bold">{{ r.dateReservation|date('d/m/Y') }}</div>
+                                <small class="text-muted">{{ r.dateReservation|date('H:i') }}</small>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <a href="{{ path('app_admin_reservation_client_edit', {id: r.id}) }}" class="btn btn-sm btn-outline-warning rounded-circle me-1"><i class="fas fa-pen"></i></a>
+                                    <button class="btn btn-sm btn-outline-danger rounded-circle" onclick="deleteRdv('{{ path('app_admin_reservation_client_delete', {id: r.id}) }}', '{{ csrf_token('delete' ~ r.id) }}', this.closest('tr'))">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function deleteRdv(url, token, row) {
+        Swal.fire({
+            title: 'Supprimer ce rendez-vous ?',
+            text: "Cette action est irréversible.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#FF5C8D',
+            confirmButtonText: 'Oui, supprimer'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const formData = new FormData();
+                formData.append('_token', token);
+                fetch(url, { method: 'POST', body: formData, headers: {'X-Requested-With': 'XMLHttpRequest'} })
+                .then(r => r.json()).then(data => {
+                    if (data.success) {
+                        row.remove();
+                        Swal.fire('Supprimé !', '', 'success');
+                    }
+                });
+            }
+        });
+    }
+
+    document.getElementById('searchRdv').addEventListener('keyup', function() {
+        const q = this.value.toLowerCase();
+        document.querySelectorAll('.rdv-row').forEach(row => {
+            row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+        });
+    });
+</script>
+{% endblock %}

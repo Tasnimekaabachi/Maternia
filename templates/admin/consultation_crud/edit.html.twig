@@ -1,93 +1,170 @@
-{% extends 'admin/base.html.twig' %}
+{% block stylesheets %}
+<style>
+    /* RÉCUPÉRATION DES STYLES VIBRANTS DE LA PAGE 'NEW' */
+    :root {
+        --primary-blue: #4A90E2;
+        --light-blue: #87CEEB;
+        --baby-blue: #B0E0E6;
+        --pink: #FF69B4;
+        --soft-pink: #FFB6C1;
+        --lavender: #E6E6FA;
+        --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--pink) 100%);
+    }
 
-{% block title %}Modifier {{ consultation.categorie }}{% endblock %}
-{% block page_title %}Modifier consultation{% endblock %}
+    .glass-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 20px 40px rgba(74, 144, 226, 0.1);
+        overflow: hidden;
+    }
 
-{% block breadcrumb %}
-    <div class="admin-breadcrumb">
-        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
-        <span>/</span>
-        <a href="{{ path('app_admin_consultation_index') }}">Consultations</a>
-        <span>/</span>
-        <span>{{ consultation.categorie }}</span>
-    </div>
-{% endblock %}
+    .admin-card-header {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 1.5rem 2rem;
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
 
-{% block header_actions %}
-    <a href="{{ path('app_admin_consultation_index') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left me-1"></i> Retour
-    </a>
+    .modern-input {
+        border: 2px solid transparent;
+        background: linear-gradient(white, white) padding-box,
+                    linear-gradient(135deg, var(--light-blue), var(--soft-pink)) border-box;
+        border-radius: 15px;
+        padding: 0.8rem 1.2rem;
+        transition: all 0.3s ease;
+    }
+
+    /* RADIO BUTTONS CUSTOM */
+    .target-option {
+        position: relative;
+        border: 2px solid #F3F4F6;
+        background: white;
+        border-radius: 18px;
+        padding: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .target-option:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+
+    .target-option input[type="radio"]:checked + .option-content {
+        background: linear-gradient(135deg, rgba(74, 144, 226, 0.05) 0%, rgba(255, 105, 180, 0.05) 100%);
+        border: 2px solid var(--primary-blue);
+    }
+
+    .target-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin: 0 auto 0.5rem auto;
+    }
+    .target-icon.baby { background: #E3F2FD; }
+    .target-icon.maman { background: #FCE4EC; }
+    .target-icon.both { background: #F3E5F5; }
+
+    .btn-save-modern {
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        font-weight: 700;
+        box-shadow: 0 10px 20px rgba(74, 144, 226, 0.2);
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-    <div class="admin-card">
+    <div class="glass-card mt-4">
         <div class="admin-card-header">
-            Modifier : {{ consultation.categorie }}
+            <i class="fas fa-edit me-2"></i> Modifier : {{ consultation.categorie }}
         </div>
-        <div class="admin-card-body">
+        <div class="p-4">
             {{ form_start(form) }}
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        {{ form_row(form.categorie) }}
+                {# FIX: setRendered pour éviter override #}
+                {% do form.pour.setRendered() %}
+
+                <div class="row g-4">
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label fw-bold">Nom de la Catégorie</label>
+                        {{ form_widget(form.categorie, {'attr': {'class': 'form-control modern-input'}}) }}
                     </div>
-                    <div class="col-md-6 mb-3">
-                        {{ form_row(form.pour) }}
+
+                    <!-- PUBLIC CIBLE CUSTOM (MATCHING NEW UI) -->
+                    <div class="col-md-12 mb-4">
+                        <label class="form-label fw-bold d-block mb-3 text-center">Public Cible</label>
+                        <div class="row g-3">
+                            {% for choice in form.pour.vars.choices %}
+                            <div class="col-md-4">
+                                <label class="target-option d-block">
+                                    <input type="radio" 
+                                           name="{{ form.pour.vars.full_name }}" 
+                                           value="{{ choice.value }}"
+                                           {{ form.pour.vars.value == choice.value ? 'checked' : '' }}
+                                           class="d-none">
+                                    <div class="option-content p-3 rounded-3">
+                                        <div class="target-icon {% if choice.value == 'BEBE' %}baby{% elseif choice.value == 'MAMAN' %}maman{% else %}both{% endif %}">
+                                            {% if choice.value == 'BEBE' %}👶{% elseif choice.value == 'MAMAN' %}🤰{% else %}👨‍👩‍👧{% endif %}
+                                        </div>
+                                        <div class="fw-bold small">
+                                            {% if choice.value == 'BEBE' %}Bébé{% elseif choice.value == 'MAMAN' %}Maman{% else %}Les Deux{% endif %}
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
                 
-                <div class="mb-3">
-                    {{ form_row(form.description) }}
+                <div class="row g-4 mt-2">
+                    <div class="col-md-12">
+                         <label class="form-label fw-bold">Description</label>
+                         {{ form_widget(form.description, {'attr': {'class': 'form-control modern-input', 'rows': 4}}) }}
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Fichier Image</label>
+                        {{ form_widget(form.image, {'attr': {'class': 'form-control modern-input', 'placeholder': 'img.jpg'}}) }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Icône FontAwesome</label>
+                        {{ form_widget(form.icon, {'attr': {'class': 'form-control modern-input'}}) }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Position (Ordre)</label>
+                        {{ form_widget(form.ordreAffichage, {'attr': {'class': 'form-control modern-input'}}) }}
+                    </div>
                 </div>
-                
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        {{ form_row(form.image) }}
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        {{ form_row(form.icon) }}
-                        <small class="form-text text-muted">Ex: fas fa-heart, fas fa-baby, etc.</small>
-                    </div>
-                    <div class="col-md-2 mb-3">
-                        {{ form_row(form.ordreAffichage) }}
-                    </div>
-                    <div class="col-md-2 mb-3">
-                        <label class="form-label fw-bold mb-3 d-flex align-items-center">
-                            <i class="fas fa-toggle-on text-success me-2"></i>
-                            Statut
-                        </label>
+
+                <div class="d-flex align-items-center gap-4 mt-5 p-3 rounded-3" style="background: #fafbfc;">
+                    <div class="form-check form-switch p-0 d-flex align-items-center gap-3">
+                        <label class="fw-bold m-0">Statut de visibilité</label>
                         <div class="status-section">
                             {{ form_widget(form.statut, {
                                 'label': false,
                                 'attr': {'class': 'status-checkbox', 'id': 'consultation_statut_edit'}
                             }) }}
-                            
-                            <div class="status-toggle-group">
-                                <label class="status-toggle-item toggle-active" for="consultation_statut_edit">
-                                    <i class="fas fa-check-circle"></i>
-                                    ACTIF
-                                </label>
-                                <label class="status-toggle-item toggle-inactive" for="consultation_statut_edit">
-                                    <i class="fas fa-times-circle"></i>
-                                    INACTIF
-                                </label>
-                            </div>
-                            
-                            <div class="status-feedback-container ps-2">
-                                <div class="status-pulse"></div>
-                                <small class="text-muted">
-                                    <span class="status-text-active">Visible pour les utilisateurs</span>
-                                    <span class="status-text-inactive">Enregistré comme brouillon</span>
-                                </small>
+                            <div class="status-toggle-group" style="scale: 0.85;">
+                                <label class="status-toggle-item toggle-active" for="consultation_statut_edit">ACTIF</label>
+                                <label class="status-toggle-item toggle-inactive" for="consultation_statut_edit">OFF</label>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="mt-4">
-                    <button type="submit" class="btn btn-primary admin-btn-primary">
-                        <i class="fas fa-save me-1"></i> Mettre à jour
+                <div class="mt-5 pt-4 border-top">
+                    <button type="submit" class="btn btn-save-modern">
+                        <i class="fas fa-magic me-2"></i> Enregistrer les modifications
                     </button>
-                    <a href="{{ path('app_admin_consultation_index') }}" class="btn btn-secondary">
+                    <a href="{{ path('app_admin_consultation_index') }}" class="btn btn-light ms-3" style="border-radius: 50px;">
                         Annuler
                     </a>
                 </div>

@@ -34,15 +34,13 @@ class ConsultationType extends AbstractType
                 ]
             ])
             ->add('pour', ChoiceType::class, [
-                'label' => 'Public cible *',  // <-- CHANGÉ ICI
+                'label' => 'Public cible *',
                 'required' => true,
                 'choices' => [
                     '👶 Bébé' => 'BEBE',
                     '🤰 Maman' => 'MAMAN',
                     '👨‍👩‍👧 Les deux' => 'LES_DEUX'
-                ],
-                'attr' => ['class' => 'd-none'],  // <-- Caché
-                'label_attr' => ['class' => 'd-none'] 
+                ]
             ])
             ->add('image', TextType::class, [
                 'label' => 'Image (nom du fichier)',
