@@ -356,7 +356,9 @@
         <div class="pregnancy-grid" id="pregnancyGrid">
             {% for g in grossesses %}
                 {% set bebesData = g.bebes is iterable ? g.bebes : [] %}
-                {% set isRisk = g.statutGrossesse == 'aRisque' %}
+                {% set trimestre = g.trimestreActuel ?? null %}
+                {# high-risk si statut à risque, ou 3e trimestre uniquement si la grossesse n'est pas encore terminée #}
+                {% set isRisk = g.statutGrossesse == 'aRisque' or (trimestre == 3 and g.statutGrossesse != 'terminee') %}
                 <div class="pregnancy-card {% if g.statutGrossesse == 'terminee' %}completed{% endif %} {% if isRisk %}high-risk{% endif %}"
                      data-statut="{{ g.statutGrossesse }}"
                      data-created="{{ g.dateCreation ? g.dateCreation|date('U') : 0 }}"

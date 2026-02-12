@@ -6,6 +6,7 @@ use App\Entity\Maman;
 use App\Form\MamanType;
 use App\Repository\GrosesseRepository;
 use App\Service\ConseilsSuiviService;
+use App\Service\MailerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,7 +20,7 @@ final class MamanController extends AbstractController
      * URL unifiée : /suivi_grossesse (création) et /suivi_grossesse/{id} (voir une maman).
      */
     #[Route('/suivi_grossesse', name: 'app_suivi_grossesse_creer', methods: ['GET', 'POST'])]
-    public function suiviGrossesseCreer(Request $request, EntityManagerInterface $entityManager): Response
+    public function suiviGrossesseCreer(Request $request, EntityManagerInterface $entityManager, MailerService $mailerService): Response
     {
         $maman = new Maman();
         $form = $this->createForm(MamanType::class, $maman);
@@ -27,6 +28,14 @@ final class MamanController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($maman);
             $entityManager->flush();
+
+            // Envoi de l'email de bienvenue si une adresse est fournie
+            $emailSent = $mailerService->sendWelcomeEmail($maman);
+            if ($emailSent) {
+                $this->addFlash('success', 'Votre profil a été créé et un email de confirmation a été envoyé.');
+            } else {
+                $this->addFlash('success', 'Votre profil a été créé. Ajoutez une adresse email valide pour recevoir une confirmation.');
+            }
 
             // Étape 2 : enchaîner directement sur le formulaire grossesse
             return $this->redirectToRoute('app_maman_grossesse_edit', ['id' => $maman->getId()], Response::HTTP_SEE_OTHER);

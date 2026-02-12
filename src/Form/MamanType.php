@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 class MamanType extends AbstractType
@@ -28,9 +29,20 @@ class MamanType extends AbstractType
                 ],
                 'help' => '8 chiffres, commençant par 2, 4, 5 ou 9 (ex. 9 12 34 56 78)',
             ])
+            // Champ email en TextType pour éviter la validation HTML5.
+            ->add('email', TextType::class, [
+                'label' => 'Adresse email',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                ],
+                // validation faite uniquement dans l'entité Maman (Assert\Email) pour éviter le doublon de messages
+                'help' => 'Un email de confirmation sera envoyé à cette adresse.',
+            ])
             ->add('groupeSanguin', ChoiceType::class, [
                 'label' => 'Groupe sanguin',
                 'attr' => ['class' => 'form-select'],
+                'placeholder' => '-- Choisissez votre groupe sanguin --',
                 'choices' => [
                     'A+' => 'A+',
                     'A-' => 'A-',
@@ -40,6 +52,11 @@ class MamanType extends AbstractType
                     'AB-' => 'AB-',
                     'O+' => 'O+',
                     'O-' => 'O-',
+                ],
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez sélectionner votre groupe sanguin.',
+                    ]),
                 ],
             ])
             ->add('taille', NumberType::class, [
@@ -105,10 +122,20 @@ class MamanType extends AbstractType
                     'Modéré (3-4 fois/semaine)' => 'Modéré',
                     'Actif (5+ fois/semaine)' => 'Actif',
                 ],
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez sélectionner votre niveau d\'activité physique.',
+                    ]),
+                ],
             ])
             ->add('habitudesAlimentaires', TextType::class, [
                 'label' => 'Habitudes alimentaires (régime, préférences)',
                 'attr' => ['class' => 'form-control', 'placeholder' => 'Ex. végétarienne, sans gluten…'],
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez indiquer vos habitudes alimentaires.',
+                    ]),
+                ],
             ])
         ;
     }

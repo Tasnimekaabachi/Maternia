@@ -10,13 +10,19 @@
 {% form_theme form _self %}
 {% endif %}
 {% block form_row %}
+    {% set hasErrors = form_errors(form) is not empty %}
+    {% set classes = 'form-control form-control-lg' ~ (hasErrors ? ' is-invalid' : '') %}
     <div class="mb-3">
         {{ form_label(form) }}
-        {{ form_widget(form, {'attr': {'class': 'form-control form-control-lg'}}) }}
+        {{ form_widget(form, {'attr': {'class': classes}}) }}
         {% if form.vars.help is defined and form.vars.help %}
             <div class="form-text">{{ form.vars.help }}</div>
         {% endif %}
-        {{ form_errors(form) }}
+        {% if hasErrors %}
+            <div class="invalid-feedback d-block">
+                {{ form_errors(form) }}
+            </div>
+        {% endif %}
     </div>
 {% endblock %}
 {% block checkbox_row %}
@@ -110,6 +116,29 @@
                                 </div>
 
                                 <hr class="my-3">
+
+                                {# Bandeau d'information selon le trimestre de grossesse #}
+                                {% set trimestre = grossesse.trimestreActuel ?? null %}
+                                {% if trimestre %}
+                                    <div class="mb-3">
+                                        {% if trimestre == 1 %}
+                                            <div class="alert alert-success border-success border-2 mb-0">
+                                                <strong>🟢 Vous êtes dans le 1er trimestre de grossesse.</strong><br>
+                                                <span class="small text-muted">Cette phase correspond au début du développement du bébé.</span>
+                                            </div>
+                                        {% elseif trimestre == 2 %}
+                                            <div class="alert alert-warning border-warning border-2 mb-0">
+                                                <strong>🟠 Début du 2ème trimestre.</strong><br>
+                                                <span class="small text-muted">La grossesse évolue positivement. Pensez à planifier votre consultation de suivi.</span>
+                                            </div>
+                                        {% else %}
+                                            <div class="alert alert-danger border-danger border-2 mb-0">
+                                                <strong>🔴 Bienvenue au 3ème trimestre.</strong><br>
+                                                <span class="small text-muted">Préparez votre suivi final et les examens avant l’accouchement.</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
 
                                 {% if grossesse.statutGrossesse != 'terminee' %}
                                     <div class="row g-3">
@@ -316,7 +345,7 @@
                 <div class="row justify-content-center">
                     <div class="col-lg-9">
                         <div class="border border-primary rounded-3 bg-light p-4 p-lg-5 shadow-sm">
-                            {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+                            {{ form_start(form, {'attr': {'class': 'needs-validation'}, 'attr': {'novalidate': 'novalidate'}}) }}
                             <div class="mb-4">
                                 <h5 class="text-primary mb-3">Contact & santé</h5>
                                 <div class="row g-3">
@@ -328,6 +357,9 @@
                                                 {{ form_widget(form.numeroUrgence, {'attr': {'class': 'form-control', 'placeholder': '9 12 34 56 78'}}) }}
                                             </div>
                                             {{ form_errors(form.numeroUrgence) }}
+                                        </div>
+                                        <div class="mb-3">
+                                            {{ form_row(form.email) }}
                                         </div>
                                     </div>
                                     <div class="col-md-6">{{ form_row(form.groupeSanguin) }}</div>
@@ -427,7 +459,7 @@
                             <h4 class="text-primary mb-4 border-bottom border-primary border-2 d-inline-block p-2 title-border-radius">Vos informations</h4>
                             <p class="text-muted mb-4">Tous les champs marqués d'un <span class="text-primary">*</span> sont obligatoires. Les données sont enregistrées de manière confidentielle.</p>
                             <div class="alert alert-info py-2 mb-4 small"><i class="fas fa-info-circle me-2"></i><strong>Déjà un profil ?</strong> Après enregistrement, vous recevrez un lien personnel (ex. <code>/suivi_grossesse/1</code>). Conservez-le pour consulter ou modifier vos informations à tout moment.</div>
-                            {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+                            {{ form_start(form, {'attr': {'class': 'needs-validation'}, 'attr': {'novalidate': 'novalidate'}}) }}
                             <div class="mb-4">
                                 <h5 class="text-primary mb-3">Contact & santé</h5>
                                 <div class="row g-3">
@@ -440,6 +472,9 @@
                                             </div>
                                             <div class="form-text">8 chiffres, commençant par 2, 4, 5 ou 9</div>
                                             {{ form_errors(form.numeroUrgence) }}
+                                        </div>
+                                        <div class="mb-3">
+                                            {{ form_row(form.email) }}
                                         </div>
                                     </div>
                                     <div class="col-md-6">{{ form_row(form.groupeSanguin) }}</div>

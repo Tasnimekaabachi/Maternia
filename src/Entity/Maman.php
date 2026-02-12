@@ -27,6 +27,10 @@ class Maman
     )]
     private ?string $numeroUrgence = null;
 
+    #[ORM\Column(length: 180, nullable: true)]
+    #[Assert\Email(message: 'L\'adresse email "{{ value }}" n\'est pas valide.')]
+    private ?string $email = null;
+
     #[ORM\Column(length: 20)]
     private ?string $groupeSanguin = null;
 
@@ -44,7 +48,7 @@ class Maman
 
     /** Taille en cm. Plage réaliste 130–220 (OMS). */
     #[ORM\Column]
-    #[Assert\NotNull]
+    #[Assert\NotNull(message: 'La taille est obligatoire.')]
     #[Assert\Range(min: 130, max: 220, notInRangeMessage: 'La taille doit être entre {{ min }} et {{ max }} cm.')]
     private ?float $taille = null;
 
@@ -87,6 +91,17 @@ class Maman
             }
         }
         $this->numeroUrgence = $digits !== '' ? $digits : $numeroUrgence;
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): static
+    {
+        $this->email = $email;
         return $this;
     }
 
@@ -143,7 +158,7 @@ class Maman
         return $this->taille;
     }
 
-    public function setTaille(float $taille): static
+    public function setTaille(?float $taille): static
     {
         $this->taille = $taille;
 
