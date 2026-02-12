@@ -2,10 +2,11 @@
 :root {
     --bs-blue: #4a7ba7;
     --bs-pink: #c4918e;
-    --bs-primary: #4a7ba7;
-    --bs-secondary: #c4918e;
-    --bs-primary-light: #6b96bd;
-    --bs-secondary-light: #e8d4d2;
+    /* On utilise maintenant le rose comme couleur principale */
+    --bs-primary: var(--bs-pink);
+    --bs-secondary: var(--bs-blue);
+    --bs-primary-light: #e8d4d2;
+    --bs-secondary-light: #6b96bd;
     --bs-surface: #f8f9fb;
     --bs-border: rgba(74, 123, 167, 0.15);
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);

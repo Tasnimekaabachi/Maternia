@@ -118,11 +118,6 @@ class ConsultationCreneauCrudController extends AbstractController
         $consultationCreneau->setUpdatedAt(new \DateTime());
         $consultationCreneau->setStatutReservation('DISPONIBLE');
 
-        // Dummy dates pour passer la validation de l'objet "prototype"
-        // Ces valeurs ne seront jamais enregistrées car on crée d'autres objets dans la boucle
-        $consultationCreneau->setDateDebut(new \DateTime());
-        $consultationCreneau->setDateFin(new \DateTime());
-
         $form = $this->createForm(ConsultationCreneauType::class, $consultationCreneau, [
             'consultations' => $consultationRepository->findAllOrdered()
         ]);
@@ -188,10 +183,6 @@ class ConsultationCreneauCrudController extends AbstractController
             $entityManager->flush();
             $this->addFlash('success', '✨ ' . $creneauxCrees . ' nouveau(x) créneau(x) ajouté(s) avec succès ! Ils sont maintenant disponibles.');
             return $this->redirectToRoute('app_admin_consultation_creneau_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        if ($form->isSubmitted() && !$form->isValid()) {
-            $this->addFlash('error', '⚠️ Le formulaire contient des erreurs. Veuillez vérifier les champs en rouge.');
         }
 
         return $this->render('admin/consultation_creneau/new.html.twig', [

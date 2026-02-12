@@ -1,0 +1,119 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Babysitting - Gestion des offres{% endblock %}
+
+{% block body %}
+    <!-- Hero Babysitting -->
+    <div class="container-fluid py-5 hero-header wow fadeIn" data-wow-delay="0.1s">
+        <div class="container py-5">
+            <div class="row g-5">
+                <div class="col-lg-7 col-md-12">
+                    <h1 class="mb-3 text-primary">Babysitting</h1>
+                    <h1 class="mb-5 display-1 text-white">Trouver ou proposer une garde d'enfants</h1>
+                    <p class="lead text-white mb-4">
+                        Consultez les offres de babysitters disponibles ou gérez vos demandes directement depuis Maternia.
+                    </p>
+                    <a href="#offres" class="btn btn-primary px-4 py-3 px-md-5 me-3 btn-border-radius">
+                        Voir les offres babysitter
+                    </a>
+                    <a href="{{ path('app_demande_baby_sitter_new') }}" class="btn btn-outline-light px-4 py-3 px-md-5 btn-border-radius">
+                        Faire une demande
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section explication -->
+    <section class="container-fluid py-5 bg-light">
+        <div class="container py-4">
+            <div class="row g-4 align-items-start">
+                <div class="col-lg-6 wow fadeIn" data-wow-delay="0.1s">
+                    <h4 class="text-primary mb-3 border-bottom border-primary border-2 d-inline-block p-2 title-border-radius">
+                        Gestion des offres babysitter
+                    </h4>
+                    <p class="text-muted">
+                        Cette section permet de centraliser la gestion des offres de babysitting : création, consultation,
+                        modification et suppression des offres, avec recherche par ville, tarif et tri par expérience.
+                    </p>
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i>Liste complète des offres disponibles</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i>Recherche par ville et tarif maximum</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i>Tri par tarif ou expérience</li>
+                    </ul>
+                </div>
+                <div class="col-lg-6 wow fadeIn" data-wow-delay="0.2s">
+                    <h4 class="text-primary mb-3 border-bottom border-primary border-2 d-inline-block p-2 title-border-radius">
+                        Demandes des parents
+                    </h4>
+                    <p class="text-muted">
+                        Les parents peuvent déposer une demande de babysitting en sélectionnant une offre existante et
+                        en renseignant leurs coordonnées. Les demandes sont ensuite consultables dans l’espace dédié.
+                    </p>
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i>Formulaire sécurisé avec validations serveur</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i>Suivi du statut des demandes</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i>Association à une offre précise</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Liste des offres disponibles -->
+    <section class="container-fluid py-5" id="offres">
+        <div class="container py-4">
+            <div class="mx-auto text-center mb-5 wow fadeIn" data-wow-delay="0.1s" style="max-width: 600px;">
+                <h4 class="text-primary mb-3 border-bottom border-primary border-2 d-inline-block p-2 title-border-radius">
+                    Offres de babysitting disponibles
+                </h4>
+                <p class="text-muted mb-0">Découvrez les babysitters disponibles et envoyez une demande en quelques clics.</p>
+            </div>
+
+            <div class="row g-4">
+                {% for offre in offre_baby_sitters %}
+                    <div class="col-md-6 col-lg-4 wow fadeIn" data-wow-delay="0.1s">
+                        <div class="border border-primary rounded-3 bg-white h-100 d-flex flex-column p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="mb-0 text-primary">{{ offre.nomBabysitter }}</h5>
+                                <span class="badge bg-secondary">{{ offre.ville }}</span>
+                            </div>
+                            <p class="mb-1 text-muted small">
+                                Expérience : <strong>{{ offre.experience }} ans</strong>
+                            </p>
+                            <p class="mb-1 text-muted small">
+                                Tarif horaire : <strong>{{ offre.tarif|number_format(2, ',', ' ') }} € / h</strong>
+                            </p>
+                            <p class="mb-2 text-muted small">
+                                Disponibilité :
+                                {% if offre.disponibilite %}
+                                    <span class="text-success">Disponible</span>
+                                {% else %}
+                                    <span class="text-danger">Indisponible</span>
+                                {% endif %}
+                            </p>
+                            <p class="mb-3 small flex-grow-1">
+                                {{ offre.description|length > 120 ? offre.description|slice(0, 120) ~ '...' : offre.description }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <a href="{{ path('app_offre_baby_sitter_show', {'id': offre.id}) }}" class="btn btn-outline-primary btn-sm btn-border-radius">
+                                    Détails
+                                </a>
+                                <a href="{{ path('app_demande_baby_sitter_new', {'offre': offre.id}) }}" class="btn btn-primary btn-sm btn-border-radius">
+                                    Commander
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            Aucune offre de babysitting n'est disponible pour le moment.
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endblock %}
+

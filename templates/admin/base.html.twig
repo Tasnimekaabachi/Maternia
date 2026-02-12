@@ -62,6 +62,10 @@
                     <i class="fas fa-baby-carriage"></i>
                     <span>Profil bébé</span>
                 </a>
+                <a href="{{ path('app_demande_baby_sitter_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_demande_baby_sitter_' ? 'active' : '' }}">
+                    <i class="fas fa-user-nurse"></i>
+                    Profil babysitting
+                </a>
             </nav>
 
             <div class="p-3 border-top" style="border-color: rgba(255,255,255,0.1) !important;">

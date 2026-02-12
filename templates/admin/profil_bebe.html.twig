@@ -3,18 +3,6 @@
 {% block title %}Profil bébé{% endblock %}
 {% block page_title %}Profil bébé{% endblock %}
 
-{% block stylesheets %}
-<style>
-    .search-box { position: relative; display: flex; align-items: center; }
-    .search-box i { position: absolute; left: 12px; color: #9ca3af; font-size: 0.85rem; }
-    .search-input {
-        border: 2px solid #e5e7eb; border-radius: 25px; padding: 6px 14px 6px 34px;
-        font-size: 0.85rem; width: 180px; transition: all 0.3s; outline: none; background: #fafbfc;
-    }
-    .search-input:focus { border-color: #FF8AAB; width: 240px; background: white; }
-</style>
-{% endblock %}
-
 {% block breadcrumb %}
     <div class="admin-breadcrumb">
         <a href="{{ path('admin_dashboard') }}">Backoffice</a>
@@ -24,60 +12,264 @@
 {% endblock %}
 
 {% block header_actions %}
-    <button type="button" class="btn btn-primary admin-btn-primary">
-        <i class="fas fa-plus me-1"></i> Ajouter un profil
-    </button>
+    <a href="{{ path('app_offre_baby_sitter_new') }}" class="btn btn-primary admin-btn-primary">
+        <i class="fas fa-plus me-1"></i> Ajouter une offre babysitter
+    </a>
 {% endblock %}
 
 {% block content %}
-    <div class="admin-card">
-        <div class="admin-card-header d-flex justify-content-between align-items-center">
-            <span>Profils bébé</span>
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="adminSearch" class="search-input" placeholder="Rechercher...">
+    <div class="row">
+        <div class="col-lg-9 mb-3">
+            <div class="admin-card">
+                <div class="admin-card-header d-flex justify-content-between align-items-center">
+                    <span>Offres babysitter</span>
+                </div>
+                <div class="admin-card-body">
+                    <form method="get" class="row g-2 mb-3">
+                        <div class="col-md-4">
+                            <input type="text"
+                                   name="ville"
+                                   class="form-control form-control-sm"
+                                   placeholder="Ville"
+                                   value="{{ ville ?? '' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <input type="number"
+                                   name="tarif"
+                                   step="0.01"
+                                   class="form-control form-control-sm"
+                                   placeholder="Tarif max"
+                                   value="{{ tarif ?? '' }}">
+                        </div>
+                        <div class="col-md-4 d-grid">
+                            <button type="submit" class="btn btn-sm btn-primary">
+                                <i class="fas fa-search me-1"></i> Filtrer
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Babysitter</th>
+                                    <th>Expérience</th>
+                                    <th>Ville</th>
+                                    <th>Tarif horaire</th>
+                                    <th>Disponibilité</th>
+                                    <th width="160"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for offre in offre_baby_sitters %}
+                                    <tr>
+                                        <td>{{ offre.nomBabysitter }}</td>
+                                        <td>{{ offre.experience }} ans</td>
+                                        <td>{{ offre.ville }}</td>
+                                        <td>{{ offre.tarif|number_format(2, ',', ' ') }} € / h</td>
+                                        <td>
+                                            {% if offre.disponibilite %}
+                                                <span class="badge bg-success text-white">Disponible</span>
+                                            {% else %}
+                                                <span class="badge bg-danger text-white">Indisponible</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{{ path('app_offre_baby_sitter_show', {'id': offre.id}) }}" class="btn btn-sm btn-outline-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ path('app_offre_baby_sitter_edit', {'id': offre.id}) }}" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="admin-empty py-4 text-center">
+                                                <i class="fas fa-baby mb-2"></i>
+                                                <p class="mb-2">Aucune offre babysitter trouvée.</p>
+                                                <a href="{{ path('app_offre_baby_sitter_new') }}" class="btn btn-primary admin-btn-primary btn-sm">
+                                                    Ajouter une première offre
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="admin-card-body p-0">
-            <div class="table-responsive">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Prénom</th>
-                            <th>Date de naissance</th>
-                            <th>Parent / Responsable</th>
-                            <th>Statut</th>
-                            <th width="120"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="5">
-                                <div class="admin-empty py-4">
-                                    <i class="fas fa-baby"></i>
-                                    <p>Aucun profil bébé pour le moment.</p>
-                                    <button type="button" class="btn btn-primary admin-btn-primary">Ajouter un profil bébé</button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+
+        <div class="col-lg-3">
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <i class="fas fa-chart-pie me-1"></i> Statistiques par ville
+                </div>
+                <div class="admin-card-body">
+                    {% if stats_ville is defined and stats_ville|length > 0 %}
+                        <ul class="list-unstyled mb-0">
+                            {% for stat in stats_ville %}
+                                <li class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
+                                    <span class="fw-medium">{{ stat.ville }}</span>
+                                    <div class="text-end">
+                                        <span class="badge bg-primary rounded-pill">{{ stat.nbOffres }} offre(s)</span>
+                                        <small class="text-muted d-block mt-1">{{ stat.tarifMoyen|number_format(2, ',', ' ') }} € / h</small>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="fas fa-chart-bar fa-2x text-muted mb-2"></i>
+                            <p class="text-muted mb-0 small">Aucune statistique disponible pour le moment.</p>
+                            <p class="text-muted mt-1 small">Ajoutez des offres babysitter pour voir les statistiques.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {# Mini aperçu des offres #}
+            <div class="admin-card mt-3">
+                <div class="admin-card-header">
+                    <i class="fas fa-info-circle me-1"></i> Résumé
+                </div>
+                <div class="admin-card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Total offres:</span>
+                        <span class="badge bg-primary rounded-pill">{{ offre_baby_sitters|length }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Babysitters disponibles:</span>
+                        <span class="badge bg-success rounded-pill">
+                            {{ offre_baby_sitters|filter(o => o.disponibilite)|length }}
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Tarif moyen:</span>
+                        <span class="fw-bold">
+                            {% set total = 0 %}
+                            {% for offre in offre_baby_sitters %}
+                                {% set total = total + offre.tarif %}
+                            {% endfor %}
+                            {% if offre_baby_sitters|length > 0 %}
+                                {{ (total / offre_baby_sitters|length)|number_format(2, ',', ' ') }} € / h
+                            {% else %}
+                                -
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    {# Section du graphique - Déplacé ici au lieu d'être créé dynamiquement #}
+    {% if stats_ville is defined and stats_ville|length > 0 %}
+    <div class="row mt-3">
+        <div class="col-12 col-lg-8 mx-auto">
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <i class="fas fa-chart-pie me-1"></i> Répartition des offres par ville
+                </div>
+                <div class="admin-card-body">
+                    <div style="position: relative; height: 300px; width: 100%;">
+                        <canvas id="chartVilleBabysitter"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}
 
 {% block javascripts %}
-<script>
-    const adminSearch = document.getElementById('adminSearch');
-    if (adminSearch) {
-        adminSearch.addEventListener('input', function() {
-            const q = this.value.toLowerCase();
-            document.querySelectorAll('.admin-table tbody tr').forEach(row => {
-                if (row.querySelector('.admin-empty')) return;
-                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
-            });
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                // Récupérer les données du template
+                const statsVille = {{ stats_ville|json_encode|raw }};
+                
+                // Vérifier si les données existent et ne sont pas vides
+                if (!statsVille || statsVille.length === 0) {
+                    console.log('Aucune statistique disponible');
+                    return;
+                }
+
+                // Attendre que le canvas soit présent dans le DOM
+                const canvas = document.getElementById('chartVilleBabysitter');
+                if (!canvas) {
+                    console.error('Canvas chartVilleBabysitter non trouvé');
+                    return;
+                }
+
+                const labels = statsVille.map(s => s.ville);
+                const data = statsVille.map(s => parseInt(s.nbOffres));
+                
+                // Vérifier que nous avons des données valides
+                if (labels.length === 0 || data.length === 0) {
+                    console.log('Pas de données à afficher');
+                    return;
+                }
+
+                const ctx = canvas.getContext('2d');
+
+                const colors = [
+                    '#ff6384', '#36a2eb', '#ffcd56',
+                    '#4bc0c0', '#9966ff', '#ff9f40',
+                    '#8dd17e', '#f67019', '#00a6b4',
+                    '#845ec2'
+                ];
+
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: labels.map((_, i) => colors[i % colors.length]),
+                            borderColor: '#ffffff',
+                            borderWidth: 2,
+                            hoverOffset: 15
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    boxWidth: 12,
+                                    padding: 15,
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.raw || 0;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return `${label}: ${value} offre(s) (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                console.log('Graphique créé avec succès');
+            } catch (error) {
+                console.error('Erreur lors de la création du graphique:', error);
+            }
         });
-    }
-</script>
+    </script>
 {% endblock %}

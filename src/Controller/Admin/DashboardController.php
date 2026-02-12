@@ -9,9 +9,11 @@ use App\Repository\EventRepository;
 use App\Repository\ConsultationRepository;
 use App\Repository\MamanRepository;
 use App\Repository\GrosesseRepository;
+use App\Repository\OffreBabySitterRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 #[Route('/admin', name: 'admin_')]
 final class DashboardController extends AbstractController
@@ -28,7 +30,8 @@ final class DashboardController extends AbstractController
         CommandeRepository $commandeRepository,
         MamanRepository $mamanRepository,
         GrosesseRepository $grosesseRepository,
-        ConsultationRepository $consultationRepository
+        ConsultationRepository $consultationRepository,
+        OffreBabySitterRepository $offreBabySitterRepository
     ): Response {
 
         // ===== Marketplace Stats =====
@@ -51,6 +54,62 @@ final class DashboardController extends AbstractController
             ($statsStatut['enCours'] ?? 0) +
             ($statsStatut['aRisque'] ?? 0);
 
+        // ===== BABYSITTING STATS - SANS createdAt =====
+        // Total babysitters
+        $totalBabysitters = $offreBabySitterRepository->count([]);
+        
+        // Babysitters disponibles
+        $babysittersDisponibles = $offreBabySitterRepository->count(['disponibilite' => true]);
+        
+        // Total offres babysitting
+        $offresBabysitting = $totalBabysitters;
+        
+        // Nouvelles offres - DÉSACTIVÉ (pas de champ createdAt)
+        $nouvellesOffresAujourdhui = 0;
+        $offresNouvellesSemaine = 0;
+        
+        // Statistiques de tarifs
+        $tarifMoyen = $offreBabySitterRepository->createQueryBuilder('o')
+            ->select('AVG(o.tarif)')
+            ->getQuery()
+            ->getSingleScalarResult() ?? 0;
+        
+        $tarifMin = $offreBabySitterRepository->createQueryBuilder('o')
+            ->select('MIN(o.tarif)')
+            ->where('o.tarif > 0')
+            ->getQuery()
+            ->getSingleScalarResult() ?? 0;
+        
+        $tarifMax = $offreBabySitterRepository->createQueryBuilder('o')
+            ->select('MAX(o.tarif)')
+            ->getQuery()
+            ->getSingleScalarResult() ?? 0;
+        
+        // Statistiques par ville pour le graphique
+        $statsVilleBabysitters = $offreBabySitterRepository->createQueryBuilder('o')
+            ->select('o.ville, COUNT(o.id) as nbOffres')
+            ->where('o.ville IS NOT NULL')
+            ->andWhere('o.ville != :empty')
+            ->setParameter('empty', '')
+            ->groupBy('o.ville')
+            ->orderBy('nbOffres', 'DESC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+        
+        // Top babysitters par expérience
+        $topBabysittersExperience = $offreBabySitterRepository->findBy(
+            [], 
+            ['experience' => 'DESC'], 
+            5
+        );
+        
+        // Expérience moyenne
+        $experienceMoyenne = $offreBabySitterRepository->createQueryBuilder('o')
+            ->select('AVG(o.experience)')
+            ->getQuery()
+            ->getSingleScalarResult() ?? 0;
+
         // ===== Recent Activity (Interleaved) =====
         $recentCreneaux = $this->consultationCreneauRepository->findBy([], ['id' => 'DESC'], 10);
         $recentEvents = $eventRepository->findBy([], ['id' => 'DESC'], 10);
@@ -59,6 +118,7 @@ final class DashboardController extends AbstractController
         $recentGrossesses = $grosesseRepository->findBy([], ['id' => 'DESC'], 10);
         $recentConsultations = $consultationRepository->findBy([], ['id' => 'DESC'], 10);
         $recentCommandes = $commandeRepository->findBy([], ['id' => 'DESC'], 10);
+        $recentBabysitters = $offreBabySitterRepository->findBy([], ['id' => 'DESC'], 5);
 
         $activityLists = [
             'event' => [],
@@ -67,7 +127,8 @@ final class DashboardController extends AbstractController
             'maman' => [],
             'grossesse' => [],
             'consultation' => [],
-            'commande' => []
+            'commande' => [],
+            'babysitter' => []
         ];
 
         foreach ($recentEvents as $e) {
@@ -167,6 +228,21 @@ final class DashboardController extends AbstractController
             ];
         }
 
+        // Ajout des babysitters à l'activité récente - SANS DATE
+        foreach ($recentBabysitters as $b) {
+            $activityLists['babysitter'][] = [
+                'type' => 'babysitter',
+                'title' => $b->getNomBabysitter(),
+                'context' => $b->getVille() . ' - ' . $b->getExperience() . ' ans - ' . $b->getTarif() . ' DT/h',
+                'date' => null, // Pas de date
+                'url' => $this->generateUrl('app_offre_baby_sitter_show', ['id' => $b->getId()]),
+                'icon' => 'fa-baby',
+                'badge_text' => 'Babysitter',
+                'badge_class' => 'bg-purple-light',
+                'id' => $b->getId()
+            ];
+        }
+
         // Interleaving to ensure variety
         $activity = [];
         $maxItems = 0;
@@ -179,7 +255,7 @@ final class DashboardController extends AbstractController
                 if (isset($list[$i])) {
                     $activity[] = $list[$i];
                     if (count($activity) >= 20)
-                        break 2; // Limit to total 20 items (was 10, but now we have many types)
+                        break 2;
                 }
             }
         }
@@ -200,6 +276,19 @@ final class DashboardController extends AbstractController
             'total_mamans' => $totalMamans,
             'total_grossesses' => $totalGrossesses,
             'suivis_grossesse_actifs' => $suivisActifs,
+
+            // BABYSITTING STATS - Sans createdAt
+            'total_babysitters' => $totalBabysitters,
+            'babysitters_disponibles' => $babysittersDisponibles,
+            'offres_babysitting' => $offresBabysitting,
+            'offres_nouvelles' => $offresNouvellesSemaine,
+            'nouvelles_offres_aujourdhui' => $nouvellesOffresAujourdhui,
+            'tarif_moyen_babysitting' => $tarifMoyen,
+            'tarif_min_babysitting' => $tarifMin,
+            'tarif_max_babysitting' => $tarifMax,
+            'experience_moyenne_babysitting' => $experienceMoyenne,
+            'stats_ville_babysitters' => $statsVilleBabysitters,
+            'top_babysitters_experience' => $topBabysittersExperience,
 
             // Existing dashboard data
             'creneaux_ce_mois' => $this->consultationCreneauRepository->countCeMois(),
@@ -237,8 +326,47 @@ final class DashboardController extends AbstractController
     }
 
     #[Route('/profil-bebe', name: 'profil_bebe', methods: ['GET'])]
-    public function profilBebe(): Response
-    {
-        return $this->render('admin/profil_bebe.html.twig');
+    public function profilBebe(
+        OffreBabySitterRepository $offreBabySitterRepository,
+        Request $request
+    ): Response {
+        // Récupération des paramètres de filtre
+        $ville = $request->query->get('ville');
+        $tarifMax = $request->query->get('tarif');
+        
+        // Construction de la requête avec filtres
+        $qb = $offreBabySitterRepository->createQueryBuilder('o');
+        
+        if ($ville) {
+            $qb->andWhere('o.ville LIKE :ville')
+               ->setParameter('ville', '%' . $ville . '%');
+        }
+        
+        if ($tarifMax) {
+            $qb->andWhere('o.tarif <= :tarif')
+               ->setParameter('tarif', $tarifMax);
+        }
+        
+        $offres = $qb->orderBy('o.id', 'DESC')
+                     ->getQuery()
+                     ->getResult();
+        
+        // Statistiques par ville pour le template profil_bebe
+        $statsVille = $offreBabySitterRepository->createQueryBuilder('o')
+            ->select('o.ville, COUNT(o.id) as nbOffres, AVG(o.tarif) as tarifMoyen')
+            ->where('o.ville IS NOT NULL')
+            ->andWhere('o.ville != :empty')
+            ->setParameter('empty', '')
+            ->groupBy('o.ville')
+            ->orderBy('nbOffres', 'DESC')
+            ->getQuery()
+            ->getResult();
+        
+        return $this->render('admin/profil_bebe.html.twig', [
+            'offre_baby_sitters' => $offres,
+            'stats_ville' => $statsVille,
+            'ville' => $ville,
+            'tarif' => $tarifMax,
+        ]);
     }
 }

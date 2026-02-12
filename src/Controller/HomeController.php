@@ -7,6 +7,7 @@ use App\Repository\ConsultationCreneauRepository;
 use App\Form\AppointmentType;
 use App\Form\Model\AppointmentData;
 use App\Repository\ProduitRepository;
+use App\Repository\OffreBabySitterRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +21,7 @@ final class HomeController extends AbstractController
     ) {
     }
 
-    #[Route('/home', name: 'app_home')]
+    #[Route('/', name: 'app_home')]
     public function index(): Response
     {
         return $this->render('home/index.html.twig', [
@@ -42,6 +43,16 @@ final class HomeController extends AbstractController
         return $this->render('pages/marketplace.html.twig', [
             'produits' => $produits,
             'searchTerm' => $term,
+        ]);
+    }
+
+    #[Route('/babysitting', name: 'app_babysitting')]
+    public function babysitting(OffreBabySitterRepository $repository): Response
+    {
+        $offres = $repository->findAll();
+
+        return $this->render('pages/babysitting.html.twig', [
+            'offre_baby_sitters' => $offres,
         ]);
     }
 

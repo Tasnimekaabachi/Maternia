@@ -1,0 +1,35 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Nouvelle offre babysitter{% endblock %}
+{% block page_title %}Nouvelle offre babysitter{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
+        <span>/</span>
+        <a href="{{ path('admin_profil_bebe') }}">Profil bébé</a>
+        <span>/</span>
+        <span>Nouvelle offre</span>
+    </div>
+{% endblock %}
+
+{% block header_actions %}
+    <a href="{{ path('admin_profil_bebe') }}" class="btn btn-outline-secondary btn-sm">
+        &larr; Retour à la liste
+    </a>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    Créer une nouvelle offre de babysitting
+                </div>
+                <div class="admin-card-body">
+                    {{ include('offre_baby_sitter/_form.html.twig', { button_label: 'Enregistrer l\'offre' }) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

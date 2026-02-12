@@ -1,0 +1,49 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Modifier une offre babysitter{% endblock %}
+
+{% block page_title %}Modifier l'offre babysitter{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ path('admin_dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin_profil_bebe') }}">Offres babysitter</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Modifier</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-8 mb-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 text-primary">
+                        <i class="bi bi-pencil-square me-2"></i>Modifier l'offre de {{ offre_baby_sitter.nomBabysitter }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {{ include('offre_baby_sitter/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0 text-muted text-uppercase small fw-semibold">Actions rapides</h6>
+                </div>
+                <div class="card-body d-grid gap-2">
+                    {{ include('offre_baby_sitter/_delete_form.html.twig', {button_label: 'Supprimer cette offre'}) }}
+                    <a href="{{ path('admin_profil_bebe') }}" class="btn btn-outline-secondary">
+                        &larr; Retour à la liste
+                    </a>
+                    <a href="{{ path('app_offre_baby_sitter_show', {'id': offre_baby_sitter.id}) }}" class="btn btn-outline-info">
+                        <i class="bi bi-eye me-1"></i>Voir les détails
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
