@@ -85,9 +85,19 @@
     .admin-card { background: white; border-radius: 24px; border: 1px solid #FCE4EC; overflow: hidden; box-shadow: 0 15px 35px rgba(255, 138, 171, 0.05); }
     .admin-card-header { padding: 1.25rem 2rem; border-bottom: 1px solid #FCE4EC; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
     
-    .premium-table { width: 100%; margin-bottom: 0; }
-    .premium-table th { background: #FDF2F8; padding: 1rem 1.25rem; font-size: 0.7rem; font-weight: 700; color: #db2777; text-transform: uppercase; white-space: nowrap; }
-    .premium-table td { padding: 1.25rem; border-bottom: 1px solid #F3E5F5; font-size: 0.9rem; vertical-align: middle; }
+    .premium-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .premium-table th { 
+        background: #FDF2F8; padding: 1.25rem 1rem; font-size: 0.75rem; 
+        color: #db2777; text-transform: uppercase; letter-spacing: 1px;
+        border-bottom: 2px solid #FBCFE8 !important; border-right: 1px solid #FBCFE8 !important;
+    }
+    .premium-table th:last-child { border-right: none; }
+    .premium-table td { 
+        padding: 1.25rem 1rem; border-bottom: 1px solid #FBCFE8 !important; 
+        border-right: 1px solid #FBCFE8 !important; vertical-align: middle; 
+    }
+    .premium-table td:last-child { border-right: none; }
+    .premium-table tr:hover { background-color: #FFF5F7; }
 
     /* ACTIONS & BADGES */
     .btn-action-circle { width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: white; border: 1px solid #FCE4EC; transition: 0.2s; text-decoration: none; }

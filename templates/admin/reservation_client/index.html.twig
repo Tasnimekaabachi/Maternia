@@ -9,138 +9,295 @@
         --primary-pink: #FF8AAB;
         --soft-pink: #FFD1DC;
         --deep-pink: #FF5C8D;
+        --rose-gold: #E5A29D;
+        --lavender: #E1BEE7;
+        --glass-white: rgba(255, 255, 255, 0.95);
         --gradient-feminine: linear-gradient(135deg, #FF8AAB 0%, #E1BEE7 100%);
         --gradient-soft: linear-gradient(135deg, #FFF5F5 0%, #FCE4EC 100%);
     }
 
-    .index-container { background: var(--gradient-soft); min-height: 100vh; padding: 2rem 0; }
+    .index-container { background: var(--gradient-soft); min-height: 100vh; padding: 2.5rem 0; }
     
     .stat-card-premium {
-        background: white; border-radius: 20px; padding: 1.5rem; text-align: center;
+        background: white; border-radius: 20px; padding: 1.5rem; 
         border: 1px solid #FCE4EC; box-shadow: 0 10px 25px rgba(255, 138, 171, 0.05);
-        position: relative; overflow: hidden; transition: 0.3s;
+        transition: all 0.3s ease; display: flex; align-items: center; gap: 1rem;
     }
-    .stat-card-premium .label { font-size: 0.75rem; font-weight: 700; color: #A0A0A0; text-transform: uppercase; }
-    .stat-card-premium .value { font-size: 1.8rem; font-weight: 800; color: #4A4A4A; }
+    .stat-card-premium:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(255, 138, 171, 0.1); }
+    .stat-icon { 
+        width: 50px; height: 50px; border-radius: 15px; 
+        display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+    }
+    .stat-info .label { font-size: 0.75rem; font-weight: 700; color: #A0A0A0; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-info .value { font-size: 1.5rem; font-weight: 800; color: #4A4A4A; line-height: 1.2; }
 
-    .admin-card { background: white; border-radius: 24px; border: 1px solid #FCE4EC; overflow: hidden; box-shadow: 0 15px 35px rgba(255, 138, 171, 0.05); }
-    .admin-card-header { padding: 1.25rem 2rem; border-bottom: 1px solid #FCE4EC; display: flex; justify-content: space-between; align-items: center; }
+    .admin-card { 
+        background: white; border-radius: 24px; border: 1px solid #FCE4EC; 
+        overflow: hidden; box-shadow: 0 20px 40px rgba(255, 138, 171, 0.05); margin-bottom: 2rem;
+    }
+    .admin-card-header { 
+        padding: 1.5rem 2rem; border-bottom: 1px solid #FCE4EC; 
+        display: flex; justify-content: space-between; align-items: center;
+        background: rgba(255, 255, 255, 0.5);
+    }
 
-    .premium-table { width: 100%; }
-    .premium-table th { background: #FDF2F8; padding: 1rem; font-size: 0.7rem; color: #db2777; text-transform: uppercase; }
-    .premium-table td { padding: 1rem; border-bottom: 1px solid #F3E5F5; font-size: 0.85rem; }
+    .premium-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .premium-table thead th { 
+        background: #FDF2F8; padding: 1.25rem 1rem; font-size: 0.75rem; 
+        color: #db2777; text-transform: uppercase; letter-spacing: 1px;
+        border-bottom: 2px solid #FBCFE8 !important; border-right: 1px solid #FBCFE8 !important;
+    }
+    .premium-table th:last-child { border-right: none; }
+    .premium-table tbody td { 
+        padding: 1.25rem 1rem; border-bottom: 1px solid #FBCFE8 !important; 
+        border-right: 1px solid #FBCFE8 !important; vertical-align: middle; 
+    }
+    .premium-table td:last-child { border-right: none; }
+    .premium-table tr:hover { background-color: #FFF5F7; }
 
-    .badge-status { padding: 4px 12px; border-radius: 50px; font-weight: 700; font-size: 0.7rem; }
+    .sort-link { color: inherit; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+    .sort-link:hover { color: var(--deep-pink); }
+    .sort-icon { font-size: 0.7rem; opacity: 0.5; }
+    .sort-link:hover .sort-icon { opacity: 1; }
+
+    .badge-status { padding: 6px 16px; border-radius: 50px; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; }
     .status-confirmed { background: #E8F5E9; color: #2E7D32; }
     .status-pending { background: #FFF3E0; color: #E65100; }
+    .status-cancelled { background: #FFF5F5; color: #D32F2F; }
 
-    .btn-feminine { background: var(--gradient-feminine); color: white; border-radius: 50px; padding: 0.6rem 1.5rem; font-weight: 700; border: none; }
+    .btn-feminine { 
+        background: var(--gradient-feminine); color: white; border-radius: 50px; 
+        padding: 0.75rem 1.75rem; font-weight: 700; border: none; transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(255, 138, 171, 0.3);
+    }
+    .btn-feminine:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 138, 171, 0.4); color: white; }
+
+    .btn-pdf {
+        background: white; color: #db2777; border-radius: 50px; 
+        padding: 0.75rem 1.75rem; font-weight: 700; border: 1px solid #FCE4EC; transition: all 0.3s;
+    }
+    .btn-pdf:hover { background: #FFF5F7; border-color: #FBCFE8; }
+
+    .chart-container { 
+        background: white; border-radius: 24px; padding: 2rem; 
+        border: 1px solid #FCE4EC; box-shadow: 0 15px 35px rgba(255, 138, 171, 0.05); 
+        height: 100%;
+    }
+    
+    .stats-grid { height: 100%; display: flex; flex-direction: column; justify-content: space-between; gap: 1rem; }
+
+    /* QUICK NAV TABS */
+    .quick-nav-tabs {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 2.5rem;
+        background: white;
+        padding: 0.6rem;
+        border-radius: 50px;
+        border: 1px solid #FCE4EC;
+        box-shadow: 0 10px 30px rgba(255, 138, 171, 0.08);
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .quick-nav-link {
+        padding: 0.7rem 1.5rem;
+        border-radius: 50px;
+        text-decoration: none;
+        color: #718096;
+        font-weight: 700;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+    .quick-nav-link i { font-size: 0.9rem; }
+    .quick-nav-link:hover { background: #FFF5F7; color: var(--deep-pink); }
+    .quick-nav-link.active {
+        background: var(--gradient-feminine);
+        color: white;
+        box-shadow: 0 5px 15px rgba(255, 138, 171, 0.3);
+    }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 {% endblock %}
 
 {% block header_actions %}
-    <a href="{{ path('app_admin_reservation_client_new') }}" class="btn btn-feminine">
-        <i class="fas fa-plus me-2"></i> Nouveau Rendez-vous
-    </a>
+    <div class="d-flex gap-2">
+        <button id="exportPdfBtn" class="btn btn-pdf">
+            <i class="fas fa-file-pdf me-2 text-danger"></i> Télécharger PDF
+        </button>
+        <a href="{{ path('app_admin_reservation_client_new') }}" class="btn btn-feminine">
+            <i class="fas fa-plus me-2"></i> Nouvelle Réservation
+        </a>
+    </div>
 {% endblock %}
 
 {% block content %}
 <div class="index-container">
-    <div class="container">
-        <div class="row g-3 mb-4">
-            <div class="col-md-3">
-                <div class="stat-card-premium">
-                    <div class="label">Total RDV</div>
-                    <div class="value">{{ stats.total }}</div>
+    <div class="container-fluid px-4">
+        <!-- Quick Navigation -->
+        <div class="quick-nav-tabs">
+            <a href="{{ path('app_admin_reservation_client_index') }}" class="quick-nav-link active">
+                <i class="fas fa-calendar-check"></i> Réservations
+            </a>
+            <a href="{{ path('app_admin_consultation_index') }}" class="quick-nav-link">
+                <i class="fas fa-stethoscope"></i> Consultations
+            </a>
+            <a href="{{ path('app_admin_consultation_creneau_index') }}" class="quick-nav-link">
+                <i class="fas fa-clock"></i> Créneaux
+            </a>
+        </div>
+
+        <!-- Dashboard Overview -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-7">
+                <div class="chart-container">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h6 class="fw-bold text-dark mb-0">Évolution des Réservations</h6>
+                        <span class="badge bg-light text-muted rounded-pill px-3">6 derniers mois</span>
+                    </div>
+                    <div style="height: 250px;">
+                        <canvas id="reservationsChart"></canvas>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="stat-card-premium">
-                    <div class="label">Confirmés</div>
-                    <div class="value text-success">{{ stats.confirmed }}</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card-premium">
-                    <div class="label">En attente</div>
-                    <div class="value text-warning">{{ stats.pending }}</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card-premium">
-                    <div class="label">Bébés / Mamans</div>
-                    <div class="value">{{ stats.bebe }} / {{ stats.maman }}</div>
+            <div class="col-lg-5">
+                <div class="stats-grid">
+                    <div class="stat-card-premium">
+                        <div class="stat-icon" style="background: #EBF8FF; color: #3182CE;"><i class="fas fa-calendar-check"></i></div>
+                        <div class="stat-info">
+                            <div class="label">Total Réservations</div>
+                            <div class="value">{{ stats.total }}</div>
+                        </div>
+                    </div>
+                    <div class="stat-card-premium">
+                        <div class="stat-icon" style="background: #E6FFFA; color: #319795;"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info">
+                            <div class="label">RDV Confirmés</div>
+                            <div class="value">{{ stats.confirmed }}</div>
+                        </div>
+                    </div>
+                    <div class="stat-card-premium">
+                        <div class="stat-icon" style="background: #FFF5F7; color: #D53F8C;"><i class="fas fa-baby"></i></div>
+                        <div class="stat-info">
+                            <div class="label">Total Bébés</div>
+                            <div class="value">{{ stats.bebe }}</div>
+                        </div>
+                    </div>
+                    <div class="stat-card-premium">
+                        <div class="stat-icon" style="background: #FAF5FF; color: #805AD5;"><i class="fas fa-female"></i></div>
+                        <div class="stat-info">
+                            <div class="label">Total Mamans</div>
+                            <div class="value">{{ stats.maman }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- Reservations Table -->
         <div class="admin-card">
             <div class="admin-card-header">
-                <h5 class="mb-0 fw-bold">Journal des réservations</h5>
-                <div class="d-flex gap-2">
-                    <input type="text" id="searchRdv" class="form-control form-control-sm rounded-pill px-3" placeholder="Rechercher...">
+                <div>
+                    <h5 class="mb-1 fw-bold text-dark">Liste des Réservations</h5>
+                    <p class="mb-0 text-muted small">Visualisez et gérez tous les rendez-vous clients</p>
+                </div>
+                <div class="d-flex gap-3 align-items-center">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white border-end-0 rounded-start-pill"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" id="searchRdv" class="form-control border-start-0 rounded-end-pill px-3" placeholder="Filtrer un patient, référence..." style="width: 250px;">
+                    </div>
                 </div>
             </div>
             <div class="table-responsive">
-                <table class="table premium-table">
+                <table class="table premium-table" id="resTable">
                     <thead>
                         <tr>
-                            <th>Référence</th>
-                            <th>Patient</th>
-                            <th>Contact</th>
-                            <th>Type</th>
+                            <th>
+                                <a href="{{ path('app_admin_reservation_client_index', {sort: 'reference', direction: currentSort == 'reference' and currentDirection == 'ASC' ? 'DESC' : 'ASC'}) }}" class="sort-link">
+                                    Réf {% if currentSort == 'reference' %}<i class="fas fa-sort-{{ currentDirection == 'ASC' ? 'up' : 'down' }} sort-icon"></i>{% else %}<i class="fas fa-sort sort-icon"></i>{% endif %}
+                                </a>
+                            </th>
+                            <th>
+                                <a href="{{ path('app_admin_reservation_client_index', {sort: 'nomClient', direction: currentSort == 'nomClient' and currentDirection == 'ASC' ? 'DESC' : 'ASC'}) }}" class="sort-link">
+                                    Patient {% if currentSort == 'nomClient' %}<i class="fas fa-sort-{{ currentDirection == 'ASC' ? 'up' : 'down' }} sort-icon"></i>{% else %}<i class="fas fa-sort sort-icon"></i>{% endif %}
+                                </a>
+                            </th>
                             <th>Détails</th>
-                            <th>Statut</th>
-                            <th>Date RDV</th>
+                            <th>Médecin</th>
+                            <th>
+                                <a href="{{ path('app_admin_reservation_client_index', {sort: 'statutReservation', direction: currentSort == 'statutReservation' and currentDirection == 'ASC' ? 'DESC' : 'ASC'}) }}" class="sort-link">
+                                    Statut {% if currentSort == 'statutReservation' %}<i class="fas fa-sort-{{ currentDirection == 'ASC' ? 'up' : 'down' }} sort-icon"></i>{% else %}<i class="fas fa-sort sort-icon"></i>{% endif %}
+                                </a>
+                            </th>
+                            <th>
+                                <a href="{{ path('app_admin_reservation_client_index', {sort: 'dateReservation', direction: currentSort == 'dateReservation' and currentDirection == 'ASC' ? 'DESC' : 'ASC'}) }}" class="sort-link">
+                                    Planifié le {% if currentSort == 'dateReservation' %}<i class="fas fa-sort-{{ currentDirection == 'ASC' ? 'up' : 'down' }} sort-icon"></i>{% else %}<i class="fas fa-sort sort-icon"></i>{% endif %}
+                                </a>
+                            </th>
                             <th class="text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="rdvBody">
                         {% for r in reservations %}
                         <tr class="rdv-row">
-                            <td><span class="fw-bold text-primary">#{{ r.reference }}</span></td>
+                            <td class="fw-bold text-primary">#{{ r.reference }}</td>
                             <td>
                                 <div class="fw-bold">{{ r.nomClient }} {{ r.prenomClient }}</div>
-                                <small class="text-muted text-uppercase" style="font-size: 0.65rem;">{{ r.typePatient }}</small>
-                            </td>
-                            <td>
-                                <div class="small"><i class="fas fa-envelope me-1 opacity-50"></i> {{ r.emailClient }}</div>
-                                <div class="small"><i class="fas fa-phone me-1 opacity-50"></i> {{ r.telephoneClient }}</div>
+                                <div class="small text-muted">{{ r.emailClient }}</div>
                             </td>
                             <td>
                                 {% if r.typePatient == 'BEBE' %}
-                                    <span class="badge bg-info text-white rounded-pill">👶 Bébé</span>
+                                    <span class="text-info-emphasis fw-bold">👶 Bébé</span>
+                                    {% if r.dateNaissanceBebe %}<div class="small text-muted">Né le {{ r.dateNaissanceBebe|date('d/m/Y') }}</div>{% endif %}
                                 {% else %}
-                                    <span class="badge bg-secondary text-white rounded-pill">🤰 Maman</span>
+                                    <span class="text-pink fw-bold">🤰 Maman</span>
+                                    {% if r.moisGrossesse %}<div class="small text-muted">{{ r.moisGrossesse }} mois</div>{% endif %}
                                 {% endif %}
                             </td>
                             <td>
-                                {% if r.moisGrossesse %}
-                                    <small>Grossesse: {{ r.moisGrossesse }} mois</small>
-                                {% elseif r.dateNaissanceBebe %}
-                                    <small>Né le: {{ r.dateNaissanceBebe|date('d/m/Y') }}</small>
+                                {% if r.consultationCreneau %}
+                                    <div class="fw-bold">Dr. {{ r.consultationCreneau.nomMedecin }}</div>
+                                    <div class="small text-muted">{{ r.consultationCreneau.consultation.categorie }}</div>
                                 {% else %}
-                                    <span class="text-muted">-</span>
+                                    <span class="text-muted italic">Non défini</span>
                                 {% endif %}
                             </td>
                             <td>
-                                <span class="badge-status {{ r.statutReservation == 'CONFIRME' ? 'status-confirmed' : 'status-pending' }}">
+                                <span class="badge-status 
+                                    {% if r.statutReservation == 'CONFIRME' %}status-confirmed
+                                    {% elseif r.statutReservation == 'ANNULE' %}status-cancelled
+                                    {% else %}status-pending{% endif %}">
                                     {{ r.statutReservation }}
                                 </span>
                             </td>
                             <td>
                                 <div class="fw-bold">{{ r.dateReservation|date('d/m/Y') }}</div>
-                                <small class="text-muted">{{ r.dateReservation|date('H:i') }}</small>
+                                <div class="small text-muted">{{ r.dateReservation|date('H:i') }}</div>
                             </td>
                             <td class="text-end">
                                 <div class="btn-group">
-                                    <a href="{{ path('app_admin_reservation_client_edit', {id: r.id}) }}" class="btn btn-sm btn-outline-warning rounded-circle me-1"><i class="fas fa-pen"></i></a>
-                                    <button class="btn btn-sm btn-outline-danger rounded-circle" onclick="deleteRdv('{{ path('app_admin_reservation_client_delete', {id: r.id}) }}', '{{ csrf_token('delete' ~ r.id) }}', this.closest('tr'))">
+                                    <a href="{{ path('app_admin_reservation_client_edit', {id: r.id}) }}" class="btn btn-sm btn-outline-warning rounded-circle me-1" title="Modifier">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <button class="btn btn-sm btn-outline-danger rounded-circle" 
+                                            onclick="deleteRdv('{{ path('app_admin_reservation_client_delete', {id: r.id}) }}', '{{ csrf_token('delete' ~ r.id) }}', this.closest('tr'))"
+                                            title="Supprimer">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <i class="fas fa-calendar-times mb-3 d-block fa-3x opacity-25"></i>
+                                <h6 class="text-muted">Aucune réservation trouvée</h6>
                             </td>
                         </tr>
                         {% endfor %}
@@ -152,14 +309,90 @@
 </div>
 
 <script>
+    // CHARTS
+    const ctx = document.getElementById('reservationsChart').getContext('2d');
+    const chartGradient = ctx.createLinearGradient(0, 0, 0, 400);
+    chartGradient.addColorStop(0, 'rgba(255, 138, 171, 0.4)');
+    chartGradient.addColorStop(1, 'rgba(255, 138, 171, 0)');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ chartData.labels|json_encode|raw }},
+            datasets: [{
+                label: 'Réservations',
+                data: {{ chartData.values|json_encode|raw }},
+                borderColor: '#FF8AAB',
+                backgroundColor: chartGradient,
+                borderWidth: 4,
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#FF5C8D',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#F0F2F5', drawBorder: false }, ticks: { color: '#A0AEC0', font: { size: 11 } } },
+                x: { grid: { display: false }, ticks: { color: '#A0AEC0', font: { size: 11 } } }
+            }
+        }
+    });
+
+    // REAL PDF EXPORT (jsPDF)
+    document.getElementById('exportPdfBtn').addEventListener('click', function() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('l', 'mm', 'a4');
+        
+        doc.setFontSize(22);
+        doc.setTextColor(255, 138, 171);
+        doc.text('Journal des Réservations - Maternia', 14, 20);
+        
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('Date d\'exportation : ' + new Date().toLocaleString(), 14, 28);
+
+        doc.autoTable({
+            html: '#resTable',
+            startY: 35,
+            headStyles: { fillColor: [255, 138, 171], textColor: 255, fontSize: 10, cellPadding: 4 },
+            bodyStyles: { fontSize: 9, cellPadding: 4 },
+            alternateRowStyles: { fillColor: [250, 250, 250] },
+            columns: [
+                { header: 'Réf', dataKey: 'col0' },
+                { header: 'Patient', dataKey: 'col1' },
+                { header: 'Détails', dataKey: 'col2' },
+                { header: 'Médecin', dataKey: 'col3' },
+                { header: 'Statut', dataKey: 'col4' },
+                { header: 'Date prévue', dataKey: 'col5' }
+            ],
+            // On exclut la colonne Actions (index 6)
+            didParseCell: function(data) {
+                if (data.column.index === 6) { data.cell.text = ''; }
+            }
+        });
+
+        doc.save('reservations_maternia_' + new Date().getTime() + '.pdf');
+    });
+
+    // DELETE RDV
     function deleteRdv(url, token, row) {
         Swal.fire({
-            title: 'Supprimer ce rendez-vous ?',
-            text: "Cette action est irréversible.",
+            title: 'Action irréversible',
+            text: "Voulez-vous vraiment supprimer cette réservation ?",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#FF5C8D',
-            confirmButtonText: 'Oui, supprimer'
+            cancelButtonColor: '#CBD5E0',
+            confirmButtonText: 'Oui, supprimer',
+            cancelButtonText: 'Annuler',
+            borderRadius: '15px'
         }).then((result) => {
             if (result.isConfirmed) {
                 const formData = new FormData();
@@ -167,14 +400,16 @@
                 fetch(url, { method: 'POST', body: formData, headers: {'X-Requested-With': 'XMLHttpRequest'} })
                 .then(r => r.json()).then(data => {
                     if (data.success) {
-                        row.remove();
-                        Swal.fire('Supprimé !', '', 'success');
+                        row.style.opacity = '0';
+                        setTimeout(() => row.remove(), 300);
+                        Swal.fire({ title: 'Supprimé !', icon: 'success', borderRadius: '15px' });
                     }
                 });
             }
         });
     }
 
+    // SEARCH SEARCH
     document.getElementById('searchRdv').addEventListener('keyup', function() {
         const q = this.value.toLowerCase();
         document.querySelectorAll('.rdv-row').forEach(row => {
