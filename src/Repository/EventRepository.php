@@ -52,4 +52,13 @@ class EventRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    public function findRecents(int $limit = 5): array
+    {
+        return $this->createQueryBuilder('e')
+            ->orderBy('e.id', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }

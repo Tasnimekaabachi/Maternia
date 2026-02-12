@@ -2,12 +2,20 @@
 
 namespace App\Controller;
 
+use App\Repository\ConsultationRepository;
+use App\Repository\ConsultationCreneauRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class HomeController extends AbstractController
 {
+    public function __construct(
+        private ConsultationRepository $consultationRepository,
+        private ConsultationCreneauRepository $creneauRepository
+    ) {
+    }
+
     #[Route('/home', name: 'app_home')]
     public function index(): Response
     {
@@ -31,7 +39,11 @@ final class HomeController extends AbstractController
     #[Route('/rendez-vous', name: 'app_appointment')]
     public function appointment(): Response
     {
-        return $this->render('pages/appointment.html.twig');
+        return $this->render('pages/appointment.html.twig', [
+            'consultationsMaman' => $this->consultationRepository->findByType('MAMAN'),
+            'consultationsBebe' => $this->consultationRepository->findByType('BEBE'),
+            'creneauxReserves' => $this->creneauRepository->findCreneauxReserves(),
+        ]);
     }
 
     #[Route('/evenements', name: 'app_events')]

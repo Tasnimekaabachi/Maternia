@@ -38,28 +38,75 @@
     <div class="admin-card">
         <div class="admin-card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
             <span>Activité récente</span>
-            <a href="{{ path('app_admin_consultation_creneau_index') }}" class="btn btn-sm btn-outline-primary">Créneaux</a>
+            <div class="d-flex gap-2">
+                <a href="{{ path('app_admin_consultation_creneau_index') }}" class="btn btn-sm btn-outline-primary">Créneaux</a>
+                <a href="{{ path('app_event_index') }}" class="btn btn-sm btn-outline-secondary">Événements</a>
+            </div>
         </div>
-        <div class="admin-card-body">
-            {% if creneaux_recents|default([])|length > 0 %}
-                <ul class="list-unstyled mb-0">
-                    {% for creneau in creneaux_recents %}
-                        <li class="d-flex align-items-center justify-content-between py-2 border-bottom border-light">
-                            <div>
-                                <span class="fw-medium">{{ creneau.nomMedecin }}</span>
-                                <span class="text-muted small ms-2">{{ creneau.dateDebut|date('d/m H:i') }}</span>
-                            </div>
-                            <a href="{{ path('app_admin_consultation_creneau_show', { id: creneau.id }) }}" class="text-primary small">Voir</a>
-                        </li>
-                    {% endfor %}
-                </ul>
+        <div class="admin-card-body p-0">
+            {% if recent_activity|default([])|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 border-0 small text-uppercase text-muted fw-bold" style="width: 50px;">Type</th>
+                                <th class="border-0 small text-uppercase text-muted fw-bold">Détails</th>
+                                <th class="border-0 small text-uppercase text-muted fw-bold">Date de l'événement</th>
+                                <th class="border-0 text-end pe-4 small text-uppercase text-muted fw-bold">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in recent_activity %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="activity-icon-sq bg-light border rounded d-flex align-items-center justify-content-center" 
+                                                 title="{{ item.badge_text }}" style="width: 32px; height: 32px; min-width: 32px;">
+                                                <i class="fas {{ item.icon }} text-primary small"></i>
+                                            </div>
+                                            <span class="badge {{ item.badge_class }} rounded-pill small fw-medium" style="font-size: 0.7rem;">
+                                                {{ item.badge_text }}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold text-dark">{{ item.title }}</div>
+                                        <div class="text-muted small">{{ item.context }}</div>
+                                    </td>
+                                    <td>
+                                        <div class="small text-muted">
+                                            <i class="far fa-calendar-alt me-1"></i>
+                                            {{ item.date|date('d/m/Y') }} à {{ item.date|date('H:i') }}
+                                        </div>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <a href="{{ item.url }}" class="btn btn-sm btn-pink">Voir</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             {% else %}
-                <div class="admin-empty">
-                    <i class="fas fa-calendar-check text-muted"></i>
-                    <p class="mb-0">Aucun créneau récent.</p>
-                    <a href="{{ path('app_admin_consultation_creneau_index') }}" class="small">Gérer les créneaux</a>
+                <div class="admin-empty py-5">
+                    <i class="fas fa-stream text-muted fa-3x mb-3"></i>
+                    <p class="mb-0">Aucune activité récente.</p>
                 </div>
             {% endif %}
         </div>
     </div>
+    
+    <style>
+        .bg-pink-light { background-color: #fce7f3; color: #be185d; }
+        .bg-info-light { background-color: #e0f2fe; color: #0369a1; }
+        .btn-pink {
+            background-color: #ec4899;
+            color: white;
+            border: none;
+        }
+        .btn-pink:hover {
+            background-color: #be185d;
+            color: white;
+        }
+    </style>
 {% endblock %}

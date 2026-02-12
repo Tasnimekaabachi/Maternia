@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventCatRepository::class)]
 class EventCat
@@ -16,10 +17,14 @@ class EventCat
     #[ORM\Column]
     private ?int $id = null;
 
+
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le nom est obligatoire")]
+    #[Assert\Length(min: 4, minMessage: "Le nom doit faire au moins {{ limit }} caractères")]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(min: 10, minMessage: "La description doit faire au moins {{ limit }} caractères")]
     private ?string $description = null;
 
     /**

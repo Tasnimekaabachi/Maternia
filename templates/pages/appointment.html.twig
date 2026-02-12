@@ -152,13 +152,13 @@
                                     </p>
                                     <p class="card-text">
                                         <i class="fas fa-user me-2"></i>
-                                        {{ creneau.prenomClient }} {{ creneau.nomClient }}
+                                        {{ creneau.reservation.prenomClient }} {{ creneau.reservation.nomClient }}
                                     </p>
                                 </div>
                                 <div class="col-md-4 text-end">
                                     <span class="badge bg-success mb-3">Confirmé</span>
                                     <p class="text-muted mb-2">
-                                        <small>Réf: {{ creneau.reference }}</small>
+                                        <small>Réf: {{ creneau.reservation.reference }}</small>
                                     </p>
                                     <button class="btn btn-outline-primary btn-sm">
                                         <i class="fas fa-video me-1"></i> Lien de connexion
