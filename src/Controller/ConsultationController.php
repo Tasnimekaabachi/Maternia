@@ -76,7 +76,7 @@ class ConsultationController extends AbstractController
         $medecinNom = $medecin;
 
         $creneaux = $creneauRepo->createQueryBuilder('cc')
-            ->where('cc.nomMedecin = :medecin')
+            ->where('cc.nom_medecin = :medecin')
             ->andWhere('cc.statutReservation = :statut')
             ->andWhere('cc.dateDebut > :now')
             ->setParameter('medecin', $medecinNom)
