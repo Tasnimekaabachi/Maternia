@@ -36,12 +36,14 @@
                     <i class="fas fa-calendar-alt"></i>
                     Événements
                 </a>
-                <!-- LIGNE MODIFIÉE - Réservations (Consultations) -->
-                <a href="{{ path('app_admin_consultation_index') }}" 
-                   class="nav-link {{ app.request.attributes.get('_route') starts with 'app_admin_consultation' ? 'active' : '' }}">
+                <!-- LIGNE MODIFIÉE - Réservations -->
+                <a href="{{ path('app_admin_reservation_client_index') }}" 
+                   class="nav-link {{ app.request.attributes.get('_route') starts with 'app_admin_reservation_client' ? 'active' : '' }}">
                     <i class="fas fa-calendar-check"></i>
                     Réservations
                 </a>
+                <a href="{{ path('app_admin_consultation_index') }}" class="d-none"></a>
+                <a href="{{ path('app_admin_consultation_creneau_index') }}" class="d-none"></a>
                 <a href="{{ path('admin_profil_bebe') }}" class="nav-link {{ app.request.attributes.get('_route') == 'admin_profil_bebe' ? 'active' : '' }}">
                     <i class="fas fa-baby"></i>
                     Profil bébé
