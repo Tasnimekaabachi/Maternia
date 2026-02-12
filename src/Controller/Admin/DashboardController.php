@@ -42,6 +42,7 @@ final class DashboardController extends AbstractController
     #[Route('/profil-bebe', name: 'profil_bebe', methods: ['GET'])]
     public function profilBebe(): Response
     {
-        return $this->render('admin/profil_bebe.html.twig');
+        // Redirige vers la liste des offres babysitter qui alimente le template admin/profil_bebe.html.twig
+        return $this->redirectToRoute('app_offre_baby_sitter_index');
     }
 }

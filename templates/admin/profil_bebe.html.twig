@@ -12,39 +12,193 @@
 {% endblock %}
 
 {% block header_actions %}
-    <button type="button" class="btn btn-primary admin-btn-primary">
-        <i class="fas fa-plus me-1"></i> Ajouter un profil
-    </button>
+    <a href="{{ path('app_offre_baby_sitter_new') }}" class="btn btn-primary admin-btn-primary">
+        <i class="fas fa-plus me-1"></i> Ajouter une offre babysitter
+    </a>
 {% endblock %}
 
 {% block content %}
-    <div class="admin-card">
-        <div class="admin-card-header">Profils bébé</div>
-        <div class="admin-card-body p-0">
-            <div class="table-responsive">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Prénom</th>
-                            <th>Date de naissance</th>
-                            <th>Parent / Responsable</th>
-                            <th>Statut</th>
-                            <th width="120"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="5">
-                                <div class="admin-empty py-4">
-                                    <i class="fas fa-baby"></i>
-                                    <p>Aucun profil bébé pour le moment.</p>
-                                    <button type="button" class="btn btn-primary admin-btn-primary">Ajouter un profil bébé</button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+    <div class="row">
+        <div class="col-lg-9 mb-3">
+            <div class="admin-card">
+                <div class="admin-card-header d-flex justify-content-between align-items-center">
+                    <span>Offres babysitter</span>
+                </div>
+                <div class="admin-card-body">
+                    <form method="get" class="row g-2 mb-3">
+                        <div class="col-md-4">
+                            <input type="text"
+                                   name="ville"
+                                   class="form-control form-control-sm"
+                                   placeholder="Ville"
+                                   value="{{ ville ?? '' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <input type="number"
+                                   name="tarif"
+                                   step="0.01"
+                                   class="form-control form-control-sm"
+                                   placeholder="Tarif max"
+                                   value="{{ tarif ?? '' }}">
+                        </div>
+                        <div class="col-md-4 d-grid">
+                            <button type="submit" class="btn btn-sm btn-primary">
+                                <i class="fas fa-search me-1"></i> Filtrer
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Babysitter</th>
+                                    <th>Expérience</th>
+                                    <th>Ville</th>
+                                    <th>Tarif horaire</th>
+                                    <th>Disponibilité</th>
+                                    <th width="160"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for offre in offre_baby_sitters %}
+                                    <tr>
+                                        <td>{{ offre.nomBabysitter }}</td>
+                                        <td>{{ offre.experience }} ans</td>
+                                        <td>{{ offre.ville }}</td>
+                                        <td>{{ offre.tarif|number_format(2, ',', ' ') }} € / h</td>
+                                        <td>
+                                            {% if offre.disponibilite %}
+                                                <span class="badge bg-success text-white">Disponible</span>
+                                            {% else %}
+                                                <span class="badge bg-danger text-white">Indisponible</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{{ path('app_offre_baby_sitter_show', {'id': offre.id}) }}" class="btn btn-sm btn-outline-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ path('app_offre_baby_sitter_edit', {'id': offre.id}) }}" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="admin-empty py-4 text-center">
+                                                <i class="fas fa-baby mb-2"></i>
+                                                <p class="mb-2">Aucune offre babysitter trouvée.</p>
+                                                <a href="{{ path('app_offre_baby_sitter_new') }}" class="btn btn-primary admin-btn-primary btn-sm">
+                                                    Ajouter une première offre
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="admin-card">
+                <div class="admin-card-header">Statistiques par ville</div>
+                <div class="admin-card-body">
+                    {% if stats_ville is not empty %}
+                        <ul class="list-unstyled mb-0">
+                            {% for stat in stats_ville %}
+                                <li class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>{{ stat.ville }}</span>
+                                    <span class="text-muted small">
+                                        {{ stat.nbOffres }} offre(s) · {{ stat.tarifMoyen|number_format(2, ',', ' ') }} € / h
+                                    </span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted mb-0">Aucune statistique disponible pour le moment.</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        (function () {
+            const statsVille = {{ stats_ville|json_encode|raw }};
+            if (!statsVille || !statsVille.length) {
+                return;
+            }
+
+            // Crée dynamiquement un bloc full-width sous les cartes existantes
+            const adminContent = document.querySelector('.admin-content');
+            if (!adminContent) {
+                return;
+            }
+
+            const row = document.createElement('div');
+            row.className = 'row mt-3';
+            row.innerHTML = `
+                <div class="col-12 col-lg-8 mx-auto">
+                    <div class="admin-card">
+                        <div class="admin-card-header">Répartition des offres par ville</div>
+                        <div class="admin-card-body">
+                            <canvas id="chartVilleBabysitter" height="80"></canvas>
+                        </div>
+                    </div>
+                </div>
+            `;
+            adminContent.appendChild(row);
+
+            const labels = statsVille.map(s => s.ville);
+            const data = statsVille.map(s => s.nbOffres);
+
+            const ctx = document.getElementById('chartVilleBabysitter').getContext('2d');
+
+            const colors = [
+                '#ff6384','#36a2eb','#ffcd56',
+                '#4bc0c0','#9966ff','#ff9f40',
+                '#8dd17e','#f67019','#00a6b4',
+                '#845ec2'
+            ];
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: labels.map((_, i) => colors[i % colors.length]),
+                        borderColor: '#ffffff',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    return `${label}: ${value} offre(s)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        })();
+    </script>
 {% endblock %}

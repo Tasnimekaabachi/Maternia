@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OffreBabySitterRepository::class)]
 class OffreBabySitter
@@ -17,24 +18,53 @@ class OffreBabySitter
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Le nom de la babysitter est obligatoire.')]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: 'Le nom doit contenir au minimum {{ limit }} caractères.',
+        maxMessage: 'Le nom doit contenir au maximum {{ limit }} caractères.'
+    )]
     private ?string $nomBabysitter = null;
 
     #[ORM\Column(length: 20)]
+    #[Assert\NotBlank(message: 'Le numéro de téléphone est obligatoire.')]
+    #[Assert\Regex(
+        pattern: '/^\+?[0-9\s]{8,20}$/',
+        message: 'Le numéro de téléphone n\'est pas valide.'
+    )]
     private ?string $telephone = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: 'L\'expérience est obligatoire.')]
+    #[Assert\PositiveOrZero(message: 'L\'expérience doit être un nombre positif.')]
     private ?int $experience = null;
 
     #[ORM\Column(length: 100)]
+    #[Assert\NotBlank(message: 'La ville est obligatoire.')]
+    #[Assert\Length(
+        min: 2,
+        max: 100,
+        minMessage: 'La ville doit contenir au minimum {{ limit }} caractères.',
+        maxMessage: 'La ville doit contenir au maximum {{ limit }} caractères.'
+    )]
     private ?string $ville = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: 'Le tarif est obligatoire.')]
+    #[Assert\Positive(message: 'Le tarif doit être un nombre positif.')]
     private ?float $tarif = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: 'La description est obligatoire.')]
+    #[Assert\Length(
+        min: 10,
+        minMessage: 'La description doit contenir au minimum {{ limit }} caractères.'
+    )]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: 'La disponibilité est obligatoire.')]
     private ?bool $disponibilite = null;
 
     // 🔗 Relation avec DemandeBabySitter

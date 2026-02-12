@@ -3,11 +3,670 @@
 {% block title %}Edit DemandeBabySitter{% endblock %}
 
 {% block body %}
-    <h1>Edit DemandeBabySitter</h1>
 
-    {{ include('demande_baby_sitter/_form.html.twig', {'button_label': 'Update'}) }}
+<div class="edit-page-wrapper">
+    <!-- Background decoratif -->
+    <div class="background-decoration">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+    </div>
 
-    <a href="{{ path('app_demande_baby_sitter_index') }}">back to list</a>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-xl-9 col-lg-10">
+                
+                <!-- Breadcrumb Navigation -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb custom-breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{{ path('app_demande_baby_sitter_index') }}">
+                                <i class="bi bi-house-door"></i> Accueil
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{{ path('app_demande_baby_sitter_index') }}">
+                                <i class="bi bi-list-ul"></i> Demandes
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            <i class="bi bi-pencil"></i> Modifier
+                        </li>
+                    </ol>
+                </nav>
 
-    {{ include('demande_baby_sitter/_delete_form.html.twig') }}
+                <!-- En-tête principal avec action rapide -->
+                <div class="page-header mb-5">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="icon-box-large me-3">
+                                    <i class="bi bi-pencil-square"></i>
+                                </div>
+                                <div>
+                                    <h1 class="display-5 fw-bold text-dark mb-2">
+                                        Modifier la Demande
+                                    </h1>
+                                    <p class="text-muted fs-6 mb-0">
+                                        <i class="bi bi-clock-history me-2"></i>
+                                        Dernière modification : aujourd'hui
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <a href="{{ path('app_demande_baby_sitter_index') }}" 
+                               class="btn btn-outline-dark btn-lg rounded-pill px-4">
+                                <i class="bi bi-arrow-left me-2"></i>Retour
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card principale du formulaire avec design amélioré -->
+                <div class="card main-form-card shadow-2xl border-0 mb-4">
+                    <!-- Header avec gradient et style moderne -->
+                    <div class="card-header-custom">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <h4 class="mb-0 text-white fw-bold">
+                                    <i class="bi bi-file-text me-2"></i>Détails de la Demande
+                                </h4>
+                            </div>
+                            <div class="col-md-6 text-md-end mt-2 mt-md-0">
+                                <span class="badge badge-light-custom px-3 py-2">
+                                    <i class="bi bi-shield-check me-1"></i>Formulaire sécurisé
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Corps du formulaire avec padding amélioré -->
+                    <div class="card-body p-5">
+                        <div class="form-wrapper">
+                            {{ include('demande_baby_sitter/_form.html.twig', {'button_label': 'Update'}) }}
+                        </div>
+                    </div>
+
+                    <!-- Footer de la card avec actions -->
+                    <div class="card-footer-custom">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <p class="text-muted small mb-0">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Tous les champs marqués d'un * sont obligatoires
+                                </p>
+                            </div>
+                            <div class="col-md-6 text-md-end mt-2 mt-md-0">
+                                <span class="text-muted small">
+                                    <i class="bi bi-lock-fill me-1"></i>Vos données sont protégées
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Zone d'actions avec boutons améliorés -->
+                <div class="action-zone mb-4">
+                    <div class="row g-3">
+                        <!-- Bouton Retour -->
+                        <div class="col-md-6">
+                            <a href="{{ path('app_demande_baby_sitter_index') }}" 
+                               class="btn btn-action btn-secondary-custom w-100">
+                                <div class="btn-content">
+                                    <i class="bi bi-arrow-left-circle fs-4"></i>
+                                    <div class="btn-text">
+                                        <span class="btn-title">Retour à la liste</span>
+                                        <span class="btn-subtitle">Annuler les modifications</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        
+                        <!-- Bouton Supprimer -->
+                        <div class="col-md-6">
+                            <div class="delete-button-wrapper w-100">
+                                {{ include('demande_baby_sitter/_delete_form.html.twig') }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cards d'aide et informations -->
+                <div class="row g-4 mt-2">
+                    <!-- Carte aide -->
+                    <div class="col-md-6">
+                        <div class="info-card help-card">
+                            <div class="info-card-icon">
+                                <i class="bi bi-question-circle"></i>
+                            </div>
+                            <div class="info-card-content">
+                                <h6 class="fw-bold mb-2">Besoin d'aide ?</h6>
+                                <p class="small text-muted mb-0">
+                                    Assurez-vous que toutes les informations sont correctes avant de mettre à jour.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Carte conseils -->
+                    <div class="col-md-6">
+                        <div class="info-card tips-card">
+                            <div class="info-card-icon">
+                                <i class="bi bi-lightbulb"></i>
+                            </div>
+                            <div class="info-card-content">
+                                <h6 class="fw-bold mb-2">Conseil pratique</h6>
+                                <p class="small text-muted mb-0">
+                                    Vérifiez les dates et horaires pour éviter les conflits de planning.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* === VARIABLES DE COULEURS === */
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    --dark-gradient: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+    --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+    --shadow-xl: 0 1.5rem 4rem rgba(0, 0, 0, 0.2);
+    --shadow-2xl: 0 2rem 5rem rgba(0, 0, 0, 0.25);
+}
+
+/* === BACKGROUND DECORATIF === */
+.edit-page-wrapper {
+    position: relative;
+    min-height: 100vh;
+    background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+}
+
+.background-decoration {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    animation: float 20s infinite ease-in-out;
+}
+
+.circle-1 {
+    width: 300px;
+    height: 300px;
+    top: -150px;
+    right: -150px;
+    animation-delay: 0s;
+}
+
+.circle-2 {
+    width: 200px;
+    height: 200px;
+    bottom: -100px;
+    left: -100px;
+    animation-delay: 5s;
+}
+
+.circle-3 {
+    width: 150px;
+    height: 150px;
+    top: 50%;
+    left: 10%;
+    animation-delay: 10s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -30px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+}
+
+/* === CONTAINER === */
+.container {
+    position: relative;
+    z-index: 1;
+}
+
+/* === BREADCRUMB CUSTOM === */
+.custom-breadcrumb {
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.custom-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+    color: #6c757d;
+    font-size: 1.2rem;
+}
+
+.custom-breadcrumb a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.custom-breadcrumb a:hover {
+    color: #764ba2;
+    transform: translateX(3px);
+}
+
+.custom-breadcrumb .active {
+    color: #6c757d;
+    font-weight: 600;
+}
+
+/* === PAGE HEADER === */
+.page-header {
+    position: relative;
+}
+
+.icon-box-large {
+    width: 80px;
+    height: 80px;
+    background: var(--primary-gradient);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-md);
+    animation: pulse-icon 3s infinite;
+}
+
+.icon-box-large i {
+    font-size: 2.5rem;
+    color: white;
+}
+
+@keyframes pulse-icon {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* === MAIN FORM CARD === */
+.main-form-card {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-2xl);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    background: white;
+}
+
+.main-form-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 2.5rem 6rem rgba(0, 0, 0, 0.3);
+}
+
+.card-header-custom {
+    background: var(--primary-gradient);
+    padding: 2rem 2.5rem;
+    border: none;
+}
+
+.badge-light-custom {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    backdrop-filter: blur(10px);
+}
+
+.card-footer-custom {
+    background: #f8f9fa;
+    padding: 1.5rem 2.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* === FORM WRAPPER === */
+.form-wrapper {
+    position: relative;
+}
+
+/* === AMÉLIORATION DES CHAMPS DE FORMULAIRE === */
+.form-wrapper .form-label {
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-wrapper .form-control,
+.form-wrapper .form-select,
+.form-wrapper textarea {
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    padding: 0.9rem 1.2rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.form-wrapper .form-control:focus,
+.form-wrapper .form-select:focus,
+.form-wrapper textarea:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.3rem rgba(102, 126, 234, 0.15);
+    background: white;
+    transform: translateY(-2px);
+}
+
+.form-wrapper .form-control:hover,
+.form-wrapper .form-select:hover,
+.form-wrapper textarea:hover {
+    border-color: #764ba2;
+    background: white;
+}
+
+/* === BOUTONS D'ACTION AMÉLIORÉS === */
+.action-zone {
+    position: relative;
+}
+
+.btn-action {
+    position: relative;
+    padding: 0;
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    height: 100px;
+}
+
+.btn-action:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+}
+
+.btn-secondary-custom {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+}
+
+.btn-content {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    height: 100%;
+    color: white;
+}
+
+.btn-content i {
+    margin-right: 1.5rem;
+    opacity: 0.9;
+}
+
+.btn-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.btn-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.btn-subtitle {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    font-weight: 400;
+}
+
+/* === WRAPPER BOUTON DELETE === */
+.delete-button-wrapper {
+    height: 100px;
+}
+
+.delete-button-wrapper form {
+    height: 100%;
+    width: 100%;
+}
+
+.delete-button-wrapper button {
+    width: 100%;
+    height: 100%;
+    background: var(--danger-gradient);
+    border: none;
+    border-radius: 16px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 700;
+    box-shadow: var(--shadow-md);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.delete-button-wrapper button:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+}
+
+.delete-button-wrapper button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: left 0.5s ease;
+}
+
+.delete-button-wrapper button:hover::before {
+    left: 100%;
+}
+
+.delete-button-wrapper button i {
+    margin-right: 0.5rem;
+    font-size: 1.3rem;
+}
+
+/* === INFO CARDS === */
+.info-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: flex-start;
+    transition: all 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.info-card-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.help-card .info-card-icon {
+    background: linear-gradient(135deg, #667eea20, #764ba220);
+    color: #667eea;
+}
+
+.tips-card .info-card-icon {
+    background: linear-gradient(135deg, #f093fb20, #f5576c20);
+    color: #f5576c;
+}
+
+.info-card-content h6 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+/* === BOUTONS STANDARD === */
+.btn {
+    border-radius: 12px;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-outline-dark {
+    border-color: #2c3e50;
+    color: #2c3e50;
+}
+
+.btn-outline-dark:hover {
+    background: #2c3e50;
+    color: white;
+    border-color: #2c3e50;
+}
+
+.rounded-pill {
+    border-radius: 50px !important;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+    .icon-box-large {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .icon-box-large i {
+        font-size: 2rem;
+    }
+    
+    h1.display-5 {
+        font-size: 1.8rem;
+    }
+    
+    .card-header-custom,
+    .card-body,
+    .card-footer-custom {
+        padding: 1.5rem;
+    }
+    
+    .btn-action {
+        height: auto;
+        min-height: 80px;
+    }
+    
+    .btn-content {
+        padding: 1rem;
+    }
+    
+    .btn-title {
+        font-size: 1rem;
+    }
+    
+    .btn-subtitle {
+        font-size: 0.75rem;
+    }
+    
+    .delete-button-wrapper {
+        height: auto;
+        min-height: 80px;
+    }
+    
+    .info-card {
+        padding: 1rem;
+    }
+    
+    .custom-breadcrumb {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .circle {
+        display: none;
+    }
+    
+    .page-header .col-md-4 {
+        margin-top: 1rem;
+    }
+    
+    .btn-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .btn-content i {
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+    }
+    
+    .btn-text {
+        align-items: center;
+        text-align: center;
+    }
+}
+
+/* === ANIMATIONS === */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.main-form-card,
+.action-zone,
+.info-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.action-zone {
+    animation-delay: 0.1s;
+}
+
+.info-card {
+    animation-delay: 0.2s;
+}
+</style>
+
 {% endblock %}

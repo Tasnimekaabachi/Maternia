@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\DemandeBabySitterRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: DemandeBabySitterRepository::class)]
 class DemandeBabySitter
@@ -15,23 +16,40 @@ class DemandeBabySitter
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Le nom du parent est obligatoire.')]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: 'Le nom doit contenir au minimum {{ limit }} caractères.',
+        maxMessage: 'Le nom doit contenir au maximum {{ limit }} caractères.'
+    )]
     private ?string $nomParent = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'L\'email du parent est obligatoire.')]
+    #[Assert\Email(message: 'L\'adresse email n\'est pas valide.')]
     private ?string $emailParent = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: 'Le message est obligatoire.')]
+    #[Assert\Length(
+        min: 10,
+        minMessage: 'Le message doit contenir au minimum {{ limit }} caractères.'
+    )]
     private ?string $message = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotNull(message: 'La date de demande est obligatoire.')]
     private ?\DateTimeInterface $dateDemande = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: 'Le statut est obligatoire.')]
     private ?string $statut = null;
 
     // 🔗 Relation avec OffreBabySitter
     #[ORM\ManyToOne(inversedBy: 'demandes')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message: 'L\'offre associée est obligatoire.')]
     private ?OffreBabySitter $offre = null;
 
     // ---------------- GETTERS & SETTERS ----------------

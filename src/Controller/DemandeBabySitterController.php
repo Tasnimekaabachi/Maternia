@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\DemandeBabySitter;
+use App\Entity\OffreBabySitter;
 use App\Form\DemandeBabySitterType;
 use App\Repository\DemandeBabySitterRepository;
+use App\Repository\OffreBabySitterRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,9 +25,22 @@ final class DemandeBabySitterController extends AbstractController
     }
 
     #[Route('/new', name: 'app_demande_baby_sitter_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, OffreBabySitterRepository $offreRepository): Response
     {
         $demandeBabySitter = new DemandeBabySitter();
+        // Valeurs par défaut côté serveur
+        $demandeBabySitter->setDateDemande(new \DateTime());
+        $demandeBabySitter->setStatut('En attente');
+
+        // Pré-sélection d'une offre si ?offre=ID est présent dans l'URL
+        $offreId = $request->query->get('offre');
+        if ($offreId) {
+            $offre = $offreRepository->find($offreId);
+            if ($offre instanceof OffreBabySitter) {
+                $demandeBabySitter->setOffre($offre);
+            }
+        }
+
         $form = $this->createForm(DemandeBabySitterType::class, $demandeBabySitter);
         $form->handleRequest($request);
 

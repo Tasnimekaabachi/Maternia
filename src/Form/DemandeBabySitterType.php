@@ -17,11 +17,9 @@ class DemandeBabySitterType extends AbstractType
             ->add('nomParent')
             ->add('emailParent')
             ->add('message')
-            ->add('dateDemande')
-            ->add('statut')
             ->add('offre', EntityType::class, [
                 'class' => OffreBabySitter::class,
-                'choice_label' => 'id',
+                'choice_label' => 'nomBabysitter',
             ])
         ;
     }

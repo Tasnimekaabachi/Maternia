@@ -1,42 +1,99 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base.html.twig' %}
 
-{% block title %}DemandeBabySitter{% endblock %}
+{% block title %}Détail demande babysitting{% endblock %}
+{% block page_title %}Détail de la demande{% endblock %}
 
-{% block body %}
-    <h1>DemandeBabySitter</h1>
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ path('admin_dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('app_demande_baby_sitter_index') }}">Demandes de babysitting</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Demande #{{ demande_baby_sitter.id }}</li>
+        </ol>
+    </nav>
+{% endblock %}
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ demande_baby_sitter.id }}</td>
-            </tr>
-            <tr>
-                <th>NomParent</th>
-                <td>{{ demande_baby_sitter.nomParent }}</td>
-            </tr>
-            <tr>
-                <th>EmailParent</th>
-                <td>{{ demande_baby_sitter.emailParent }}</td>
-            </tr>
-            <tr>
-                <th>Message</th>
-                <td>{{ demande_baby_sitter.message }}</td>
-            </tr>
-            <tr>
-                <th>DateDemande</th>
-                <td>{{ demande_baby_sitter.dateDemande ? demande_baby_sitter.dateDemande|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Statut</th>
-                <td>{{ demande_baby_sitter.statut }}</td>
-            </tr>
-        </tbody>
-    </table>
+{% block content %}
+    <div class="row">
+        <div class="col-lg-8 mb-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1 text-primary">
+                            <i class="bi bi-person-lines-fill me-2"></i>{{ demande_baby_sitter.nomParent }}
+                        </h5>
+                        <p class="mb-0 text-muted small">
+                            {{ demande_baby_sitter.emailParent }}
+                        </p>
+                    </div>
+                    <div>
+                        {% if demande_baby_sitter.statut == 'En attente' %}
+                            <span class="badge bg-warning text-white px-3 py-2">
+                                {{ demande_baby_sitter.statut }}
+                            </span>
+                        {% elseif demande_baby_sitter.statut == 'Validée' %}
+                            <span class="badge bg-success text-white px-3 py-2">
+                                {{ demande_baby_sitter.statut }}
+                            </span>
+                        {% elseif demande_baby_sitter.statut == 'Refusée' %}
+                            <span class="badge bg-danger text-white px-3 py-2">
+                                {{ demande_baby_sitter.statut }}
+                            </span>
+                        {% else %}
+                            <span class="badge bg-light text-muted px-3 py-2">
+                                {{ demande_baby_sitter.statut }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="text-muted text-uppercase small fw-semibold">Offre concernée</h6>
+                        {% if demande_baby_sitter.offre %}
+                            <p class="mb-1">
+                                <strong>{{ demande_baby_sitter.offre.nomBabysitter }}</strong> • {{ demande_baby_sitter.offre.ville }}
+                            </p>
+                            <p class="mb-0 small text-muted">
+                                Tarif : {{ demande_baby_sitter.offre.tarif|number_format(2, ',', ' ') }} € / h
+                            </p>
+                        {% else %}
+                            <p class="mb-0 text-muted small">Aucune offre associée.</p>
+                        {% endif %}
+                    </div>
 
-    <a href="{{ path('app_demande_baby_sitter_index') }}">back to list</a>
+                    <div class="mb-3">
+                        <h6 class="text-muted text-uppercase small fw-semibold">Date de la demande</h6>
+                        <p class="mb-0">
+                            {{ demande_baby_sitter.dateDemande ? demande_baby_sitter.dateDemande|date('d/m/Y H:i') : '' }}
+                        </p>
+                    </div>
 
-    <a href="{{ path('app_demande_baby_sitter_edit', {'id': demande_baby_sitter.id}) }}">edit</a>
+                    <div>
+                        <h6 class="text-muted text-uppercase small fw-semibold">Message</h6>
+                        <p class="mb-0">
+                            {{ demande_baby_sitter.message }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    {{ include('demande_baby_sitter/_delete_form.html.twig') }}
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0 text-muted text-uppercase small fw-semibold">Actions</h6>
+                </div>
+                <div class="card-body d-grid gap-2">
+                    <a href="{{ path('app_demande_baby_sitter_edit', {'id': demande_baby_sitter.id}) }}"
+                       class="btn btn-warning text-white">
+                        <i class="bi bi-pencil-square me-1"></i>Modifier la demande
+                    </a>
+                    {{ include('demande_baby_sitter/_delete_form.html.twig') }}
+                    <a href="{{ path('app_demande_baby_sitter_index') }}" class="btn btn-outline-secondary">
+                        &larr; Retour à la liste
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

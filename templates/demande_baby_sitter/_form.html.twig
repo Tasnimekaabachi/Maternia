@@ -1,4 +1,37 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+    <div class="mb-3">
+        {{ form_label(form.nomParent, 'Nom du parent', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.nomParent, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger small">
+            {{ form_errors(form.nomParent) }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.emailParent, 'Email du parent', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.emailParent, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger small">
+            {{ form_errors(form.emailParent) }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.message, 'Message', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.message, {'attr': {'class': 'form-control', 'rows': 5}}) }}
+        <div class="text-danger small">
+            {{ form_errors(form.message) }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.offre, 'Offre de babysitting', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.offre, {'attr': {'class': 'form-select'}}) }}
+        <div class="text-danger small">
+            {{ form_errors(form.offre) }}
+        </div>
+    </div>
+
+    <button class="btn btn-primary btn-border-radius">
+        {{ button_label|default('Enregistrer') }}
+    </button>
 {{ form_end(form) }}
