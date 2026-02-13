@@ -14,18 +14,21 @@ class CreneauHoraireType extends AbstractType
         $builder
             ->add('jour', \Symfony\Component\Form\Extension\Core\Type\DateType::class, [
                 'label' => 'Jour',
+                'required' => false,
                 'widget' => 'single_text',
                 'html5' => true,
                 'attr' => ['class' => 'form-control modern-input']
             ])
             ->add('heureDebut', \Symfony\Component\Form\Extension\Core\Type\TimeType::class, [
                 'label' => 'Heure de début',
+                'required' => false,
                 'widget' => 'single_text',
                 'html5' => true,
                 'attr' => ['class' => 'form-control modern-input']
             ])
             ->add('heureFin', \Symfony\Component\Form\Extension\Core\Type\TimeType::class, [
                 'label' => 'Heure de fin',
+                'required' => false,
                 'widget' => 'single_text',
                 'html5' => true,
                 'attr' => ['class' => 'form-control modern-input']

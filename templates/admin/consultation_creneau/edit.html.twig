@@ -292,16 +292,16 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">H. Début</label>
-                                        {{ form_widget(form.heureDebut, {'attr': {'class': 'form-control modern-input timepicker'}}) }}
+                                        {{ form_widget(form.heureDebut, {'attr': {'class': 'form-control modern-input timepicker', 'id': 'creneau_heure_debut'}}) }}
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">H. Fin</label>
-                                        {{ form_widget(form.heureFin, {'attr': {'class': 'form-control modern-input timepicker'}}) }}
+                                        {{ form_widget(form.heureFin, {'attr': {'class': 'form-control modern-input timepicker', 'id': 'creneau_heure_fin'}}) }}
                                     </div>
 
                                     <div class="col-md-4">
                                         <label class="form-label">Durée (min)</label>
-                                        {{ form_widget(form.dureeMinutes, {'attr': {'class': 'form-control modern-input'}}) }}
+                                        {{ form_widget(form.dureeMinutes, {'attr': {'class': 'form-control modern-input', 'id': 'creneau_duree_minutes'}}) }}
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Nombre de places</label>
@@ -352,35 +352,44 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Function to calculate end time
-        function calculateHeureFin(containerElement, isMain = false) {
-            const dureeInput = document.querySelector('[id$="_dureeMinutes"]');
-            let debutInput, finInput;
-
+        // Heure de fin = Heure de début + Durée (remplissage automatique)
+        function calculateHeureFin(containerElement, isMain, debutValueOverride) {
+            var dureeInput, debutInput, finInput;
             if (isMain) {
-                debutInput = document.querySelector('[id$="_heureDebut"]:not([id*="_creneauxHoraires_"])');
-                finInput = document.querySelector('[id$="_heureFin"]:not([id*="_creneauxHoraires_"])');
+                debutInput = document.getElementById('creneau_heure_debut');
+                finInput = document.getElementById('creneau_heure_fin');
+                dureeInput = document.getElementById('creneau_duree_minutes');
             } else {
-                debutInput = containerElement.querySelector('[id$="_heureDebut"]');
-                finInput = containerElement.querySelector('[id$="_heureFin"]');
+                if (!containerElement) return;
+                debutInput = containerElement.querySelector('input[id*="_heureDebut"]');
+                finInput = containerElement.querySelector('input[id*="_heureFin"]');
+                dureeInput = document.getElementById('creneau_duree_minutes');
             }
+            if (!dureeInput || !finInput) return;
 
-            if (debutInput && debutInput.value && dureeInput && dureeInput.value && finInput) {
-                const [hours, minutes] = debutInput.value.split(':').map(Number);
-                const duree = parseInt(dureeInput.value);
-                
-                const date = new Date();
-                date.setHours(hours);
-                date.setMinutes(minutes + duree);
-                
-                const newHours = String(date.getHours()).padStart(2, '0');
-                const newMinutes = String(date.getMinutes()).padStart(2, '0');
-                
-                if (finInput._flatpickr) {
-                    finInput._flatpickr.setDate(`${newHours}:${newMinutes}`);
-                } else {
-                    finInput.value = `${newHours}:${newMinutes}`;
-                }
+            var debutValue = (arguments.length >= 3 && debutValueOverride != null && debutValueOverride !== '') ? debutValueOverride : (debutInput && debutInput.value ? debutInput.value.trim() : null);
+            if (!debutValue) return;
+
+            var duree = parseInt(dureeInput.value, 10);
+            if (isNaN(duree) || duree <= 0) return;
+
+            var parts = debutValue.split(':');
+            var hours = parseInt(parts[0], 10) || 0;
+            var minutes = parseInt(parts[1], 10) || 0;
+
+            var d = new Date();
+            d.setHours(hours, minutes, 0, 0);
+            d.setMinutes(d.getMinutes() + duree);
+
+            var newHours = ('0' + d.getHours()).slice(-2);
+            var newMinutes = ('0' + d.getMinutes()).slice(-2);
+            var newTime = newHours + ':' + newMinutes;
+
+            if (finInput._flatpickr) {
+                finInput._flatpickr.setDate(newTime, false);
+            } else {
+                finInput.value = newTime;
+                finInput.dispatchEvent(new Event('input', { bubbles: true }));
             }
         }
 
@@ -402,12 +411,34 @@
             time_24hr: false,
             minuteIncrement: 5,
             disableMobile: "true",
+            onChange: function(selectedDates, dateStr, instance) {
+                if (instance.element.id && instance.element.id.indexOf('heureDebut') !== -1) {
+                    if (instance.element.id === 'creneau_heure_debut') {
+                        calculateHeureFin(null, true, dateStr || undefined);
+                    } else {
+                        var wrapper = instance.element.closest('.creneau-item');
+                        if (wrapper) calculateHeureFin(wrapper, false, dateStr || undefined);
+                    }
+                }
+            },
             onClose: function(selectedDates, dateStr, instance) {
-                if (instance.element.id.includes('heureDebut')) {
-                    calculateHeureFin(null, true);
+                if (instance.element.id && instance.element.id.indexOf('heureDebut') !== -1) {
+                    if (instance.element.id === 'creneau_heure_debut') {
+                        calculateHeureFin(null, true, dateStr || undefined);
+                    } else {
+                        var wrapper = instance.element.closest('.creneau-item');
+                        if (wrapper) calculateHeureFin(wrapper, false, dateStr || undefined);
+                    }
                 }
             }
         });
+
+        // Recalcul au changement manuel (durée ou heure début principal)
+        var mainDebut = document.getElementById('creneau_heure_debut');
+        if (mainDebut) {
+            mainDebut.addEventListener('change', function() { calculateHeureFin(null, true); });
+            mainDebut.addEventListener('input', function() { calculateHeureFin(null, true); });
+        }
 
         const container = document.getElementById('creneaux-container');
         const addButton = document.getElementById('add-creneau');
@@ -451,9 +482,14 @@
                             time_24hr: false,
                             minuteIncrement: 5,
                             disableMobile: "true",
+                            onChange: function(selectedDates, dateStr, instance) {
+                                if (instance.element.id && instance.element.id.includes('heureDebut')) {
+                                    calculateHeureFin(wrapper, false, dateStr || undefined);
+                                }
+                            },
                             onClose: function(selectedDates, dateStr, instance) {
-                                if (instance.element.id.includes('heureDebut')) {
-                                    calculateHeureFin(wrapper);
+                                if (instance.element.id && instance.element.id.includes('heureDebut')) {
+                                    calculateHeureFin(wrapper, false, dateStr || undefined);
                                 }
                             }
                         });
@@ -473,18 +509,19 @@
             });
         }
 
-        // Global listeners
-        const dureeGlobal = document.querySelector('[id$="_dureeMinutes"]');
+        // Quand la durée change : recalculer l'heure de fin (créneau principal + sous-créneaux)
+        var dureeGlobal = document.getElementById('creneau_duree_minutes');
         if (dureeGlobal) {
-            dureeGlobal.addEventListener('change', function() {
-                // Recalculate main slot
+            function recalcAllFromDuree() {
                 calculateHeureFin(null, true);
-                // Recalculate all collection slots
                 if (container) {
-                    const items = container.querySelectorAll('.creneau-item');
-                    items.forEach(item => calculateHeureFin(item));
+                    container.querySelectorAll('.creneau-item').forEach(function(item) {
+                        calculateHeureFin(item, false);
+                    });
                 }
-            });
+            }
+            dureeGlobal.addEventListener('change', recalcAllFromDuree);
+            dureeGlobal.addEventListener('input', recalcAllFromDuree);
         }
     });
 </script>

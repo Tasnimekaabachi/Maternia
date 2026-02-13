@@ -72,6 +72,21 @@ class ConsultationCreneauCrudController extends AbstractController
         ]);
     }
 
+    private function getExistingPhotos(): array
+    {
+        $projectDir = $this->getParameter('kernel.project_dir');
+        $uploadDir = $projectDir . '/public/uploads/medecins';
+        $photos = [];
+        if (is_dir($uploadDir)) {
+            foreach (scandir($uploadDir) as $file) {
+                if ($file !== '.' && $file !== '..' && preg_match('/\.(jpg|jpeg|png|gif|webp|avif)$/i', $file)) {
+                    $photos[$file] = $file;
+                }
+            }
+        }
+        return $photos;
+    }
+
     private function getFrenchDayName(\DateTimeInterface $date): string
     {
         $days = [
@@ -117,20 +132,29 @@ class ConsultationCreneauCrudController extends AbstractController
         $consultationCreneau->setCreatedAt(new \DateTime());
         $consultationCreneau->setUpdatedAt(new \DateTime());
         $consultationCreneau->setStatutReservation('DISPONIBLE');
+        // Requis pour la validation (entité non persistée, utilisée comme template)
+        $consultationCreneau->setDateDebut(new \DateTime());
+        $consultationCreneau->setDateFin(new \DateTime());
+
+        $existingPhotos = $this->getExistingPhotos();
 
         $form = $this->createForm(ConsultationCreneauType::class, $consultationCreneau, [
-            'consultations' => $consultationRepository->findAllOrdered()
+            'consultations' => $consultationRepository->findAllOrdered(),
+            'existing_photos' => $existingPhotos,
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Upload photo médecin : enregistrement physique + nom en BDD
+            // Photo : upload nouveau OU sélection existante
             $photoFile = $form->get('photoFile')->getData();
+            $photoExistante = $form->get('photoExistante')->getData();
             if ($photoFile) {
                 $photoFileName = $this->processPhotoUpload($photoFile);
                 if ($photoFileName) {
                     $consultationCreneau->setPhotoMedecin($photoFileName);
                 }
+            } elseif ($photoExistante) {
+                $consultationCreneau->setPhotoMedecin($photoExistante);
             }
 
             // Récupérer la collection de créneaux horaires
@@ -140,7 +164,7 @@ class ConsultationCreneauCrudController extends AbstractController
             if (!empty($creneauxHoraires)) {
                 foreach ($creneauxHoraires as $idx => $creneauData) {
                     // Ignorer les créneaux vides/incomplets
-                    if (empty($creneauData['heureDebut']) || empty($creneauData['heureFin'])) {
+                    if (empty($creneauData['jour']) || empty($creneauData['heureDebut']) || empty($creneauData['heureFin'])) {
                         continue;
                     }
 
@@ -161,10 +185,13 @@ class ConsultationCreneauCrudController extends AbstractController
                     $creneau->setCreatedAt(new \DateTime());
                     $creneau->setUpdatedAt(new \DateTime());
 
-                    // Dates
+                    // Dates : jour + heures
                     $creneau->setJour($creneauData['jour']);
                     $creneau->setHeureDebut($creneauData['heureDebut']);
                     $creneau->setHeureFin($creneauData['heureFin']);
+                    // S'assurer que dateDebut/dateFin sont bien remplis (requis pour l'affichage public)
+                    $creneau->setDateDebut($this->mergeDateAndTime($creneauData['jour'], $creneauData['heureDebut']));
+                    $creneau->setDateFin($this->mergeDateAndTime($creneauData['jour'], $creneauData['heureFin']));
 
                     $entityManager->persist($creneau);
                     $creneauxCrees++;
@@ -210,18 +237,22 @@ class ConsultationCreneauCrudController extends AbstractController
         $consultationCreneau->setUpdatedAt(new \DateTime());
 
         $form = $this->createForm(ConsultationCreneauType::class, $consultationCreneau, [
-            'consultations' => $consultationRepository->findAllOrdered()
+            'consultations' => $consultationRepository->findAllOrdered(),
+            'existing_photos' => $this->getExistingPhotos(),
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Upload photo médecin si un nouveau fichier est envoyé
+            // Photo : upload nouveau OU sélection existante
             $photoFile = $form->get('photoFile')->getData();
+            $photoExistante = $form->get('photoExistante')->getData();
             if ($photoFile) {
                 $photoFileName = $this->processPhotoUpload($photoFile);
                 if ($photoFileName) {
                     $consultationCreneau->setPhotoMedecin($photoFileName);
                 }
+            } elseif ($photoExistante) {
+                $consultationCreneau->setPhotoMedecin($photoExistante);
             }
 
             // Processing existing slot
@@ -233,7 +264,7 @@ class ConsultationCreneauCrudController extends AbstractController
 
             if (!empty($creneauxHoraires)) {
                 foreach ($creneauxHoraires as $creneauData) {
-                    if (empty($creneauData['heureDebut']) || empty($creneauData['heureFin'])) {
+                    if (empty($creneauData['jour']) || empty($creneauData['heureDebut']) || empty($creneauData['heureFin'])) {
                         continue;
                     }
 
@@ -256,6 +287,9 @@ class ConsultationCreneauCrudController extends AbstractController
                     $creneau->setJour($creneauData['jour']);
                     $creneau->setHeureDebut($creneauData['heureDebut']);
                     $creneau->setHeureFin($creneauData['heureFin']);
+                    // S'assurer que dateDebut/dateFin sont bien remplis (affichage page publique)
+                    $creneau->setDateDebut($this->mergeDateAndTime($creneauData['jour'], $creneauData['heureDebut']));
+                    $creneau->setDateFin($this->mergeDateAndTime($creneauData['jour'], $creneauData['heureFin']));
 
                     $entityManager->persist($creneau);
                     $creneauxCrees++;
@@ -357,5 +391,14 @@ class ConsultationCreneauCrudController extends AbstractController
         }
 
         return $this->redirectToRoute('app_admin_consultation_creneau_show', ['id' => $creneau->getId()]);
+    }
+
+    /** Fusionne une date (jour) et une heure pour produire un DateTime (pour dateDebut/dateFin). */
+    private function mergeDateAndTime(\DateTimeInterface $jour, \DateTimeInterface $heure): \DateTime
+    {
+        $dt = new \DateTime();
+        $dt->setDate((int) $jour->format('Y'), (int) $jour->format('m'), (int) $jour->format('d'));
+        $dt->setTime((int) $heure->format('H'), (int) $heure->format('i'), (int) $heure->format('s'));
+        return $dt;
     }
 }

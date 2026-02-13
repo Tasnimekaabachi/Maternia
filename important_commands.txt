@@ -2,6 +2,11 @@
 MATERNIA PROJECT - SYMFONY COMMAND CHEAT SHEET
 =========================================================
 
+--- SERVER (IMPORTANT: utiliser le router pour éviter 404 sur les routes) ---
+php -S localhost:8000 -t public public/router.php
+> Lance le serveur avec le router qui redirige tout vers Symfony.
+> SANS le router, les URLs comme /medecin/Dr.Semi/creneaux renverront 404 !
+
 --- DATABASE STRUCTURE (Migrations) ---
 php bin/console doctrine:database:create 
 > Create database

@@ -1081,8 +1081,9 @@
 
                         <!-- Footer avec bouton fixe -->
                         <div class="card-footer">
-                            <a href="{{ path('app_medecin_creneaux', {'medecin': medecin.nomMedecin|url_encode}) }}" 
-                               class="appointment-btn">
+                            <a href="{{ path('app_medecin_creneaux', {'medecin': medecin.nomMedecin}) }}" 
+                               class="appointment-btn"
+                               title="Voir les créneaux du Dr. {{ medecin.nomMedecin }}">
                                 <i class="fas fa-calendar-check"></i>
                                 Prendre Rendez-vous
                             </a>

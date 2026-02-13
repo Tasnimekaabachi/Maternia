@@ -73,6 +73,20 @@ class ConsultationCreneauRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /** Tous les créneaux disponibles (statut DISPONIBLE) - affichés en front office */
+    public function findTousCreneauxDisponibles(): array
+    {
+        return $this->createQueryBuilder('c')
+            ->innerJoin('c.consultation', 'cons')
+            ->where('c.statutReservation = :statut')
+            ->setParameter('statut', 'DISPONIBLE')
+            ->orderBy('c.dateDebut', 'ASC')
+            ->addOrderBy('cons.categorie', 'ASC')
+            ->addOrderBy('c.nomMedecin', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function countCeMois(): int
     {
         $debut = (new \DateTime())->modify('first day of this month')->setTime(0, 0);
