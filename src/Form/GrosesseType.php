@@ -59,7 +59,6 @@ class GrosesseType extends AbstractType
             ->add('nombreBebes', null, [
                 'required' => false,
                 'label' => 'Nombre de bébés (si multiple)',
-                // HTML5 : commence à 2 pour une grossesse multiple
                 'attr' => [
                     'min' => 2,
                 ],

@@ -21,13 +21,13 @@ class MamanType extends AbstractType
                 'label' => 'Numéro d\'urgence (téléphone Tunisie 🇹🇳)',
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => '9 12 34 56 78',
+                    'placeholder' => 'xx xxx xxx',
                     'maxlength' => 11,
                     'inputmode' => 'numeric',
                     'pattern' => '[0-9\s]*',
                     'data-prefix' => '+216',
                 ],
-                'help' => '8 chiffres, commençant par 2, 4, 5 ou 9 (ex. 9 12 34 56 78)',
+                'help' => '8 chiffres, commençant par 2, 4, 5 ou 9 (ex. xx xxx xxx)',
             ])
             // Champ email en TextType pour éviter la validation HTML5.
             ->add('email', TextType::class, [
