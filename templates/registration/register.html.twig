@@ -1,0 +1,163 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Rejoindre Maternia{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* 1. Flowing Background Animation */
+        .register-page-wrapper {
+            background: linear-gradient(-45deg, #e0c3fc, #fbc2eb, #a1c4fd, #c2e9fb);
+            background-size: 400% 400%;
+            animation: flowingGradient 15s ease infinite;
+            min-height: 100vh;
+            padding: 100px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes flowingGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 2. Card Styling */
+        .auth-card {
+            background: #ffffff;
+            border-radius: 40px;
+            border: none;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+            padding: 50px 40px;
+            width: 100%;
+            max-width: 500px;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .auth-card:hover {
+            transform: translateY(-10px);
+        }
+
+        /* 3. Hover Scaling for Textfields */
+        .form-control {
+            background-color: #f7fafc !important;
+            border: 2px solid transparent !important;
+            border-radius: 15px !important;
+            padding: 15px 20px !important;
+            color: #2d3748;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            transform-origin: center;
+        }
+
+        /* Enlarge on Hover and Focus */
+        .form-control:hover, .form-control:focus {
+            transform: scale(1.03); /* This makes the field enlarge */
+            background-color: #ffffff !important;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            z-index: 10;
+        }
+
+        .form-control:focus {
+            border-color: #f06292 !important;
+            box-shadow: 0 0 0 4px rgba(240, 98, 146, 0.1) !important;
+        }
+
+        /* Typography and Button remains consistent with reference */
+        .welcome-title { color: #4a5568; font-weight: 700; font-size: 2rem; }
+        .welcome-title span { color: #d53f8c; }
+        .label-custom { font-size: 0.8rem; font-weight: 700; color: #718096; text-transform: uppercase; margin-bottom: 8px; display: block; }
+
+        .btn-register {
+            background: linear-gradient(90deg, #ff6b8b 0%, #f06292 100%);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            font-weight: 700;
+            padding: 18px;
+            text-transform: uppercase;
+            box-shadow: 0 10px 20px rgba(255, 107, 139, 0.3);
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-register:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="register-page-wrapper">
+    <div class="container d-flex justify-content-center">
+        <div class="auth-card">
+            <div class="text-center mb-4">
+                <h2 class="welcome-title">Bienvenue <span>sur Maternia</span></h2>
+                <p class="text-muted small">L'aventure Maternia commence ici</p>
+            </div>
+
+            {{ form_start(registrationForm) }}
+                {{ form_errors(registrationForm) }}
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="label-custom">Nom</label>
+                        {{ form_widget(registrationForm.nom, {'attr': {'class': 'form-control', 'placeholder': 'Nom'}}) }}
+                        <div class="text-danger small mt-1">{{ form_errors(registrationForm.nom) }}</div>
+                    </div>
+                    <div class="col-6">
+                        <label class="label-custom">Prénom</label>
+                        {{ form_widget(registrationForm.prenom, {'attr': {'class': 'form-control', 'placeholder': 'Prénom'}}) }}
+                        <div class="text-danger small mt-1">{{ form_errors(registrationForm.prenom) }}</div>
+                    </div>
+                </div>
+
+                {# Catch-all for hidden errors (DEBUG) #}
+                {% if not registrationForm.vars.valid %}
+                    {% for child in registrationForm.children %}
+                        {% for error in child.vars.errors %}
+                            <div class="alert alert-warning py-2 px-3 small rounded-pill mb-1 border-0 shadow-sm" style="font-size: 0.75rem;">
+                                <i class="fas fa-search me-1"></i> {{ child.vars.label|default(child.vars.name) }} : {{ error.message }}
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                {% endif %}
+
+                <div class="mt-4">
+                    <label class="label-custom">Email</label>
+                    {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'placeholder': 'Email'}}) }}
+                    <div class="text-danger small mt-1">{{ form_errors(registrationForm.email) }}</div>
+                </div>
+
+                <div class="mt-4">
+                    <label class="label-custom">Mot de passe</label>
+                    {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'placeholder': '••••••••'}}) }}
+                    <div class="text-danger small mt-1">{{ form_errors(registrationForm.plainPassword) }}</div>
+                </div>
+
+                <div class="mt-4">
+                    <div class="form-check custom-checkbox d-flex align-items-start p-0">
+                        <div class="me-3 mt-1">
+                            {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input ms-0'}}) }}
+                        </div>
+                        <label class="form-check-label text-muted" for="{{ registrationForm.agreeTerms.vars.id }}" style="font-size: 0.85rem; line-height: 1.4;">
+                            En m'inscrivant, j'accepte les 
+                            <a href="#" class="text-primary fw-bold text-decoration-none border-bottom border-primary border-2 pb-0">conditions d'utilisation</a> 
+                            et la <a href="#" class="text-primary fw-bold text-decoration-none border-bottom border-primary border-2 pb-0">politique de confidentialité</a> de Maternia.
+                        </label>
+                    </div>
+                </div>
+                {% if registrationForm.agreeTerms.vars.errors|length > 0 %}
+                    <div class="invalid-feedback d-block small mt-1 ps-2">
+                        <i class="fas fa-exclamation-triangle me-1"></i> Veuillez accepter les conditions.
+                    </div>
+                {% endif %}
+
+                <button type="submit" class="btn btn-register w-100 mt-5">
+                    CRÉER MON COMPTE <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+            {{ form_end(registrationForm) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

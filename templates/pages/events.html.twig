@@ -24,8 +24,9 @@
                     <p class="text-muted mb-0">Tous nos événements sont dédiés aux futures et jeunes mamans. Inscription sur place ou en ligne selon l’événement.</p>
                 </div>
                 <div class="col-lg-4 text-lg-end mt-2 mt-lg-0">
-                    <span class="badge bg-primary px-3 py-2">À venir</span>
-                    <span class="badge bg-secondary px-3 py-2 ms-2">Sur place</span>
+                    <a href="{{ path('app_event_user_new') }}" class="btn btn-primary px-4 py-2 btn-border-radius shadow-sm">
+                        <i class="fas fa-plus-circle me-2"></i>Créer un événement
+                    </a>
                 </div>
             </div>
         </div>
@@ -39,72 +40,7 @@
                 <h2 class="mb-0 display-6">Prochains événements</h2>
             </div>
             <div class="row g-5 justify-content-center">
-                <div class="col-lg-6 col-xl-4 wow fadeIn" data-wow-delay="0.1s">
-                    <div class="events-item bg-primary rounded overflow-hidden h-100 d-flex flex-column">
-                        <div class="events-inner position-relative flex-grow-1 d-flex flex-column">
-                            <div class="events-img overflow-hidden rounded-circle position-relative mx-auto mt-4" style="width: 200px; height: 200px;">
-                                <img src="{{ asset('img/event-1.jpg') }}" class="img-fluid w-100 h-100 rounded-circle" alt="Café des mamans" style="object-fit: cover;">
-                                <div class="event-overlay">
-                                    <a href="{{ asset('img/event-1.jpg') }}" data-lightbox="events-page"><i class="fas fa-search-plus text-white fa-2x"></i></a>
-                                </div>
-                            </div>
-                            <div class="px-4 py-2 bg-secondary text-white text-center events-rate">À venir</div>
-                            <div class="d-flex justify-content-between px-4 py-2 bg-secondary flex-wrap gap-1">
-                                <small class="text-white"><i class="fas fa-calendar me-1 text-primary"></i> 10h - 12h</small>
-                                <small class="text-white"><i class="fas fa-map-marker-alt me-1 text-primary"></i> Sur place</small>
-                            </div>
-                        </div>
-                        <div class="events-text p-4 border border-primary bg-white border-top-0 rounded-bottom">
-                            <a href="#" class="h4 text-decoration-none text-dark d-block">Café des mamans</a>
-                            <p class="mb-0 mt-2 text-muted">Rencontres conviviales entre futures et jeunes mamans. Échanges et partage d’expériences dans une ambiance bienveillante.</p>
-                            <a href="#" class="btn btn-primary btn-sm mt-3 btn-border-radius">En savoir plus</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-xl-4 wow fadeIn" data-wow-delay="0.2s">
-                    <div class="events-item bg-primary rounded overflow-hidden h-100 d-flex flex-column">
-                        <div class="events-inner position-relative flex-grow-1 d-flex flex-column">
-                            <div class="events-img overflow-hidden rounded-circle position-relative mx-auto mt-4" style="width: 200px; height: 200px;">
-                                <img src="{{ asset('img/event-2.jpg') }}" class="img-fluid w-100 h-100 rounded-circle" alt="Atelier portage" style="object-fit: cover;">
-                                <div class="event-overlay">
-                                    <a href="{{ asset('img/event-2.jpg') }}" data-lightbox="events-page"><i class="fas fa-search-plus text-white fa-2x"></i></a>
-                                </div>
-                            </div>
-                            <div class="px-4 py-2 bg-secondary text-white text-center events-rate">À venir</div>
-                            <div class="d-flex justify-content-between px-4 py-2 bg-secondary flex-wrap gap-1">
-                                <small class="text-white"><i class="fas fa-calendar me-1 text-primary"></i> 14h - 16h</small>
-                                <small class="text-white"><i class="fas fa-map-marker-alt me-1 text-primary"></i> Sur place</small>
-                            </div>
-                        </div>
-                        <div class="events-text p-4 border border-primary bg-white border-top-0 rounded-bottom">
-                            <a href="#" class="h4 text-decoration-none text-dark d-block">Atelier portage</a>
-                            <p class="mb-0 mt-2 text-muted">Découverte du portage physiologique pour les nouveau-nés. Apprenez les nœuds et les bonnes postures avec une professionnelle.</p>
-                            <a href="#" class="btn btn-primary btn-sm mt-3 btn-border-radius">En savoir plus</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-xl-4 wow fadeIn" data-wow-delay="0.3s">
-                    <div class="events-item bg-primary rounded overflow-hidden h-100 d-flex flex-column">
-                        <div class="events-inner position-relative flex-grow-1 d-flex flex-column">
-                            <div class="events-img overflow-hidden rounded-circle position-relative mx-auto mt-4" style="width: 200px; height: 200px;">
-                                <img src="{{ asset('img/event-3.jpg') }}" class="img-fluid w-100 h-100 rounded-circle" alt="Journée bien-être" style="object-fit: cover;">
-                                <div class="event-overlay">
-                                    <a href="{{ asset('img/event-3.jpg') }}" data-lightbox="events-page"><i class="fas fa-search-plus text-white fa-2x"></i></a>
-                                </div>
-                            </div>
-                            <div class="px-4 py-2 bg-secondary text-white text-center events-rate">À venir</div>
-                            <div class="d-flex justify-content-between px-4 py-2 bg-secondary flex-wrap gap-1">
-                                <small class="text-white"><i class="fas fa-calendar me-1 text-primary"></i> 9h - 12h</small>
-                                <small class="text-white"><i class="fas fa-map-marker-alt me-1 text-primary"></i> Sur place</small>
-                            </div>
-                        </div>
-                        <div class="events-text p-4 border border-primary bg-white border-top-0 rounded-bottom">
-                            <a href="#" class="h4 text-decoration-none text-dark d-block">Journée bien-être maman-bébé</a>
-                            <p class="mb-0 mt-2 text-muted">Moment dédié au bien-être des mamans et des bébés : massages, relaxation et conseils pour les premiers mois.</p>
-                            <a href="#" class="btn btn-primary btn-sm mt-3 btn-border-radius">En savoir plus</a>
-                        </div>
-                    </div>
-                </div>
+                {{ render(controller('App\\Controller\\EventController::publicEvents')) }}
             </div>
 
             <!-- Événements passés / à venir (bloc info) -->

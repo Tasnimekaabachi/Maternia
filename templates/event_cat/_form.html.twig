@@ -1,0 +1,72 @@
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{{ form_start(form, {'attr': {'id': 'event_cat_form', 'novalidate': 'novalidate'}}) }}
+
+<div class="form-section">
+    <h6 class="form-section-title">
+        <i class="fas fa-tag text-primary me-2"></i>Informations de la catégorie
+    </h6>
+    
+    {% if form.name is defined %}
+        <div class="mb-3">
+            {{ form_label(form.name, 'Nom de la catégorie', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+            {{ form_widget(form.name, {'attr': {'class': 'form-control', 'placeholder': 'Ex: Ateliers Prénatals'}}) }}
+            {{ form_errors(form.name) }}
+        </div>
+    {% endif %}
+
+    {% if form.description is defined %}
+        <div class="mb-3">
+            {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+            {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 4, 'placeholder': 'Décrivez cette catégorie...'}}) }}
+            {{ form_errors(form.description) }}
+        </div>
+    {% endif %}
+
+    {% if form.events is defined %}
+        <div class="mb-3">
+            {{ form_label(form.events, 'Événements liés', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+            {{ form_widget(form.events, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.events) }}
+        </div>
+    {% endif %}
+</div>
+
+{{ form_end(form) }}
+
+<style>
+    /* Form Section styling matching events form */
+    .form-section {
+        background: #fff;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .form-section-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #fce7f3;
+    }
+
+    .form-label {
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #ec4899;
+        box-shadow: 0 0 0 0.2rem rgba(236, 72, 153, 0.15);
+    }
+
+    /* Remove default Bootstrap validation icons to prevent glitches */
+    .form-control.is-invalid,
+    .form-select.is-invalid {
+        background-image: none !important;
+        padding-right: 0.75rem !important;
+    }
+</style>

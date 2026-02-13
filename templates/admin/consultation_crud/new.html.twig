@@ -1,0 +1,767 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Nouvelle consultation{% endblock %}
+{% block page_title %}Nouvelle consultation{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* DESIGN ULTRA MODERNE ET PROFESSIONNEL */
+    :root {
+        --primary-blue: #4A90E2;
+        --light-blue: #87CEEB;
+        --baby-blue: #B0E0E6;
+        --pink: #FF69B4;
+        --soft-pink: #FFB6C1;
+        --lavender: #E6E6FA;
+        --mint: #98FF98;
+        --peach: #FFDAB9;
+        --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--pink) 100%);
+        --gradient-soft: linear-gradient(135deg, var(--light-blue) 0%, var(--soft-pink) 100%);
+        --gradient-baby: linear-gradient(135deg, var(--baby-blue) 0%, var(--lavender) 100%);
+    }
+
+    .new-consultation-container {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 20px 40px rgba(74, 144, 226, 0.15),
+                    0 10px 20px rgba(255, 105, 180, 0.1);
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 25px 50px rgba(74, 144, 226, 0.2),
+                    0 15px 30px rgba(255, 105, 180, 0.15);
+    }
+
+    .header-gradient {
+        background: var(--gradient-primary);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .header-gradient::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+        opacity: 0.1;
+    }
+
+    .floating-icons {
+        position: absolute;
+        right: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 4rem;
+        opacity: 0.3;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(-50%) translateX(0); }
+        50% { transform: translateY(-50%) translateX(-10px); }
+    }
+
+    .section-container {
+        padding: 2.5rem;
+    }
+
+    .section-title {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-bottom: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .section-title::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        background: var(--gradient-primary);
+        border-radius: 3px;
+    }
+
+    .icon-badge {
+        width: 50px;
+        height: 50px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-right: 1rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    /* INPUT STYLES MODERNES */
+    .modern-input {
+        border: 2px solid transparent;
+        background: linear-gradient(white, white) padding-box,
+                    linear-gradient(135deg, var(--light-blue), var(--soft-pink)) border-box;
+        border-radius: 15px;
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .modern-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.1);
+        border-color: var(--primary-blue);
+    }
+
+    .input-with-icon {
+        position: relative;
+    }
+
+    .input-with-icon i {
+        position: absolute;
+        left: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary-blue);
+        z-index: 2;
+    }
+
+    .input-with-icon input {
+        padding-left: 3.5rem;
+    }
+
+    /* BOUTONS RADIO MODERNES */
+    .target-option {
+        position: relative;
+        border: 2px solid transparent;
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+
+    .target-option::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.8) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .target-option:hover::before {
+        opacity: 1;
+    }
+
+    .target-option input[type="radio"]:checked + .option-content {
+        background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(255, 105, 180, 0.1) 100%);
+        border-color: var(--primary-blue);
+        transform: scale(1.02);
+    }
+
+    .target-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .target-icon.baby {
+        background: linear-gradient(135deg, var(--light-blue), var(--baby-blue));
+    }
+
+    .target-icon.maman {
+        background: linear-gradient(135deg, var(--pink), var(--soft-pink));
+    }
+
+    .target-icon.both {
+        background: linear-gradient(135deg, var(--primary-blue), var(--lavender));
+    }
+
+    /* Les styles du Switch Moderne ont été déplacés dans admin.css pour être partagés */
+
+    /* BOUTONS */
+    .btn-modern {
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        border: none;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-modern::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .btn-modern:hover::before {
+        opacity: 1;
+    }
+
+    .btn-primary-modern {
+        background: var(--gradient-primary);
+        color: white;
+        box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3);
+    }
+
+    .btn-primary-modern:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(74, 144, 226, 0.4);
+    }
+
+    .btn-secondary-modern {
+        background: white;
+        color: var(--primary-blue);
+        border: 2px solid var(--primary-blue);
+    }
+
+    .btn-secondary-modern:hover {
+        background: var(--gradient-soft);
+        color: white;
+        border-color: transparent;
+    }
+
+    /* PREVIEW CONTAINERS */
+    .preview-container {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        border: 2px dashed var(--light-blue);
+        transition: all 0.3s ease;
+    }
+
+    .preview-container:hover {
+        border-color: var(--primary-blue);
+        box-shadow: 0 10px 30px rgba(74, 144, 226, 0.1);
+    }
+
+    .icon-preview-large {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .image-preview-placeholder {
+        width: 100%;
+        height: 150px;
+        background: linear-gradient(135deg, var(--baby-blue), var(--lavender));
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+        margin-bottom: 1rem;
+    }
+
+    /* ANIMATIONS */
+    .fade-in {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(74, 144, 226, 0.4); }
+        70% { box-shadow: 0 0 0 15px rgba(74, 144, 226, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(74, 144, 226, 0); }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        .section-container {
+            padding: 1.5rem;
+        }
+        
+        .target-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+        }
+        
+        .icon-preview-large {
+            font-size: 3rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">🏠 Accueil</a>
+        <span class="mx-2">›</span>
+        <a href="{{ path('app_admin_consultation_index') }}">📋 Consultations</a>
+        <span class="mx-2">›</span>
+        <span class="text-primary fw-bold">✨ Nouvelle</span>
+    </div>
+{% endblock %}
+
+{% block header_actions %}
+    <a href="{{ path('app_admin_consultation_index') }}" class="btn btn-secondary-modern btn-modern">
+        <i class="fas fa-arrow-left me-2"></i> Retour aux consultations
+    </a>
+{% endblock %}
+
+{% block content %}
+<div class="new-consultation-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <div class="glass-card fade-in">
+                    <!-- HEADER SPECTACULAIRE -->
+                    <div class="header-gradient text-white py-5 position-relative">
+                        <div class="container">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="icon-badge bg-white text-primary">
+                                            <i class="fas fa-stethoscope"></i>
+                                        </div>
+                                        <div>
+                                            <h1 class="display-5 fw-bold mb-2">Nouvelle Consultation</h1>
+                                            <p class="lead mb-0 opacity-90">Créez une nouvelle catégorie médicale pour Maternia</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <div class="floating-icons">
+                                        <i class="fas fa-heartbeat"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-container">
+                        {{ form_start(form, {'attr': {'class': 'form-modern', 'novalidate': 'novalidate'}}) }}
+                        
+                        {# On marque 'pour' comme rendu pour éviter qu'il ne soit ajouté à nouveau à la fin du formulaire par form_end, ce qui écraserait la sélection manuelle #}
+                        {% do form.pour.setRendered() %}
+                        
+                        <!-- SECTION 1: INFORMATIONS PRINCIPALES -->
+                        <div class="mb-5 fade-in" style="animation-delay: 0.1s">
+                            <h3 class="section-title">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Informations Principales
+                            </h3>
+                            
+                            <div class="row g-4">
+                                <div class="col-md-12">
+                                    <div class="input-with-icon">
+                                        <i class="fas fa-tag"></i>
+                                        {{ form_widget(form.categorie, {'attr': {
+                                            'class': 'form-control modern-input',
+                                            'placeholder': 'Ex: Pédiatrie, Gynécologie, Nutrition Infantile...'
+                                        }}) }}
+                                    </div>
+                                    <div class="mt-2 ps-4">
+                                        <small class="text-muted">
+                                            <i class="fas fa-lightbulb text-warning me-1"></i>
+                                            Donnez un nom clair et précis à cette consultation
+                                        </small>
+                                    </div>
+                                    {{ form_errors(form.categorie) }}
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="input-with-icon">
+                                        <i class="fas fa-align-left"></i>
+                                        {{ form_widget(form.description, {'attr': {
+                                            'class': 'form-control modern-input',
+                                            'rows': 4,
+                                            'placeholder': 'Décrivez cette consultation de manière détaillée...'
+                                        }}) }}
+                                    </div>
+                                    <div class="mt-2 ps-4">
+                                        <small class="text-muted">
+                                            <i class="fas fa-comment-medical text-info me-1"></i>
+                                            Cette description sera visible par les utilisateurs
+                                        </small>
+                                    </div>
+                                    {{ form_errors(form.description) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 2: PUBLIC CIBLE -->
+                        <div class="mb-5 fade-in" style="animation-delay: 0.2s">
+                            <h3 class="section-title">
+                                <i class="fas fa-users me-2"></i>
+                                Public Cible
+                            </h3>
+                            
+                            <div class="text-center mb-4">
+                                <p class="text-muted">Sélectionnez le(s) bénéficiaire(s) de cette consultation</p>
+                            </div>
+                            
+                            <div class="row g-4">
+                                {% for choice in form.pour.vars.choices %}
+                                <div class="col-md-4">
+                                    <label class="target-option d-block">
+                                        <input type="radio" 
+                                               name="{{ form.pour.vars.full_name }}" 
+                                               value="{{ choice.value }}"
+                                               {{ form.pour.vars.value == choice.value ? 'checked' : '' }}
+                                               class="d-none"
+                                               required>
+                                        <div class="option-content text-center p-4 rounded-3">
+                                            <div class="target-icon 
+                                                {% if choice.value == 'BEBE' %}baby
+                                                {% elseif choice.value == 'MAMAN' %}maman
+                                                {% else %}both{% endif %} mx-auto mb-3">
+                                                {% if choice.value == 'BEBE' %}👶
+                                                {% elseif choice.value == 'MAMAN' %}🤰
+                                                {% else %}👨‍👩‍👧{% endif %}
+                                            </div>
+                                            <h5 class="fw-bold mb-2">
+                                                {% if choice.value == 'BEBE' %}Bébé
+                                                {% elseif choice.value == 'MAMAN' %}Maman
+                                                {% else %}Les Deux{% endif %}
+                                            </h5>
+                                            <p class="text-muted small mb-0">
+                                                {% if choice.value == 'BEBE' %}Consultation dédiée aux nourrissons et enfants
+                                                {% elseif choice.value == 'MAMAN' %}Consultation réservée aux futures et jeunes mamans
+                                                {% else %}Consultation pour le duo maman-bébé{% endif %}
+                                            </p>
+                                        </div>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {{ form_errors(form.pour) }}
+                        </div>
+
+                        <!-- SECTION 3: CONFIGURATION -->
+                        <div class="mb-5 fade-in" style="animation-delay: 0.3s">
+                            <h3 class="section-title">
+                                <i class="fas fa-cogs me-2"></i>
+                                Configuration
+                            </h3>
+                            
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="p-4 rounded-3" style="background: linear-gradient(135deg, rgba(176, 224, 230, 0.1), rgba(230, 230, 250, 0.1))">
+                                        <label class="form-label fw-bold mb-3 d-flex align-items-center">
+                                            <i class="fas fa-sort-numeric-down-alt text-primary me-2"></i>
+                                            Ordre d'Affichage
+                                        </label>
+                                        <div class="input-with-icon">
+                                            <i class="fas fa-hashtag"></i>
+                                            {{ form_widget(form.ordreAffichage, {'attr': {
+                                                'class': 'form-control modern-input',
+                                                'min': '1',
+                                                'max': '100'
+                                            }}) }}
+                                        </div>
+                                        <div class="mt-3">
+                                            <div class="progress" style="height: 8px;">
+                                                <div class="progress-bar" 
+                                                     style="width: 50%; background: var(--gradient-primary);"
+                                                     role="progressbar"></div>
+                                            </div>
+                                            <small class="text-muted d-block mt-2">
+                                                <i class="fas fa-chart-line me-1"></i>
+                                                Détermine la position dans la liste (1 = premier)
+                                            </small>
+                                        </div>
+                                        {{ form_errors(form.ordreAffichage) }}
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="p-4 border rounded-3 bg-white">
+                                        <label class="form-label fw-bold mb-3 d-flex align-items-center">
+                                            <i class="fas fa-toggle-on text-success me-2"></i>
+                                            Statut de la Consultation
+                                        </label>
+                                        <div class="status-section">
+                                            {{ form_widget(form.statut, {
+                                                'label': false,
+                                                'attr': {'class': 'status-checkbox', 'id': 'consultation_statut'}
+                                            }) }}
+                                            
+                                            <div class="status-toggle-group">
+                                                <label class="status-toggle-item toggle-active" for="consultation_statut">
+                                                    <i class="fas fa-check-circle"></i>
+                                                    ACTIF
+                                                </label>
+                                                <label class="status-toggle-item toggle-inactive" for="consultation_statut">
+                                                    <i class="fas fa-times-circle"></i>
+                                                    INACTIF
+                                                </label>
+                                            </div>
+                                            
+                                            <div class="status-feedback-container ps-2">
+                                                <div class="status-pulse"></div>
+                                                <small class="text-muted">
+                                                    <span class="status-text-active">Visible pour les utilisateurs</span>
+                                                    <span class="status-text-inactive">Enregistré comme brouillon</span>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 4: APPEARANCE -->
+                        <div class="mb-5 fade-in" style="animation-delay: 0.4s">
+                            <h3 class="section-title">
+                                <i class="fas fa-palette me-2"></i>
+                                Apparence & Design
+                            </h3>
+                            
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="preview-container">
+                                        <label class="form-label fw-bold mb-3 d-flex align-items-center">
+                                            <i class="fas fa-icons text-primary me-2"></i>
+                                            Icône FontAwesome
+                                        </label>
+                                        <div class="input-with-icon mb-4">
+                                            <i class="fab fa-font-awesome"></i>
+                                            {{ form_widget(form.icon, {'attr': {
+                                                'class': 'form-control modern-input',
+                                                'placeholder': 'fas fa-baby, fas fa-heartbeat...'
+                                            }}) }}
+                                        </div>
+                                        
+                                        <div class="text-center">
+                                            <div class="mb-3">
+                                                <i id="iconPreview" class="icon-preview-large text-primary"></i>
+                                            </div>
+                                            <small class="text-muted d-block">
+                                                <i class="fas fa-eye me-1"></i>
+                                                Aperçu de l'icône
+                                            </small>
+                                            <small class="text-muted">
+                                                Exemples: fas fa-baby, fas fa-heart, fas fa-stethoscope
+                                            </small>
+                                        </div>
+                                        {{ form_errors(form.icon) }}
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="preview-container">
+                                        <label class="form-label fw-bold mb-3 d-flex align-items-center">
+                                            <i class="fas fa-image text-pink me-2"></i>
+                                            Image d'Illustration
+                                        </label>
+                                        <div class="input-with-icon mb-4">
+                                            <i class="fas fa-file-image"></i>
+                                            {{ form_widget(form.image, {'attr': {
+                                                'class': 'form-control modern-input',
+                                                'placeholder': 'nom_du_fichier.jpg'
+                                            }}) }}
+                                        </div>
+                                        
+                                        <div class="text-center">
+                                            <div class="image-preview-placeholder mb-3">
+                                                <i class="fas fa-camera"></i>
+                                            </div>
+                                            <small class="text-muted d-block">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Format: JPG, PNG, WEBP
+                                            </small>
+                                            <small class="text-muted">
+                                                Le nom du fichier s'affichera ici
+                                            </small>
+                                        </div>
+                                        {{ form_errors(form.image) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 5: ACTIONS -->
+                        <div class="fade-in" style="animation-delay: 0.5s">
+                            <div class="border-top pt-5">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <div style="width: 40px; height: 40px; background: var(--gradient-primary); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fas fa-exclamation text-white"></i>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1 fw-bold">Champs Requis</h6>
+                                                <small class="text-muted">Les champs marqués d'un * sont obligatoires</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="d-flex justify-content-end gap-3">
+                                            <a href="{{ path('app_admin_consultation_index') }}" class="btn btn-secondary-modern btn-modern">
+                                                <i class="fas fa-times me-2"></i>
+                                                Annuler
+                                            </a>
+                                            <button type="submit" class="btn btn-primary-modern btn-modern">
+                                                <i class="fas fa-check me-2"></i>
+                                                Créer la Consultation
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Aperçu dynamique de l'icône
+    document.getElementById('{{ form.icon.vars.id }}').addEventListener('input', function(e) {
+        const preview = document.getElementById('iconPreview');
+        const value = e.target.value.trim();
+        
+        if (value) {
+            preview.className = value + ' icon-preview-large';
+            preview.style.background = 'linear-gradient(135deg, var(--primary-blue), var(--pink))';
+            preview.style.webkitBackgroundClip = 'text';
+            preview.style.webkitTextFillColor = 'transparent';
+            preview.style.backgroundClip = 'text';
+        } else {
+            preview.className = 'fas fa-question icon-preview-large';
+            preview.style.color = '#4A90E2';
+            preview.style.background = 'none';
+            preview.style.webkitTextFillColor = '';
+        }
+    });
+
+    // Aperçu dynamique de l'image
+    document.getElementById('{{ form.image.vars.id }}').addEventListener('input', function(e) {
+        const placeholder = document.querySelector('.image-preview-placeholder');
+        const value = e.target.value.trim();
+        
+        if (value) {
+            const extension = value.split('.').pop().toLowerCase();
+            let icon = 'fas fa-image';
+            
+            if (['jpg', 'jpeg', 'png', 'gif'].includes(extension)) {
+                icon = 'fas fa-file-image';
+            } else if (extension === 'pdf') {
+                icon = 'fas fa-file-pdf';
+            }
+            
+            placeholder.innerHTML = `
+                <i class="${icon}"></i>
+                <div class="mt-2 small text-white">${value.length > 20 ? value.substring(0, 20) + '...' : value}</div>
+            `;
+            placeholder.style.background = 'linear-gradient(135deg, var(--primary-blue), var(--pink))';
+        } else {
+            placeholder.innerHTML = '<i class="fas fa-camera"></i>';
+            placeholder.style.background = 'linear-gradient(135deg, var(--baby-blue), var(--lavender))';
+        }
+    });
+
+    // Animation pour la barre de progression de l'ordre d'affichage
+    const orderInput = document.getElementById('{{ form.ordreAffichage.vars.id }}');
+    const progressBar = document.querySelector('.progress-bar');
+    
+    if (orderInput && progressBar) {
+        orderInput.addEventListener('input', function(e) {
+            const value = parseInt(e.target.value) || 1;
+            const percentage = Math.min((value / 100) * 100, 100);
+            progressBar.style.width = percentage + '%';
+        });
+        
+        // Initialiser la barre
+        const initialValue = parseInt(orderInput.value) || 1;
+        const initialPercentage = Math.min((initialValue / 100) * 100, 100);
+        progressBar.style.width = initialPercentage + '%';
+    }
+
+    // Animation des options de public cible
+    document.querySelectorAll('.target-option input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.querySelectorAll('.target-option .option-content').forEach(content => {
+                content.style.transform = '';
+                content.style.borderColor = '';
+            });
+            
+            if (this.checked) {
+                const content = this.nextElementSibling;
+                content.style.transform = 'scale(1.05)';
+                content.style.transition = 'transform 0.3s ease';
+            }
+        });
+    });
+
+    // Initialiser l'aperçu de l'icône
+    document.addEventListener('DOMContentLoaded', function() {
+        const iconInput = document.getElementById('{{ form.icon.vars.id }}');
+        if (iconInput.value) {
+            iconInput.dispatchEvent(new Event('input'));
+        }
+        
+        const imageInput = document.getElementById('{{ form.image.vars.id }}');
+        if (imageInput.value) {
+            imageInput.dispatchEvent(new Event('input'));
+        }
+        
+        // Animation d'entrée
+        document.querySelectorAll('.fade-in').forEach((el, index) => {
+            el.style.animationDelay = (index * 0.1) + 's';
+        });
+
+        // Failsafe pour le toggle de statut
+        const statusCheckbox = document.getElementById('consultation_statut');
+        if (statusCheckbox) {
+            // Pas besoin de listener de clic complexe ici car on utilise 'for' sur les labels
+            // qui pointent vers le même ID de checkbox.
+            // Cependant, comme c'est une checkbox, cliquer sur "INACTIF" quand c'est actif
+            // va justement la décocher, ce qui est parfait.
+            console.log('Status Toggle initialized');
+        }
+    });
+</script>
+{% endblock %}

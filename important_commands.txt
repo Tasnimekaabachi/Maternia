@@ -1,0 +1,53 @@
+=========================================================
+MATERNIA PROJECT - SYMFONY COMMAND CHEAT SHEET
+=========================================================
+
+--- SERVER (IMPORTANT: utiliser le router pour éviter 404 sur les routes) ---
+php -S localhost:8000 -t public public/router.php
+> Lance le serveur avec le router qui redirige tout vers Symfony.
+> SANS le router, les URLs comme /medecin/Dr.Semi/creneaux renverront 404 !
+
+--- DATABASE STRUCTURE (Migrations) ---
+php bin/console doctrine:database:create 
+> Create database
+
+php bin/console make:migration
+> Compares Entities to the Database and creates a PHP/SQL version file.
+
+php bin/console doctrine:migrations:migrate
+> Applies the migration files to the actual Database (creates/updates tables).
+
+php bin/console doctrine:migrations:sync-metadata-storage
+> Sync metadata storage 
+
+--- DATA MANAGEMENT (Fixtures & Commands) ---
+php bin/console doctrine:fixtures:load
+> WARNING: Wipes the DB and loads initial data from src/DataFixtures/.
+
+php bin/console app:create-admin
+> (Custom Command) Creates the admin@gmail.com account safely.
+
+php bin/console app:generate-mothers
+> generer entites mothers pour testing
+
+--- CODE GENERATION ---
+php bin/console make:crud User
+> Generates Controller, FormType, and Twig templates for the User entity.
+
+php bin/console make:form UserType
+> Generates/updates the form mapping for the User entity.
+
+--- SYSTEM & DEBUGGING ---
+php bin/console cache:clear
+> Clears the application cache (run this if routes or changes aren't appearing).
+
+php bin/console debug:router
+> Displays a list of all registered routes and their names.
+
+php bin/console debug:autowiring
+> Lists all services available for injection (like UserPasswordHasherInterface).
+
+composer install
+> Download requiered dependencies for the project
+
+=========================================================

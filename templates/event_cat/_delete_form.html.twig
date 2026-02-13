@@ -1,0 +1,5 @@
+{# event_cat/_delete_form.html.twig #}
+<form method="post" action="{{ path('app_event_cat_delete', {'id': event_cat.id}) }}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?');">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event_cat.id) }}">
+    <button type="submit" class="btn btn-danger">Supprimer</button>
+</form>

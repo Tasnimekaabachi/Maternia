@@ -1,0 +1,504 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Gestion des Rendez-vous{% endblock %}
+{% block page_title %}Rendez-vous clients{% endblock %}
+
+{% block stylesheets %}
+<style>
+    :root {
+        --primary-pink: #FF8AAB;
+        --soft-pink: #FFD1DC;
+        --deep-pink: #FF5C8D;
+        --rose-gold: #E5A29D;
+        --lavender: #E1BEE7;
+        --glass-white: rgba(255, 255, 255, 0.95);
+        --gradient-feminine: linear-gradient(135deg, #FF8AAB 0%, #E1BEE7 100%);
+        --gradient-soft: linear-gradient(135deg, #FFF5F5 0%, #FCE4EC 100%);
+    }
+
+    .index-container { background: var(--gradient-soft); min-height: 100vh; padding: 2.5rem 0; }
+    
+    .stat-card-premium {
+        background: white; border-radius: 20px; padding: 1.5rem; 
+        border: 1px solid #FCE4EC; box-shadow: 0 10px 25px rgba(255, 138, 171, 0.05);
+        transition: all 0.3s ease; display: flex; align-items: center; gap: 1rem;
+    }
+    .stat-card-premium:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(255, 138, 171, 0.1); }
+    .stat-icon { 
+        width: 50px; height: 50px; border-radius: 15px; 
+        display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+    }
+    .stat-info .label { font-size: 0.75rem; font-weight: 700; color: #A0A0A0; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-info .value { font-size: 1.5rem; font-weight: 800; color: #4A4A4A; line-height: 1.2; }
+
+    .admin-card { 
+        background: white; border-radius: 24px; border: 1px solid #FCE4EC; 
+        overflow: hidden; box-shadow: 0 20px 40px rgba(255, 138, 171, 0.05); margin-bottom: 2rem;
+    }
+    .admin-card-header { 
+        padding: 1.5rem 2rem; border-bottom: 1px solid #FCE4EC; 
+        display: flex; justify-content: space-between; align-items: center;
+        background: rgba(255, 255, 255, 0.5);
+    }
+
+    .premium-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .premium-table thead th { 
+        background: #FDF2F8; padding: 1.25rem 1rem; font-size: 0.75rem; 
+        color: #db2777; text-transform: uppercase; letter-spacing: 1px;
+        border-bottom: 2px solid #FBCFE8 !important; border-right: 1px solid #FBCFE8 !important;
+    }
+    .premium-table th:last-child { border-right: none; }
+    .premium-table tbody td { 
+        padding: 1.25rem 1rem; border-bottom: 1px solid #FBCFE8 !important; 
+        border-right: 1px solid #FBCFE8 !important; vertical-align: middle; 
+    }
+    .premium-table td:last-child { border-right: none; }
+    .premium-table tr:hover { background-color: #FFF5F7; }
+
+    /* RECHERCHE & TRIS (DESIGN SPÉCIFIQUE) */
+    .search-box { position: relative; display: flex; align-items: center; }
+    .search-box i { position: absolute; left: 12px; color: #9ca3af; font-size: 0.85rem; }
+    .search-input {
+        border: 2px solid #e5e7eb;
+        border-radius: 25px;
+        padding: 6px 14px 6px 34px;
+        font-size: 0.85rem;
+        width: 180px;
+        transition: all 0.3s;
+        outline: none;
+        background: #fafbfc;
+    }
+    .search-input:focus { border-color: var(--primary-pink); width: 240px; background: white; }
+
+    .sort-group { display: flex; gap: 4px; }
+    .sort-btn {
+        border: 2px solid #e5e7eb;
+        background: white;
+        border-radius: 8px;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: #6b7280;
+    }
+    .sort-btn:hover { border-color: var(--primary-pink); color: var(--primary-pink); }
+    .sort-btn.active { background: var(--gradient-feminine); color: white; border-color: transparent; }
+    .sort-arrow { font-size: 0.7rem; }
+
+    .badge-status { padding: 6px 16px; border-radius: 50px; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; }
+    .status-confirmed { background: #E8F5E9; color: #2E7D32; }
+    .status-pending { background: #FFF3E0; color: #E65100; }
+    .status-cancelled { background: #FFF5F5; color: #D32F2F; }
+
+    .btn-feminine { 
+        background: var(--gradient-feminine); color: white; border-radius: 50px; 
+        padding: 0.75rem 1.75rem; font-weight: 700; border: none; transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(255, 138, 171, 0.3);
+    }
+    .btn-feminine:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 138, 171, 0.4); color: white; }
+
+    .btn-pdf {
+        background: white; color: #db2777; border-radius: 50px; 
+        padding: 0.75rem 1.75rem; font-weight: 700; border: 1px solid #FCE4EC; transition: all 0.3s;
+    }
+    .btn-pdf:hover { background: #FFF5F7; border-color: #FBCFE8; }
+
+    .chart-container { 
+        background: white; border-radius: 24px; padding: 2rem; 
+        border: 1px solid #FCE4EC; box-shadow: 0 15px 35px rgba(255, 138, 171, 0.05); 
+        height: 100%;
+    }
+    
+    .stats-grid { height: 100%; display: flex; flex-direction: column; justify-content: space-between; gap: 1rem; }
+
+    /* QUICK NAV TABS */
+    .quick-nav-tabs {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 2.5rem;
+        background: white;
+        padding: 0.6rem;
+        border-radius: 50px;
+        border: 1px solid #FCE4EC;
+        box-shadow: 0 10px 30px rgba(255, 138, 171, 0.08);
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .quick-nav-link {
+        padding: 0.7rem 1.5rem;
+        border-radius: 50px;
+        text-decoration: none;
+        color: #718096;
+        font-weight: 700;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+    .quick-nav-link i { font-size: 0.9rem; }
+    .quick-nav-link:hover { background: #FFF5F7; color: var(--deep-pink); }
+    .quick-nav-link.active {
+        background: var(--gradient-feminine);
+        color: white;
+        box-shadow: 0 5px 15px rgba(255, 138, 171, 0.3);
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+{% endblock %}
+
+{% block header_actions %}
+    <div class="d-flex gap-2">
+        <button id="exportPdfBtn" class="btn btn-pdf">
+            <i class="fas fa-file-pdf me-2 text-danger"></i> Télécharger PDF
+        </button>
+        <a href="{{ path('app_admin_reservation_client_new') }}" class="btn btn-feminine">
+            <i class="fas fa-plus me-2"></i> Nouvelle Réservation
+        </a>
+    </div>
+{% endblock %}
+
+{% block content %}
+<div class="index-container">
+    <div class="container-fluid px-4">
+        <!-- Quick Navigation -->
+        <div class="quick-nav-tabs">
+            <a href="{{ path('app_admin_reservation_client_index') }}" class="quick-nav-link active">
+                <i class="fas fa-calendar-check"></i> Réservations
+            </a>
+            <a href="{{ path('app_admin_consultation_index') }}" class="quick-nav-link">
+                <i class="fas fa-stethoscope"></i> Consultations
+            </a>
+            <a href="{{ path('app_admin_consultation_creneau_index') }}" class="quick-nav-link">
+                <i class="fas fa-clock"></i> Créneaux
+            </a>
+        </div>
+
+        <!-- Dashboard Overview -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-7">
+                <div class="chart-container">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h6 class="fw-bold text-dark mb-0">Évolution des Réservations</h6>
+                        <span class="badge bg-light text-muted rounded-pill px-3">6 derniers mois</span>
+                    </div>
+                    <div style="height: 250px;">
+                        <canvas id="reservationsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="stats-grid">
+                    <div class="stat-card-premium">
+                        <div class="stat-icon" style="background: #EBF8FF; color: #3182CE;"><i class="fas fa-calendar-check"></i></div>
+                        <div class="stat-info">
+                            <div class="label">Total Réservations</div>
+                            <div class="value">{{ stats.total }}</div>
+                        </div>
+                    </div>
+                    <div class="stat-card-premium">
+                        <div class="stat-icon" style="background: #E6FFFA; color: #319795;"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info">
+                            <div class="label">RDV Confirmés</div>
+                            <div class="value">{{ stats.confirmed }}</div>
+                        </div>
+                    </div>
+                    <div class="stat-card-premium">
+                        <div class="stat-icon" style="background: #FFF5F7; color: #D53F8C;"><i class="fas fa-baby"></i></div>
+                        <div class="stat-info">
+                            <div class="label">Total Bébés</div>
+                            <div class="value">{{ stats.bebe }}</div>
+                        </div>
+                    </div>
+                    <div class="stat-card-premium">
+                        <div class="stat-icon" style="background: #FAF5FF; color: #805AD5;"><i class="fas fa-female"></i></div>
+                        <div class="stat-info">
+                            <div class="label">Total Mamans</div>
+                            <div class="value">{{ stats.maman }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reservations Table -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <div>
+                    <h5 class="mb-1 fw-bold text-dark">Liste des Réservations</h5>
+                    <p class="mb-0 text-muted small">Visualisez et gérez tous les rendez-vous clients</p>
+                </div>
+                <div class="d-flex gap-3 align-items-center">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchRdv" class="search-input" placeholder="Rechercher...">
+                    </div>
+                    {# TRI AVEC FLÈCHES #}
+                    <div class="sort-group">
+                        <button class="sort-btn active" onclick="sortRows('date', this)" title="Trier par date">
+                            <i class="fas fa-calendar-alt"></i> <i class="fas fa-arrow-down sort-arrow"></i>
+                        </button>
+                        <button class="sort-btn" onclick="sortRows('patient', this)" title="Trier par patient">
+                            <span class="fw-bold">A-Z</span> <i class="fas fa-arrow-up sort-arrow"></i>
+                        </button>
+                        <button class="sort-btn" onclick="sortRows('status', this)" title="Trier par statut">
+                            <i class="fas fa-check-double"></i> <i class="fas fa-arrow-up sort-arrow"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table premium-table" id="resTable">
+                    <thead>
+                        <tr>
+                            <th>Réf</th>
+                            <th>Patient</th>
+                            <th>Détails</th>
+                            <th>Médecin</th>
+                            <th>Statut</th>
+                            <th>Planifié le</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rdvBody">
+                        {% for r in reservations %}
+                        <tr class="rdv-row" 
+                            data-date="{{ r.dateReservation ? r.dateReservation|date('Y-m-d H:i') : '' }}"
+                            data-patient="{{ (r.nomClient ~ ' ' ~ r.prenomClient)|lower }}"
+                            data-status="{{ r.statutReservation|lower }}">
+                            <td class="fw-bold text-primary">#{{ r.reference }}</td>
+                            <td>
+                                <div class="fw-bold">{{ r.nomClient }} {{ r.prenomClient }}</div>
+                                <div class="small text-muted">{{ r.emailClient }}</div>
+                            </td>
+                            <td>
+                                {% if r.typePatient == 'BEBE' %}
+                                    <span class="text-info-emphasis fw-bold">👶 Bébé</span>
+                                    {% if r.dateNaissanceBebe %}<div class="small text-muted">Né le {{ r.dateNaissanceBebe|date('d/m/Y') }}</div>{% endif %}
+                                {% else %}
+                                    <span class="text-pink fw-bold">🤰 Maman</span>
+                                    {% if r.moisGrossesse %}<div class="small text-muted">{{ r.moisGrossesse }} mois</div>{% endif %}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if r.consultationCreneau %}
+                                    <div class="fw-bold">Dr. {{ r.consultationCreneau.nomMedecin }}</div>
+                                    <div class="small text-muted">{{ r.consultationCreneau.consultation.categorie }}</div>
+                                {% else %}
+                                    <span class="text-muted italic">Non défini</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge-status 
+                                    {% if r.statutReservation == 'CONFIRME' %}status-confirmed
+                                    {% elseif r.statutReservation == 'ANNULE' %}status-cancelled
+                                    {% else %}status-pending{% endif %}">
+                                    {{ r.statutReservation }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="fw-bold">{{ r.dateReservation|date('d/m/Y') }}</div>
+                                <div class="small text-muted">{{ r.dateReservation|date('H:i') }}</div>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{{ path('app_admin_reservation_client_edit', {id: r.id}) }}" 
+                                       class="btn btn-sm btn-light text-warning" 
+                                       style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px;"
+                                       title="Modifier">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <button type="button" 
+                                            class="btn btn-sm btn-light text-danger" 
+                                            style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px;"
+                                            onclick="deleteRdv('{{ path('app_admin_reservation_client_delete', {id: r.id}) }}', '{{ csrf_token('delete' ~ r.id) }}', this.closest('tr'))"
+                                            title="Supprimer">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <i class="fas fa-calendar-times mb-3 d-block fa-3x opacity-25"></i>
+                                <h6 class="text-muted">Aucune réservation trouvée</h6>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // CHARTS
+    const ctx = document.getElementById('reservationsChart').getContext('2d');
+    const chartGradient = ctx.createLinearGradient(0, 0, 0, 400);
+    chartGradient.addColorStop(0, 'rgba(255, 138, 171, 0.4)');
+    chartGradient.addColorStop(1, 'rgba(255, 138, 171, 0)');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ chartData.labels|json_encode|raw }},
+            datasets: [{
+                label: 'Réservations',
+                data: {{ chartData.values|json_encode|raw }},
+                borderColor: '#FF8AAB',
+                backgroundColor: chartGradient,
+                borderWidth: 4,
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#FF5C8D',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#F0F2F5', drawBorder: false }, ticks: { color: '#A0AEC0', font: { size: 11 } } },
+                x: { grid: { display: false }, ticks: { color: '#A0AEC0', font: { size: 11 } } }
+            }
+        }
+    });
+
+    // REAL PDF EXPORT (jsPDF) - Cleaned Version
+    document.getElementById('exportPdfBtn').addEventListener('click', function() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('l', 'mm', 'a4');
+        
+        doc.setFontSize(22);
+        doc.setTextColor(255, 138, 171);
+        doc.text('Journal des Réservations - Maternia', 14, 20);
+        
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('Date d\'exportation : ' + new Date().toLocaleString(), 14, 28);
+
+        // Emoji/Special char remover helper (Safe Unicode Version)
+        const cleanText = (str) => {
+            return str
+                .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F1E6}-\u{1F1FF}]/gu, '')
+                .replace(/\s\s+/g, ' ')
+                .trim();
+        };
+
+        // Get table data manually to avoid HTML/Emoji pollution
+        const tableData = [];
+        const rows = document.querySelectorAll('.rdv-row');
+        
+        rows.forEach(row => {
+            // Check if row is visible
+            const isVisible = row.offsetWidth > 0 || row.offsetHeight > 0 || row.getClientRects().length > 0;
+            if (isVisible) {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 6) {
+                    tableData.push([
+                        cleanText(cells[0].textContent), // Réf
+                        cleanText(cells[1].textContent), // Patient
+                        cleanText(cells[2].textContent), // Détails
+                        cleanText(cells[3].textContent), // Médecin
+                        cleanText(cells[4].textContent), // Statut
+                        cleanText(cells[5].textContent)  // Date
+                    ]);
+                }
+            }
+        });
+
+        if (tableData.length === 0) {
+            Swal.fire({ title: 'Erreur', text: 'Aucune donnée à exporter', icon: 'error' });
+            return;
+        }
+
+        doc.autoTable({
+            head: [['Réf', 'Patient', 'Détails', 'Médecin', 'Statut', 'Planifié le']],
+            body: tableData,
+            startY: 35,
+            headStyles: { fillColor: [255, 138, 171], textColor: 255, fontSize: 10, cellPadding: 4 },
+            bodyStyles: { fontSize: 9, cellPadding: 4 },
+            alternateRowStyles: { fillColor: [250, 250, 250] },
+            margin: { left: 14, right: 14 }
+        });
+
+        doc.save('reservations_maternia_' + new Date().getTime() + '.pdf');
+    });
+
+    // DELETE RDV
+    function deleteRdv(url, token, row) {
+        Swal.fire({
+            title: 'Action irréversible',
+            text: "Voulez-vous vraiment supprimer cette réservation ?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#FF5C8D',
+            cancelButtonColor: '#CBD5E0',
+            confirmButtonText: 'Oui, supprimer',
+            cancelButtonText: 'Annuler',
+            borderRadius: '15px'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const formData = new FormData();
+                formData.append('_token', token);
+                fetch(url, { method: 'POST', body: formData, headers: {'X-Requested-With': 'XMLHttpRequest'} })
+                .then(r => r.json()).then(data => {
+                    if (data.success) {
+                        row.style.opacity = '0';
+                        setTimeout(() => row.remove(), 300);
+                        Swal.fire({ title: 'Supprimé !', icon: 'success', borderRadius: '15px' });
+                    }
+                });
+            }
+        });
+    }
+
+    // SEARCH SEARCH
+    const searchRdv = document.getElementById('searchRdv');
+    if (searchRdv) {
+        searchRdv.addEventListener('input', function() {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('.rdv-row').forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        });
+    }
+
+    // TRI AVEC FLÈCHES
+    function sortRows(key, btn) {
+        const body = document.getElementById('rdvBody');
+        const rows = Array.from(body.querySelectorAll('.rdv-row'));
+        let dir = btn.dataset.dir || 'asc';
+        if (btn.classList.contains('active')) {
+            dir = dir === 'asc' ? 'desc' : 'asc';
+        }
+        
+        document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        rows.sort((a, b) => {
+            let valA = a.dataset[key];
+            let valB = b.dataset[key];
+            if (dir === 'asc') return valA > valB ? 1 : -1;
+            return valA < valB ? 1 : -1;
+        });
+        
+        rows.forEach(r => body.appendChild(r));
+        btn.dataset.dir = dir;
+        btn.querySelector('.sort-arrow').className = dir === 'asc' ? 'fas fa-arrow-up sort-arrow' : 'fas fa-arrow-down sort-arrow';
+    }
+</script>
+{% endblock %}

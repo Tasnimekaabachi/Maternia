@@ -22,36 +22,60 @@
             <nav class="admin-sidebar-nav">
                 <a href="{{ path('admin_dashboard') }}" class="nav-link {{ app.request.attributes.get('_route') == 'admin_dashboard' ? 'active' : '' }}">
                     <i class="fas fa-tachometer-alt"></i>
-                    Tableau de bord
+                    <span>Tableau de bord</span>
                 </a>
+
+                {# Gestion Utilisateurs (Indispensable pour Face ID) #}
+                <a href="{{ path('admin_user_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'admin_user' ? 'active' : '' }}">
+                    <i class="fas fa-users"></i>
+                    <span>Gestion Utilisateurs</span>
+                </a>
+
+                {# Suivi de Grossesse (Logique de route optimisée) #}
                 <a href="{{ path('admin_suivi_grossesse') }}" class="nav-link {{ (app.request.attributes.get('_route') == 'admin_suivi_grossesse' or app.request.attributes.get('_route') starts with 'admin_maman_') ? 'active' : '' }}">
-                    <i class="fas fa-heart"></i>
-                    Suivi grossesse
+                    <i class="fas fa-baby"></i>
+                    <span>Suivi Grossesse</span>
                 </a>
+
                 <a href="{{ path('admin_marketplace') }}" class="nav-link {{ app.request.attributes.get('_route') == 'admin_marketplace' ? 'active' : '' }}">
                     <i class="fas fa-shopping-bag"></i>
-                    Marketplace
+                    <span>Marketplace</span>
                 </a>
-                <a href="{{ path('admin_evenements') }}" class="nav-link {{ app.request.attributes.get('_route') == 'admin_evenements' ? 'active' : '' }}">
+                <a href="{{ path('admin_evenements') }}" class="nav-link {{ app.request.attributes.get('_route') == 'app_event_new' ? 'active' : '' }}">
                     <i class="fas fa-calendar-alt"></i>
-                    Événements
-                </a>
-                <a href="{{ path('admin_consultations') }}" class="nav-link {{ app.request.attributes.get('_route') == 'admin_consultations' ? 'active' : '' }}">
-                    <i class="fas fa-stethoscope"></i>
-                    Consultations
-                </a>
+                    <span>Événements</span>
+                </a>{# Consultations (types de consultations) #}
+{% set _route = app.request.attributes.get('_route') %}
+{% set is_consultation_route =
+    (_route starts with 'app_admin_consultation')
+    or (_route starts with 'app_admin_reservation_client')
+%}
+
+<a href="{{ path('app_admin_consultation_index') }}"
+   class="nav-link {{ is_consultation_route ? 'active' : '' }}">
+    <i class="fas fa-stethoscope"></i>
+    <span>Consultations</span>
+</a>
+
+
                 <a href="{{ path('admin_profil_bebe') }}" class="nav-link {{ app.request.attributes.get('_route') == 'admin_profil_bebe' ? 'active' : '' }}">
-                    <i class="fas fa-baby"></i>
-                    Profil bébé
+                    <i class="fas fa-baby-carriage"></i>
+                    <span>Profil bébé</span>
+                </a>
+                <a href="{{ path('app_demande_baby_sitter_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_demande_baby_sitter_' ? 'active' : '' }}">
+                    <i class="fas fa-user-nurse"></i>
+                    Profil babysitting
                 </a>
             </nav>
-            <div class="p-3 border-top border-primary" style="border-color: var(--bs-border) !important;">
+
+            <div class="p-3 border-top" style="border-color: rgba(255,255,255,0.1) !important;">
                 <a href="{{ path('app_home') }}" class="nav-link" target="_blank">
                     <i class="fas fa-external-link-alt"></i>
-                    Voir le site
+                    <span>Voir le site</span>
                 </a>
             </div>
         </aside>
+
         <main class="admin-main">
             <header class="admin-header">
                 <h1 class="admin-header-title mb-0">{% block page_title %}Tableau de bord{% endblock %}</h1>
@@ -60,11 +84,15 @@
                 </div>
             </header>
             <div class="admin-content">
-                {% block breadcrumb %}{% endblock %}
+                <nav aria-label="breadcrumb">
+                    {% block breadcrumb %}{% endblock %}
+                </nav>
                 {% block content %}{% endblock %}
             </div>
         </main>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     {% block javascripts %}{% endblock %}
 </body>

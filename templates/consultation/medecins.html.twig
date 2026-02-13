@@ -1,0 +1,1485 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nos Spécialistes - {{ consultation.categorie }} - Maternia{% endblock %}
+
+{% block body %}
+{# === THÈME BLEU UNIFIÉ === #}
+{% set blue_gradient_light = 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)' %}
+{% set blue_gradient_medium = 'linear-gradient(135deg, #4dabf7 0%, #228be6 100%)' %}
+{% set blue_gradient_dark = 'linear-gradient(135deg, #1c7ed6 0%, #1864ab 100%)' %}
+{% set blue_accent = '#4dabf7' %}
+{% set blue_light = '#e7f5ff' %}
+
+<style>
+    :root {
+        --blue-light: {{ blue_gradient_light }};
+        --blue-medium: {{ blue_gradient_medium }};
+        --blue-dark: {{ blue_gradient_dark }};
+        --blue-accent: {{ blue_accent }};
+        --blue-bg: {{ blue_light }};
+        --card-width: 320px;
+        --card-height: 480px;
+    }
+
+    /* RESET ET BASE */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        background: #f8fafc;
+        color: #334155;
+        line-height: 1.6;
+    }
+
+    /* HEADER DYNAMIQUE */
+    .dynamic-header {
+        background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 40%, #fdcbf1 70%, #ff9a9e 100%);
+        padding: 40px 0;
+        position: relative;
+        overflow: hidden;
+        border-radius: 0 0 30px 30px;
+        box-shadow: 0 4px 20px rgba(30, 58, 138, 0.15);
+    }
+
+    /* NAVIGATION BREADCRUMB */
+    .breadcrumb-modern {
+        display: inline-flex;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(5px);
+        border-radius: 50px;
+        padding: 8px 16px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        font-size: 0.85rem;
+    }
+
+    .breadcrumb-modern a {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: flex; align-items: center; gap: 6px;
+    }
+    
+    .breadcrumb-modern a:hover { opacity: 0.8; }
+    .breadcrumb-separator { color: rgba(255, 255, 255, 0.7); margin: 0 8px; }
+    .breadcrumb-current { color: white; font-weight: 700; }
+
+    /* TITRE PRINCIPAL */
+    .main-title-container {
+        text-align: center;
+        max-width: 900px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+    }
+
+    .title-gradient {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: white;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 10px;
+        line-height: 1.1;
+    }
+
+    .title-subtitle {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.95);
+        max-width: 700px;
+        margin: 0 auto 25px;
+        font-weight: 500;
+    }
+
+    /* STATISTIQUES */
+    .stats-container {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .stat-badge {
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+        border-radius: 50px;
+        padding: 8px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+        transition: transform 0.2s;
+        border: 2px solid rgba(255,255,255,0.4);
+    }
+    
+    .stat-badge:hover { transform: translateY(-3px); }
+
+    .stat-number {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #b02456;
+        line-height: 1;
+        margin-bottom: 0;
+    }
+
+    .stat-label {
+        color: #b02456;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* SECTION PRINCIPALE */
+    .main-section {
+        padding: 80px 20px;
+        position: relative;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+
+    .section-title {
+        text-align: center;
+        margin-bottom: 60px;
+        position: relative;
+    }
+
+    .section-title h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 16px;
+        display: inline-block;
+    }
+
+    .title-underline {
+        width: 80px;
+        height: 4px;
+        background: var(--blue-medium);
+        border-radius: 2px;
+        margin: 0 auto 20px;
+    }
+
+    .section-description {
+        font-size: 1.1rem;
+        color: #64748b;
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.7;
+    }
+
+    /* GRID SYMÉTRIQUE PARFAITE - NOUVELLE VERSION */
+    .doctors-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 30px;
+        justify-items: center;
+        margin-bottom: 80px;
+    }
+
+    /* CARTE MÉDECIN SYMÉTRIQUE - VERSION OPTIMISÉE */
+    .doctor-card {
+        width: 100%;
+        max-width: 320px;
+        min-height: 480px;
+        background: white;
+        border-radius: 20px;
+        overflow: visible;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 
+            0 10px 30px rgba(30, 41, 59, 0.08),
+            0 5px 15px rgba(30, 41, 59, 0.04);
+        border: 1px solid #f1f5f9;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+    .doctor-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 
+            0 25px 50px rgba(30, 41, 59, 0.12),
+            0 15px 35px rgba(30, 41, 59, 0.08);
+        border-color: transparent;
+    }
+
+    /* HEADER CARTE - DÉGRADÉ BLEU CIEL (hauteur pour que la photo ne soit pas coupée) */
+    .card-header {
+        background: var(--blue-light);
+        height: 100px;
+        position: relative;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding: 0 20px;
+        overflow: visible;
+        flex-shrink: 0;
+    }
+
+    .card-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.4) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.3) 0%, transparent 50%);
+    }
+
+    /* ============ PHOTO MÉDECIN - CERCLE ENTIER VISIBLE, À CHEVAL HEADER/BODY ============ */
+    .doctor-photo-container {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 120px;
+        height: 120px;
+        z-index: 10;
+        pointer-events: none;
+    }
+
+    .photo-frame {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: linear-gradient(145deg, #ffffff, #f0f9ff);
+        padding: 5px;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2), 0 0 0 3px rgba(255, 255, 255, 0.9);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .doctor-card:hover .photo-frame {
+        transform: scale(1.05);
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25), 0 0 0 4px rgba(255, 255, 255, 0.95);
+    }
+
+    .doctor-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top;
+        border-radius: 50%;
+        display: block;
+    }
+
+    .photo-placeholder {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #c8e7ff, #9ad0f5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .photo-placeholder i {
+        font-size: 3rem;
+        color: #0369a1;
+        text-shadow: 0 2px 10px rgba(3, 105, 161, 0.3);
+    }
+
+    .status-dot {
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        width: 16px;
+        height: 16px;
+        background: #10b981;
+        border: 2px solid white;
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+        z-index: 5;
+        pointer-events: none;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.15); opacity: 0.9; }
+    }
+
+    /* CORPS DE LA CARTE - DIMENSIONS FIXES */
+    .card-body {
+        padding: 70px 20px 16px;
+        text-align: center;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 220px;
+    }
+
+    .doctor-name {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 10px;
+        line-height: 1.3;
+        min-height: 1.5em;
+        word-break: break-word;
+    }
+
+    .doctor-specialty {
+        display: inline-block;
+        padding: 6px 14px;
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        color: #0c4a6e;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border-radius: 50px;
+        margin-bottom: 12px;
+        border: 1px solid #bae6fd;
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .doctor-description {
+        color: #64748b;
+        font-size: 0.875rem;
+        line-height: 1.55;
+        margin-bottom: 16px;
+        flex: 1;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        word-break: break-word;
+    }
+
+    /* INFORMATIONS COMPLÉMENTAIRES */
+    .doctor-meta {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #64748b;
+        font-size: 0.85rem;
+        background: #f8fafc;
+        padding: 5px 12px;
+        border-radius: 50px;
+        border: 1px solid #f1f5f9;
+    }
+
+    .meta-item i {
+        color: #4dabf7;
+        font-size: 0.9rem;
+    }
+
+    /* FOOTER CARTE - HAUTEUR FIXE */
+    .card-footer {
+        padding: 20px;
+        background: #f8fafc;
+        border-top: 1px solid #f1f5f9;
+        flex-shrink: 0;
+        min-height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .appointment-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        padding: 14px 20px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        background: var(--blue-medium);
+        color: white;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        box-shadow: 0 8px 20px rgba(30, 58, 138, 0.2);
+        cursor: pointer;
+        min-height: 48px;
+    }
+
+    .appointment-btn:hover {
+        background: var(--blue-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px rgba(30, 58, 138, 0.3);
+        color: white;
+    }
+
+    .appointment-btn i {
+        font-size: 1rem;
+        transition: transform 0.3s ease;
+    }
+
+    .appointment-btn:hover i {
+        transform: translateX(3px);
+    }
+
+    /* SECTION VIDE STYLISÉE */
+    .empty-state {
+        background: white;
+        border-radius: 24px;
+        padding: 80px 40px;
+        text-align: center;
+        max-width: 600px;
+        margin: 0 auto 80px;
+        box-shadow: 0 20px 60px rgba(30, 41, 59, 0.08);
+        border: 1px solid #f1f5f9;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        color: #cbd5e1;
+        margin-bottom: 30px;
+        opacity: 0.7;
+    }
+
+    .empty-state h3 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 20px;
+    }
+
+    .empty-state p {
+        color: #64748b;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 30px;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 28px;
+        background: var(--blue-light);
+        color: #0c4a6e;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 1px solid #bae6fd;
+    }
+
+    .back-btn:hover {
+        background: var(--blue-medium);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(30, 58, 138, 0.2);
+    }
+
+    /* BADGES DE CONFIANCE */
+    .trust-badges {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 30px;
+        max-width: 1000px;
+        margin: 80px auto 0;
+    }
+
+    .trust-badge {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 5px 15px rgba(30, 41, 59, 0.05);
+    }
+
+    .trust-badge:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(30, 41, 59, 0.1);
+        border-color: #bae6fd;
+    }
+
+    .badge-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 20px;
+        background: var(--blue-light);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        color: #0ea5e9;
+        box-shadow: 0 5px 15px rgba(14, 165, 233, 0.15);
+    }
+
+    .badge-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 10px;
+    }
+
+    .badge-description {
+        color: #64748b;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    /* ============ NOUVEAUX STYLES - RECHERCHE ET TRI ============ */
+    .filter-tools {
+        margin: -20px auto 40px;
+        max-width: 1000px;
+        position: relative;
+        z-index: 50;
+    }
+
+    .filter-container {
+        background: white;
+        border-radius: 50px;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 15px 35px rgba(30, 41, 59, 0.12);
+        border: 1px solid #f1f5f9;
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.98);
+        flex-wrap: wrap;
+    }
+
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 20px;
+        border-right: 1px solid #e2e8f0;
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .filter-group:last-child {
+        border-right: none;
+    }
+
+    .filter-icon {
+        color: #4dabf7;
+        font-size: 1.1rem;
+    }
+
+    .filter-select, .filter-input {
+        width: 100%;
+        padding: 10px 0;
+        border: none;
+        background: transparent;
+        font-size: 0.95rem;
+        color: #1e293b;
+        outline: none;
+        font-weight: 500;
+    }
+
+    .filter-select {
+        cursor: pointer;
+    }
+
+    .filter-input::placeholder {
+        color: #94a3b8;
+        font-weight: 400;
+    }
+
+    .search-btn {
+        background: var(--blue-medium);
+        color: white;
+        border: none;
+        padding: 14px 32px;
+        border-radius: 50px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+
+    .search-btn:hover {
+        background: var(--blue-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(30, 58, 138, 0.2);
+    }
+
+    .active-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+        justify-content: center;
+    }
+
+    .filter-tag {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 50px;
+        padding: 8px 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.9rem;
+        color: #1e293b;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .filter-tag i {
+        color: #4dabf7;
+    }
+
+    .remove-filter {
+        color: #94a3b8;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .remove-filter:hover {
+        color: #ef4444;
+    }
+
+    .sort-indicator {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: #64748b;
+        font-size: 0.9rem;
+        cursor: pointer;
+        padding: 8px 16px;
+        border-radius: 50px;
+        transition: all 0.2s;
+    }
+
+    .sort-indicator:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+
+    .sort-indicator.active {
+        color: #4dabf7;
+        font-weight: 600;
+        background: #e6f7ff;
+    }
+
+    .results-count {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #64748b;
+        font-size: 0.95rem;
+        padding: 10px;
+        background: white;
+        border-radius: 50px;
+        display: inline-block;
+        padding: 10px 30px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    }
+
+    .results-count strong {
+        color: #1e293b;
+        font-size: 1.2rem;
+        margin: 0 5px;
+    }
+
+    .results-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 30px;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-card {
+        animation: fadeInUp 0.6s ease-out forwards;
+        opacity: 0;
+    }
+
+    .animate-card:nth-child(1) { animation-delay: 0.1s; }
+    .animate-card:nth-child(2) { animation-delay: 0.2s; }
+    .animate-card:nth-child(3) { animation-delay: 0.3s; }
+    .animate-card:nth-child(4) { animation-delay: 0.4s; }
+    .animate-card:nth-child(5) { animation-delay: 0.5s; }
+    .animate-card:nth-child(6) { animation-delay: 0.6s; }
+
+    /* LOADER POUR LES CARTES */
+    .card-loader {
+        width: 320px;
+        height: 480px;
+        background: #f1f5f9;
+        border-radius: 20px;
+        animation: pulse-bg 1.5s infinite;
+    }
+
+    @keyframes pulse-bg {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+
+    /* RESPONSIVE DESIGN */
+    @media (max-width: 1200px) {
+        .doctors-grid {
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        }
+    }
+
+    @media (max-width: 992px) {
+        .doctors-grid {
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .doctor-card {
+            max-width: 100%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .filter-container {
+            flex-direction: column;
+            border-radius: 24px;
+        }
+        
+        .filter-group {
+            width: 100%;
+            border-right: none;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .filter-group:last-child {
+            border-bottom: none;
+        }
+        
+        .search-btn {
+            width: 100%;
+            justify-content: center;
+            margin-top: 8px;
+        }
+        
+        .dynamic-header {
+            padding: 60px 0;
+            border-radius: 0 0 30px 30px;
+        }
+
+        .title-gradient {
+            font-size: 2.5rem;
+        }
+
+        .breadcrumb-modern {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
+
+        .doctors-grid {
+            grid-template-columns: 1fr;
+            max-width: 400px;
+            gap: 25px;
+        }
+
+        .doctor-card {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .card-header {
+            height: 120px;
+        }
+
+        .doctor-photo-container {
+            width: 110px;
+            height: 110px;
+        }
+
+        .card-body {
+            padding: 70px 20px 20px;
+        }
+
+        .stats-container {
+            gap: 20px;
+        }
+
+        .stat-item {
+            min-width: 120px;
+            padding: 15px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+        }
+
+        .trust-badges {
+            grid-template-columns: 1fr;
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        .empty-state {
+            padding: 60px 20px;
+            margin: 0 20px 60px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .title-gradient {
+            font-size: 2rem;
+        }
+
+        .section-title h2 {
+            font-size: 1.8rem;
+        }
+
+        .doctor-name {
+            font-size: 1.2rem;
+        }
+
+        .breadcrumb-modern {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 15px;
+            width: 100%;
+        }
+
+        .breadcrumb-separator {
+            display: none;
+        }
+        
+        .doctors-grid {
+            gap: 20px;
+        }
+        
+        .doctor-card {
+            min-height: 440px;
+        }
+        
+        .doctor-photo-container {
+            width: 100px;
+            height: 100px;
+        }
+    }
+</style>
+
+<!-- HEADER DYNAMIQUE MIXTE -->
+<header class="dynamic-header">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-modern">
+            <a href="{{ path('app_home') }}">
+                <i class="fas fa-home"></i>
+                Accueil
+            </a>
+            <span class="breadcrumb-separator">›</span>
+            <a href="{{ path('app_consultations') }}">
+                <i class="fas fa-stethoscope"></i>
+                Consultations
+            </a>
+            <span class="breadcrumb-separator">›</span>
+            <span class="breadcrumb-current">
+                {{ consultation.categorie }}
+            </span>
+        </div>
+
+        <!-- Titre Principal -->
+        <div class="main-title-container">
+            <h1 class="title-gradient">{{ consultation.categorie }}</h1>
+            <p class="title-subtitle">{{ consultation.description }}</p>
+            
+            <!-- Statistiques / Badges -->
+            <div class="stats-container">
+                <div class="stat-badge">
+                    <span class="stat-label">Spécialistes</span>
+                    <span class="stat-number">{{ medecins|length }}</span>
+                </div>
+                <div class="stat-badge">
+                    <span class="stat-label">Public Cible</span>
+                    <span class="stat-number">{{ consultation.pour }}</span>
+                </div>
+                <div class="stat-badge">
+                    <span class="stat-label">Disponibilité</span>
+                    <span class="stat-number">24/7</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- SECTION PRINCIPALE -->
+<main class="main-section">
+    <div class="container">
+        <!-- Titre Section -->
+        <div class="section-title">
+            <h2>Nos Experts Médicaux</h2>
+            <div class="title-underline"></div>
+            <p class="section-description">
+                Découvrez notre équipe de médecins spécialisés, dédiés à votre santé 
+                et à celle de votre bébé avec expertise et bienveillance.
+            </p>
+        </div>
+
+        <!-- ============ NOUVEAU: OUTILS DE RECHERCHE ET TRI ============ -->
+        <div class="filter-tools">
+            <div class="filter-container">
+                <!-- Recherche par nom/spécialité -->
+                <div class="filter-group">
+                    <i class="fas fa-search filter-icon"></i>
+                    <input type="text" id="searchInput" class="filter-input" placeholder="Rechercher un médecin..." autocomplete="off">
+                </div>
+                
+                <!-- Filtre par spécialité -->
+                <div class="filter-group">
+                    <i class="fas fa-stethoscope filter-icon"></i>
+                    <select id="specialtyFilter" class="filter-select">
+                        <option value="all">Toutes spécialités</option>
+                        {% set specialties = [] %}
+                        {% for medecin in medecins %}
+                            {% if medecin.specialiteMedecin and medecin.specialiteMedecin not in specialties %}
+                                {% set specialties = specialties|merge([medecin.specialiteMedecin]) %}
+                                <option value="{{ medecin.specialiteMedecin|lower|replace({' ': '_'}) }}">{{ medecin.specialiteMedecin }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Filtre par disponibilité -->
+                <div class="filter-group">
+                    <i class="fas fa-clock filter-icon"></i>
+                    <select id="availabilityFilter" class="filter-select">
+                        <option value="all">Tous</option>
+                        <option value="available">Disponible</option>
+                        <option value="busy">Complet</option>
+                    </select>
+                </div>
+                
+                <!-- Bouton de recherche -->
+                <button id="searchButton" class="search-btn">
+                    <i class="fas fa-filter"></i>
+                    Filtrer
+                </button>
+            </div>
+            
+            <!-- Filtres actifs -->
+            <div class="active-filters" id="activeFilters"></div>
+            
+            <!-- Options de tri -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                <div style="display: flex; gap: 10px;">
+                    <div class="sort-indicator active" data-sort="name">
+                        <i class="fas fa-sort-alpha-down"></i> Nom
+                    </div>
+                    <div class="sort-indicator" data-sort="specialty">
+                        <i class="fas fa-sort"></i> Spécialité
+                    </div>
+                    <div class="sort-indicator" data-sort="rating">
+                        <i class="fas fa-star"></i> Note
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Compteur de résultats -->
+            <div class="results-wrapper">
+                <div class="results-count" id="resultsCount">
+                    <strong id="visibleCount">{{ medecins|length }}</strong> spécialistes affichés sur <strong id="totalCount">{{ medecins|length }}</strong>
+                </div>
+            </div>
+        </div>
+
+        {% if medecins|length > 0 %}
+            <!-- GRID SYMÉTRIQUE DES MÉDECINS - VERSION OPTIMISÉE -->
+            <div class="doctors-grid" id="doctorsGrid">
+                {% for medecin in medecins %}
+                    <div class="doctor-card animate-card"
+                         data-name="{{ medecin.nomMedecin|lower }}"
+                         data-specialty="{{ medecin.specialiteMedecin is defined and medecin.specialiteMedecin ? medecin.specialiteMedecin|lower|replace({' ': '_'}) : '' }}"
+                         data-availability="available"
+                         data-rating="4.8">
+                        <div class="card-header">
+                            <div class="doctor-photo-container">
+                                <div class="photo-frame">
+                                    {% if medecin.photoMedecin is defined and medecin.photoMedecin and medecin.photoMedecin|trim != '' %}
+                                        <img src="{{ medecin.photoMedecin starts with 'http' ? medecin.photoMedecin : asset('uploads/medecins/' ~ medecin.photoMedecin) }}"
+                                             alt="{{ medecin.nomMedecin }}"
+                                             class="doctor-photo"
+                                             loading="lazy">
+                                    {% else %}
+                                        <div class="photo-placeholder">
+                                            <i class="fas fa-user-md"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <span class="status-dot" title="Disponible" aria-hidden="true"></span>
+                            </div>
+                        </div>
+
+                        <!-- Corps de la carte -->
+                        <div class="card-body">
+                            <h3 class="doctor-name">{{ medecin.nomMedecin }}</h3>
+                            
+                            <span class="doctor-specialty">
+                                {% if medecin.specialiteMedecin %}
+                                    {{ medecin.specialiteMedecin }}
+                                {% else %}
+                                    Médecin Spécialiste
+                                {% endif %}
+                            </span>
+
+                            <p class="doctor-description">
+                                {% if medecin.descriptionMedecin %}
+                                    {{ medecin.descriptionMedecin|slice(0, 150) }}
+                                    {% if medecin.descriptionMedecin|length > 150 %}...{% endif %}
+                                {% else %}
+                                    Professionnel de santé expérimenté et engagé, 
+                                    spécialisé dans l'accompagnement médical personnalisé.
+                                {% endif %}
+                            </p>
+
+                            <!-- Informations complémentaires -->
+                            <div class="doctor-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-award"></i>
+                                    <span>Expérimenté</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-star"></i>
+                                    <span>4.8/5</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Disponible</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer avec bouton fixe -->
+                        <div class="card-footer">
+                            <a href="{{ path('app_medecin_creneaux', {'medecin': medecin.nomMedecin}) }}" 
+                               class="appointment-btn"
+                               title="Voir les créneaux du Dr. {{ medecin.nomMedecin }}">
+                                <i class="fas fa-calendar-check"></i>
+                                Prendre Rendez-vous
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- État vide -->
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <h3>Expertise en Préparation</h3>
+                <p>
+                    Nous élargissons actuellement notre réseau de spécialistes 
+                    pour mieux répondre à vos besoins. Revenez bientôt !
+                </p>
+                <a href="{{ path('app_consultations') }}" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Retour aux consultations
+                </a>
+            </div>
+        {% endif %}
+
+        <!-- BADGES DE CONFIANCE -->
+        <div class="trust-badges">
+            <div class="trust-badge">
+                <div class="badge-icon">
+                    <i class="fas fa-certificate"></i>
+                </div>
+                <h4 class="badge-title">Diplômes Certifiés</h4>
+                <p class="badge-description">
+                    Tous nos médecins sont diplômés et certifiés par les autorités de santé.
+                </p>
+            </div>
+
+            <div class="trust-badge">
+                <div class="badge-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h4 class="badge-title">Flexibilité Horaires</h4>
+                <p class="badge-description">
+                    Des créneaux adaptés à votre emploi du temps, même en soirée.
+                </p>
+            </div>
+
+            <div class="trust-badge">
+                <div class="badge-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h4 class="badge-title">Sécurité des Données</h4>
+                <p class="badge-description">
+                    Vos informations médicales sont cryptées et protégées.
+                </p>
+            </div>
+
+            <div class="trust-badge">
+                <div class="badge-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h4 class="badge-title">Approche Humaine</h4>
+                <p class="badge-description">
+                    Un accompagnement personnalisé et bienveillant à chaque étape.
+                </p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- ============ NOUVEAU: SCRIPT DE RECHERCHE ET TRI AVEC PHOTOS FIXÉES ============ -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ============ PHOTOS - FIXÉES ET PERMANENTES ============
+        // Forcer l'affichage de TOUTES les photos immédiatement
+        const forceImages = () => {
+            document.querySelectorAll('.doctor-photo-container, .photo-frame, .doctor-photo, .photo-placeholder').forEach(el => {
+                if (el) {
+                    el.style.display = 'flex';
+                    el.style.visibility = 'visible';
+                    el.style.opacity = '1';
+                    el.style.zIndex = '100';
+                }
+            });
+            
+            // Chargement immédiat des images
+            document.querySelectorAll('.doctor-photo').forEach(img => {
+                if (img.dataset.src) {
+                    img.src = img.dataset.src;
+                }
+                img.style.display = 'block !important';
+                img.style.visibility = 'visible !important';
+                img.style.opacity = '1 !important';
+            });
+        };
+        
+        // Exécuter immédiatement
+        forceImages();
+        
+        // Réappliquer après chaque chargement
+        setTimeout(forceImages, 100);
+        setTimeout(forceImages, 500);
+        setInterval(forceImages, 2000); // Garder les photos visibles en permanence
+        
+        // ============ ANIMATIONS EXISTANTES ============
+        // Animation des cartes au scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                    entry.target.style.opacity = '1';
+                }
+            });
+        }, observerOptions);
+
+        // Observer toutes les cartes
+        document.querySelectorAll('.animate-card').forEach(card => {
+            card.style.animationPlayState = 'paused';
+            observer.observe(card);
+        });
+
+        // Effet de parallaxe léger sur le header
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const header = document.querySelector('.dynamic-header');
+            if (header && scrolled < 500) {
+                header.style.backgroundPositionY = scrolled * 0.05 + 'px';
+            }
+        });
+
+        // Animation au survol des boutons
+        const buttons = document.querySelectorAll('.appointment-btn');
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', function(e) {
+                this.style.transform = 'translateY(-2px) scale(1.02)';
+            });
+            
+            button.addEventListener('mouseleave', function(e) {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Animation au survol des cartes
+        const cards = document.querySelectorAll('.doctor-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.zIndex = '10';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.zIndex = '1';
+            });
+        });
+
+        // ============ NOUVELLES FONCTIONNALITÉS: RECHERCHE ET TRI ============
+        
+        // Éléments DOM
+        const searchInput = document.getElementById('searchInput');
+        const specialtyFilter = document.getElementById('specialtyFilter');
+        const availabilityFilter = document.getElementById('availabilityFilter');
+        const searchButton = document.getElementById('searchButton');
+        const activeFilters = document.getElementById('activeFilters');
+        const sortIndicators = document.querySelectorAll('.sort-indicator');
+        const doctorsGrid = document.getElementById('doctorsGrid');
+        const visibleCountSpan = document.getElementById('visibleCount');
+        const totalCountSpan = document.getElementById('totalCount');
+        
+        // Variables d'état
+        let currentSort = 'name';
+        let currentSortDirection = 'asc';
+        
+        // Fonction pour normaliser le texte de recherche
+        function normalizeText(text) {
+            if (!text) return '';
+            return text.toString().toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Enlever accents
+                .replace(/[^a-z0-9]/g, '');
+        }
+        
+        // Fonction pour mettre à jour les filtres actifs
+        function updateActiveFilters() {
+            let filters = [];
+            const searchValue = searchInput.value.trim();
+            const specialtyValue = specialtyFilter.value;
+            const availabilityValue = availabilityFilter.value;
+            
+            if (searchValue) {
+                filters.push(`<span class="filter-tag"><i class="fas fa-search"></i> "${searchValue}" <i class="fas fa-times remove-filter" data-filter="search"></i></span>`);
+            }
+            
+            if (specialtyValue !== 'all') {
+                const specialtyOption = specialtyFilter.querySelector(`option[value="${specialtyValue}"]`);
+                filters.push(`<span class="filter-tag"><i class="fas fa-stethoscope"></i> ${specialtyOption.textContent} <i class="fas fa-times remove-filter" data-filter="specialty"></i></span>`);
+            }
+            
+            if (availabilityValue !== 'all') {
+                const availabilityText = availabilityValue === 'available' ? 'Disponible' : 'Complet';
+                filters.push(`<span class="filter-tag"><i class="fas fa-clock"></i> ${availabilityText} <i class="fas fa-times remove-filter" data-filter="availability"></i></span>`);
+            }
+            
+            activeFilters.innerHTML = filters.join('');
+            
+            // Ajouter les événements de suppression
+            document.querySelectorAll('.remove-filter').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const filterType = this.dataset.filter;
+                    
+                    if (filterType === 'search') {
+                        searchInput.value = '';
+                    } else if (filterType === 'specialty') {
+                        specialtyFilter.value = 'all';
+                    } else if (filterType === 'availability') {
+                        availabilityFilter.value = 'all';
+                    }
+                    
+                    applyFilters();
+                });
+            });
+        }
+        
+        // Fonction principale de filtrage
+        function applyFilters() {
+            const searchTerm = normalizeText(searchInput.value.trim());
+            const specialtyValue = specialtyFilter.value;
+            const availabilityValue = availabilityFilter.value;
+            
+            let visibleCount = 0;
+            
+            // Filtrer les cartes
+            document.querySelectorAll('.doctor-card').forEach(card => {
+                const cardName = normalizeText(card.dataset.name);
+                const cardSpecialty = card.dataset.specialty;
+                const cardAvailability = card.dataset.availability;
+                
+                let showCard = true;
+                
+                // Filtre par recherche
+                if (searchTerm) {
+                    if (!cardName.includes(searchTerm)) {
+                        showCard = false;
+                    }
+                }
+                
+                // Filtre par spécialité
+                if (showCard && specialtyValue !== 'all') {
+                    if (cardSpecialty !== specialtyValue) {
+                        showCard = false;
+                    }
+                }
+                
+                // Filtre par disponibilité
+                if (showCard && availabilityValue !== 'all') {
+                    if (cardAvailability !== availabilityValue) {
+                        showCard = false;
+                    }
+                }
+                
+                // Afficher ou masquer la carte
+                if (showCard) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Mettre à jour le compteur
+            const total = document.querySelectorAll('.doctor-card').length;
+            if (visibleCountSpan) visibleCountSpan.textContent = visibleCount;
+            if (totalCountSpan) totalCountSpan.textContent = total;
+            
+            updateActiveFilters();
+            sortCards(currentSort, currentSortDirection);
+            
+            // Forcer l'affichage des photos après filtrage
+            setTimeout(forceImages, 50);
+        }
+        
+        // Fonction de tri
+        function sortCards(sortType, direction = 'asc') {
+            currentSort = sortType;
+            
+            // Mettre à jour l'affichage des indicateurs de tri
+            sortIndicators.forEach(ind => {
+                ind.classList.remove('active');
+            });
+            const activeIndicator = document.querySelector(`.sort-indicator[data-sort="${sortType}"]`);
+            if (activeIndicator) activeIndicator.classList.add('active');
+            
+            const grid = document.getElementById('doctorsGrid');
+            if (!grid) return;
+            
+            const cards = Array.from(grid.querySelectorAll('.doctor-card'));
+            
+            // Filtrer seulement les cartes visibles pour le tri
+            const visibleCards = cards.filter(card => card.style.display !== 'none');
+            
+            // Trier les cartes visibles
+            visibleCards.sort((a, b) => {
+                let valA, valB;
+                
+                switch(sortType) {
+                    case 'name':
+                        valA = a.dataset.name;
+                        valB = b.dataset.name;
+                        break;
+                    case 'specialty':
+                        valA = a.dataset.specialty || '';
+                        valB = b.dataset.specialty || '';
+                        break;
+                    case 'rating':
+                        valA = parseFloat(a.dataset.rating) || 0;
+                        valB = parseFloat(b.dataset.rating) || 0;
+                        break;
+                    default:
+                        valA = a.dataset.name;
+                        valB = b.dataset.name;
+                }
+                
+                if (direction === 'asc') {
+                    if (valA < valB) return -1;
+                    if (valA > valB) return 1;
+                    return 0;
+                } else {
+                    if (valA > valB) return -1;
+                    if (valA < valB) return 1;
+                    return 0;
+                }
+            });
+            
+            // Réorganiser le DOM
+            visibleCards.forEach(card => {
+                grid.appendChild(card);
+            });
+            
+            // Forcer l'affichage des photos après tri
+            setTimeout(forceImages, 50);
+        }
+        
+        // Événements de recherche et filtrage
+        if (searchButton) searchButton.addEventListener('click', applyFilters);
+        
+        // Recherche en temps réel (avec debounce)
+        let debounceTimer;
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(applyFilters, 300);
+            });
+        }
+        
+        if (specialtyFilter) specialtyFilter.addEventListener('change', applyFilters);
+        if (availabilityFilter) availabilityFilter.addEventListener('change', applyFilters);
+        
+        // Événements de tri
+        sortIndicators.forEach(indicator => {
+            indicator.addEventListener('click', function() {
+                const sortType = this.dataset.sort;
+                
+                // Inverser la direction si on clique sur le même tri
+                if (currentSort === sortType) {
+                    currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+                    
+                    // Changer l'icône
+                    const icon = this.querySelector('i');
+                    if (icon) {
+                        if (currentSortDirection === 'asc') {
+                            icon.className = sortType === 'name' ? 'fas fa-sort-alpha-down' : 
+                                            (sortType === 'rating' ? 'fas fa-star' : 'fas fa-sort');
+                        } else {
+                            icon.className = sortType === 'name' ? 'fas fa-sort-alpha-up' : 
+                                            (sortType === 'rating' ? 'fas fa-star' : 'fas fa-sort');
+                        }
+                    }
+                } else {
+                    currentSortDirection = 'asc';
+                }
+                
+                sortCards(sortType, currentSortDirection);
+            });
+        });
+        
+        // Initialisation
+        updateActiveFilters();
+        
+        // Forcer l'affichage des photos après chaque interaction
+        document.addEventListener('click', forceImages);
+        document.addEventListener('scroll', forceImages);
+        
+        console.log('Recherche, tri et photos permanentes activés !');
+    });
+</script>
+{% endblock %}

@@ -2,13 +2,26 @@
 
 namespace App\Controller;
 
+use App\Repository\ConsultationRepository;
+use App\Repository\ConsultationCreneauRepository;
+use App\Form\AppointmentType;
+use App\Form\Model\AppointmentData;
+use App\Repository\ProduitRepository;
+use App\Repository\OffreBabySitterRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class HomeController extends AbstractController
 {
-    #[Route('/home', name: 'app_home')]
+    public function __construct(
+        private ConsultationRepository $consultationRepository,
+        private ConsultationCreneauRepository $creneauRepository
+    ) {
+    }
+
+    #[Route('/', name: 'app_home')]
     public function index(): Response
     {
         return $this->render('home/index.html.twig', [
@@ -17,9 +30,30 @@ final class HomeController extends AbstractController
     }
 
     #[Route('/marketplace', name: 'app_marketplace')]
-    public function marketplace(): Response
+    public function marketplace(Request $request, ProduitRepository $produitRepository): Response
     {
-        return $this->render('pages/marketplace.html.twig');
+        $term = $request->query->get('q', '');
+
+        if ($term) {
+            $produits = $produitRepository->search($term);
+        } else {
+            $produits = $produitRepository->findAll();
+        }
+
+        return $this->render('pages/marketplace.html.twig', [
+            'produits' => $produits,
+            'searchTerm' => $term,
+        ]);
+    }
+
+    #[Route('/babysitting', name: 'app_babysitting')]
+    public function babysitting(OffreBabySitterRepository $repository): Response
+    {
+        $offres = $repository->findAll();
+
+        return $this->render('pages/babysitting.html.twig', [
+            'offre_baby_sitters' => $offres,
+        ]);
     }
 
     #[Route('/services', name: 'app_services')]
@@ -28,10 +62,23 @@ final class HomeController extends AbstractController
         return $this->render('pages/services.html.twig');
     }
 
-    #[Route('/rendez-vous', name: 'app_appointment')]
-    public function appointment(): Response
+    #[Route('/rendez-vous', name: 'app_appointment', methods: ['GET', 'POST'])]
+    public function appointment(Request $request): Response
     {
-        return $this->render('pages/appointment.html.twig');
+        $data = new AppointmentData();
+        $form = $this->createForm(AppointmentType::class, $data);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Ici, on pourrait envoyer un email ou enregistrer la demande.
+            $this->addFlash('success', 'Votre demande de rendez-vous a été envoyée. Nous vous contacterons pour confirmer.');
+
+            return $this->redirectToRoute('app_appointment');
+        }
+
+        return $this->render('pages/appointment.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 
     #[Route('/evenements', name: 'app_events')]

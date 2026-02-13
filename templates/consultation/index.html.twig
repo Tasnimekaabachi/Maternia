@@ -1,0 +1,323 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Consultations - Maternia{% endblock %}
+
+{% block body %}
+<!-- Hero Section -->
+<div class="container-fluid py-5 hero-header wow fadeIn" data-wow-delay="0.1s">
+    <div class="container py-5">
+        <div class="row g-5">
+            <div class="col-lg-7 col-md-12">
+                <h1 class="mb-3 text-primary">Nos consultations</h1>
+                <h1 class="mb-5 display-1 text-white">Choisissez votre spécialité</h1>
+                <p class="mb-5 text-white">
+                    Sélectionnez une catégorie pour voir les médecins disponibles et prendre rendez-vous.
+                </p>
+                <a href="{{ path('app_creneaux') }}" class="btn btn-light btn-lg">
+                    <i class="fas fa-calendar-alt me-2"></i>Voir tous les créneaux disponibles
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Consultation Categories -->
+<div class="container py-5">
+
+    {# Barre de recherche simple #}
+    <form action="{{ path('app_consultations') }}" method="get" class="mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="input-group consult-search-bar">
+                    <span class="input-group-text bg-white border-end-0"><i class="fa fa-search text-muted"></i></span>
+                    <input type="search" name="q" value="{{ searchTerm|default('') }}"
+                           class="form-control border-start-0" placeholder="Rechercher une consultation (ex. échographie, pédiatre...)"
+                           aria-label="Rechercher">
+                    <button type="submit" class="btn btn-primary px-4">Rechercher</button>
+                    {% if searchTerm %}
+                        <a href="{{ path('app_consultations') }}" class="btn btn-outline-secondary">Effacer</a>
+                    {% endif %}
+                </div>
+                {% if searchTerm is not null and searchTerm != '' %}
+                    <p class="text-muted small mt-2 mb-0 text-center">
+                        {{ searchResultCount|default(0) }} résultat(s) pour « {{ searchTerm|e }} »
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+
+    {% if searchTerm and (consultationsMaman|length == 0 and consultationsBebe|length == 0) %}
+    <div class="text-center py-5">
+        <p class="text-muted mb-3">Aucune consultation ne correspond à « {{ searchTerm|e }} ».</p>
+        <a href="{{ path('app_consultations') }}" class="btn btn-outline-primary">Voir toutes les consultations</a>
+    </div>
+    {% else %}
+    <!-- Pour les mamans -->
+    {% if consultationsMaman|length > 0 %}
+    <div class="mb-5">
+        <div class="consult-section-header consult-header-maman mb-4">
+            <div class="consult-header-icon">🤰</div>
+            <div>
+                <h2 class="mb-0">Pour les mamans</h2>
+                <p class="mb-0 consult-header-sub">Prenez soin de vous avec nos spécialistes dédiés</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            {% for consultation in consultationsMaman %}
+            <div class="col-lg-4 col-md-6">
+                <div class="consult-card consult-card-maman h-100">
+                    <div class="consult-card-accent"></div>
+                    <div class="consult-card-body">
+                        <div class="consult-card-icon-wrap consult-icon-maman">
+                            <i class="{{ consultation.icon }} fa-2x"></i>
+                        </div>
+                        <h4 class="consult-card-title">{{ consultation.categorie }}</h4>
+                        <p class="consult-card-desc">{{ consultation.description|slice(0, 100) }}{% if consultation.description|length > 100 %}...{% endif %}</p>
+                        <a href="{{ path('app_consultation_medecins', {'id': consultation.id}) }}" 
+                           class="btn consult-btn consult-btn-maman">
+                            Voir les médecins <i class="fa fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Pour les bébés -->
+    {% if consultationsBebe|length > 0 %}
+    <div class="mb-5">
+        <div class="consult-section-header consult-header-bebe mb-4">
+            <div class="consult-header-icon">👶</div>
+            <div>
+                <h2 class="mb-0">Pour les bébés</h2>
+                <p class="mb-0 consult-header-sub">Les meilleurs soins pour votre petit trésor</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            {% for consultation in consultationsBebe %}
+            <div class="col-lg-4 col-md-6">
+                <div class="consult-card consult-card-bebe h-100">
+                    <div class="consult-card-accent consult-accent-bebe"></div>
+                    <div class="consult-card-body">
+                        <div class="consult-card-icon-wrap consult-icon-bebe">
+                            <i class="{{ consultation.icon }} fa-2x"></i>
+                        </div>
+                        <h4 class="consult-card-title">{{ consultation.categorie }}</h4>
+                        <p class="consult-card-desc">{{ consultation.description|slice(0, 100) }}{% if consultation.description|length > 100 %}...{% endif %}</p>
+                        <a href="{{ path('app_consultation_medecins', {'id': consultation.id}) }}" 
+                           class="btn consult-btn consult-btn-bebe">
+                            Voir les médecins <i class="fa fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Catégories pour les deux -->
+    {% set consultationsDeux = consultationsMaman|filter(c => c.getPour() == 'LES_DEUX') %}
+    {% if consultationsDeux|length > 0 %}
+    <div>
+        <div class="consult-section-header consult-header-deux mb-4">
+            <div class="consult-header-icon">👩‍👦</div>
+            <div>
+                <h2 class="mb-0">Pour les mamans et les bébés</h2>
+                <p class="mb-0 consult-header-sub">Des consultations adaptées à toute la famille</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            {% for consultation in consultationsDeux %}
+            <div class="col-lg-4 col-md-6">
+                <div class="consult-card consult-card-deux h-100">
+                    <div class="consult-card-accent consult-accent-deux"></div>
+                    <div class="consult-card-body">
+                        <div class="consult-card-icon-wrap consult-icon-deux">
+                            <i class="{{ consultation.icon }} fa-2x"></i>
+                        </div>
+                        <h4 class="consult-card-title">{{ consultation.categorie }}</h4>
+                        <p class="consult-card-desc">{{ consultation.description|slice(0, 100) }}{% if consultation.description|length > 100 %}...{% endif %}</p>
+                        <a href="{{ path('app_consultation_medecins', {'id': consultation.id}) }}" 
+                           class="btn consult-btn consult-btn-deux">
+                            Voir les médecins <i class="fa fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    {% endif %}
+</div>
+
+<style>
+/* ===== SECTION HEADERS ===== */
+/* ===== SECTION HEADERS ===== */
+.consult-section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 24px;
+    border-radius: 16px;
+    border-left: 5px solid;
+    transition: transform 0.3s ease;
+}
+.consult-section-header:hover {
+    transform: translateX(5px);
+}
+
+/* MAMAN - PINK THEME */
+.consult-header-maman {
+    background: linear-gradient(135deg, rgba(255, 154, 158, 0.1), rgba(254, 207, 239, 0.15));
+    border-left-color: #ff9a9e;
+}
+.consult-icon-maman {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    box-shadow: 0 6px 20px rgba(255, 154, 158, 0.3);
+}
+.consult-btn-maman {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+    color: #b02456; /* Darker pink for text contrast */
+}
+.consult-btn-maman:hover {
+    box-shadow: 0 6px 22px rgba(255, 154, 158, 0.4);
+    color: #b02456;
+}
+.consult-accent-maman {
+    background: linear-gradient(90deg, #ff9a9e, #fecfef);
+}
+
+/* BEBE - BLUE THEME */
+.consult-header-bebe {
+    background: linear-gradient(135deg, rgba(137, 247, 254, 0.1), rgba(102, 166, 255, 0.15));
+    border-left-color: #66a6ff;
+}
+.consult-icon-bebe {
+    background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+    box-shadow: 0 6px 20px rgba(102, 166, 255, 0.3);
+}
+.consult-btn-bebe {
+    background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+    box-shadow: 0 4px 15px rgba(102, 166, 255, 0.3);
+    color: #0c4a6e; /* Darker blue for text contrast */
+}
+.consult-btn-bebe:hover {
+    box-shadow: 0 6px 22px rgba(102, 166, 255, 0.4);
+    color: #0c4a6e;
+}
+.consult-accent-bebe {
+    background: linear-gradient(90deg, #89f7fe, #66a6ff);
+}
+
+/* DEUX - MIXED THEME */
+.consult-header-deux {
+    background: linear-gradient(135deg, rgba(205, 156, 242, 0.1), rgba(246, 243, 255, 0.15));
+    border-left-color: #cd9cf2;
+}
+.consult-icon-deux {
+    background: linear-gradient(135deg, #cd9cf2 0%, #f6f3ff 100%);
+    box-shadow: 0 6px 20px rgba(205, 156, 242, 0.3);
+}
+.consult-btn-deux {
+    background: linear-gradient(135deg, #cd9cf2 0%, #a18cd1 100%);
+    box-shadow: 0 4px 15px rgba(205, 156, 242, 0.3);
+    color: #5b2a86; /* Darker purple for text contrast */
+}
+.consult-btn-deux:hover {
+    box-shadow: 0 6px 22px rgba(205, 156, 242, 0.4);
+    color: #5b2a86;
+}
+.consult-accent-deux {
+    background: linear-gradient(90deg, #cd9cf2, #a18cd1);
+}
+
+/* RECHERCHE */
+.consult-search-bar .input-group-text { border-radius: 50px 0 0 50px; }
+.consult-search-bar .form-control { border-radius: 0; }
+.consult-search-bar .form-control:focus { box-shadow: none; border-color: #ced4da; }
+.consult-search-bar .btn { border-radius: 0 50px 50px 0; }
+
+/* GENERAL STYLES */
+.consult-header-icon { font-size: 2.2rem; line-height: 1; }
+.consult-section-header h2 { font-size: 1.5rem; font-weight: 700; color: #1f2937; }
+.consult-header-sub { font-size: 0.9rem; color: #6b7280; margin-top: 2px; }
+
+.consult-card {
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.03);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    height: 100%;
+}
+.consult-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.consult-card-accent { height: 6px; }
+
+.consult-card-body {
+    padding: 30px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+}
+
+.consult-card-icon-wrap {
+    width: 80px; height: 80px;
+    border-radius: 50%; /* Circle shape like medecins */
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+    color: white;
+    transition: transform 0.3s ease;
+}
+.consult-card:hover .consult-card-icon-wrap {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.consult-card-title {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #1f2937;
+    margin-bottom: 12px;
+}
+.consult-card-desc {
+    color: #6b7280;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    flex-grow: 1;
+}
+
+.consult-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: none;
+    transition: all 0.2s;
+    width: 100%;
+}
+.consult-btn:hover { transform: translateY(-2px); }
+
+/* RESPONSIVE */
+@media (max-width: 576px) {
+    .consult-section-header { padding: 12px 16px; }
+    .consult-header-icon { font-size: 1.8rem; }
+    .consult-section-header h2 { font-size: 1.2rem; }
+    .hero-header { border-radius: 0 0 20px 20px; padding-bottom: 40px; }
+}
+</style>
+{% endblock %}

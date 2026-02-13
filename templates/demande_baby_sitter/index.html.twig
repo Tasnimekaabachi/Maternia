@@ -1,0 +1,108 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Demandes de babysitting{% endblock %}
+{% block page_title %}Demandes de babysitting{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ path('admin_dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Demandes de babysitting</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="bi bi-envelope-open-heart me-2"></i>Liste des demandes
+            </h5>
+            <a href="{{ path('app_demande_baby_sitter_new') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>Nouvelle demande
+            </a>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="px-4 py-3 text-uppercase text-muted fw-semibold" style="font-size: 0.85rem;">Parent</th>
+                            <th class="px-4 py-3 text-uppercase text-muted fw-semibold" style="font-size: 0.85rem;">Email</th>
+                            <th class="px-4 py-3 text-uppercase text-muted fw-semibold" style="font-size: 0.85rem;">Offre</th>
+                            <th class="px-4 py-3 text-uppercase text-muted fw-semibold" style="font-size: 0.85rem;">Date</th>
+                            <th class="px-4 py-3 text-uppercase text-muted fw-semibold" style="font-size: 0.85rem;">Statut</th>
+                            <th class="px-4 py-3 text-uppercase text-muted fw-semibold text-end" style="font-size: 0.85rem;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for demande_baby_sitter in demande_baby_sitters %}
+                        <tr>
+                            <td class="px-4 py-3">
+                                <strong>{{ demande_baby_sitter.nomParent }}</strong>
+                            </td>
+                            <td class="px-4 py-3">
+                                {{ demande_baby_sitter.emailParent }}
+                            </td>
+                            <td class="px-4 py-3">
+                                {% if demande_baby_sitter.offre %}
+                                    <span class="badge bg-secondary text-white px-3 py-2">
+                                        {{ demande_baby_sitter.offre.nomBabysitter }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted small">Aucune</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 py-3">
+                                {{ demande_baby_sitter.dateDemande ? demande_baby_sitter.dateDemande|date('d/m/Y H:i') : '' }}
+                            </td>
+                            <td class="px-4 py-3">
+                                {% if demande_baby_sitter.statut == 'En attente' %}
+                                    <span class="badge bg-warning text-white px-3 py-2">
+                                        {{ demande_baby_sitter.statut }}
+                                    </span>
+                                {% elseif demande_baby_sitter.statut == 'Validée' %}
+                                    <span class="badge bg-success text-white px-3 py-2">
+                                        {{ demande_baby_sitter.statut }}
+                                    </span>
+                                {% elseif demande_baby_sitter.statut == 'Refusée' %}
+                                    <span class="badge bg-danger text-white px-3 py-2">
+                                        {{ demande_baby_sitter.statut }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-light text-muted px-3 py-2">
+                                        {{ demande_baby_sitter.statut }}
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 py-3 text-end">
+                                <div class="btn-group" role="group">
+                                    <a href="{{ path('app_demande_baby_sitter_show', {'id': demande_baby_sitter.id}) }}"
+                                       class="btn btn-sm btn-outline-info"
+                                       title="Voir">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ path('app_demande_baby_sitter_edit', {'id': demande_baby_sitter.id}) }}"
+                                       class="btn btn-sm btn-outline-warning"
+                                       title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <div class="text-muted">
+                                    <i class="bi bi-inbox display-4 d-block mb-3"></i>
+                                    <h5>Aucune demande trouvée</h5>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

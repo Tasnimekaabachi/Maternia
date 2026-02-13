@@ -1,0 +1,264 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Nouveau créneau{% endblock %}
+{% block page_title %}Nouveau créneau{% endblock %}
+
+{% block stylesheets %}
+<style>
+    :root {
+        --primary-pink: #FF8AAB;
+        --gradient-feminine: linear-gradient(135deg, #FF8AAB 0%, #E1BEE7 100%);
+        --gradient-soft: linear-gradient(135deg, #FFF5F5 0%, #FCE4EC 100%);
+    }
+
+    .creneau-form-container { background: var(--gradient-soft); min-height: 100vh; padding: 2rem 0; }
+    .creneau-form-card { background: white; border-radius: 24px; box-shadow: 0 20px 40px rgba(255, 138, 171, 0.1); overflow: hidden; }
+    .creneau-form-header { background: var(--gradient-feminine); padding: 2rem; color: white; }
+    .form-section { padding: 2rem; border-bottom: 1px solid #f1f5f9; }
+    .form-section:last-of-type { border-bottom: none; }
+    .form-section-title { font-weight: 700; color: #4A4A4A; margin-bottom: 1.5rem; padding-left: 1rem; border-left: 4px solid var(--primary-pink); }
+    .creneau-item { background: #f8fafc; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; border: 2px solid #fce4ec; position: relative; }
+    .creneau-item:hover { border-color: var(--primary-pink); }
+    .btn-remove-creneau { position: absolute; top: -10px; right: -10px; width: 32px; height: 32px; border-radius: 50%; background: #ef4444; color: white; border: 2px solid white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem; }
+    .btn-remove-creneau:hover { transform: scale(1.1); background: #dc2626; color: white; }
+    .btn-add-creneau { border: 2px dashed var(--primary-pink); border-radius: 16px; padding: 2rem; background: rgba(255, 138, 171, 0.08); color: var(--primary-pink); font-weight: 600; width: 100%; }
+    .btn-add-creneau:hover { background: rgba(255, 138, 171, 0.15); border-style: solid; color: #e91e63; }
+    .form-control-modern { border-radius: 12px; padding: 0.6rem 1rem; border: 1px solid #e2e8f0; }
+    .form-control-modern:focus { border-color: var(--primary-pink); box-shadow: 0 0 0 3px rgba(255, 138, 171, 0.2); }
+    .photo-preview-box { width: 120px; height: 120px; border-radius: 12px; overflow: hidden; border: 3px solid #fce4ec; background: #f8fafc; display: flex; align-items: center; justify-content: center; }
+    .photo-preview-box img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-preview-box .placeholder { color: #94a3b8; font-size: 2rem; }
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="creneau-form-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="creneau-form-card">
+                    <div class="creneau-form-header">
+                        <a href="{{ path('app_admin_consultation_creneau_index') }}" class="text-white text-decoration-none small mb-2 d-inline-block">
+                            <i class="fas fa-chevron-left me-1"></i> Retour
+                        </a>
+                        <h2 class="h4 mb-1 fw-bold"><i class="fas fa-calendar-plus me-2"></i>Nouveau créneau</h2>
+                        <p class="mb-0 opacity-90 small">Remplissez les informations du médecin puis ajoutez les horaires</p>
+                    </div>
+
+                    {{ form_start(form, {'attr': {'id': 'creneau-form', 'class': 'creneau-form', 'novalidate': 'novalidate'}}) }}
+
+                    {% do form.jour.setRendered() %}
+                    {% do form.heureDebut.setRendered() %}
+                    {% do form.heureFin.setRendered() %}
+
+                    {# Section 1: Informations médecin #}
+                    <div class="form-section">
+                        <h3 class="form-section-title"><i class="fas fa-user-md me-2"></i>Informations du médecin</h3>
+
+                        {% if form.vars.errors|length > 0 %}
+                            <div class="alert alert-danger">
+                                <strong>Erreurs :</strong>
+                                {{ form_errors(form) }}
+                            </div>
+                        {% endif %}
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Type de consultation *</label>
+                                {{ form_widget(form.consultation, {'attr': {'class': 'form-select form-control-modern'}}) }}
+                                {{ form_errors(form.consultation) }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Nom du médecin *</label>
+                                {{ form_widget(form.nomMedecin, {'attr': {'class': 'form-control form-control-modern', 'placeholder': 'Dr. Jean Dupont'}}) }}
+                                {{ form_errors(form.nomMedecin) }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Spécialité</label>
+                                {{ form_widget(form.specialiteMedecin, {'attr': {'class': 'form-control form-control-modern', 'placeholder': 'Gynécologue, Pédiatre...'}}) }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Durée (min)</label>
+                                {{ form_widget(form.dureeMinutes, {'attr': {'class': 'form-control form-control-modern', 'id': 'creneau-duree-global'}}) }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Description</label>
+                                {{ form_widget(form.descriptionMedecin, {'attr': {'class': 'form-control form-control-modern', 'rows': '2', 'placeholder': 'Description du médecin...'}}) }}
+                            </div>
+
+                            {# Photo : choix existant + upload + aperçu #}
+                            <div class="col-12">
+                                <label class="form-label fw-semibold d-block">Photo du médecin</label>
+                                <div class="row align-items-start g-3">
+                                    <div class="col-auto">
+                                        <div class="photo-preview-box" id="photo-preview">
+                                            <span class="placeholder"><i class="fas fa-user-md"></i></span>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="mb-3">
+                                            {{ form_widget(form.photoExistante, {'attr': {'class': 'form-select form-control-modern', 'id': 'photo-existante'}}) }}
+                                        </div>
+                                        <div>
+                                            {{ form_widget(form.photoFile, {'attr': {'class': 'form-control form-control-modern', 'id': 'photo-file'}}) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Places</label>
+                                {{ form_widget(form.nombrePlaces, {'attr': {'class': 'form-control form-control-modern'}}) }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Statut</label>
+                                {{ form_widget(form.statutReservation, {'attr': {'class': 'form-select form-control-modern'}}) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Section 2: Planning #}
+                    <div class="form-section">
+                        <h3 class="form-section-title"><i class="fas fa-clock me-2"></i>Horaires des créneaux</h3>
+                        <p class="text-muted small mb-4">Cliquez sur "Ajouter un créneau" puis renseignez <strong>date, heure début et heure fin</strong> pour chaque disponibilité.</p>
+
+                        <div id="creneaux-collection"
+                             data-prototype="{{ form_widget(form.creneauxHoraires.vars.prototype)|e('html_attr') }}"
+                             data-index="{{ form.creneauxHoraires|length }}">
+                        </div>
+
+                        <button type="button" id="btn-add-creneau" class="btn-add-creneau mt-3">
+                            <i class="fas fa-plus me-2"></i>Ajouter un créneau horaire
+                        </button>
+
+                        <div id="creneaux-empty-alert" class="alert alert-warning mt-3 d-none">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Veuillez ajouter au moins un créneau avec date, heure de début et heure de fin.
+                        </div>
+                    </div>
+
+                    {# Actions #}
+                    <div class="form-section d-flex justify-content-between align-items-center">
+                        <a href="{{ path('app_admin_consultation_creneau_index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary" style="background: var(--gradient-feminine); border: none;">
+                            <i class="fas fa-check me-2"></i>Enregistrer les créneaux
+                        </button>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('creneaux-collection');
+    const addBtn = document.getElementById('btn-add-creneau');
+    const form = document.getElementById('creneau-form');
+    const emptyAlert = document.getElementById('creneaux-empty-alert');
+    const photoPreview = document.getElementById('photo-preview');
+    const photoExistante = document.getElementById('photo-existante');
+    const photoFile = document.getElementById('photo-file');
+    const uploadsBase = '{{ asset('uploads/medecins/') }}';
+
+    if (!container || !addBtn || !form) return;
+
+    // Aperçu photo
+    function updatePhotoPreview(src) {
+        if (!photoPreview) return;
+        if (src) {
+            photoPreview.innerHTML = '<img src="' + src + '" alt="Aperçu">';
+        } else {
+            photoPreview.innerHTML = '<span class="placeholder"><i class="fas fa-user-md"></i></span>';
+        }
+    }
+    if (photoExistante) {
+        photoExistante.addEventListener('change', function() {
+            if (photoFile) photoFile.value = '';
+            const val = this.value;
+            updatePhotoPreview(val ? (uploadsBase + val) : null);
+        });
+    }
+    if (photoFile) {
+        photoFile.addEventListener('change', function() {
+            if (photoExistante) photoExistante.value = '';
+            const f = this.files[0];
+            if (f) {
+                const r = new FileReader();
+                r.onload = function() { updatePhotoPreview(r.result); };
+                r.readAsDataURL(f);
+            } else {
+                updatePhotoPreview(null);
+            }
+        });
+    }
+    if (photoExistante && photoExistante.value) {
+        updatePhotoPreview(uploadsBase + photoExistante.value);
+    }
+
+    let index = parseInt(container.dataset.index) || 0;
+    const prototype = container.dataset.prototype;
+    if (!prototype) { console.error('Prototype manquant'); return; }
+
+    function addCreneauItem() {
+        const newForm = prototype.replace(/__name__/g, index);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'creneau-item';
+        wrapper.dataset.index = index;
+        wrapper.innerHTML = '<button type="button" class="btn-remove-creneau" title="Supprimer"><i class="fas fa-times"></i></button><div class="row g-3 creneau-item-fields">' + newForm + '</div>';
+        container.appendChild(wrapper);
+
+        const fields = wrapper.querySelector('.creneau-item-fields');
+        if (fields) {
+            fields.querySelectorAll('input').forEach(function(el) {
+                if (el.type === 'hidden') return;
+                el.classList.add('form-control', 'form-control-modern');
+                const name = (el.name || '').toLowerCase();
+                if (name.includes('jour') && !name.includes('heure') && typeof flatpickr !== 'undefined') {
+                    flatpickr(el, { locale: 'fr', dateFormat: 'Y-m-d', altInput: true, altFormat: 'j F Y' });
+                } else if ((name.includes('heuredebut') || name.includes('heure_debut')) && typeof flatpickr !== 'undefined') {
+                    flatpickr(el, { enableTime: true, noCalendar: true, dateFormat: 'H:i', time_24hr: true, minuteIncrement: 5 });
+                } else if ((name.includes('heurefin') || name.includes('heure_fin')) && typeof flatpickr !== 'undefined') {
+                    flatpickr(el, { enableTime: true, noCalendar: true, dateFormat: 'H:i', time_24hr: true, minuteIncrement: 5 });
+                }
+            });
+        }
+
+        index++;
+        container.dataset.index = index;
+        emptyAlert.classList.add('d-none');
+
+        wrapper.querySelector('.btn-remove-creneau')?.addEventListener('click', function() {
+            wrapper.remove();
+            if (container.querySelectorAll('.creneau-item').length === 0) emptyAlert.classList.remove('d-none');
+        });
+    }
+
+    addBtn.addEventListener('click', addCreneauItem);
+
+    form.addEventListener('submit', function(e) {
+        const items = container.querySelectorAll('.creneau-item');
+        let hasValid = false;
+        items.forEach(function(item) {
+            const j = item.querySelector('input[name*="[jour]"]');
+            const d = item.querySelector('input[name*="[heureDebut]"]');
+            const f = item.querySelector('input[name*="[heureFin]"]');
+            if (j?.value?.trim() && d?.value?.trim() && f?.value?.trim()) hasValid = true;
+        });
+        if (!hasValid) {
+            e.preventDefault();
+            emptyAlert.classList.remove('d-none');
+            emptyAlert.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+
+    if (index === 0) addCreneauItem();
+});
+</script>
+{% endblock %}

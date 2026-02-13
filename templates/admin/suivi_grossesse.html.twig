@@ -3,6 +3,18 @@
 {% block title %}Suivi grossesse{% endblock %}
 {% block page_title %}Suivi grossesse{% endblock %}
 
+{% block stylesheets %}
+<style>
+    .search-box { position: relative; display: flex; align-items: center; }
+    .search-box i { position: absolute; left: 12px; color: #9ca3af; font-size: 0.85rem; }
+    .search-input {
+        border: 2px solid #e5e7eb; border-radius: 25px; padding: 6px 14px 6px 34px;
+        font-size: 0.85rem; width: 180px; transition: all 0.3s; outline: none; background: #fafbfc;
+    }
+    .search-input:focus { border-color: #FF8AAB; width: 240px; background: white; }
+</style>
+{% endblock %}
+
 {% block breadcrumb %}
     <div class="admin-breadcrumb">
         <a href="{{ path('admin_dashboard') }}">Backoffice</a>
@@ -244,4 +256,19 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    const adminSearch = document.getElementById('adminSearch');
+    if (adminSearch) {
+        adminSearch.addEventListener('input', function() {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('.admin-table tbody tr').forEach(row => {
+                if (row.querySelector('.admin-empty')) return;
+                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        });
+    }
+</script>
 {% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des offres babysitter{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <h1 class="mb-4 text-primary">Liste des offres babysitter</h1>
+
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <input type="text" name="ville" class="form-control" placeholder="Ville" value="{{ ville ?? '' }}">
+        </div>
+        <div class="col-md-4">
+            <input type="number" name="tarif" step="0.01" class="form-control" placeholder="Tarif max" value="{{ tarif ?? '' }}">
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary w-100">Rechercher</button>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Babysitter</th>
+                    <th>Expérience</th>
+                    <th>Ville</th>
+                    <th>Tarif horaire (€)</th>
+                    <th>Disponibilité</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for offre in offre_baby_sitters %}
+                <tr>
+                    <td>{{ offre.nomBabysitter }}</td>
+                    <td>{{ offre.experience }} ans</td>
+                    <td>{{ offre.ville }}</td>
+                    <td>{{ offre.tarif|number_format(2, ',', ' ') }} € / h</td>
+                    <td>
+                        {% if offre.disponibilite %}
+                            <span class="badge bg-success text-white">Disponible</span>
+                        {% else %}
+                            <span class="badge bg-danger text-white">Indisponible</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ path('app_offre_baby_sitter_show', {'id': offre.id}) }}" class="btn btn-sm btn-outline-primary">Détails</a>
+                        <a href="{{ path('app_offre_baby_sitter_edit', {'id': offre.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">Aucune offre trouvée</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

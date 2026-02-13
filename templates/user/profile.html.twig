@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+{# Chargement PRIORITAIRE de jQuery pour débloquer le site #}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-5 text-center" style="border-radius: 30px; background: white; min-height: 450px;">
+        <div id="setup-view">
+            <h2 class="fw-bold">Face ID Maternia</h2>
+            <p class="text-muted">Activez la reconnaissance faciale pour votre profil.</p>
+            <button class="btn btn-primary rounded-pill px-5 mt-4" id="start-camera">Démarrer</button>
+        </div>
+
+        <div id="scan-view" style="display:none;">
+            <video id="v" width="320" height="320" autoplay muted playsinline style="border-radius: 50%; border: 6px solid #0d6efd; object-fit: cover;"></video>
+            <h4 id="msg" class="mt-4 text-primary fw-bold">Prêt pour l'analyse...</h4>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Force la disparition du point rose de chargement
+        $('.spinner, #preloader, .loading').fadeOut();
+
+        const btn = document.getElementById('start-camera');
+        btn.onclick = async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                $('#setup-view').hide();
+                $('#scan-view').show();
+                document.getElementById('v').srcObject = stream;
+                setTimeout(captureAndSend, 3000);
+            } catch (e) {
+                alert("Caméra bloquée : " + e.message);
+            }
+        };
+    });
+
+    async function captureAndSend() {
+    const video = document.getElementById('v');
+    const msg = document.getElementById('msg');
+    const canvas = document.createElement('canvas');
+    
+    msg.innerText = "Analyse en cours...";
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+
+    canvas.toBlob(blob => {
+        const fd = new FormData();
+        fd.append('photo', blob, 'face.jpg');
+
+        fetch("{{ path('app_enroll_face') }}", { method: "POST", body: fd })
+            .then(async response => {
+                const contentType = response.headers.get("content-type");
+                // Si on reçoit du HTML au lieu de JSON, c'est que PHP a crashé
+                if (!response.ok || !contentType || !contentType.includes("application/json")) {
+                    const text = await response.text();
+                    console.error("Réponse serveur (Erreur 500) :", text);
+                    throw new Error("Erreur 500 : Le serveur n'a pas pu traiter l'image.");
+                }
+                return response.json();
+            })
+            .then(res => {
+                if(res.success) {
+                    msg.innerHTML = "<span style='color:green'>Succès !</span>";
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    alert("Erreur : " + res.error);
+                    location.reload();
+                }
+            })
+            .catch(err => {
+                alert(err.message);
+                location.reload();
+            });
+    }, 'image/jpeg');
+}
+</script>
+{% endblock %}

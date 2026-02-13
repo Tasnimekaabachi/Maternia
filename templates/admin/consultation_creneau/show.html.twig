@@ -1,0 +1,193 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Détails du créneau{% endblock %}
+{% block page_title %}Détails du créneau{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* DESIGN ULTRA MODERNE */
+    :root {
+        --primary-blue: #4A90E2;
+        --pink: #FF69B4;
+        --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--pink) 100%);
+    }
+
+    .admin-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        border: 1px solid rgba(255,255,255,0.3);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .header-gradient {
+        background: var(--gradient-primary);
+        padding: 3rem 2rem;
+        color: white;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        padding: 2rem;
+    }
+
+    .info-box {
+        background: #f7fafc;
+        padding: 1.5rem;
+        border-radius: 20px;
+        border: 1px solid #edf2f7;
+        text-align: center;
+    }
+
+    .info-box .label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #718096;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-box .value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--primary-blue);
+    }
+
+    .status-pill {
+        display: inline-block;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+    }
+
+    .status-dispo { background: #e6fffa; color: #234e52; }
+    .status-reserve { background: #fff5f5; color: #822727; }
+
+    .doctor-profile {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        padding: 2rem;
+        background: white;
+        border-radius: 24px;
+        margin-top: -2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .doctor-profile img {
+        width: 100px;
+        height: 100px;
+        border-radius: 24px;
+        object-fit: cover;
+        box-shadow: 0 10px 20px rgba(74,144,226,0.2);
+    }
+
+    .btn-modern {
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s;
+        border: none;
+    }
+
+    .btn-edit-modern { background: var(--gradient-primary); color: white; }
+    .btn-back-modern { background: #f7fafc; color: #4a5568; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="admin-card">
+        <div class="header-gradient text-center">
+            <h1 class="h2 fw-bold mb-2">Détails du Créneau #{{ creneau.id }}</h1>
+            <div class="status-pill {% if creneau.statutReservation == 'DISPONIBLE' %}status-dispo{% else %}status-reserve{% endif %}">
+                {{ creneau.statutReservation }}
+            </div>
+        </div>
+
+        <div class="container" style="max-width: 900px;">
+            <div class="doctor-profile mb-5">
+                {% if creneau.photoMedecin %}
+                    <img src="{{ asset('uploads/medecins/' ~ creneau.photoMedecin) }}" alt="">
+                {% else %}
+                    <div class="rounded-4 d-flex align-items-center justify-content-center" style="width: 100px; height: 100px; background: #edf2f7; color: #4A5568; font-size: 2.5rem; font-weight: bold;">
+                        {{ creneau.nomMedecin|slice(0, 1)|upper }}
+                    </div>
+                {% endif %}
+                <div>
+                    <h2 class="h4 fw-bold mb-1">{{ creneau.nomMedecin }}</h2>
+                    <p class="text-primary fw-600 mb-2">{{ creneau.consultation.categorie }}</p>
+                    <div class="small text-muted"><i class="fas fa-stethoscope me-1"></i> {{ creneau.specialiteMedecin|default('Médecin Spécialiste') }}</div>
+                </div>
+            </div>
+
+            <h3 class="h5 fw-bold mb-4 px-4"><i class="far fa-calendar-alt me-2 text-primary"></i> Horaires Manuels</h3>
+            <div class="info-grid">
+                <div class="info-box">
+                    <span class="label">Date (Jour)</span>
+                    <span class="value">{{ creneau.jour ? creneau.jour|date('d/m/Y') : (creneau.dateDebut ? creneau.dateDebut|date('d/m/Y') : '-') }}</span>
+                </div>
+                <div class="info-box" style="background: #ebf8ff;">
+                    <span class="label">Heure de Début</span>
+                    <span class="value" style="color: #2b6cb0;">{{ creneau.heureDebut ? creneau.heureDebut|date('H:i') : (creneau.dateDebut ? creneau.dateDebut|date('H:i') : '-') }}</span>
+                </div>
+                <div class="info-box" style="background: #fff5f5;">
+                    <span class="label">Heure de Fin</span>
+                    <span class="value" style="color: #c53030;">{{ creneau.heureFin ? creneau.heureFin|date('H:i') : (creneau.dateFin ? creneau.dateFin|date('H:i') : '-') }}</span>
+                </div>
+            </div>
+
+            <h3 class="h5 fw-bold mb-4 mt-5 px-4"><i class="fas fa-info-circle me-2 text-primary"></i> Paramètres du Créneau</h3>
+            <div class="info-grid pt-0">
+                <div class="info-box">
+                    <span class="label">Durée</span>
+                    <span class="value">{{ creneau.dureeMinutes }} minutes</span>
+                </div>
+                <div class="info-box">
+                    <span class="label">Capacité (Places)</span>
+                    <span class="value">{{ creneau.nombrePlaces }} Patient(s)</span>
+                </div>
+                <div class="info-box">
+                    <span class="label">ID Système</span>
+                    <span class="value">#{{ creneau.id }}</span>
+                </div>
+            </div>
+
+            {% if creneau.reservation %}
+            <h3 class="h5 fw-bold mb-4 mt-5 px-4"><i class="fas fa-user-check me-2 text-success"></i> Réservé par</h3>
+            <div class="px-4 mb-5">
+                <div class="p-4 rounded-4 bg-white border border-success-subtle shadow-sm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="small text-muted uppercase fw-bold d-block">Client</label>
+                            <span class="h6 fw-bold mb-0">{{ creneau.reservation.prenomClient }} {{ creneau.reservation.nomClient }}</span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="small text-muted uppercase fw-bold d-block">Contact</label>
+                            <span class="h6 mb-0">{{ creneau.reservation.telephoneClient }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="px-4 pb-5 mt-5 d-flex gap-3 justify-content-center">
+                <a href="{{ path('app_admin_consultation_creneau_index') }}" class="btn-modern btn-back-modern">
+                    <i class="fas fa-arrow-left me-2"></i> Retour
+                </a>
+                <a href="{{ path('app_admin_consultation_creneau_edit', {'id': creneau.id}) }}" class="btn-modern btn-edit-modern">
+                    <i class="fas fa-edit me-2"></i> Modifier ce créneau
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

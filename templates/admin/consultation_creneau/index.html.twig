@@ -1,0 +1,640 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Gestion des créneaux{% endblock %}
+{% block page_title %}Créneaux de consultation{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* DESIGN PREMIUM FÉMININ & ÉLÉGANT */
+    :root {
+        --primary-pink: #FF8AAB;
+        --soft-pink: #FFD1DC;
+        --deep-pink: #FF5C8D;
+        --rose-gold: #E5A29D;
+        --lavender: #E1BEE7;
+        --glass-white: rgba(255, 255, 255, 0.95);
+        --gradient-feminine: linear-gradient(135deg, #FF8AAB 0%, #E1BEE7 100%);
+        --gradient-soft: linear-gradient(135deg, #FFF5F5 0%, #FCE4EC 100%);
+        --gradient-stat-1: linear-gradient(135deg, #FF8AAB 0%, #FFB6C1 100%);
+        --gradient-stat-2: linear-gradient(135deg, #FFD1DC 0%, #FFF5F5 100%);
+        --gradient-stat-3: linear-gradient(135deg, #E1BEE7 0%, #F3E5F5 100%);
+    }
+
+    .index-container {
+        background: var(--gradient-soft);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .stat-card-premium {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        border: 1px solid #FCE4EC;
+        box-shadow: 0 10px 25px rgba(255, 138, 171, 0.05);
+        transition: all 0.3s ease;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card-premium .label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #A0A0A0;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-card-premium .value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #4A4A4A;
+    }
+
+    /* RECHERCHE & TRIS (DESIGN SPÉCIFIQUE) */
+    .search-box {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    .search-box i {
+        position: absolute;
+        left: 12px;
+        color: #9ca3af;
+        font-size: 0.85rem;
+    }
+    .search-input {
+        border: 2px solid #e5e7eb;
+        border-radius: 25px;
+        padding: 6px 14px 6px 34px;
+        font-size: 0.85rem;
+        width: 200px;
+        transition: all 0.3s;
+        outline: none;
+        background: #fafbfc;
+    }
+    .search-input:focus {
+        border-color: var(--primary-pink);
+        width: 260px;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(255, 138, 171, 0.1);
+    }
+
+    .sort-group { display: flex; gap: 4px; }
+    .sort-btn {
+        border: 2px solid #e5e7eb;
+        background: white;
+        border-radius: 8px;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: #6b7280;
+    }
+    .sort-btn:hover { border-color: var(--primary-pink); color: var(--primary-pink); }
+    .sort-btn.active {
+        background: var(--gradient-feminine);
+        color: white;
+        border-color: transparent;
+    }
+    .sort-arrow { font-size: 0.7rem; }
+
+    .admin-card {
+        background: white;
+        border-radius: 24px;
+        border: 1px solid #FCE4EC;
+        box-shadow: 0 15px 35px rgba(255, 138, 171, 0.05);
+        overflow: hidden;
+        margin-top: 2rem;
+    }
+
+    .admin-card-header {
+        padding: 1.25rem 2rem;
+        border-bottom: 1px solid #FCE4EC;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .premium-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .premium-table th {
+        background: #FDF2F8; padding: 1rem 1.5rem; text-transform: uppercase;
+        font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: #db2777;
+        border-bottom: 2px solid #FBCFE8 !important; border-right: 1px solid #FBCFE8 !important;
+    }
+    .premium-table th:last-child { border-right: none; }
+    .premium-table td {
+        padding: 1.25rem 1.5rem; vertical-align: middle;
+        border-bottom: 1px solid #FBCFE8 !important; border-right: 1px solid #FBCFE8 !important; font-size: 0.9rem;
+    }
+    .premium-table td:last-child { border-right: none; }
+    .premium-table tr:hover { background-color: #FFF5F7; }
+
+    .doctor-profile {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .pdp-wrapper {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 2px solid white;
+        box-shadow: 0 3px 8px rgba(255, 138, 171, 0.2);
+        background: var(--gradient-feminine);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+    }
+
+    .pdp-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+
+    .badge-pink-soft {
+        background: #FCE4EC;
+        color: #db2777;
+        border: 1px solid #fbcfe8;
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.75rem;
+    }
+
+    .time-badge {
+        display: inline-flex;
+        flex-direction: column;
+        padding: 4px 10px;
+        border-radius: 10px;
+        min-width: 70px;
+        text-align: center;
+    }
+    .time-badge.debut { background: #E8F5E9; color: #2E7D32; border: 1px solid #C8E6C9; }
+    .time-badge.fin { background: #FFF5F5; color: #D32F2F; border: 1px solid #FFCDD2; }
+    .time-badge .label { font-size: 0.55rem; text-transform: uppercase; font-weight: 800; }
+    .time-badge .value { font-size: 0.85rem; font-weight: 700; }
+
+    .btn-action-circle {
+        width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+        background: white; border: 1px solid #FCE4EC; transition: all 0.2s; text-decoration: none; font-size: 0.8rem;
+    }
+    .btn-action-view { color: #4dabf7; }
+    .btn-action-edit { color: #FF8AAB; }
+    .btn-action-delete { color: #fa5252; }
+    /* BADGES HAUTE-FIDÉLITÉ (PHOTO MATCH) */
+    .badge-lux-date {
+        background: #FFF0F6; border: 1.5px solid #FFD1DC; border-radius: 12px;
+        padding: 6px 15px; text-align: center; min-width: 90px;
+    }
+    .badge-lux-date .label { font-size: 0.55rem; font-weight: 800; color: #db2777; text-transform: uppercase; display: block; }
+    .badge-lux-date .value { font-size: 0.85rem; font-weight: 800; color: #1f2937; }
+
+    .badge-lux-time {
+        border-radius: 12px; padding: 6px 15px; text-align: center; min-width: 80px;
+        background: white; border: 2px solid #E5E7EB;
+    }
+    .badge-lux-time.debut { border-color: #10B981; }
+    .badge-lux-time.fin { border-color: #EF4444; background: #FFF1F2; }
+    .badge-lux-time .label { font-size: 0.55rem; font-weight: 900; text-transform: uppercase; display: block; margin-bottom: 2px; }
+    .badge-lux-time.debut .label { color: #059669; }
+    .badge-lux-time.fin .label { color: #dc2626; }
+    .badge-lux-time .value { font-size: 0.85rem; font-weight: 800; color: #1f2937; }
+
+    .capa-box {
+        display: flex; flex-direction: column; gap: 4px; font-size: 0.8rem; color: #6b7280; font-weight: 600;
+    }
+    .capa-box i { width: 18px; color: #9ca3af; }
+
+    .premium-table th {
+        font-size: 0.65rem; color: #6b7280; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;
+        padding: 1rem 1.5rem; background: #fafbfc; border-bottom: 2px solid #f3f4f6;
+    }
+    .creneau-row td { padding: 1.5rem 1.5rem; }
+    
+    .status-text { font-weight: 800; font-size: 0.75rem; letter-spacing: 0.5px; }
+    .status-dispo-text { color: #10B981; }
+    .status-reserve-text { color: #F59E0B; }
+
+    /* QUICK NAV TABS */
+    .quick-nav-tabs {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 2.5rem;
+        background: white;
+        padding: 0.6rem;
+        border-radius: 50px;
+        border: 1px solid #FCE4EC;
+        box-shadow: 0 10px 30px rgba(255, 138, 171, 0.08);
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .quick-nav-link {
+        padding: 0.7rem 1.5rem;
+        border-radius: 50px;
+        text-decoration: none;
+        color: #718096;
+        font-weight: 700;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+    .quick-nav-link i { font-size: 0.9rem; }
+    .quick-nav-link:hover { background: #FFF5F7; color: var(--deep-pink); }
+    .quick-nav-link.active {
+        background: var(--gradient-feminine);
+        color: white;
+        box-shadow: 0 5px 15px rgba(255, 138, 171, 0.3);
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">🏠 Accueil</a>
+        <span class="mx-2">›</span>
+        <a href="{{ path('app_admin_consultation_index') }}">📋 Consultations</a>
+        <span class="mx-2">›</span>
+        <span class="text-primary fw-bold">📅 Agenda</span>
+    </div>
+{% endblock %}
+
+{% block header_actions %}
+<div class="d-flex gap-2">
+    <a href="{{ path('app_admin_consultation_index') }}" class="btn btn-outline-secondary" style="border-radius: 8px; font-weight: 600; padding: 0.5rem 1rem;">
+        <i class="fas fa-arrow-left me-1"></i> Consultations
+    </a>
+    <button onclick="exportPDF()" class="btn btn-outline-danger" style="border-radius: 8px; font-weight: 600; padding: 0.5rem 1rem;">
+        <i class="fas fa-file-pdf me-1"></i> PDF
+    </button>
+    <a href="{{ path('app_admin_consultation_creneau_new') }}" class="btn btn-feminine">
+        <i class="fas fa-plus-circle me-1"></i> Nouveau créneau
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="index-container">
+    <div class="container">
+        <!-- Quick Navigation -->
+        <div class="quick-nav-tabs">
+            <a href="{{ path('app_admin_reservation_client_index') }}" class="quick-nav-link">
+                <i class="fas fa-calendar-check"></i> Réservations
+            </a>
+            <a href="{{ path('app_admin_consultation_index') }}" class="quick-nav-link">
+                <i class="fas fa-stethoscope"></i> Consultations
+            </a>
+            <a href="{{ path('app_admin_consultation_creneau_index') }}" class="quick-nav-link active">
+                <i class="fas fa-clock"></i> Créneaux
+            </a>
+        </div>
+
+        {# SECTION STATS WAW #}
+        {% set occRate = stats.total > 0 ? (stats.reserves / stats.total * 100)|round(1) : 0 %}
+
+        <div class="row g-4 mb-5">
+            {# CHIFFRES CLÉS #}
+            <div class="col-lg-3">
+                <div class="d-flex flex-column gap-3">
+                    <div class="stat-card-premium">
+                        <div class="label">Total Créneaux</div>
+                        <div class="value">{{ stats.total }}</div>
+                        <div class="progress-bar-premium"><div class="progress-fill-rose" style="width: 100%"></div></div>
+                    </div>
+                    <div class="stat-card-premium">
+                        <div class="label">Taux d'Occupation</div>
+                        <div class="value">{{ occRate }}%</div>
+                        <div class="progress-bar-premium"><div class="progress-fill-rose" style="width: {{ occRate }}%"></div></div>
+                    </div>
+                    <div class="stat-card-premium">
+                        <div class="label" style="color: #4CAF50;">Créneaux Libres</div>
+                        <div class="value" style="color: #4CAF50;">{{ stats.disponibles }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {# GRAPHIQUE DONUT #}
+            <div class="col-lg-4">
+                <div class="chart-container-premium">
+                    <h6 class="fw-bold mb-3 text-muted" style="font-size: 0.75rem; text-transform: uppercase;">Répartition Disponibilité</h6>
+                    <div style="height: 230px;"><canvas id="occupancyChart"></canvas></div>
+                </div>
+            </div>
+
+            {# GRAPHIQUE ACTIVITÉ #}
+            <div class="col-lg-5">
+                <div class="chart-container-premium">
+                    <h6 class="fw-bold mb-3 text-muted" style="font-size: 0.75rem; text-transform: uppercase;">Activité Hebdomadaire</h6>
+                    <div style="height: 230px;"><canvas id="activityChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h5 class="mb-0 fw-bold">Gestion des rendez-vous</h5>
+                <div class="d-flex gap-3 align-items-center">
+                    <span class="text-muted small">{{ stats.total }} créneaux programmés</span>
+                <div class="d-flex gap-3 align-items-center">
+                    <form action="{{ path('app_admin_consultation_creneau_index') }}" method="get" class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="search" name="q" id="creneauSearch" class="search-input" placeholder="Médecin, type de consultation…" value="{{ searchTerm|default('') }}">
+                    </form>
+                    {% if searchTerm %}
+                        <a href="{{ path('app_admin_consultation_creneau_index') }}" class="btn btn-sm btn-outline-secondary">Effacer</a>
+                    {% endif %}
+                    {# TRI AVEC FLÈCHES #}
+                    <div class="sort-group">
+                        <button class="sort-btn active" onclick="sortRows('date', this)" title="Trier par date">
+                            <i class="fas fa-calendar-alt"></i> <i class="fas fa-arrow-down sort-arrow"></i>
+                        </button>
+                        <button class="sort-btn" onclick="sortRows('medecin', this)" title="Trier par médecin">
+                            <i class="fas fa-user-md"></i> <i class="fas fa-arrow-up sort-arrow"></i>
+                        </button>
+                        <button class="sort-btn" onclick="sortRows('places', this)" title="Trier par places">
+                            <i class="fas fa-users"></i> <i class="fas fa-arrow-up sort-arrow"></i>
+                        </button>
+                    </div>
+                </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table premium-table" id="slotsTable">
+                    <thead>
+                        <tr>
+                            <th>Médecin & Type</th>
+                            <th>Description</th>
+                            <th>Jour</th>
+                            <th>Début</th>
+                            <th>Fin</th>
+                            <th>Capacité</th>
+                            <th>Statut</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for creneau in creneaux %}
+                        <tr class="creneau-row"
+                            data-date="{{ creneau.jour ? creneau.jour|date('Y-m-d') : (creneau.dateDebut ? creneau.dateDebut|date('Y-m-d') : '') }}"
+                            data-medecin="{{ creneau.nomMedecin|lower }}"
+                            data-places="{{ creneau.nombrePlaces ?: 1 }}">
+                            <td>
+                                <div class="doctor-profile">
+                                    <div class="pdp-wrapper">
+                                        {% if creneau.photoMedecin %}
+                                            {% if creneau.photoMedecin starts with 'http' %}
+                                                <img src="{{ creneau.photoMedecin }}" alt="{{ creneau.nomMedecin }}">
+                                            {% else %}
+                                                <img src="{{ asset('uploads/medecins/' ~ creneau.photoMedecin) }}" alt="{{ creneau.nomMedecin }}">
+                                            {% endif %}
+                                        {% else %}
+                                            {{ creneau.nomMedecin|slice(0, 1)|upper }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold">{{ creneau.nomMedecin }}</span>
+                                        <span class="small text-muted">{{ creneau.consultation.categorie }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="text-muted small">{{ creneau.descriptionMedecin|slice(0, 40) }}...</span>
+                            </td>
+                            <td>
+                                <div class="badge-lux-date">
+                                    <span class="label">Date</span>
+                                    <span class="value">{{ creneau.jour ? creneau.jour|date('d/m/Y') : (creneau.dateDebut ? creneau.dateDebut|date('d/m/Y') : '-') }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="badge-lux-time debut">
+                                    <span class="label">H. Début</span>
+                                    <span class="value">{{ creneau.heureDebut ? creneau.heureDebut|date('H:i') : '-' }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="badge-lux-time fin">
+                                    <span class="label">H. Fin</span>
+                                    <span class="value">{{ creneau.heureFin ? creneau.heureFin|date('H:i') : '-' }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="capa-box">
+                                    <span><i class="far fa-clock"></i> {{ creneau.dureeMinutes ?: 30 }} min</span>
+                                    <span><i class="fas fa-users"></i> {{ creneau.nombrePlaces ?: 1 }} pers.</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-text {{ creneau.statutReservation == 'DISPONIBLE' ? 'status-dispo-text' : 'status-reserve-text' }}">
+                                    {{ creneau.statutReservation }}
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{{ path('app_admin_consultation_creneau_show', {'id': creneau.id}) }}" class="btn-action-circle btn-action-view"><i class="fas fa-eye"></i></a>
+                                    <a href="{{ path('app_admin_consultation_creneau_edit', {'id': creneau.id}) }}" class="btn-action-circle btn-action-edit"><i class="fas fa-pen"></i></a>
+                                    <button class="btn-action-circle btn-action-delete" title="Supprimer" onclick="confirmDelete('{{ path('app_admin_consultation_creneau_delete', {'id': creneau.id}) }}', '{{ csrf_token('delete' ~ creneau.id) }}', this.closest('tr'))"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</div>
+
+{# PDF CONTENT #}
+<div id="pdfContent" style="display: none;">
+    <div style="padding: 40px; font-family: sans-serif;">
+        <h1 style="color: #FF8AAB;">Rapport des Créneaux - Maternia</h1>
+        <hr>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 9px;">
+            <thead>
+                <tr style="background: #FDF2F8;">
+                    <th style="padding: 8px; border: 1px solid #EEE; text-align: left;">Médecin</th>
+                    <th style="padding: 8px; border: 1px solid #EEE; text-align: left;">Spécialité</th>
+                    <th style="padding: 8px; border: 1px solid #EEE; text-align: left;">Consultation</th>
+                    <th style="padding: 8px; border: 1px solid #EEE; text-align: left;">Date</th>
+                    <th style="padding: 8px; border: 1px solid #EEE; text-align: left;">Début</th>
+                    <th style="padding: 8px; border: 1px solid #EEE; text-align: left;">Fin</th>
+                    <th style="padding: 8px; border: 1px solid #EEE; text-align: left;">Durée</th>
+                    <th style="padding: 8px; border: 1px solid #EEE; text-align: left;">Places</th>
+                    <th style="padding: 8px; border: 1px solid #EEE; text-align: left;">Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in creneaux %}
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #EEE; font-weight: bold;">{{ c.nomMedecin }}</td>
+                    <td style="padding: 8px; border: 1px solid #EEE;">{{ c.specialiteMedecin ?: '-' }}</td>
+                    <td style="padding: 8px; border: 1px solid #EEE;">{{ c.consultation.categorie }}</td>
+                    <td style="padding: 8px; border: 1px solid #EEE;">{{ c.jour ? c.jour|date('d/m/Y') : '-' }}</td>
+                    <td style="padding: 8px; border: 1px solid #EEE;">{{ c.heureDebut ? c.heureDebut|date('H:i') : '-' }}</td>
+                    <td style="padding: 8px; border: 1px solid #EEE;">{{ c.heureFin ? c.heureFin|date('H:i') : '-' }}</td>
+                    <td style="padding: 8px; border: 1px solid #EEE;">{{ c.dureeMinutes ?: 30 }} min</td>
+                    <td style="padding: 8px; border: 1px solid #EEE;">{{ c.nombrePlaces ?: 1 }}</td>
+                    <td style="padding: 8px; border: 1px solid #EEE;">
+                        <span style="color: {{ c.statutReservation == 'DISPONIBLE' ? '#2E7D32' : '#F59E0B' }}; font-weight: bold;">
+                            {{ c.statutReservation }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // PDF Landscape Update
+    function exportPDF() {
+        const element = document.getElementById('pdfContent');
+        element.style.display = 'block';
+        html2pdf().from(element).set({
+            margin: 10, 
+            filename: 'maternia_creneaux.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        }).save().then(() => element.style.display = 'none');
+    }
+
+    // SEARCH
+    const creneauSearch = document.getElementById('creneauSearch');
+    if (creneauSearch) {
+        creneauSearch.addEventListener('input', function() {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('.creneau-row').forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        });
+    }
+
+    // TRI AVEC FLÈCHES
+    function sortRows(key, btn) {
+        const body = document.querySelector('#slotsTable tbody');
+        const rows = Array.from(body.querySelectorAll('.creneau-row'));
+        let dir = btn.dataset.dir || 'asc';
+        if (btn.classList.contains('active')) {
+            dir = dir === 'asc' ? 'desc' : 'asc';
+        }
+        
+        document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        rows.sort((a, b) => {
+            let valA = a.dataset[key];
+            let valB = b.dataset[key];
+            if (key === 'places') { valA = parseInt(valA); valB = parseInt(valB); }
+            if (dir === 'asc') return valA > valB ? 1 : -1;
+            return valA < valB ? 1 : -1;
+        });
+        
+        rows.forEach(r => body.appendChild(r));
+        btn.dataset.dir = dir;
+        btn.querySelector('.sort-arrow').className = dir === 'asc' ? 'fas fa-arrow-up sort-arrow' : 'fas fa-arrow-down sort-arrow';
+    }
+
+    // DELETE
+    function confirmDelete(url, token, row) {
+        Swal.fire({
+            title: 'Action Irréversible ?', text: "Ce créneau sera supprimé définitivement.",
+            icon: 'warning', showCancelButton: true, confirmButtonColor: '#FF5C8D', cancelButtonColor: '#B0B0B0',
+            confirmButtonText: 'Oui, supprimer', borderRadius: '24px'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const formData = new FormData(); formData.append('_token', token);
+                fetch(url, { method: 'POST', body: formData, headers: {'X-Requested-With': 'XMLHttpRequest'} })
+                .then(r => r.json()).then(data => {
+                    if (data.success) {
+                        row.classList.add('animate__animated', 'animate__fadeOutLeft');
+                        setTimeout(() => row.remove(), 500);
+                        Swal.fire({ title: '✨ Supprimé !', icon: 'success', timer: 1500, showConfirmButton: false });
+                    }
+                });
+            }
+        });
+    }
+
+    // --- CHARTS WAW INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const chartColors = {
+            pink: '#FF8AAB',
+            green: '#4CAF50',
+            violet: '#E1BEE7',
+            light: '#F3F4F6'
+        };
+
+        const ctxOcc = document.getElementById('occupancyChart');
+        if (ctxOcc) {
+            new Chart(ctxOcc, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Réservés', 'Libres'],
+                    datasets: [{
+                        data: [{{ stats.reserves }}, {{ stats.disponibles }}],
+                        backgroundColor: [chartColors.pink, chartColors.green],
+                        borderWidth: 0,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '80%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true, font: { weight: '700' } } }
+                    }
+                }
+            });
+        }
+
+        const ctxAct = document.getElementById('activityChart');
+        if (ctxAct) {
+            new Chart(ctxAct, {
+                type: 'bar',
+                data: {
+                    labels: {{ parJourLabels|json_encode|raw }},
+                    datasets: [{
+                        label: 'Créneaux par jour',
+                        data: {{ parJourValues|json_encode|raw }},
+                        backgroundColor: chartColors.pink + '99',
+                        borderColor: chartColors.pink,
+                        borderWidth: 2,
+                        borderRadius: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { display: false } },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+    });
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+{% endblock %}
