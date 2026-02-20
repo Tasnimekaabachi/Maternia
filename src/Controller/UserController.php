@@ -21,13 +21,39 @@ class UserController extends AbstractController
     }
 
     #[Route('/profile', name: 'app_user_profile')]
-    public function index(): Response
+    public function index(Request $request, EntityManagerInterface $entityManager, \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $userPasswordHasher): Response
     {
-        if (!$this->getUser()) {
+        $user = $this->getUser();
+        if (!$user) {
             return $this->redirectToRoute('app_login');
         }
 
-        $response = $this->render('user/profile.html.twig');
+        $form = $this->createForm(\App\Form\ProfileEditType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Encode the plain password if handled
+            $plainPassword = $form->get('plainPassword')->getData();
+            if ($plainPassword) {
+                $user->setPassword(
+                    $userPasswordHasher->hashPassword(
+                        $user,
+                        $plainPassword
+                    )
+                );
+            }
+
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Votre profil a été mis à jour avec succès.');
+
+            return $this->redirectToRoute('app_user_profile');
+        }
+
+        $response = $this->render('user/profile.html.twig', [
+            'form' => $form->createView(),
+        ]);
         
         // On autorise TOUT ce qui est bloqué dans tes captures (Fonts, CDNs, scripts)
         $scripts = ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://ajax.googleapis.com", "https://code.jquery.com", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"];
