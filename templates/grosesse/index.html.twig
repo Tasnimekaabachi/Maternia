@@ -44,7 +44,7 @@
                 <td>{{ grosesse.statutGrossesse }}</td>
                 <td>{{ grosesse.typeGrossesse }}</td>
                 <td>{{ grosesse.poidsActuel }}</td>
-                <td>{{ grosesse.symptomes }}</td>
+                <td>{{ grosesse.symptomesList|length > 0 ? grosesse.symptomesList|join(', ') : '—' }}</td>
                 <td>{{ grosesse.indiceRisque }}</td>
                 <td>{{ grosesse.dateAccouchementReelle ? grosesse.dateAccouchementReelle|date('Y-m-d') : '' }}</td>
                 <td>{{ grosesse.nombreBebes }}</td>

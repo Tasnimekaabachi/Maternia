@@ -2,305 +2,36 @@
 
 namespace App\Controller\Admin;
 
-use App\Repository\ConsultationCreneauRepository;
-use App\Repository\CommandeRepository;
-use App\Repository\ProduitRepository;
-use App\Repository\EventRepository;
-use App\Repository\ConsultationRepository;
-use App\Repository\MamanRepository;
 use App\Repository\GrosesseRepository;
-use App\Repository\OffreBabySitterRepository;
+use App\Repository\MamanRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\HttpFoundation\Request;
 
 #[Route('/admin', name: 'admin_')]
 final class DashboardController extends AbstractController
 {
-    public function __construct(
-        private readonly ConsultationCreneauRepository $consultationCreneauRepository
-    ) {
-    }
-
     #[Route('', name: 'dashboard', methods: ['GET'])]
-    public function dashboard(
-        EventRepository $eventRepository,
-        ProduitRepository $produitRepository,
-        CommandeRepository $commandeRepository,
-        MamanRepository $mamanRepository,
-        GrosesseRepository $grosesseRepository,
-        ConsultationRepository $consultationRepository,
-        OffreBabySitterRepository $offreBabySitterRepository
-    ): Response {
-
-        // ===== Marketplace Stats =====
-        $nbProduits = $produitRepository->count([]);
-        $nbCommandesAttente = $commandeRepository->countByStatut('En attente');
-        $nbCommandesValidees = $commandeRepository->countByStatut('Validée');
-        $nbCommandesAnnulees = $commandeRepository->countByStatut('Annulée');
-        $chiffreAffaires = $commandeRepository->chiffreAffairesValidees();
-        $topProduits = $commandeRepository->topProduitsCommandes(5);
-
-        // ===== Events =====
-        $eventCount = $eventRepository->count([]);
-
-        // ===== Suivi Grossesse Stats =====
+    public function dashboard(MamanRepository $mamanRepository, GrosesseRepository $grosesseRepository): Response
+    {
         $totalMamans = $mamanRepository->count([]);
         $totalGrossesses = $grosesseRepository->count([]);
         $statsStatut = $grosesseRepository->getStatsByStatut();
 
-        $suivisActifs =
-            ($statsStatut['enCours'] ?? 0) +
-            ($statsStatut['aRisque'] ?? 0);
-
-        // ===== BABYSITTING STATS - SANS createdAt =====
-        // Total babysitters
-        $totalBabysitters = $offreBabySitterRepository->count([]);
-        
-        // Babysitters disponibles
-        $babysittersDisponibles = $offreBabySitterRepository->count(['disponibilite' => true]);
-        
-        // Total offres babysitting
-        $offresBabysitting = $totalBabysitters;
-        
-        // Nouvelles offres - DÉSACTIVÉ (pas de champ createdAt)
-        $nouvellesOffresAujourdhui = 0;
-        $offresNouvellesSemaine = 0;
-        
-        // Statistiques de tarifs
-        $tarifMoyen = $offreBabySitterRepository->createQueryBuilder('o')
-            ->select('AVG(o.tarif)')
-            ->getQuery()
-            ->getSingleScalarResult() ?? 0;
-        
-        $tarifMin = $offreBabySitterRepository->createQueryBuilder('o')
-            ->select('MIN(o.tarif)')
-            ->where('o.tarif > 0')
-            ->getQuery()
-            ->getSingleScalarResult() ?? 0;
-        
-        $tarifMax = $offreBabySitterRepository->createQueryBuilder('o')
-            ->select('MAX(o.tarif)')
-            ->getQuery()
-            ->getSingleScalarResult() ?? 0;
-        
-        // Statistiques par ville pour le graphique
-        $statsVilleBabysitters = $offreBabySitterRepository->createQueryBuilder('o')
-            ->select('o.ville, COUNT(o.id) as nbOffres')
-            ->where('o.ville IS NOT NULL')
-            ->andWhere('o.ville != :empty')
-            ->setParameter('empty', '')
-            ->groupBy('o.ville')
-            ->orderBy('nbOffres', 'DESC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult();
-        
-        // Top babysitters par expérience
-        $topBabysittersExperience = $offreBabySitterRepository->findBy(
-            [], 
-            ['experience' => 'DESC'], 
-            5
-        );
-        
-        // Expérience moyenne
-        $experienceMoyenne = $offreBabySitterRepository->createQueryBuilder('o')
-            ->select('AVG(o.experience)')
-            ->getQuery()
-            ->getSingleScalarResult() ?? 0;
-
-        // ===== Recent Activity (Interleaved) =====
-        $recentCreneaux = $this->consultationCreneauRepository->findBy([], ['id' => 'DESC'], 10);
-        $recentEvents = $eventRepository->findBy([], ['id' => 'DESC'], 10);
-        $recentProduits = $produitRepository->findBy([], ['id' => 'DESC'], 10);
-        $recentMamans = $mamanRepository->findBy([], ['id' => 'DESC'], 10);
-        $recentGrossesses = $grosesseRepository->findBy([], ['id' => 'DESC'], 10);
-        $recentConsultations = $consultationRepository->findBy([], ['id' => 'DESC'], 10);
-        $recentCommandes = $commandeRepository->findBy([], ['id' => 'DESC'], 10);
-        $recentBabysitters = $offreBabySitterRepository->findBy([], ['id' => 'DESC'], 5);
-
-        $activityLists = [
-            'event' => [],
-            'creneau' => [],
-            'product' => [],
-            'maman' => [],
-            'grossesse' => [],
-            'consultation' => [],
-            'commande' => [],
-            'babysitter' => []
-        ];
-
-        foreach ($recentEvents as $e) {
-            $activityLists['event'][] = [
-                'type' => 'event',
-                'title' => $e->getTitle(),
-                'context' => $e->getEventCat()->getName(),
-                'date' => $e->getStartAt(),
-                'url' => $this->generateUrl('app_event_show', ['id' => $e->getId()]),
-                'icon' => 'fa-calendar-alt',
-                'badge_text' => 'Événement',
-                'badge_class' => 'bg-pink-light',
-                'id' => $e->getId()
-            ];
-        }
-
-        foreach ($recentCreneaux as $c) {
-            $activityLists['creneau'][] = [
-                'type' => 'creneau',
-                'title' => $c->getNomMedecin(),
-                'context' => $c->getSpecialiteMedecin() ?: $c->getConsultation()->getCategorie(),
-                'date' => $c->getDateDebut(),
-                'url' => $this->generateUrl('app_admin_consultation_creneau_show', ['id' => $c->getId()]),
-                'icon' => 'fa-stethoscope',
-                'badge_text' => 'Créneau',
-                'badge_class' => 'bg-info-light',
-                'id' => $c->getId()
-            ];
-        }
-
-        foreach ($recentProduits as $p) {
-            $activityLists['product'][] = [
-                'type' => 'product',
-                'title' => $p->getNom(),
-                'context' => $p->getPrix() . ' DT - Stock: ' . $p->getStock(),
-                'url' => $this->generateUrl('admin_produit_edit', ['id' => $p->getId()]),
-                'icon' => 'fa-box',
-                'badge_text' => 'Produit',
-                'badge_class' => 'bg-success-light',
-                'id' => $p->getId()
-            ];
-        }
-
-        foreach ($recentMamans as $m) {
-            $activityLists['maman'][] = [
-                'type' => 'maman',
-                'title' => $m->getEmail() ?: 'Maman #' . $m->getId(),
-                'context' => '📞 ' . $m->getNumeroUrgence() . ' - Sanguin: ' . $m->getGroupeSanguin(),
-                'date' => $m->getDateCreation(),
-                'url' => $this->generateUrl('admin_maman_show', ['id' => $m->getId()]),
-                'icon' => 'fa-user-nurse',
-                'badge_text' => 'Maman',
-                'badge_class' => 'bg-warning-light',
-                'id' => $m->getId()
-            ];
-        }
-
-        foreach ($recentGrossesses as $g) {
-            $activityLists['grossesse'][] = [
-                'type' => 'grossesse',
-                'title' => 'Grossesse ' . ($g->getStatutGrossesse() === 'enCours' ? 'en cours' : $g->getStatutGrossesse()),
-                'context' => 'Identifiée pour ' . ($g->getMaman() ? $g->getMaman()->getEmail() : 'maman inconnue'),
-                'date' => $g->getDateCreation(),
-                'url' => $this->generateUrl('admin_grosesse_show', ['id' => $g->getId()]),
-                'icon' => 'fa-baby',
-                'badge_text' => 'Grossesse',
-                'badge_class' => 'bg-purple-light',
-                'id' => $g->getId()
-            ];
-        }
-
-        foreach ($recentConsultations as $c) {
-            $activityLists['consultation'][] = [
-                'type' => 'consultation',
-                'title' => $c->getCategorie(),
-                'context' => 'Pour: ' . $c->getPour(),
-                'date' => $c->getCreatedAt(),
-                'url' => $this->generateUrl('app_admin_consultation_show', ['id' => $c->getId()]),
-                'icon' => 'fa-file-medical',
-                'badge_text' => 'Consultation',
-                'badge_class' => 'bg-secondary-light',
-                'id' => $c->getId()
-            ];
-        }
-
-        foreach ($recentCommandes as $co) {
-            $activityLists['commande'][] = [
-                'type' => 'commande',
-                'title' => 'Commande #' . $co->getId(),
-                'context' => $co->getStatut() . ' - Total: ' . $co->getTotal() . ' DT',
-                'date' => $co->getDateCommande(),
-                'url' => $this->generateUrl('app_commande_show', ['id' => $co->getId()]),
-                'icon' => 'fa-shopping-cart',
-                'badge_text' => 'Commande',
-                'badge_class' => 'bg-indigo-light',
-                'id' => $co->getId()
-            ];
-        }
-
-        // Ajout des babysitters à l'activité récente - SANS DATE
-        foreach ($recentBabysitters as $b) {
-            $activityLists['babysitter'][] = [
-                'type' => 'babysitter',
-                'title' => $b->getNomBabysitter(),
-                'context' => $b->getVille() . ' - ' . $b->getExperience() . ' ans - ' . $b->getTarif() . ' DT/h',
-                'date' => null, // Pas de date
-                'url' => $this->generateUrl('app_offre_baby_sitter_show', ['id' => $b->getId()]),
-                'icon' => 'fa-baby',
-                'badge_text' => 'Babysitter',
-                'badge_class' => 'bg-purple-light',
-                'id' => $b->getId()
-            ];
-        }
-
-        // Interleaving to ensure variety
-        $activity = [];
-        $maxItems = 0;
-        foreach ($activityLists as $list) {
-            $maxItems = max($maxItems, count($list));
-        }
-
-        for ($i = 0; $i < $maxItems; $i++) {
-            foreach ($activityLists as $type => $list) {
-                if (isset($list[$i])) {
-                    $activity[] = $list[$i];
-                    if (count($activity) >= 20)
-                        break 2;
-                }
-            }
-        }
+        // On considère "suivis grossesse actifs" = grossesses en cours + à risque
+        $suivisActifs = ($statsStatut['enCours'] ?? 0) + ($statsStatut['aRisque'] ?? 0);
 
         return $this->render('admin/dashboard.html.twig', [
-            // Marketplace
-            'nbProduits' => $nbProduits,
-            'nbCommandesAttente' => $nbCommandesAttente,
-            'nbCommandesValidees' => $nbCommandesValidees,
-            'nbCommandesAnnulees' => $nbCommandesAnnulees,
-            'chiffreAffaires' => $chiffreAffaires,
-            'topProduits' => $topProduits,
-
-            // Events
-            'eventCount' => $eventCount,
-
-            // Suivi grossesse
             'total_mamans' => $totalMamans,
             'total_grossesses' => $totalGrossesses,
             'suivis_grossesse_actifs' => $suivisActifs,
-
-            // BABYSITTING STATS - Sans createdAt
-            'total_babysitters' => $totalBabysitters,
-            'babysitters_disponibles' => $babysittersDisponibles,
-            'offres_babysitting' => $offresBabysitting,
-            'offres_nouvelles' => $offresNouvellesSemaine,
-            'nouvelles_offres_aujourdhui' => $nouvellesOffresAujourdhui,
-            'tarif_moyen_babysitting' => $tarifMoyen,
-            'tarif_min_babysitting' => $tarifMin,
-            'tarif_max_babysitting' => $tarifMax,
-            'experience_moyenne_babysitting' => $experienceMoyenne,
-            'stats_ville_babysitters' => $statsVilleBabysitters,
-            'top_babysitters_experience' => $topBabysittersExperience,
-
-            // Existing dashboard data
-            'creneaux_ce_mois' => $this->consultationCreneauRepository->countCeMois(),
-            'recent_activity' => $activity,
         ]);
     }
 
-    #[Route('/suivi-grossesse', name: 'suivi_grossesse', methods: ['GET'])]
-    public function suiviGrossesse(
-        MamanRepository $mamanRepository,
-        GrosesseRepository $grosesseRepository
-    ): Response {
+    #[Route('/suivi', name: 'suivi', methods: ['GET'])]
+    public function suivi(MamanRepository $mamanRepository, GrosesseRepository $grosesseRepository): Response
+    {
         $totalMamans = $mamanRepository->count([]);
         $totalGrossesses = $grosesseRepository->count([]);
         $statsStatut = $grosesseRepository->getStatsByStatut();
@@ -313,10 +44,25 @@ final class DashboardController extends AbstractController
         ]);
     }
 
-    #[Route('/marketplace-legacy', name: 'marketplace_legacy', methods: ['GET'])]
-    public function marketplaceLegacy(): Response
+    #[Route('/suivi-grossesse', name: 'suivi_grossesse', methods: ['GET'])]
+    public function suiviGrossesse(MamanRepository $mamanRepository, GrosesseRepository $grosesseRepository): Response
     {
-        return $this->redirectToRoute('admin_marketplace');
+        $totalMamans = $mamanRepository->count([]);
+        $totalGrossesses = $grosesseRepository->count([]);
+        $statsStatut = $grosesseRepository->getStatsByStatut();
+
+        return $this->render('admin/suivi_choice.html.twig', [
+            'total_mamans' => $totalMamans,
+            'total_grossesses' => $totalGrossesses,
+            'grossesses_en_cours' => $statsStatut['enCours'] ?? 0,
+            'grossesses_terminees' => $statsStatut['terminee'] ?? 0,
+        ]);
+    }
+
+    #[Route('/marketplace', name: 'marketplace', methods: ['GET'])]
+    public function marketplace(): Response
+    {
+        return $this->render('admin/marketplace.html.twig');
     }
 
     #[Route('/evenements', name: 'evenements', methods: ['GET'])]
@@ -325,48 +71,15 @@ final class DashboardController extends AbstractController
         return $this->render('admin/evenements.html.twig');
     }
 
+    #[Route('/consultations', name: 'consultations', methods: ['GET'])]
+    public function consultations(): Response
+    {
+        return $this->render('admin/consultations.html.twig');
+    }
+
     #[Route('/profil-bebe', name: 'profil_bebe', methods: ['GET'])]
-    public function profilBebe(
-        OffreBabySitterRepository $offreBabySitterRepository,
-        Request $request
-    ): Response {
-        // Récupération des paramètres de filtre
-        $ville = $request->query->get('ville');
-        $tarifMax = $request->query->get('tarif');
-        
-        // Construction de la requête avec filtres
-        $qb = $offreBabySitterRepository->createQueryBuilder('o');
-        
-        if ($ville) {
-            $qb->andWhere('o.ville LIKE :ville')
-               ->setParameter('ville', '%' . $ville . '%');
-        }
-        
-        if ($tarifMax) {
-            $qb->andWhere('o.tarif <= :tarif')
-               ->setParameter('tarif', $tarifMax);
-        }
-        
-        $offres = $qb->orderBy('o.id', 'DESC')
-                     ->getQuery()
-                     ->getResult();
-        
-        // Statistiques par ville pour le template profil_bebe
-        $statsVille = $offreBabySitterRepository->createQueryBuilder('o')
-            ->select('o.ville, COUNT(o.id) as nbOffres, AVG(o.tarif) as tarifMoyen')
-            ->where('o.ville IS NOT NULL')
-            ->andWhere('o.ville != :empty')
-            ->setParameter('empty', '')
-            ->groupBy('o.ville')
-            ->orderBy('nbOffres', 'DESC')
-            ->getQuery()
-            ->getResult();
-        
-        return $this->render('admin/profil_bebe.html.twig', [
-            'offre_baby_sitters' => $offres,
-            'stats_ville' => $statsVille,
-            'ville' => $ville,
-            'tarif' => $tarifMax,
-        ]);
+    public function profilBebe(): Response
+    {
+        return $this->render('admin/profil_bebe.html.twig');
     }
 }

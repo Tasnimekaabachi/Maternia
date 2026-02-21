@@ -59,6 +59,7 @@ class GrosesseType extends AbstractType
             ->add('nombreBebes', null, [
                 'required' => false,
                 'label' => 'Nombre de bébés (si multiple)',
+                // HTML5 : commence à 2 pour une grossesse multiple
                 'attr' => [
                     'min' => 2,
                 ],
@@ -67,11 +68,13 @@ class GrosesseType extends AbstractType
                 'required' => false,
                 'label' => 'Poids actuel (kg)',
             ])
-            ->add('symptomes', TextareaType::class, [
-                'required' => false,
-                'label' => 'Symptômes',
-                'attr' => ['rows' => 3],
-            ])
+            ->add('nausee', CheckboxType::class, ['required' => false, 'label' => 'Nausée'])
+            ->add('vomissement', CheckboxType::class, ['required' => false, 'label' => 'Vomissement'])
+            ->add('saignement', CheckboxType::class, ['required' => false, 'label' => 'Saignement'])
+            ->add('fievre', CheckboxType::class, ['required' => false, 'label' => 'Fièvre'])
+            ->add('douleurAbdominale', CheckboxType::class, ['required' => false, 'label' => 'Douleur abdominale'])
+            ->add('fatigue', CheckboxType::class, ['required' => false, 'label' => 'Fatigue'])
+            ->add('vertiges', CheckboxType::class, ['required' => false, 'label' => 'Vertiges'])
             // indiceRisque : calculé automatiquement → pas saisi par la maman
             ->add('dateAccouchementReelle', DateType::class, [
                 'required' => false,

@@ -47,8 +47,32 @@ class Grosesse
     #[Assert\Length(max: 2000, maxMessage: 'Les symptômes ne peuvent pas dépasser {{ limit }} caractères.')]
     private ?string $symptomes = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $nausee = false;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $vomissement = false;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $saignement = false;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $fievre = false;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $douleurAbdominale = false;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $fatigue = false;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $vertiges = false;
+
     #[ORM\Column(nullable: true)]
     private ?float $indiceRisque = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+private ?string $riskLevel = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     #[Assert\LessThanOrEqual('today', message: 'La date d’accouchement réelle doit être dans le passé ou aujourd’hui.')]
@@ -200,6 +224,111 @@ class Grosesse
         $this->symptomes = $symptomes;
 
         return $this;
+    }
+
+    public function isNausee(): bool
+    {
+        return $this->nausee;
+    }
+
+    public function setNausee(bool $nausee): static
+    {
+        $this->nausee = $nausee;
+        return $this;
+    }
+
+    public function isVomissement(): bool
+    {
+        return $this->vomissement;
+    }
+
+    public function setVomissement(bool $vomissement): static
+    {
+        $this->vomissement = $vomissement;
+        return $this;
+    }
+
+    public function isSaignement(): bool
+    {
+        return $this->saignement;
+    }
+
+    public function setSaignement(bool $saignement): static
+    {
+        $this->saignement = $saignement;
+        return $this;
+    }
+
+    public function isFievre(): bool
+    {
+        return $this->fievre;
+    }
+
+    public function setFievre(bool $fievre): static
+    {
+        $this->fievre = $fievre;
+        return $this;
+    }
+
+    public function isDouleurAbdominale(): bool
+    {
+        return $this->douleurAbdominale;
+    }
+
+    public function setDouleurAbdominale(bool $douleurAbdominale): static
+    {
+        $this->douleurAbdominale = $douleurAbdominale;
+        return $this;
+    }
+
+    public function isFatigue(): bool
+    {
+        return $this->fatigue;
+    }
+
+    public function setFatigue(bool $fatigue): static
+    {
+        $this->fatigue = $fatigue;
+        return $this;
+    }
+
+    public function isVertiges(): bool
+    {
+        return $this->vertiges;
+    }
+
+    public function setVertiges(bool $vertiges): static
+    {
+        $this->vertiges = $vertiges;
+        return $this;
+    }
+
+    /** @return string[] Labels of symptoms that are true */
+    public function getSymptomesList(): array
+    {
+        $labels = [];
+        if ($this->nausee) {
+            $labels[] = 'Nausée';
+        }
+        if ($this->vomissement) {
+            $labels[] = 'Vomissement';
+        }
+        if ($this->saignement) {
+            $labels[] = 'Saignement';
+        }
+        if ($this->fievre) {
+            $labels[] = 'Fièvre';
+        }
+        if ($this->douleurAbdominale) {
+            $labels[] = 'Douleur abdominale';
+        }
+        if ($this->fatigue) {
+            $labels[] = 'Fatigue';
+        }
+        if ($this->vertiges) {
+            $labels[] = 'Vertiges';
+        }
+        return $labels;
     }
 
     public function getIndiceRisque(): ?float
@@ -438,4 +567,14 @@ class Grosesse
             }
         }
     }
+    public function getRiskLevel(): ?string
+{
+    return $this->riskLevel;
+}
+
+public function setRiskLevel(?string $riskLevel): static
+{
+    $this->riskLevel = $riskLevel;
+    return $this;
+}
 }

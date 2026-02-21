@@ -111,8 +111,32 @@
                                     </div>
                                     <div class="col-12">
                                         <span class="text-muted small d-block">Symptômes</span>
-                                        <span>{{ grossesse.symptomes ?: '—' }}</span>
+                                        <span>{{ grossesse.symptomesList|length > 0 ? grossesse.symptomesList|join(', ') : '—' }}</span>
                                     </div>
+                                    {% if grossesse.riskLevel %}
+    <div class="col-12 mt-2">
+        {% if grossesse.riskLevel == 'High' %}
+            {% set color = 'danger' %}
+            {% set icon = '🚨' %}
+            {% set message = 'Risque élevé détecté ! Consultez un médecin immédiatement.' %}
+        {% elseif grossesse.riskLevel == 'Mid' %}
+            {% set color = 'warning' %}
+            {% set icon = '⚠️' %}
+            {% set message = 'Risque modéré détecté. Une consultation médicale est recommandée.' %}
+        {% else %}
+            {% set color = 'success' %}
+            {% set icon = '✅' %}
+            {% set message = 'Grossesse à faible risque. Continuez les consultations régulières.' %}
+        {% endif %}
+        <div class="alert alert-{{ color }} border-2 d-flex align-items-start mb-0" role="alert">
+            <span class="fs-4 me-3">{{ icon }}</span>
+            <div>
+                <h6 class="alert-heading mb-1">Niveau de risque ML : <strong>{{ grossesse.riskLevel }}</strong></h6>
+                <p class="mb-0 small">{{ message }}</p>
+            </div>
+        </div>
+    </div>
+{% endif %}
                                 </div>
 
                                 <hr class="my-3">
