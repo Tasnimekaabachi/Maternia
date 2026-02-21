@@ -2,97 +2,306 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Liste des Événements</title>
+    <title>Maternia - Rapport des Événements</title>
     <style>
+        @page { margin: 0; }
         body {
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-            color: #333;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #ec4899;
-            padding-bottom: 10px;
-        }
-        .header h1 {
-            color: #ec4899;
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 10pt;
+            color: #334155;
+            line-height: 1.4;
             margin: 0;
+            padding: 40px;
+            background: #ffffff;
         }
-        .date {
+
+        /* HEADER */
+        .header {
+            width: 100%;
+            border-bottom: 2px solid #ec4899;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24pt;
+            font-weight: bold;
+            color: #ec4899;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            font-size: 10pt;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+        .meta-info {
+            float: right;
             text-align: right;
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 15px;
+            font-size: 9pt;
+            color: #94a3b8;
+            margin-top: -35px;
         }
+
+        /* STATS CARDS */
+        .stats-container {
+            width: 100%;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        .stat-card {
+            float: left;
+            width: 23%;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-right: 2%;
+            box-sizing: border-box;
+        }
+        .stat-card:last-child { margin-right: 0; }
+        .stat-value {
+            font-size: 18pt;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 8pt;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* TABLE */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
+            margin-bottom: 40px;
         }
         th {
-            background-color: #fce7f3; /* Light Pink */
-            color: #be185d; /* Dark Pink */
+            background-color: #f1f5f9;
+            color: #475569;
             font-weight: bold;
+            text-transform: uppercase;
+            font-size: 8pt;
+            letter-spacing: 1px;
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 2px solid #cbd5e1;
         }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
         }
+        tr:nth-child(even) { background-color: #f8fafc; }
+
+        .event-title {
+            font-weight: bold;
+            color: #0f172a;
+            font-size: 11pt;
+            margin-bottom: 4px;
+        }
+        .event-location {
+            font-size: 9pt;
+            color: #64748b;
+        }
+        .data-label {
+            display: block;
+            font-size: 7pt;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        /* BADGES */
         .badge {
             display: inline-block;
-            padding: 3px 6px;
+            padding: 4px 8px;
             border-radius: 4px;
-            font-size: 12px;
-            background-color: #ec4899;
-            color: white;
+            font-size: 8pt;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .badge-upcoming { background: #dcfce7; color: #16a34a; }
+        .badge-ongoing { background: #fef3c7; color: #d97706; }
+        .badge-ended { background: #fee2e2; color: #dc2626; }
+        .badge-weekly { background: #e0e7ff; color: #2563eb; }
+
+        .cat-tag {
+            display: inline-block;
+            background: #fce7f3;
+            color: #db2777;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 8pt;
+            font-weight: 600;
+        }
+
+        /* FOOTER */
+        .footer {
+            position: fixed;
+            bottom: -40px;
+            left: 0;
+            right: 0;
+            height: 40px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 10px;
+            font-size: 8pt;
+            color: #94a3b8;
+            text-align: center;
+        }
+        .page-number:after { content: counter(page); }
+        
+        .capacity-bar {
+            display: inline-block;
+            width: 100%;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        .capacity-fill {
+            height: 100%;
+            background: #10b981;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Maternia - Liste des Événements</h1>
+        <div class="logo">MATERNIA</div>
+        <div class="subtitle">Rapport des Événements</div>
+        <div class="meta-info">
+            Généré le {{ "now"|date("d/m/Y") }} à {{ "now"|date("H:i") }}<br>
+            Export confidentiel
+        </div>
     </div>
 
-    <div class="date">
-        Généré le {{ "now"|date("d/m/Y à H:i") }}
+    {# STATS SUMMARY #}
+    {% set totalParticipants = 0 %}
+    {% set upcomingCount = 0 %}
+    {% set weeklyCount = 0 %}
+    {% set ongoingCount = 0 %}
+    {% set endedCount = 0 %}
+    {% for event in events %}
+        {% set totalParticipants = totalParticipants + event.attendances|length %}
+        {% if event.isWeekly %}
+            {% set weeklyCount = weeklyCount + 1 %}
+        {% elseif event.endAt and event.endAt < date() %}
+            {% set endedCount = endedCount + 1 %}
+        {% elseif event.startAt and event.startAt <= date() and event.endAt and event.endAt >= date() %}
+            {% set ongoingCount = ongoingCount + 1 %}
+        {% elseif event.startAt and event.startAt > date() %}
+            {% set upcomingCount = upcomingCount + 1 %}
+        {% endif %}
+    {% endfor %}
+
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-value">{{ events|length }}</div>
+            <div class="stat-label">Total</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ totalParticipants }}</div>
+            <div class="stat-label">Participants</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ upcomingCount }}</div>
+            <div class="stat-label">À venir</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ weeklyCount }}</div>
+            <div class="stat-label">Hebdomadaire</div>
+        </div>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th>Titre</th>
-                <th>Date de début</th>
-                <th>Date de fin</th>
-                <th>Lieu</th>
-                <th>Catégorie</th>
+                <th width="35%">Événement</th>
+                <th width="20%">Date & Heure</th>
+                <th width="15%">Statut</th>
+                <th width="15%">Participation</th>
+                <th width="15%">Catégorie</th>
             </tr>
         </thead>
         <tbody>
             {% for event in events %}
                 <tr>
-                    <td>{{ event.title }}</td>
-                    <td>{{ event.startAt ? event.startAt|date("d/m/Y H:i") : '-' }}</td>
-                    <td>{{ event.endAt ? event.endAt|date("d/m/Y H:i") : '-' }}</td>
-                    <td>{{ event.location }}</td>
+                    <td>
+                        <div class="event-title">{{ event.title }}</div>
+                        <div class="event-location" style="margin-left: 2px;">
+                            {{ event.location }}
+                        </div>
+                        <div style="font-size: 8pt; color: #94a3b8; margin-top: 4px;">
+                            Org: {{ event.creator ? event.creator.prenom ~ ' ' ~ event.creator.nom : 'Admin' }}
+                        </div>
+                    </td>
+                    <td>
+                        {% if event.isWeekly %}
+                            <div style="color: #2563eb; font-weight: bold;">
+                                {{ event.dayOfWeek|replace({'Monday': 'Lundi', 'Tuesday': 'Mardi', 'Wednesday': 'Mercredi', 'Thursday': 'Jeudi', 'Friday': 'Vendredi', 'Saturday': 'Samedi', 'Sunday': 'Dimanche'}) }}
+                            </div>
+                            <div style="font-size: 9pt;">
+                                {{ event.startTime ? event.startTime|date('H:i') : '-' }} - {{ event.endTime ? event.endTime|date('H:i') : '-' }}
+                            </div>
+                        {% else %}
+                            <div style="font-weight: 600;">
+                                {{ event.startAt ? event.startAt|date("d/m/Y") : '-' }}
+                            </div>
+                            <div style="font-size: 9pt; color: #64748b;">
+                                {{ event.startAt ? event.startAt|date("H:i") : '' }} - {{ event.endAt ? event.endAt|date("H:i") : '' }}
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if event.isWeekly %}
+                            <span class="badge badge-weekly">Hebdo</span>
+                        {% elseif event.endAt and event.endAt < date() %}
+                            <span class="badge badge-ended">Terminé</span>
+                        {% elseif event.startAt and event.startAt <= date() and event.endAt and event.endAt >= date() %}
+                            <span class="badge badge-ongoing">En cours</span>
+                        {% elseif event.startAt and event.startAt > date() %}
+                            <span class="badge badge-upcoming">À venir</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% set percent = event.capacity ? (event.attendances|length / event.capacity * 100)|round : 0 %}
+                        <div style="font-weight: bold; color: #0f172a;">
+                            {{ event.attendances|length }} <span style="font-weight: normal; color: #94a3b8;">/ {{ event.capacity|default('∞') }}</span>
+                        </div>
+                        {% if event.capacity %}
+                            <div class="capacity-bar">
+                                <div class="capacity-fill" style="width: {{ percent > 100 ? 100 : percent }}%; background-color: {% if percent >= 100 %}#ef4444{% elseif percent >= 80 %}#f59e0b{% else %}#10b981{% endif %};"></div>
+                            </div>
+                        {% endif %}
+                    </td>
                     <td>
                         {% if event.eventCat %}
-                            {{ event.eventCat.name }}
+                            <span class="cat-tag">{{ event.eventCat.name }}</span>
                         {% else %}
-                            -
+                            <span style="color: #cbd5e1;">—</span>
                         {% endif %}
                     </td>
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="5" style="text-align: center;">Aucun événement trouvé</td>
+                    <td colspan="5" style="text-align: center; color: #94a3b8; padding: 40px;">
+                        Aucun événement trouvé dans la base de données.
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <div class="footer">
+        Maternia © {{ "now"|date("Y") }} — Document généré automatiquement par le système d'administration.
+        <br>Page <span class="page-number"></span>
+    </div>
 </body>
 </html>

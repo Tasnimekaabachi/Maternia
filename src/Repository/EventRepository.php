@@ -17,14 +17,55 @@ class EventRepository extends ServiceEntityRepository
     public function findWithSearchAndSort(
         ?string $searchTerm,
         string $sortBy = 'startAt',
-        string $sortOrder = 'DESC'
+        string $sortOrder = 'DESC',
+        ?int $categoryId = null,
+        ?string $status = null,
+        ?string $organizer = null
     ): array {
         $qb = $this->createQueryBuilder('e')
             ->leftJoin('e.eventCat', 'cat');
 
         if ($searchTerm && trim($searchTerm) !== '') {
-            $qb->where('e.title LIKE :search OR e.location LIKE :search OR cat.name LIKE :search')
+            $qb->andWhere('e.title LIKE :search OR e.location LIKE :search OR cat.name LIKE :search')
                 ->setParameter('search', '%' . $searchTerm . '%');
+        }
+
+        if ($categoryId) {
+            $qb->andWhere('e.eventCat = :categoryId')
+                ->setParameter('categoryId', $categoryId);
+        }
+
+        if ($organizer) {
+            if ($organizer === 'admin') {
+                $qb->andWhere('e.creator IS NULL');
+            } elseif ($organizer === 'user') {
+                $qb->andWhere('e.creator IS NOT NULL');
+            }
+        }
+
+        if ($status) {
+            $now = new \DateTime();
+            switch ($status) {
+                case 'weekly':
+                    $qb->andWhere('e.isWeekly = true');
+                    break;
+                case 'upcoming':
+                    $qb->andWhere('e.isWeekly = false')
+                        ->andWhere('e.startAt > :now')
+                        ->setParameter('now', $now);
+                    break;
+                case 'ongoing':
+                    $qb->andWhere('e.isWeekly = false')
+                        ->andWhere('e.startAt <= :now')
+                        ->andWhere('e.endAt >= :now')
+                        ->setParameter('now', $now);
+                    break;
+                case 'past':
+                    $qb->andWhere('e.isWeekly = false')
+                        ->andWhere('e.endAt < :now')
+                        ->setParameter('now', $now);
+                    break;
+            }
         }
 
         $allowedSortFields = ['title', 'startAt', 'endAt', 'location'];

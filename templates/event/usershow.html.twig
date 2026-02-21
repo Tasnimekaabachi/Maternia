@@ -195,7 +195,7 @@
         align-items: center;
         gap: 8px;
         padding: 8px 16px;
-        border-radius: 50px;
+        border-radius: 8px;
         font-weight: 600;
         font-size: 0.85rem;
         background: var(--light-pink);
@@ -515,6 +515,51 @@
         font-size: 1.5rem;
         font-weight: 700;
     }
+
+    /* Requirements Show Styling */
+    .requirements-grid-show {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 15px;
+    }
+    .requirement-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #fff9db;
+        color: #92400e;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        border: 1px solid #f59e0b;
+        font-size: 0.95rem;
+    }
+    .requirement-tag i {
+        color: #f59e0b;
+    }
+
+    /* PREMIUM MODAL SCOPED */
+    .premium-modal {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.1);
+        background: white;
+    }
+    .modal-icon-wrapper {
+        width: 80px; height: 80px;
+        background: #fee2e2;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto;
+        font-size: 2.5rem;
+        animation: bounce-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes bounce-in {
+        0% { transform: scale(0); opacity: 0; }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); opacity: 1; }
+    }
 </style>
 {% endblock %}
 
@@ -522,10 +567,51 @@
 <div class="event-show-container">
     <!-- Top Action Bar with Smart Back Button -->
     <div class="top-action-bar">
-        <a href="#" id="smartBackButton" class="smart-back-button" onclick="goBack()">
+        <a href="{{ path('app_events') }}" class="back-btn">
             <i class="fas fa-arrow-left"></i>
-            Retour
+            <span>Retour aux événements</span>
         </a>
+
+        {% if event.creator == app.user or is_granted('ROLE_ADMIN') %}
+            <div class="action-buttons">
+                <a href="{{ path('app_event_user_edit', {'id': event.id}) }}" class="action-btn btn-edit-sm">
+                    <i class="fas fa-edit"></i> Modifier
+                </a>
+                <button type="button" class="action-btn btn-delete-sm" data-bs-toggle="modal" data-bs-target="#deleteEventModal-{{ event.id }}">
+                    <i class="fas fa-trash"></i> Supprimer
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="deleteEventModal-{{ event.id }}" tabindex="-1" aria-labelledby="deleteEventModalLabel-{{ event.id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content premium-modal">
+                            <div class="modal-header border-0 pb-0" style="background: transparent;">
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                            </div>
+                            <div class="modal-body text-center pb-4 pt-2">
+                                <div class="modal-icon-wrapper mb-3">
+                                    <i class="fas fa-exclamation-triangle text-danger"></i>
+                                </div>
+                                <h4 class="modal-title fw-bold mb-2" style="color: #1f2937;">Supprimer l'événement ?</h4>
+                                <p class="text-muted mb-4">
+                                    Êtes-vous sûr de vouloir supprimer <span class="fw-bold text-dark">{{ event.title }}</span> ?<br>
+                                    <span class="small text-danger">Cette action est irréversible.</span>
+                                </p>
+                                <div class="d-flex justify-content-center gap-3">
+                                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Annuler</button>
+                                    <form method="post" action="{{ path('app_event_user_delete', {'id': event.id}) }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
+                                        <button type="submit" class="btn btn-danger rounded-pill px-4 shadow-sm">
+                                            <i class="fas fa-trash-alt me-2"></i>Supprimer
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
     </div>
 
     <!-- Event Hero Section -->
@@ -550,8 +636,31 @@
                             <i class="fas fa-tag"></i> {{ event.eventCat.name }}
                         </span>
                     {% endif %}
+                    {% if event.isWeekly %}
+                        <span class="status-badge mb-2" style="background: #e0e7ff; color: #4338ca; border-color: #c7d2fe;">
+                            <i class="fas fa-redo"></i> Hebdomadaire
+                        </span>
+                    {% elseif event.endAt and event.endAt < date() %}
+                        <span class="status-badge mb-2" style="background: #fee2e2; color: #dc2626; border-color: #ef4444;">
+                            <i class="fas fa-check-double"></i> Terminé
+                        </span>
+                    {% elseif event.startAt and event.startAt <= date() and event.endAt >= date() %}
+                        <span class="status-badge mb-2" style="background: #fef3c7; color: #92400e; border-color: #f59e0b;">
+                            <i class="fas fa-play"></i> En cours
+                        </span>
+                    {% elseif event.startAt and event.startAt > date() %}
+                        <span class="status-badge mb-2" style="background: #dcfce7; color: #166534; border-color: #22c55e;">
+                            <i class="fas fa-calendar-check"></i> À venir
+                        </span>
+                    {% endif %}
+                    
                     <h1 class="event-title">{{ event.title }}</h1>
-
+                    
+                    {% if event.creator %}
+                        <div class="event-subtitle">
+                            <i class="fas fa-user"></i> Organisé par {{ event.creator.nom }} {{ event.creator.prenom }}
+                        </div>
+                    {% endif %}
                 </div>
 
 
@@ -563,33 +672,70 @@
     <div class="event-content animate-in" style="animation-delay: 0.2s">
         <!-- Date Cards -->
         <div class="date-cards">
-            <div class="date-card">
-                <i class="fas fa-play-circle"></i>
-                <div class="date-label">Date de début</div>
-                <div class="date-value">{{ event.startAt ? event.startAt|date('d/m/Y H:i') : 'Non définie' }}</div>
-            </div>
-            
-            <div class="date-card">
-                <i class="fas fa-stop-circle"></i>
-                <div class="date-label">Date de fin</div>
-                <div class="date-value">{{ event.endAt ? event.endAt|date('d/m/Y H:i') : 'Non définie' }}</div>
-            </div>
+            {% if event.isWeekly %}
+                <div class="date-card">
+                    <i class="fas fa-redo"></i>
+                    <div class="date-label">Fréquence</div>
+                    <div class="date-value">Chaque {{ event.dayOfWeek|replace({'Monday': 'Lundi', 'Tuesday': 'Mardi', 'Wednesday': 'Mercredi', 'Thursday': 'Jeudi', 'Friday': 'Vendredi', 'Saturday': 'Samedi', 'Sunday': 'Dimanche'}) }}</div>
+                </div>
+                
+                <div class="date-card">
+                    <i class="fas fa-clock"></i>
+                    <div class="date-label">Horaire</div>
+                    <div class="date-value">{{ event.startTime ? event.startTime|date('H:i') : '--:--' }} - {{ event.endTime ? event.endTime|date('H:i') : '--:--' }}</div>
+                </div>
+            {% else %}
+                <div class="date-card">
+                    <i class="fas fa-play-circle"></i>
+                    <div class="date-label">Date de début</div>
+                    <div class="date-value">{{ event.startAt ? event.startAt|date('d/m/Y H:i') : 'Non définie' }}</div>
+                </div>
+                
+                <div class="date-card">
+                    <i class="fas fa-stop-circle"></i>
+                    <div class="date-label">Date de fin</div>
+                    <div class="date-value">{{ event.endAt ? event.endAt|date('d/m/Y H:i') : 'Non définie' }}</div>
+                </div>
+            {% endif %}
             
             <div class="duration-card">
                 <i class="fas fa-clock"></i>
                 <div class="duration-label">Durée</div>
                 <div class="duration-value">
-                    {% if event.startAt and event.endAt %}
-                        {% set duration = event.startAt.diff(event.endAt) %}
-                        {% if duration.d > 0 %}
-                            {{ duration.d }} jour{{ duration.d > 1 ? 's' : '' }}
-                        {% elseif duration.h > 0 %}
-                            {{ duration.h }}h {{ duration.i }}min
+                    {% if event.isWeekly %}
+                        {% if event.startTime and event.endTime %}
+                            {% set start = event.startTime|date('H:i') %}
+                            {% set end = event.endTime|date('H:i') %}
+                            {# Simple string manipulation or timestamp logic #}
+                            {% set startH = event.startTime|date('H') %}
+                            {% set startM = event.startTime|date('i') %}
+                            {% set endH = event.endTime|date('H') %}
+                            {% set endM = event.endTime|date('i') %}
+                            {% set diffH = endH - startH %}
+                            {% set diffM = endM - startM %}
+                            {% if diffM < 0 %}
+                                {% set diffH = diffH - 1 %}
+                                {% set diffM = diffM + 60 %}
+                            {% endif %}
+                            
+                            {% if diffH > 0 %}{{ diffH }}h{% endif %}
+                            {% if diffM > 0 %}{{ diffM }}min{% endif %}
                         {% else %}
-                            {{ duration.i }} minutes
+                            Non définie
                         {% endif %}
                     {% else %}
-                        Non définie
+                        {% if event.startAt and event.endAt %}
+                            {% set duration = event.startAt.diff(event.endAt) %}
+                            {% if duration.d > 0 %}
+                                {{ duration.d }} jour{{ duration.d > 1 ? 's' : '' }}
+                            {% elseif duration.h > 0 %}
+                                {{ duration.h }}h {{ duration.i }}min
+                            {% else %}
+                                {{ duration.i }} minutes
+                            {% endif %}
+                        {% else %}
+                            Non définie
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
@@ -602,10 +748,14 @@
                 <p>{{ event.location ? event.location : 'Non spécifié' }}</p>
             </div>
             
-            {% if event.maxAttendees is defined and event.maxAttendees %}
+            {% if event.capacity %}
             <div class="info-card">
                 <h3><i class="fas fa-users"></i> Capacité</h3>
-                <p>{{ event.maxAttendees }} participants maximum</p>
+                <p>{{ event.attendances|length }} / {{ event.capacity }} participants</p>
+                <div class="progress mt-2" style="height: 10px; border-radius: 5px;">
+                    {% set percent = (event.attendances|length / event.capacity * 100)|round %}
+                    <div class="progress-bar bg-pink" role="progressbar" style="width: {{ percent }}%; background-color: var(--primary-pink);" aria-valuenow="{{ percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
             </div>
             {% endif %}
             
@@ -626,6 +776,69 @@
             </div>
         </div>
         {% endif %}
+
+        <!-- Requirements Section -->
+        {% if event.requirements|length > 0 %}
+            <div class="description-card mt-4" style="border-left: 4px solid #f59e0b;">
+                <h3><i class="fas fa-box-open text-warning"></i> Matériel à apporter</h3>
+                <div class="requirements-grid-show">
+                    {% for requirement in event.requirements %}
+                        <div class="requirement-tag">
+                            <i class="fas fa-check-circle"></i>
+                            <span>{{ requirement.name }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Participation Action -->
+        <div class="action-section mt-4">
+            <div class="participation-status">
+                {% set isAttending = false %}
+                {% for attendance in event.attendances %}
+                    {% if app.user and attendance.user.id == app.user.id %}
+                        {% set isAttending = true %}
+                    {% endif %}
+                {% endfor %}
+
+                {% if not event.isWeekly and event.endAt and event.endAt < date() %}
+                    <p class="mb-0 text-danger fw-bold"><i class="fas fa-history"></i> Cette session est terminée</p>
+                {% elseif isAttending %}
+                    <p class="mb-0 text-success fw-bold"><i class="fas fa-check-circle"></i> Vous participez à cet événement</p>
+                {% elseif event.capacity and event.attendances|length >= event.capacity %}
+                    <p class="mb-0 text-danger fw-bold"><i class="fas fa-times-circle"></i> Cet événement est complet</p>
+                {% else %}
+                    <p class="mb-0 text-muted">Intéressé(e) ? Rejoignez-nous !</p>
+                {% endif %}
+            </div>
+
+            <div class="btn-group">
+                {% if app.user %}
+                    {% if isAttending %}
+                        <form action="{{ path('app_event_unattend', {id: event.id}) }}" method="POST" style="display: inline;">
+                            <button type="submit" class="btn btn-delete">
+                                <i class="fas fa-user-minus"></i> Annuler ma participation
+                            </button>
+                        </form>
+                    {% elseif not event.capacity or event.attendances|length < event.capacity %}
+                        {% if not event.isWeekly and event.endAt and event.endAt < date() %}
+                            {# No button for past events #}
+                        {% else %}
+                            <form action="{{ path('app_event_attend', {id: event.id}) }}" method="POST" style="display: inline;">
+                                <button type="submit" class="btn btn-edit">
+                                    <i class="fas fa-user-plus"></i> Participer
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="btn btn-edit">
+                        <i class="fas fa-sign-in-alt"></i> Connectez-vous pour participer
+                    </a>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 

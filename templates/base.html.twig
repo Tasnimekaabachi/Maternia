@@ -28,6 +28,450 @@
 
         <!-- Template Stylesheet -->
         <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+
+        <style>
+            :root {
+                --primary-pink: #ec4899;
+                --dark-pink: #be185d;
+                --accent-pink: #db2777;
+                --light-pink: #fdf2f8;
+                --text-dark: #1f2937;
+                --text-muted: #64748b;
+                --glass-bg: rgba(255, 255, 255, 0.92);
+                --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+                --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+                --shadow-lg: 0 10px 40px rgba(0,0,0,0.12);
+            }
+
+            /* ============ NAVBAR ============ */
+            .bg-glass-navbar {
+                background: var(--glass-bg);
+                backdrop-filter: blur(16px) saturate(180%);
+                -webkit-backdrop-filter: blur(16px) saturate(180%);
+                border-bottom: 1px solid rgba(236, 72, 153, 0.08);
+                box-shadow: var(--shadow-sm);
+                z-index: 1050;
+                transition: all 0.35s ease;
+                margin: 0 !important;
+                top: 0 !important;
+                left: 0;
+                right: 0;
+            }
+
+            .bg-glass-navbar.scrolled {
+                background: rgba(255, 255, 255, 0.97);
+                box-shadow: 0 4px 30px rgba(236, 72, 153, 0.1), var(--shadow-md);
+                border-bottom-color: rgba(236, 72, 153, 0.15);
+            }
+
+            .bg-glass-navbar.scrolled .topbar-modern {
+                max-height: 0;
+                padding: 0 !important;
+                overflow: hidden;
+                border: none;
+                opacity: 0;
+            }
+
+            .topbar-modern {
+                background: linear-gradient(135deg, #fdf2f8 0%, #f8fafc 100%);
+                border-bottom: 1px solid #f1f5f9;
+                font-size: 0.82rem;
+                max-height: 50px;
+                transition: all 0.35s ease;
+                overflow: hidden;
+                opacity: 1;
+            }
+
+            .topbar-link {
+                color: var(--text-muted) !important;
+                text-decoration: none;
+                transition: color 0.2s ease;
+                font-weight: 500;
+            }
+
+            .topbar-link:hover {
+                color: var(--primary-pink) !important;
+            }
+
+            .social-icon {
+                color: #cbd5e1;
+                margin-left: 0.75rem;
+                font-size: 0.85rem;
+                transition: all 0.25s ease;
+                width: 28px;
+                height: 28px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                text-decoration: none;
+            }
+
+            .social-icon:hover {
+                color: white;
+                background: var(--primary-pink);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+            }
+
+            .navbar-brand-modern {
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                gap: 3px;
+                transition: transform 0.2s ease;
+            }
+
+            .navbar-brand-modern:hover { transform: scale(1.03); }
+
+            .brand-text {
+                font-family: 'Fredoka', sans-serif;
+                font-size: 1.8rem;
+                font-weight: 700;
+                color: #0284c7; /* Sky blue */
+                letter-spacing: -0.5px;
+            }
+
+            .text-primary-pink { color: var(--primary-pink) !important; }
+
+            .brand-dot {
+                width: 7px;
+                height: 7px;
+                background: var(--primary-pink);
+                border-radius: 50%;
+                margin-top: 14px;
+                box-shadow: 0 0 12px rgba(236, 72, 153, 0.5);
+                animation: pulse-dot 2s ease-in-out infinite;
+            }
+
+            @keyframes pulse-dot {
+                0%, 100% { box-shadow: 0 0 8px rgba(236, 72, 153, 0.4); }
+                50% { box-shadow: 0 0 18px rgba(236, 72, 153, 0.7); }
+            }
+
+            /* Nav Links */
+            .nav-link-modern {
+                position: relative;
+                color: #4b5563 !important;
+                font-weight: 600;
+                font-size: 0.92rem;
+                padding: 0.6rem 1rem !important;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                letter-spacing: 0.01em;
+            }
+
+            .nav-link-modern span { position: relative; z-index: 1; }
+
+            .nav-link-modern::before {
+                content: '';
+                position: absolute;
+                inset: 4px 8px;
+                background: var(--light-pink);
+                border-radius: 8px;
+                opacity: 0;
+                transform: scale(0.9);
+                transition: all 0.3s ease;
+                z-index: 0;
+            }
+
+            .nav-link-modern::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                width: 0;
+                height: 3px;
+                background: linear-gradient(90deg, var(--primary-pink), var(--accent-pink));
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transform: translateX(-50%);
+                border-radius: 3px;
+            }
+
+            .nav-link-modern:hover::before { opacity: 1; transform: scale(1); }
+            .nav-link-modern:hover::after, .nav-link-modern.active::after { width: 50%; }
+            .nav-link-modern.active::before { opacity: 1; transform: scale(1); }
+
+            .nav-link-modern:hover, .nav-link-modern.active {
+                color: var(--primary-pink) !important;
+            }
+
+            /* Auth Buttons */
+            .btn-login-modern {
+                color: var(--text-dark) !important;
+                font-weight: 700;
+                font-size: 0.9rem;
+                text-decoration: none;
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                transition: all 0.25s ease;
+            }
+
+            .btn-login-modern:hover {
+                color: var(--primary-pink) !important;
+                background: var(--light-pink);
+            }
+
+            .btn-signup-modern {
+                background: linear-gradient(135deg, var(--primary-pink) 0%, var(--accent-pink) 100%);
+                color: white !important;
+                padding: 0.55rem 1.5rem;
+                border-radius: 50px;
+                font-weight: 600;
+                font-size: 0.9rem;
+                text-decoration: none !important;
+                box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .btn-signup-modern::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(135deg, var(--accent-pink) 0%, var(--dark-pink) 100%);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .btn-signup-modern:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4);
+                color: white !important;
+            }
+
+            .btn-signup-modern:hover::before { opacity: 1; }
+
+            .btn-search-modern {
+                background: var(--light-pink);
+                border: 1px solid rgba(236, 72, 153, 0.15);
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+                color: var(--primary-pink);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.25s ease;
+                font-size: 0.9rem;
+            }
+
+            .btn-search-modern:hover {
+                background: var(--primary-pink);
+                color: white;
+                transform: scale(1.05);
+                box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+            }
+
+            /* Profile */
+            .profile-trigger {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                text-decoration: none !important;
+                color: var(--text-dark);
+                background: var(--light-pink);
+                padding: 5px 14px 5px 6px;
+                border-radius: 50px;
+                border: 1px solid rgba(236, 72, 153, 0.15);
+                transition: all 0.25s ease;
+            }
+
+            .profile-trigger:hover {
+                box-shadow: 0 4px 15px rgba(236, 72, 153, 0.15);
+                border-color: rgba(236, 72, 153, 0.3);
+            }
+
+            .profile-avatar {
+                font-size: 1.6rem;
+                color: var(--primary-pink);
+                line-height: 1;
+            }
+
+            .profile-name {
+                font-weight: 600;
+                font-size: 0.85rem;
+                color: var(--text-dark);
+            }
+
+            .profile-dropdown {
+                border: none;
+                box-shadow: var(--shadow-lg);
+                border-radius: 14px;
+                padding: 8px;
+                min-width: 210px;
+                margin-top: 10px !important;
+                border: 1px solid rgba(236, 72, 153, 0.08);
+            }
+
+            .profile-dropdown .dropdown-item {
+                padding: 10px 16px;
+                border-radius: 10px;
+                font-weight: 500;
+                font-size: 0.9rem;
+                color: #4b5563;
+                transition: all 0.2s ease;
+            }
+
+            .profile-dropdown .dropdown-item:hover {
+                background: var(--light-pink);
+                color: var(--primary-pink);
+                transform: translateX(4px);
+            }
+
+            .animate-in { animation: slideUp 0.25s ease-out; }
+
+            @keyframes slideUp {
+                from { opacity: 0; transform: translateY(8px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+
+            .custom-toggler {
+                border: 1px solid rgba(236, 72, 153, 0.2);
+                padding: 8px 12px;
+                border-radius: 10px;
+                font-size: 1.2rem;
+                color: var(--primary-pink);
+                transition: all 0.2s ease;
+            }
+
+            .custom-toggler:hover {
+                background: var(--light-pink);
+            }
+
+            .custom-toggler:focus { box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15); }
+
+            /* ============ BLOG CARDS EQUAL HEIGHT ============ */
+            .blog-grid {
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+            .blog-grid > [class*="col"] {
+                display: flex;
+            }
+
+            .blog-item {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                border-radius: 16px;
+                overflow: hidden;
+                box-shadow: var(--shadow-md);
+                border: 1px solid #f1f5f9;
+                transition: all 0.3s ease;
+                background: white;
+            }
+
+            .blog-item:hover {
+                transform: translateY(-6px);
+                box-shadow: 0 12px 35px rgba(236, 72, 153, 0.15);
+                border-color: rgba(236, 72, 153, 0.2);
+            }
+
+            .blog-item .blog-img {
+                overflow: hidden;
+            }
+
+            .blog-item .blog-img img {
+                width: 100%;
+                height: auto;
+                display: block;
+                transition: transform 0.4s ease;
+            }
+
+            .blog-item:hover .blog-img img {
+                transform: scale(1.06);
+            }
+
+            .blog-item .blog-text-inner {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .blog-item .blog-text-inner .h4,
+            .blog-item .blog-text-inner a.h4 {
+                min-height: 56px;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                font-size: 1.15rem;
+                font-weight: 700;
+                color: var(--text-dark);
+                text-decoration: none;
+                line-height: 1.4;
+                transition: color 0.2s ease;
+            }
+
+            .blog-item .blog-text-inner a.h4:hover {
+                color: var(--primary-pink);
+            }
+
+            .blog-item .blog-text-inner p {
+                min-height: 44px;
+                font-size: 0.9rem;
+                color: var(--text-muted);
+                line-height: 1.5;
+            }
+
+            .blog-bottom {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .blog-date-comments {
+                border-bottom: 1px solid #f1f5f9 !important;
+                background: #fafbfc !important;
+                padding-top: 0.5rem !important;
+                margin-top: 0 !important;
+            }
+
+            .blog-content {
+                background: #fafbfc !important;
+            }
+
+            /* Override template style.css that hides blog images */
+            .blog .blog-item .blog-img::after {
+                display: none !important;
+            }
+
+            .blog .blog-item .blog-date-comments {
+                padding-top: 0.5rem !important;
+                margin-top: 0 !important;
+            }
+
+            .blog .blog-item .blog-img img {
+                transform: none !important;
+            }
+
+            .blog .blog-item:hover .blog-img img {
+                transform: scale(1.06) !important;
+            }
+
+            @media (max-width: 991px) {
+                .nav-link-modern { padding: 0.5rem 0.75rem !important; font-size: 0.85rem; }
+                .custom-nav { gap: 2px; }
+            }
+
+            @media (max-width: 767px) {
+                .blog-item .blog-text-inner .h4,
+                .blog-item .blog-text-inner a.h4 { min-height: auto; }
+                .blog-item .blog-text-inner p { min-height: auto; }
+            }
+
+            /* Remove gap between navbar and content below */
+            body { margin: 0; padding: 0; }
+
+            .hero-header {
+                margin-top: -8px !important;
+                padding-top: 4rem !important;
+            }
+        </style>
     {% endblock %}
 </head>
 
@@ -41,100 +485,92 @@
 
     {% block navbar %}
     <!-- Navbar start -->
-    <div class="container-fluid border-bottom bg-light wow fadeIn" data-wow-delay="0.1s">
-        <div class="container topbar topbar-compact bg-primary d-none d-lg-block">
-            <div class="d-flex justify-content-between align-items-center">
+    <div class="container-fluid sticky-top bg-glass-navbar px-0">
+        <div class="container-fluid topbar-modern d-none d-lg-block">
+            <div class="d-flex justify-content-between align-items-center px-4 py-2">
                 <div class="top-info">
-                    <span class="topbar-item"><i class="fas fa-map-marker-alt me-1 opacity-75"></i><a href="#contact" class="text-white text-decoration-none">Contact</a></span>
-                    <span class="topbar-item"><i class="fas fa-envelope me-1 opacity-75"></i><a href="mailto:contact@maternia.fr" class="text-white text-decoration-none">contact@maternia.fr</a></span>
+                    <span class="topbar-item"><i class="fas fa-map-marker-alt me-2 text-primary"></i><a href="#contact" class="topbar-link">Contact</a></span>
+                    <span class="topbar-item ms-4"><i class="fas fa-envelope me-2 text-primary"></i><a href="mailto:contact@maternia.fr" class="topbar-link">contact@maternia.fr</a></span>
                 </div>
                 <div class="top-link">
-                    <a href="" class="btn btn-light btn-sm-square rounded-circle" aria-label="Facebook"><i class="fab fa-facebook-f text-secondary"></i></a>
-                    <a href="" class="btn btn-light btn-sm-square rounded-circle" aria-label="Twitter"><i class="fab fa-twitter text-secondary"></i></a>
-                    <a href="" class="btn btn-light btn-sm-square rounded-circle" aria-label="Instagram"><i class="fab fa-instagram text-secondary"></i></a>
-                    <a href="" class="btn btn-light btn-sm-square rounded-circle me-0" aria-label="LinkedIn"><i class="fab fa-linkedin-in text-secondary"></i></a>
+                    <a href="" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="" class="social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="" class="social-icon me-0" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
                 </div>
             </div>
         </div>
-        <div class="container px-0">
-            <nav class="navbar navbar-light navbar-expand-xl py-3">
-                <a href="{{ path('app_home') }}" class="navbar-brand">
-                    <h1 class="text-primary display-6">Mater<span class="text-secondary">nia</span></h1>
+        <div class="container-fluid px-0">
+            <nav class="navbar navbar-expand-xl px-4 py-3">
+                <a href="{{ path('app_home') }}" class="navbar-brand-modern">
+                    <span class="brand-text">Mater<span class="text-primary-pink">nia</span></span>
+                    <div class="brand-dot"></div>
                 </a>
-                <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-                    <span class="fa fa-bars text-primary"></span>
+                <button class="navbar-toggler custom-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                    <span class="fa fa-bars"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
-                    <div class="navbar-nav mx-auto">
+                    <div class="navbar-nav mx-auto custom-nav">
                         <a href="{{ path('app_home') }}"
-                           class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_home' %} active{% endif %}">
-                            Accueil
+                           class="nav-link-modern{% if app.request.attributes.get('_route') == 'app_home' %} active{% endif %}">
+                            <span>Accueil</span>
                         </a>
 
                         <a href="{{ path('app_services') }}"
-                           class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_services' %} active{% endif %}">
-                            Services
+                           class="nav-link-modern{% if app.request.attributes.get('_route') == 'app_services' %} active{% endif %}">
+                            <span>Services</span>
                         </a>
 
-                        {# Mon Suivi (Suivi Grossesse Module) #}
                         <a href="{{ path('app_suivi_grossesse_creer') }}"
-                           class="nav-item nav-link{% if app.request.attributes.get('_route') starts with 'app_suivi_grossesse' %} active{% endif %}">
-                            Mon suivi
+                           class="nav-link-modern{% if app.request.attributes.get('_route') starts with 'app_suivi_grossesse' %} active{% endif %}">
+                            <span>Mon suivi</span>
                         </a>
 
                         <a href="{{ path('app_marketplace') }}"
-                           class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_marketplace' %} active{% endif %}">
-                            Marketplace
-                        </a>
-
-                        <a href="{{ path('app_babysitting') }}"
-                           class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_babysitting' %} active{% endif %}">
-                            Baby-sitter
+                           class="nav-link-modern{% if app.request.attributes.get('_route') == 'app_marketplace' %} active{% endif %}">
+                            <span>Boutique</span>
                         </a>
 
                         <a href="{{ path('app_events') }}"
-                           class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_events' %} active{% endif %}">
-                            Événements
+                           class="nav-link-modern{% if app.request.attributes.get('_route') == 'app_events' %} active{% endif %}">
+                            <span>Événements</span>
+                        </a>
+
+                        <a href="{{ path('app_babysitting') }}"
+                           class="nav-link-modern{% if app.request.attributes.get('_route') == 'app_babysitting' %} active{% endif %}">
+                            <span>Babysitting</span>
                         </a>
 
                         <a href="{{ path('app_consultations') }}"
-                           class="nav-item nav-link{% if app.request.attributes.get('_route') == 'app_consultations' %} active{% endif %}">
-                            Rendez-vous
+                           class="nav-link-modern{% if app.request.attributes.get('_route') == 'app_consultations' %} active{% endif %}">
+                            <span>Rendez-vous</span>
                         </a>
-
-                        <a href="#contact" class="nav-item nav-link">Contact</a>
                     </div>
 
-                    <div class="d-flex align-items-center flex-wrap flex-xl-nowrap mt-3 mt-xl-0">
-                        {# Phone Contact Section #}
-                        <div class="d-flex align-items-center me-4 d-none d-xl-flex border-end pe-4 border-primary">
-                            
-                        </div>
-
-                        {# Question / Contact Section #}
-                        <div class="d-flex flex-column pe-3 border-end border-primary ms-3 d-none d-lg-flex">
-                            <span class="text-primary small">Une question ?</span>
-                            <a href="#contact" class="text-decoration-none border-0">
-                                <span class="text-secondary fw-bold">Contactez-nous</span>
-                            </a>
-                        </div>
-
-                        {# Section Authentification & Profil #}
-                        <div class="d-flex align-items-center ms-3">
+                    <div class="d-flex align-items-center">
+                        <div class="auth-section-modern d-flex align-items-center">
                             {% if app.user %}
-                                <a href="{{ path('app_logout') }}" class="btn btn-outline-primary btn-border-radius px-3 me-2">Déconnexion</a>
-                                <a href="{{ path('app_user_profile') }}" class="text-primary" title="Mon Profil Face ID">
-                                    <i class="fas fa-user-circle fa-2x"></i>
-                                </a>
+                                <div class="dropdown me-3">
+                                    <a href="#" class="profile-trigger dropdown-toggle" data-bs-toggle="dropdown">
+                                        <div class="profile-avatar">
+                                            <i class="fas fa-user-circle"></i>
+                                        </div>
+                                        <span class="profile-name d-none d-md-inline">{{ app.user.prenom }} {{ app.user.nom }}</span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end profile-dropdown animate-in">
+                                        <li><a class="dropdown-item" href="{{ path('app_user_profile') }}"><i class="fas fa-id-card me-2"></i>Mon Profil</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-danger" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Déconnexion</a></li>
+                                    </ul>
+                                </div>
                             {% else %}
-                                <a href="{{ path('app_login') }}" class="btn btn-link text-primary me-2 fw-bold text-decoration-none">Connexion</a>
-                                <a href="{{ path('app_register') }}" class="btn btn-primary btn-border-radius px-4 py-2 text-white">S'inscrire</a>
+                                <a href="{{ path('app_login') }}" class="btn-login-modern me-3">Connexion</a>
+                                <a href="{{ path('app_register') }}" class="btn-signup-modern">S'inscrire</a>
                             {% endif %}
                         </div>
 
-                        {# Bouton Recherche #}
-                        <button class="btn-search btn btn-primary btn-md-square rounded-circle ms-3" data-bs-toggle="modal" data-bs-target="#searchModal">
-                            <i class="fas fa-search text-white"></i>
+                        <button class="btn-search-modern ms-3" data-bs-toggle="modal" data-bs-target="#searchModal">
+                            <i class="fas fa-search"></i>
                         </button>
                     </div>
                 </div>
@@ -358,90 +794,90 @@
                 <h4 class="text-primary mb-4 border-bottom border-primary border-2 d-inline-block p-2 title-border-radius">Actualités & conseils</h4>
                 <h1 class="mb-5 display-3">Nos derniers articles et conseils</h1>
             </div>
-            <div class="row g-5 justify-content-center">
+            <div class="row g-4 justify-content-center blog-grid">
                 <div class="col-md-6 col-lg-6 col-xl-4 wow fadeIn" data-wow-delay="0.1s">
-                    <div class="blog-item rounded-bottom">
-                        <div class="blog-img overflow-hidden position-relative img-border-radius">
-                            <img src="{{ asset('img/blog-1.jpg') }}" class="img-fluid w-100" alt="Image">
+                    <div class="blog-item">
+                        <div class="blog-img">
+                            <img src="{{ asset('img/blog-1.jpg') }}" alt="Suivi de grossesse">
                         </div>
-                        <div class="d-flex justify-content-between px-4 py-3 bg-light border-bottom border-primary blog-date-comments">
-                            <small class="text-dark"><i class="fas fa-calendar me-1 text-dark"></i> Nov 2024</small>
-                            <small class="text-dark"><i class="fas fa-comment-alt me-1 text-dark"></i> Conseils</small>
+                        <div class="d-flex justify-content-between px-4 py-2 blog-date-comments">
+                            <small class="text-muted"><i class="fas fa-calendar me-1 text-primary"></i> Nov 2024</small>
+                            <small class="text-muted"><i class="fas fa-tag me-1 text-primary"></i> Conseils</small>
                         </div>
-                        <div class="blog-content d-flex align-items-center px-4 py-3 bg-light">
-                            <div class="overflow-hidden rounded-circle rounded-top border border-primary">
-                                <img src="{{ asset('img/program-teacher.jpg') }}" class="img-fluid rounded-circle p-2 rounded-top" alt="" style="width: 70px; height: 70px; border-style: dotted; border-color: var(--bs-primary) !important;">
+                        <div class="blog-content d-flex align-items-center px-4 py-3">
+                            <div class="overflow-hidden rounded-circle border border-primary" style="flex-shrink:0;">
+                                <img src="{{ asset('img/program-teacher.jpg') }}" class="rounded-circle p-1" alt="" style="width: 50px; height: 50px; border-style: dotted; border-color: var(--bs-primary) !important;">
                             </div>
                             <div class="ms-3">
-                                <h6 class="text-primary">Maternia</h6>
-                                <p class="text-muted">Équipe</p>
+                                <h6 class="text-primary mb-0" style="font-size:0.85rem;">Maternia</h6>
+                                <small class="text-muted">Équipe</small>
                             </div>
                         </div>
-                        <div class="px-4 pb-4 bg-light rounded-bottom">
+                        <div class="px-4 pb-4 blog-bottom">
                             <div class="blog-text-inner">
                                 <a href="#" class="h4">Comment bien vivre son suivi de grossesse ?</a>
-                                <p class="mt-3 mb-4">Conseils pour un suivi serein et bien préparé.</p>
+                                <p class="mt-2 mb-3">Conseils pour un suivi serein et bien préparé.</p>
                             </div>
-                            <div class="text-center">
-                                <a href="#" class="btn btn-primary text-white px-4 py-2 mb-3 btn-border-radius">Lire la suite</a>
+                            <div class="text-center mt-auto">
+                                <a href="#" class="btn btn-primary text-white px-4 py-2 btn-border-radius w-100">Lire la suite</a>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-6 col-xl-4 wow fadeIn" data-wow-delay="0.3s">
-                    <div class="blog-item rounded-bottom">
-                        <div class="blog-img overflow-hidden position-relative img-border-radius">
-                            <img src="{{ asset('img/blog-2.jpg') }}" class="img-fluid w-100" alt="">
+                    <div class="blog-item">
+                        <div class="blog-img">
+                            <img src="{{ asset('img/blog-2.jpg') }}" alt="Premiers jours avec bébé">
                         </div>
-                        <div class="d-flex justify-content-between px-4 py-3 bg-light border-bottom border-primary blog-date-comments">
-                            <small class="text-dark"><i class="fas fa-calendar me-1 text-dark"></i> Nov 2024</small>
-                            <small class="text-dark"><i class="fas fa-comment-alt me-1 text-dark"></i> Conseils</small>
+                        <div class="d-flex justify-content-between px-4 py-2 blog-date-comments">
+                            <small class="text-muted"><i class="fas fa-calendar me-1 text-primary"></i> Nov 2024</small>
+                            <small class="text-muted"><i class="fas fa-tag me-1 text-primary"></i> Conseils</small>
                         </div>
-                        <div class="blog-content d-flex align-items-center px-4 py-3 bg-light">
-                            <div class="overflow-hidden rounded-circle rounded-top border border-primary">
-                                <img src="{{ asset('img/program-teacher.jpg') }}" class="img-fluid rounded-circle p-2 rounded-top" alt="" style="width: 70px; height: 70px; border-style: dotted; border-color: var(--bs-primary) !important;">
+                        <div class="blog-content d-flex align-items-center px-4 py-3">
+                            <div class="overflow-hidden rounded-circle border border-primary" style="flex-shrink:0;">
+                                <img src="{{ asset('img/program-teacher.jpg') }}" class="rounded-circle p-1" alt="" style="width: 50px; height: 50px; border-style: dotted; border-color: var(--bs-primary) !important;">
                             </div>
                             <div class="ms-3">
-                                <h6 class="text-primary">Maternia</h6>
-                                <p class="text-muted">Équipe</p>
+                                <h6 class="text-primary mb-0" style="font-size:0.85rem;">Maternia</h6>
+                                <small class="text-muted">Équipe</small>
                             </div>
                         </div>
-                        <div class="px-4 pb-4 bg-light rounded-bottom">
+                        <div class="px-4 pb-4 blog-bottom">
                             <div class="blog-text-inner">
                                 <a href="#" class="h4">Les premiers jours avec bébé</a>
-                                <p class="mt-3 mb-4">Retour à la maison : ce qu’il faut savoir.</p>
+                                <p class="mt-2 mb-3">Retour à la maison : ce qu'il faut savoir.</p>
                             </div>
-                            <div class="text-center">
-                                <a href="#" class="btn btn-primary text-white px-4 py-2 mb-3 btn-border-radius">Lire la suite</a>
+                            <div class="text-center mt-auto">
+                                <a href="#" class="btn btn-primary text-white px-4 py-2 btn-border-radius w-100">Lire la suite</a>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-6 col-xl-4 wow fadeIn" data-wow-delay="0.5s">
-                    <div class="blog-item rounded-bottom">
-                        <div class="blog-img overflow-hidden position-relative img-border-radius">
-                            <img src="{{ asset('img/blog-3.jpg') }}" class="img-fluid w-100" alt="">
+                    <div class="blog-item">
+                        <div class="blog-img">
+                            <img src="{{ asset('img/blog-3.jpg') }}" alt="Soin après accouchement">
                         </div>
-                        <div class="d-flex justify-content-between px-4 py-3 bg-light border-bottom border-primary blog-date-comments">
-                            <small class="text-dark"><i class="fas fa-calendar me-1 text-dark"></i> Nov 2024</small>
-                            <small class="text-dark"><i class="fas fa-comment-alt me-1 text-dark"></i> Conseils</small>
+                        <div class="d-flex justify-content-between px-4 py-2 blog-date-comments">
+                            <small class="text-muted"><i class="fas fa-calendar me-1 text-primary"></i> Nov 2024</small>
+                            <small class="text-muted"><i class="fas fa-tag me-1 text-primary"></i> Conseils</small>
                         </div>
-                        <div class="blog-content d-flex align-items-center px-4 py-3 bg-light">
-                            <div class="overflow-hidden rounded-circle rounded-top border border-primary">
-                                <img src="{{ asset('img/program-teacher.jpg') }}" class="img-fluid rounded-circle p-2 rounded-top" alt="" style="width: 70px; height: 70px; border-style: dotted; border-color: var(--bs-primary) !important;">
+                        <div class="blog-content d-flex align-items-center px-4 py-3">
+                            <div class="overflow-hidden rounded-circle border border-primary" style="flex-shrink:0;">
+                                <img src="{{ asset('img/program-teacher.jpg') }}" class="rounded-circle p-1" alt="" style="width: 50px; height: 50px; border-style: dotted; border-color: var(--bs-primary) !important;">
                             </div>
                             <div class="ms-3">
-                                <h6 class="text-primary">Maternia</h6>
-                                <p class="text-muted">Équipe</p>
+                                <h6 class="text-primary mb-0" style="font-size:0.85rem;">Maternia</h6>
+                                <small class="text-muted">Équipe</small>
                             </div>
                         </div>
-                        <div class="px-4 pb-4 bg-light rounded-bottom">
+                        <div class="px-4 pb-4 blog-bottom">
                             <div class="blog-text-inner">
-                                <a href="#" class="h4">Prendre soin de soi après l’accouchement</a>
-                                <p class="mt-3 mb-4">Conseils bien-être pour la jeune maman.</p>
+                                <a href="#" class="h4">Prendre soin de soi après l'accouchement</a>
+                                <p class="mt-2 mb-3">Conseils bien-être pour la jeune maman.</p>
                             </div>
-                            <div class="text-center">
-                                <a href="#" class="btn btn-primary text-white px-4 py-2 mb-3 btn-border-radius">Lire la suite</a>
+                            <div class="text-center mt-auto">
+                                <a href="#" class="btn btn-primary text-white px-4 py-2 btn-border-radius w-100">Lire la suite</a>
                             </div>
                         </div>
                     </div>
@@ -665,6 +1101,22 @@
 
     <!-- Template Javascript -->
     <script src="{{ asset('js/main.js') }}"></script>
+
+    <!-- Navbar scroll effect -->
+    <script>
+        (function() {
+            var navbar = document.querySelector('.bg-glass-navbar');
+            if (navbar) {
+                window.addEventListener('scroll', function() {
+                    if (window.scrollY > 60) {
+                        navbar.classList.add('scrolled');
+                    } else {
+                        navbar.classList.remove('scrolled');
+                    }
+                });
+            }
+        })();
+    </script>
     {% endblock %}
 </body>
 

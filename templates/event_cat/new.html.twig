@@ -4,15 +4,25 @@
 {% block page_title %}Créer une catégorie{% endblock %}
 
 {% block breadcrumb %}
-    <div class="admin-breadcrumb">
-        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
-        <span>/</span>
-        <a href="{{ path('admin_evenements') }}">Événements & Catégories</a>
-        <span>/</span>
-        <a href="{{ path('app_event_cat_index') }}">Catégories</a>
-        <span>/</span>
-        <span class="current">Nouvelle</span>
-    </div>
+    <nav aria-label="breadcrumb" class="premium-breadcrumb-wrapper">
+        <ol class="premium-breadcrumb">
+            <li class="pb-item">
+                <a href="{{ path('admin_dashboard') }}">
+                    <i class="fas fa-home"></i>
+                </a>
+            </li>
+            <li class="pb-separator"><i class="fas fa-chevron-right"></i></li>
+            <li class="pb-item">
+                <a href="{{ path('admin_evenements') }}">Événements & Catégories</a>
+            </li>
+            <li class="pb-separator"><i class="fas fa-chevron-right"></i></li>
+            <li class="pb-item">
+                <a href="{{ path('app_event_cat_index') }}">Catégories</a>
+            </li>
+            <li class="pb-separator"><i class="fas fa-chevron-right"></i></li>
+            <li class="pb-item active" aria-current="page">Nouvelle</li>
+        </ol>
+    </nav>
 {% endblock %}
 
 {% block header_actions %}
@@ -52,6 +62,12 @@
         .admin-btn-primary:hover {
             background-color: #be185d;
             border-color: #be185d;
+        }
+
+        .pb-separator {
+            margin: 0 0.8rem;
+            color: #d1d5db;
+            font-size: 0.7rem;
         }
     </style>
 {% endblock %}

@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -57,6 +58,44 @@ final class EventCatController extends AbstractController
                 'Content-Disposition' => 'attachment; filename="categories-maternia.pdf"',
             ]
         );
+    }
+
+    #[Route('/csv', name: 'app_event_cat_csv', methods: ['GET'])]
+    public function csv(EventCatRepository $eventCatRepository): StreamedResponse
+    {
+        $eventCats = $eventCatRepository->findAll();
+
+        $response = new StreamedResponse(function () use ($eventCats) {
+            $handle = fopen('php://output', 'w');
+
+            // Add BOM for Excel compatibility
+            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            // Header
+            fputcsv($handle, ['ID', 'Nom', 'Description', 'Nombre d\'événements', 'Nombre de participants']);
+
+            foreach ($eventCats as $cat) {
+                $eventCount = count($cat->getEvents()); // Direct access if public or use getter
+                $participantCount = 0;
+                foreach ($cat->getEvents() as $event) {
+                    $participantCount += count($event->getAttendances());
+                }
+
+                fputcsv($handle, [
+                    $cat->getId(),
+                    $cat->getName(),
+                    $cat->getDescription(),
+                    count($cat->getEvents()),
+                    $participantCount
+                ]);
+            }
+            fclose($handle);
+        });
+
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="categories-maternia.csv"');
+
+        return $response;
     }
 
     #[Route('/new', name: 'app_event_cat_new', methods: ['GET', 'POST'])]

@@ -2,35 +2,23 @@
 
 namespace App\Entity;
 
-use App\Repository\EventCatRepository;
+use App\Repository\RequirementRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: EventCatRepository::class)]
-class EventCat
+#[ORM\Entity(repositoryClass: RequirementRepository::class)]
+class Requirement
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "Le nom est obligatoire")]
-    #[Assert\Length(min: 4, minMessage: "Le nom doit faire au moins {{ limit }} caractères")]
     private ?string $name = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Assert\Length(min: 10, minMessage: "La description doit faire au moins {{ limit }} caractères")]
-    private ?string $description = null;
-
-    /**
-     * @var Collection<int, Event>
-     */
-    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'eventCat')]
+    #[ORM\ManyToMany(targetEntity: Event::class, mappedBy: 'requirements')]
     private Collection $events;
 
     public function __construct()
@@ -55,18 +43,6 @@ class EventCat
         return $this;
     }
 
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): static
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Event>
      */
@@ -79,7 +55,7 @@ class EventCat
     {
         if (!$this->events->contains($event)) {
             $this->events->add($event);
-            $event->setEventCat($this);
+            $event->addRequirement($this);
         }
 
         return $this;
@@ -88,9 +64,7 @@ class EventCat
     public function removeEvent(Event $event): static
     {
         if ($this->events->removeElement($event)) {
-            if ($event->getEventCat() === $this) {
-                $event->setEventCat(null);
-            }
+            $event->removeRequirement($this);
         }
 
         return $this;

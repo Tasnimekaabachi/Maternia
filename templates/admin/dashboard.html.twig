@@ -43,6 +43,11 @@
         </div>
 
         <div class="admin-stat">
+            <div class="admin-stat-value">{{ eventCatCount|default(0) }}</div>
+            <div class="admin-stat-label">Catégories d'événements</div>
+        </div>
+
+        <div class="admin-stat">
             <div class="admin-stat-value">
                 {{ (nbCommandesAttente|default(0))
                  + (nbCommandesValidees|default(0))
@@ -399,6 +404,7 @@
         .bg-info-light { background-color: #e0f2fe; color: #0369a1; }
         .bg-warning-light { background-color: #fef3c7; color: #92400e; }
         .bg-success-light { background-color: #dcfce7; color: #15803d; }
+        .bg-primary-light { background-color: #cfe2ff; color: #084298; }
         .bg-secondary-light { background-color: #f3f4f6; color: #374151; }
         .bg-indigo-light { background-color: #e0e7ff; color: #4338ca; }
 

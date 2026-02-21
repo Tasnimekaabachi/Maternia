@@ -4,15 +4,25 @@
 {% block page_title %}Modifier un événement{% endblock %}
 
 {% block breadcrumb %}
-    <div class="admin-breadcrumb">
-        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
-        <span>/</span>
-        <a href="{{ path('admin_evenements') }}">Événements & Catégories</a>
-        <span>/</span>
-        <a href="{{ path('app_event_index') }}">Événements</a>
-        <span>/</span>
-        <span class="current">Modifier</span>
-    </div>
+    <nav aria-label="breadcrumb" class="premium-breadcrumb-wrapper">
+        <ol class="premium-breadcrumb">
+            <li class="pb-item">
+                <a href="{{ path('admin_dashboard') }}">
+                    <i class="fas fa-home"></i>
+                </a>
+            </li>
+            <li class="pb-separator"><i class="fas fa-chevron-right"></i></li>
+            <li class="pb-item">
+                <a href="{{ path('admin_evenements') }}">Événements & Catégories</a>
+            </li>
+            <li class="pb-separator"><i class="fas fa-chevron-right"></i></li>
+            <li class="pb-item">
+                <a href="{{ path('app_event_index') }}">Événements</a>
+            </li>
+            <li class="pb-separator"><i class="fas fa-chevron-right"></i></li>
+            <li class="pb-item active" aria-current="page">Modifier</li>
+        </ol>
+    </nav>
 {% endblock %}
 
 {% block header_actions %}
@@ -50,31 +60,29 @@
 
     <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-danger" id="deleteModalLabel">
-                        <i class="fas fa-exclamation-triangle me-2"></i>Confirmer la suppression
-                    </h5>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content premium-modal">
+                <div class="modal-header border-0 pb-0">
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                 </div>
-                <div class="modal-body">
-                    <p>Êtes-vous sûr de vouloir supprimer cet événement ?</p>
-                    <div class="p-3 bg-light rounded border mb-3">
-                        <span class="fw-bold">{{ event.title }}</span>
+                <div class="modal-body text-center pb-4 pt-2">
+                    <div class="modal-icon-wrapper mb-3">
+                        <i class="fas fa-exclamation-triangle text-danger"></i>
                     </div>
-                    <p class="text-danger small mb-0">
-                        <i class="fas fa-info-circle me-1"></i>Cette action ne peut pas être annulée.
+                    <h4 class="modal-title fw-bold mb-2">Supprimer l'événement ?</h4>
+                    <p class="text-muted mb-4">
+                        Êtes-vous sûr de vouloir supprimer <span class="fw-bold text-dark">{{ event.title }}</span> ?<br>
+                        <span class="small text-danger">Cette action est irréversible.</span>
                     </p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <form method="post" action="{{ path('app_event_delete', {'id': event.id}) }}" class="d-inline">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
-                        <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-trash-alt me-1"></i> Oui, supprimer
-                        </button>
-                    </form>
+                    <div class="d-flex justify-content-center gap-3">
+                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Annuler</button>
+                        <form method="post" action="{{ path('admin_event_delete', {'id': event.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
+                            <button type="submit" class="btn btn-danger rounded-pill px-4 shadow-sm">
+                                <i class="fas fa-trash-alt me-2"></i>Supprimer
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -89,6 +97,27 @@
         .admin-btn-primary:hover {
             background-color: #be185d;
             border-color: #be185d;
+        }
+        
+        /* PREMIUM MODAL */
+        .premium-modal {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.1);
+        }
+        .modal-icon-wrapper {
+            width: 80px; height: 80px;
+            background: #fee2e2;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto;
+            font-size: 2.5rem;
+            animation: bounce-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes bounce-in {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
         }
     </style>
 {% endblock %}

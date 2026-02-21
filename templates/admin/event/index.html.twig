@@ -4,74 +4,188 @@
 {% block page_title %}Gestion des Événements{% endblock %}
 
 {% block breadcrumb %}
-    <div class="admin-breadcrumb">
-        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
-        <span>/</span>
-        <a href="{{ path('admin_evenements') }}">Événements & Catégories</a>
-        <span>/</span>
-        <span class="current">Événements</span>
-    </div>
+    <nav aria-label="breadcrumb" class="premium-breadcrumb-wrapper">
+        <ol class="premium-breadcrumb">
+            <li class="pb-item">
+                <a href="{{ path('admin_dashboard') }}">
+                    <i class="fas fa-home"></i>
+                </a>
+            </li>
+            <li class="pb-separator"><i class="fas fa-chevron-right"></i></li>
+            <li class="pb-item">
+                <a href="{{ path('admin_evenements') }}">Événements & Catégories</a>
+            </li>
+            <li class="pb-separator"><i class="fas fa-chevron-right"></i></li>
+            <li class="pb-item active" aria-current="page">Événements</li>
+        </ol>
+    </nav>
 {% endblock %}
 
 {% block header_actions %}
     <div class="d-flex gap-2">
-        <a href="{{ path('app_event_pdf') }}" class="btn btn-outline-primary pdf-btn">
+        <a href="{{ path('app_event_pdf') }}" class="btn btn-outline-primary ei-btn-outline rounded-pill px-4 shadow-sm">
             <i class="fas fa-file-pdf me-1"></i> PDF
         </a>
-        <a href="{{ path('app_event_new') }}" class="btn btn-primary admin-btn-primary">
+        <a href="{{ path('app_event_csv') }}" class="btn btn-outline-primary ei-btn-outline rounded-pill px-4 shadow-sm">
+            <i class="fas fa-file-csv me-1"></i> CSV
+        </a>
+        <a href="{{ path('app_event_new') }}" class="btn ei-btn-create rounded-pill px-4 shadow-sm">
             <i class="fas fa-plus me-1"></i> Créer
         </a>
     </div>
 {% endblock %}
 
 {% block content %}
-    <div class="admin-card">
-        <div class="admin-card-header d-flex flex-wrap align-items-center justify-content-between p-4 border-bottom">
-            <h5 class="mb-0 fw-bold text-primary">
-                <i class="fas fa-calendar-alt me-2"></i>Liste des événements
-            </h5>
+    {# ── STAT CARDS ── #}
+    {% set totalEvents = events|length %}
+    {% set totalParticipants = 0 %}
+    {% set upcomingCount = 0 %}
+    {% set weeklyCount = 0 %}
+    {% for event in events %}
+        {% set totalParticipants = totalParticipants + event.attendances|length %}
+        {% if event.isWeekly %}
+            {% set weeklyCount = weeklyCount + 1 %}
+        {% elseif event.startAt and event.startAt > date() %}
+            {% set upcomingCount = upcomingCount + 1 %}
+        {% endif %}
+    {% endfor %}
+
+    <div class="ei-stats-grid">
+        <div class="ei-stat-card ei-stat-total">
+            <div class="ei-stat-icon"><i class="fas fa-calendar-alt"></i></div>
+            <div class="ei-stat-info">
+                <span class="ei-stat-value">{{ totalEvents }}</span>
+                <span class="ei-stat-label">Total événements</span>
+            </div>
+        </div>
+        <div class="ei-stat-card ei-stat-participants">
+            <div class="ei-stat-icon"><i class="fas fa-users"></i></div>
+            <div class="ei-stat-info">
+                <span class="ei-stat-value">{{ totalParticipants }}</span>
+                <span class="ei-stat-label">Participants</span>
+            </div>
+        </div>
+        <div class="ei-stat-card ei-stat-upcoming">
+            <div class="ei-stat-icon"><i class="fas fa-calendar-check"></i></div>
+            <div class="ei-stat-info">
+                <span class="ei-stat-value">{{ upcomingCount }}</span>
+                <span class="ei-stat-label">À venir</span>
+            </div>
+        </div>
+        <div class="ei-stat-card ei-stat-weekly">
+            <div class="ei-stat-icon"><i class="fas fa-redo"></i></div>
+            <div class="ei-stat-info">
+                <span class="ei-stat-value">{{ weeklyCount }}</span>
+                <span class="ei-stat-label">Hebdomadaires</span>
+            </div>
+        </div>
+    </div>
+
+    {# ── MAIN LIST CARD ── #}
+    <div class="ei-main-card">
+        {# Header with Search & Filters #}
+        <div class="ei-card-header">
+            <div class="ei-header-top">
+                <h5 class="ei-card-title">
+                    <div class="ei-title-icon"><i class="fas fa-calendar-alt"></i></div>
+                    Liste des événements
+                </h5>
+                <div class="d-flex gap-2 align-items-center">
+                    <button class="btn ei-btn-filter" type="button" data-bs-toggle="collapse" data-bs-target="#filterPane">
+                        <i class="fas fa-sliders-h me-1"></i> Filtres
+                        {% set filterCount = (currentCategoryId ? 1 : 0) + (currentStatus ? 1 : 0) + (currentOrganizer ? 1 : 0) %}
+                        {% if filterCount > 0 %}
+                            <span class="ei-filter-badge">{{ filterCount }}</span>
+                        {% endif %}
+                    </button>
+                    {% if searchTerm or currentCategoryId or currentStatus or currentOrganizer or sortBy != 'startAt' or sortOrder != 'DESC' %}
+                        <a href="{{ path('app_event_index') }}" class="btn ei-btn-reset" title="Réinitialiser">
+                            <i class="fas fa-sync-alt me-1"></i> Réinitialiser
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
             
-            {# SEARCH & FILTER #}
-            <form method="get" action="{{ path('app_event_index') }}" class="d-flex gap-2 align-items-center">
-                <div class="input-group">
-                    <span class="input-group-text bg-white text-muted border-end-0">
-                        <i class="fas fa-search"></i>
-                    </span>
+            <form method="get" action="{{ path('app_event_index') }}" id="filterForm">
+                <div class="ei-search-bar">
+                    <i class="fas fa-search ei-search-icon"></i>
                     <input type="text" 
                            name="search" 
-                           class="form-control border-start-0 ps-0" 
-                           placeholder="Rechercher..." 
+                           class="ei-search-input" 
+                           placeholder="Rechercher par titre, lieu..." 
                            value="{{ searchTerm|default('') }}">
+                    <button type="submit" class="btn ei-btn-search">Rechercher</button>
                 </div>
-                
-                {% if searchTerm or sortBy != 'startAt' or sortOrder != 'DESC' %}
-                    <a href="{{ path('app_event_index') }}" class="btn btn-outline-secondary" title="Réinitialiser">
-                        <i class="fas fa-sync-alt"></i>
-                    </a>
-                {% endif %}
+
+                <div class="collapse {{ currentCategoryId or currentStatus or currentOrganizer ? 'show' : '' }} mt-3" id="filterPane">
+                    <div class="ei-filter-panel">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="ei-filter-label">
+                                    <i class="fas fa-tags me-1"></i> Catégorie
+                                </label>
+                                <select name="category_id" class="form-select ei-filter-select" onchange="this.form.submit()">
+                                    <option value="">Toutes les catégories</option>
+                                    {% for cat in categories %}
+                                        <option value="{{ cat.id }}" {{ currentCategoryId == cat.id ? 'selected' : '' }}>{{ cat.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="ei-filter-label">
+                                    <i class="fas fa-flag me-1"></i> Statut
+                                </label>
+                                <select name="status" class="form-select ei-filter-select" onchange="this.form.submit()">
+                                    <option value="">Tous les statuts</option>
+                                    <option value="upcoming" {{ currentStatus == 'upcoming' ? 'selected' : '' }}>À venir</option>
+                                    <option value="ongoing" {{ currentStatus == 'ongoing' ? 'selected' : '' }}>En cours</option>
+                                    <option value="past" {{ currentStatus == 'past' ? 'selected' : '' }}>Terminés</option>
+                                    <option value="weekly" {{ currentStatus == 'weekly' ? 'selected' : '' }}>Hebdomadaires</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="ei-filter-label">
+                                    <i class="fas fa-user me-1"></i> Organisateur
+                                </label>
+                                <select name="organizer" class="form-select ei-filter-select" onchange="this.form.submit()">
+                                    <option value="">Tous les organisateurs</option>
+                                    <option value="admin" {{ currentOrganizer == 'admin' ? 'selected' : '' }}>Admin / Système</option>
+                                    <option value="user" {{ currentOrganizer == 'user' ? 'selected' : '' }}>Utilisateurs</option>
+                                </select>
+                            </div>
+                        </div>
+                        <input type="hidden" name="sort_by" value="{{ sortBy }}">
+                        <input type="hidden" name="sort_order" value="{{ sortOrder }}">
+                    </div>
+                </div>
             </form>
         </div>
 
-        <div class="admin-card-body p-0">
+        {# Event Table #}
+        <div class="ei-card-body">
             <div class="table-responsive">
-                <table class="table align-middle table-hover mb-0">
-                    <thead class="bg-light text-muted uppercase small">
+                <table class="ei-table">
+                    <thead>
                         <tr>
+                            {% set common_params = {
+                                search: searchTerm, 
+                                category_id: currentCategoryId, 
+                                status: currentStatus, 
+                                organizer: currentOrganizer
+                            } %}
                             <th class="ps-4">
-                                <a href="{{ path('app_event_index', {search: searchTerm, sort_by: 'title', sort_order: sortBy == 'title' and sortOrder == 'ASC' ? 'DESC' : 'ASC'}) }}" class="text-decoration-none text-muted">
+                                <a href="{{ path('app_event_index', common_params|merge({sort_by: 'title', sort_order: sortBy == 'title' and sortOrder == 'ASC' ? 'DESC' : 'ASC'})) }}" class="ei-th-link">
                                     TITRE {% if sortBy == 'title' %}<i class="fas fa-sort-{{ sortOrder == 'ASC' ? 'up' : 'down' }}"></i>{% endif %}
                                 </a>
                             </th>
                             <th>
-                                <a href="{{ path('app_event_index', {search: searchTerm, sort_by: 'startAt', sort_order: sortBy == 'startAt' and sortOrder == 'ASC' ? 'DESC' : 'ASC'}) }}" class="text-decoration-none text-muted">
+                                <a href="{{ path('app_event_index', common_params|merge({sort_by: 'startAt', sort_order: sortBy == 'startAt' and sortOrder == 'ASC' ? 'DESC' : 'ASC'})) }}" class="ei-th-link">
                                     DATE {% if sortBy == 'startAt' %}<i class="fas fa-sort-{{ sortOrder == 'ASC' ? 'up' : 'down' }}"></i>{% endif %}
                                 </a>
                             </th>
-                            <th>
-                                <a href="{{ path('app_event_index', {search: searchTerm, sort_by: 'location', sort_order: sortBy == 'location' and sortOrder == 'ASC' ? 'DESC' : 'ASC'}) }}" class="text-decoration-none text-muted">
-                                    LIEU {% if sortBy == 'location' %}<i class="fas fa-sort-{{ sortOrder == 'ASC' ? 'up' : 'down' }}"></i>{% endif %}
-                                </a>
-                            </th>
+                            <th>STATUT</th>
+                            <th>INSCRIPTIONS</th>
+                            <th>ORGANISATEUR</th>
                             <th>CATÉGORIE</th>
                             <th class="text-end pe-4">ACTIONS</th>
                         </tr>
@@ -79,56 +193,106 @@
                     <tbody>
                         {% if events|length == 0 %}
                             <tr>
-                                <td colspan="5" class="text-center py-5 text-muted">
-                                    <i class="fas fa-inbox fa-3x mb-3 text-light"></i>
-                                    <p class="mb-0">Aucun événement trouvé.</p>
+                                <td colspan="7">
+                                    <div class="ei-empty-state">
+                                        <div class="ei-empty-icon"><i class="fas fa-calendar-times"></i></div>
+                                        <p class="ei-empty-text">Aucun événement trouvé.</p>
+                                        <a href="{{ path('app_event_new') }}" class="btn ei-btn-create rounded-pill px-4 mt-2">
+                                            <i class="fas fa-plus me-1"></i> Créer un événement
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         {% else %}
                             {% for event in events %}
-                                <tr>
+                                <tr class="ei-row">
+                                    {# TITLE + LOCATION #}
                                     <td class="ps-4">
-                                        <div class="d-flex align-items-center">
-                                            <div>
-                                                <h6 class="mb-0 fw-semibold">{{ event.title }}</h6>
-                                                <small class="text-muted d-block text-truncate" style="max-width: 200px;">
-                                                    {{ event.description|slice(0, 50) }}...
-                                                </small>
-                                            </div>
+                                        <div class="ei-event-info">
+                                            <h6 class="ei-event-title">{{ event.title }}</h6>
+                                            <span class="ei-event-location">
+                                                <i class="fas fa-map-marker-alt"></i> {{ event.location }}
+                                            </span>
                                         </div>
                                     </td>
+
+                                    {# DATE #}
                                     <td>
-                                        <div class="d-flex flex-column">
-                                            <span class="fw-medium text-dark">
-                                                {{ event.startAt ? event.startAt|date('d M Y') : '—' }}
-                                            </span>
-                                            <small class="text-muted">
-                                                {{ event.startAt ? event.startAt|date('H:i') : '' }} 
-                                                <i class="fas fa-arrow-right mx-1 text-xs"></i> 
-                                                {{ event.endAt ? event.endAt|date('H:i') : '' }}
-                                            </small>
+                                        <div class="ei-date-cell">
+                                            {% if event.isWeekly %}
+                                                <span class="ei-date-main ei-date-weekly">
+                                                    <i class="fas fa-redo me-1"></i>
+                                                    {{ event.dayOfWeek|replace({'Monday': 'Lun', 'Tuesday': 'Mar', 'Wednesday': 'Mer', 'Thursday': 'Jeu', 'Friday': 'Ven', 'Saturday': 'Sam', 'Sunday': 'Dim'}) }}
+                                                </span>
+                                                <span class="ei-date-time">{{ event.startTime ? event.startTime|date('H:i') : '' }}</span>
+                                            {% else %}
+                                                <span class="ei-date-main">{{ event.startAt ? event.startAt|date('d/m/Y') : '—' }}</span>
+                                                <span class="ei-date-time">{{ event.startAt ? event.startAt|date('H:i') : '' }}</span>
+                                            {% endif %}
                                         </div>
                                     </td>
+
+                                    {# STATUS #}
                                     <td>
-                                        <span class="text-truncate d-inline-block" style="max-width: 150px;" title="{{ event.location }}">
-                                            <i class="fas fa-map-marker-alt text-danger me-1 small"></i>{{ event.location }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        {% if event.eventCat %}
-                                            <span class="badge bg-white text-primary border border-primary px-3 py-2 rounded-pill">
-                                                {{ event.eventCat.name }}
-                                            </span>
-                                        {% else %}
-                                            <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill">—</span>
+                                        {% if not event.isWeekly and event.endAt and event.endAt < date() %}
+                                            <span class="ei-badge ei-badge-ended"><i class="fas fa-check-double me-1"></i> Terminé</span>
+                                        {% elseif not event.isWeekly and event.startAt and event.startAt <= date() and event.endAt >= date() %}
+                                            <span class="ei-badge ei-badge-ongoing"><i class="fas fa-play me-1"></i> En cours</span>
+                                        {% elseif not event.isWeekly and event.startAt and event.startAt > date() %}
+                                            <span class="ei-badge ei-badge-upcoming"><i class="fas fa-calendar-check me-1"></i> À venir</span>
+                                        {% elseif event.isWeekly %}
+                                            <span class="ei-badge ei-badge-weekly"><i class="fas fa-redo me-1"></i> Hebdo</span>
                                         {% endif %}
                                     </td>
+
+                                    {# REGISTRATIONS #}
+                                    <td>
+                                        {% set percent = event.capacity ? (event.attendances|length / event.capacity * 100)|round : 0 %}
+                                        <div class="ei-registration-cell">
+                                            <div class="ei-progress-track">
+                                                <div class="ei-progress-fill {% if percent >= 100 %}fill-danger{% elseif percent >= 80 %}fill-warning{% else %}fill-success{% endif %}" 
+                                                     style="width: {{ percent > 100 ? 100 : percent }}%"></div>
+                                            </div>
+                                            <span class="ei-registration-count {% if percent >= 100 %}text-danger fw-bold{% endif %}">
+                                                {{ event.attendances|length }}/{{ event.capacity|default('∞') }}
+                                            </span>
+                                        </div>
+                                    </td>
+
+                                    {# ORGANIZER #}
+                                    <td>
+                                        {% if event.creator %}
+                                            <div class="ei-organizer">
+                                                <div class="ei-avatar">
+                                                    {{ event.creator.prenom|first|upper }}{{ event.creator.nom|first|upper }}
+                                                </div>
+                                                <span class="ei-organizer-name">{{ event.creator.prenom }} {{ event.creator.nom }}</span>
+                                            </div>
+                                        {% else %}
+                                            <span class="ei-system-badge">
+                                                <i class="fas fa-shield-alt me-1"></i> Admin
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                    {# CATEGORY #}
+                                    <td>
+                                        {% if event.eventCat %}
+                                            <span class="ei-category-badge">
+                                                <i class="fas fa-tag me-1"></i> {{ event.eventCat.name }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted small">—</span>
+                                        {% endif %}
+                                    </td>
+
+                                    {# ACTIONS #}
                                     <td class="text-end pe-4">
-                                        <div class="btn-group">
-                                            <a href="{{ path('app_event_show', {id: event.id}) }}" class="btn btn-sm btn-light text-primary" title="Voir">
+                                        <div class="ei-actions">
+                                            <a href="{{ path('app_event_show', {id: event.id}) }}" class="ei-action-btn ei-action-view" title="Voir">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="{{ path('app_event_edit', {id: event.id}) }}" class="btn btn-sm btn-light text-warning" title="Modifier">
+                                            <a href="{{ path('admin_event_edit', {id: event.id}) }}" class="ei-action-btn ei-action-edit" title="Modifier">
                                                 <i class="fas fa-pen"></i>
                                             </a>
                                         </div>
@@ -140,14 +304,14 @@
                 </table>
             </div>
             
-            {# PAGINATION (Placeholder style) #}
-            <div class="d-flex justify-content-between align-items-center p-4 border-top">
-                <small class="text-muted">Affichage de {{ events|length }} événement(s)</small>
+            {# PAGINATION #}
+            <div class="ei-pagination">
+                <small class="ei-pagination-info">Affichage de {{ events|length }} événement(s)</small>
                 <nav aria-label="Page navigation">
                     <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item disabled"><a class="page-link" href="#">Précédent</a></li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item disabled"><a class="page-link" href="#">Suivant</a></li>
+                        <li class="page-item disabled"><a class="page-link ei-page-link" href="#">Précédent</a></li>
+                        <li class="page-item active"><a class="page-link ei-page-link" href="#">1</a></li>
+                        <li class="page-item disabled"><a class="page-link ei-page-link" href="#">Suivant</a></li>
                     </ul>
                 </nav>
             </div>
@@ -155,38 +319,634 @@
     </div>
 
     <style>
-        .pdf-btn {
-            color: #0d6efd;
-            border-color: #0d6efd;
+        /* ===== MATERNIA PREMIUM EVENT INDEX ===== */
+        :root {
+            --ei-pink: #ec4899;
+            --ei-pink-light: #fce7f3;
+            --ei-pink-dark: #be185d;
+            --ei-blue: #4a7ba7;
+            --ei-green: #10b981;
+            --ei-green-light: #d1fae5;
+            --ei-orange: #f59e0b;
+            --ei-orange-light: #fef3c7;
+            --ei-red: #ef4444;
+            --ei-red-light: #fee2e2;
+            --ei-indigo: #6366f1;
+            --ei-indigo-light: #e0e7ff;
         }
-        .pdf-btn:hover {
-            background-color: #0d6efd;
+
+        /* ── STAT CARDS ── */
+        .ei-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .ei-stat-card {
+            position: relative;
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            border: 1px solid #f3f4f6;
+            box-shadow: 0 4px 20px -5px rgba(0,0,0,0.06);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+
+        .ei-stat-card::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 3px;
+            border-radius: 0 0 16px 16px;
+            transition: height 0.3s ease;
+        }
+
+        .ei-stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px -8px rgba(0,0,0,0.12);
+        }
+
+        .ei-stat-card:hover::before { height: 4px; }
+
+        .ei-stat-total::before { background: var(--ei-pink); }
+        .ei-stat-participants::before { background: var(--ei-blue); }
+        .ei-stat-upcoming::before { background: var(--ei-green); }
+        .ei-stat-weekly::before { background: var(--ei-indigo); }
+
+        .ei-stat-icon {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .ei-stat-total .ei-stat-icon { background: var(--ei-pink-light); color: var(--ei-pink); }
+        .ei-stat-participants .ei-stat-icon { background: rgba(74, 123, 167, 0.12); color: var(--ei-blue); }
+        .ei-stat-upcoming .ei-stat-icon { background: var(--ei-green-light); color: var(--ei-green); }
+        .ei-stat-weekly .ei-stat-icon { background: var(--ei-indigo-light); color: var(--ei-indigo); }
+
+        .ei-stat-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ei-stat-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            line-height: 1.2;
+            color: #1f2937;
+        }
+
+        .ei-stat-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── MAIN CARD ── */
+        .ei-main-card {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #f3f4f6;
+            box-shadow: 0 4px 25px -5px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+
+        .ei-card-header {
+            padding: 1.5rem 1.75rem;
+            border-bottom: 1px solid #f3f4f6;
+            background: linear-gradient(180deg, #ffffff 0%, #fefefe 100%);
+        }
+
+        .ei-header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+        }
+
+        .ei-card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .ei-title-icon {
+            width: 38px; height: 38px;
+            background: var(--ei-pink-light);
+            color: var(--ei-pink);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        /* ── SEARCH BAR ── */
+        .ei-search-bar {
+            display: flex;
+            align-items: center;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 0.25rem 0.25rem 0.25rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .ei-search-bar:focus-within {
+            border-color: var(--ei-pink);
+            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+            background: white;
+        }
+
+        .ei-search-icon {
+            color: #9ca3af;
+            margin-right: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .ei-search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 0.9rem;
+            color: #374151;
+            padding: 0.5rem 0;
+        }
+
+        .ei-search-input::placeholder { color: #d1d5db; }
+
+        .ei-btn-search {
+            background: var(--ei-pink);
             color: white;
-            border-color: #0d6efd;
+            border: none;
+            border-radius: 10px;
+            padding: 0.5rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
         }
-        .admin-btn-primary {
-            background-color: #ec4899;
-            border-color: #ec4899;
+
+        .ei-btn-search:hover {
+            background: var(--ei-pink-dark);
             color: white;
+            transform: translateY(-1px);
         }
-        .admin-btn-primary:hover {
-            background-color: #be185d;
-            border-color: #be185d;
+
+        /* ── BUTTONS ── */
+        .ei-btn-filter {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #6b7280;
+            transition: all 0.2s ease;
         }
-        .admin-btn-secondary {
-            border-color: #ec4899;
-            color: #ec4899;
+
+        .ei-btn-filter:hover {
+            border-color: var(--ei-pink);
+            color: var(--ei-pink);
+            background: var(--ei-pink-light);
         }
-        .admin-btn-secondary:hover {
-            background-color: #fce7f3;
-            color: #be185d;
-            border-color: #be185d;
+
+        .ei-filter-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px; height: 20px;
+            background: var(--ei-pink);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-left: 0.5rem;
         }
-        .table-hover tbody tr:hover {
-            background-color: #fdf2f8; /* Very light pink hover */
+
+        .ei-btn-reset {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #9ca3af;
+            transition: all 0.2s ease;
         }
-        .text-xs {
+
+        .ei-btn-reset:hover {
+            border-color: #ef4444;
+            color: #ef4444;
+            background: #fee2e2;
+        }
+
+        .ei-btn-outline {
+            border: 2px solid var(--ei-pink);
+            color: var(--ei-pink);
+            background: transparent;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .ei-btn-outline:hover {
+            background: var(--ei-pink-light);
+            color: var(--ei-pink-dark);
+        }
+
+        .ei-btn-create {
+            background: linear-gradient(135deg, var(--ei-pink) 0%, var(--ei-pink-dark) 100%);
+            color: white;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .ei-btn-create:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -5px rgba(236, 72, 153, 0.4);
+        }
+
+        /* ── FILTER PANEL ── */
+        .ei-filter-panel {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .ei-filter-label {
             font-size: 0.75rem;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .ei-filter-select {
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            font-size: 0.875rem;
+            padding: 0.5rem 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .ei-filter-select:focus {
+            border-color: var(--ei-pink);
+            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+        }
+
+        /* ── TABLE ── */
+        .ei-card-body { padding: 0; }
+
+        .ei-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .ei-table thead tr {
+            background: #f9fafb;
+        }
+
+        .ei-table th {
+            padding: 0.85rem 1rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .ei-th-link {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .ei-th-link:hover { color: var(--ei-pink); }
+        .ei-th-link i { margin-left: 4px; font-size: 0.65rem; }
+
+        .ei-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f9fafb;
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
+
+        .ei-row {
+            transition: all 0.2s ease;
+        }
+
+        .ei-row:hover {
+            background: linear-gradient(90deg, var(--ei-pink-light) 0%, transparent 100%);
+        }
+
+        .ei-row:hover .ei-event-title {
+            color: var(--ei-pink);
+        }
+
+        /* ── EVENT INFO ── */
+        .ei-event-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ei-event-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.2rem;
+            transition: color 0.2s;
+        }
+
+        .ei-event-location {
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        .ei-event-location i {
+            color: #ef4444;
+            font-size: 0.65rem;
+            margin-right: 2px;
+        }
+
+        /* ── DATE CELL ── */
+        .ei-date-cell {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ei-date-main {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.85rem;
+        }
+
+        .ei-date-weekly {
+            color: var(--ei-indigo);
+        }
+
+        .ei-date-time {
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        /* ── STATUS BADGES ── */
+        .ei-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .ei-badge-ended {
+            background: var(--ei-red-light);
+            color: var(--ei-red);
+            border: 1px solid #fecaca;
+        }
+
+        .ei-badge-ongoing {
+            background: var(--ei-orange-light);
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+
+        .ei-badge-upcoming {
+            background: var(--ei-green-light);
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .ei-badge-weekly {
+            background: var(--ei-indigo-light);
+            color: var(--ei-indigo);
+            border: 1px solid #c7d2fe;
+        }
+
+        /* ── REGISTRATION / PROGRESS ── */
+        .ei-registration-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .ei-progress-track {
+            width: 60px;
+            height: 6px;
+            background: #f3f4f6;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .ei-progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .fill-success { background: linear-gradient(90deg, #34d399, var(--ei-green)); }
+        .fill-warning { background: linear-gradient(90deg, #fbbf24, var(--ei-orange)); }
+        .fill-danger { background: linear-gradient(90deg, #f87171, var(--ei-red)); }
+
+        .ei-registration-count {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #6b7280;
+        }
+
+        /* ── ORGANIZER ── */
+        .ei-organizer {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ei-avatar {
+            width: 28px; height: 28px;
+            background: linear-gradient(135deg, var(--ei-pink) 0%, var(--ei-pink-dark) 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.6rem;
+            box-shadow: 0 3px 8px rgba(236, 72, 153, 0.3);
+        }
+
+        .ei-organizer-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .ei-system-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 10px;
+            background: #f3f4f6;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        /* ── CATEGORY BADGE ── */
+        .ei-category-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            background: white;
+            border: 1px solid rgba(74, 123, 167, 0.3);
+            color: var(--ei-blue);
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .ei-category-badge:hover {
+            background: rgba(74, 123, 167, 0.08);
+            border-color: var(--ei-blue);
+        }
+
+        /* ── ACTION BUTTONS ── */
+        .ei-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+
+        .ei-action-btn {
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .ei-action-view {
+            background: #eff6ff;
+            color: #3b82f6;
+            border: 1px solid #dbeafe;
+        }
+
+        .ei-action-view:hover {
+            background: #3b82f6;
+            color: white;
+            transform: scale(1.15);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .ei-action-edit {
+            background: var(--ei-orange-light);
+            color: var(--ei-orange);
+            border: 1px solid #fde68a;
+        }
+
+        .ei-action-edit:hover {
+            background: var(--ei-orange);
+            color: white;
+            transform: scale(1.15);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        /* ── EMPTY STATE ── */
+        .ei-empty-state {
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .ei-empty-icon {
+            width: 80px; height: 80px;
+            background: #f9fafb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.25rem;
+            font-size: 2rem;
+            color: #d1d5db;
+            border: 2px dashed #e5e7eb;
+        }
+
+        .ei-empty-text {
+            color: #9ca3af;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0;
+        }
+
+        /* ── PAGINATION ── */
+        .ei-pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.75rem;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .ei-pagination-info {
+            color: #9ca3af;
+            font-weight: 600;
+        }
+
+        .ei-page-link {
+            border-radius: 8px !important;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .page-item.active .ei-page-link {
+            background: var(--ei-pink);
+            border-color: var(--ei-pink);
+        }
+
+        /* ── ANIMATIONS ── */
+        .ei-stat-card, .ei-main-card {
+            animation: eiFadeIn 0.4s ease-out;
+        }
+
+        @keyframes eiFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ei-stat-card:nth-child(2) { animation-delay: 0.05s; }
+        .ei-stat-card:nth-child(3) { animation-delay: 0.1s; }
+        .ei-stat-card:nth-child(4) { animation-delay: 0.15s; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            .ei-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+            .ei-header-top { flex-direction: column; gap: 0.75rem; align-items: flex-start; }
+            .ei-stat-card { padding: 1rem; }
+            .ei-stat-value { font-size: 1.25rem; }
         }
     </style>
 {% endblock %}

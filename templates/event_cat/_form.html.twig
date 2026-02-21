@@ -2,31 +2,44 @@
 
 {{ form_start(form, {'attr': {'id': 'event_cat_form', 'novalidate': 'novalidate'}}) }}
 
-<div class="form-section">
+<div class="form-section mb-4">
     <h6 class="form-section-title">
-        <i class="fas fa-tag text-primary me-2"></i>Informations de la catégorie
+        <i class="fas fa-tag"></i>Informations de la catégorie
     </h6>
     
     {% if form.name is defined %}
-        <div class="mb-3">
-            {{ form_label(form.name, 'Nom de la catégorie', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
-            {{ form_widget(form.name, {'attr': {'class': 'form-control', 'placeholder': 'Ex: Ateliers Prénatals'}}) }}
+        <div class="mb-4">
+            {{ form_label(form.name, 'Nom de la catégorie', {'label_attr': {'class': 'form-label'}}) }}
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-id-card"></i>
+                </span>
+                {{ form_widget(form.name, {'attr': {'class': 'form-control', 'placeholder': 'Ex: Ateliers Prénatals'}}) }}
+            </div>
             {{ form_errors(form.name) }}
         </div>
     {% endif %}
 
     {% if form.description is defined %}
-        <div class="mb-3">
-            {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+        <div class="mb-4">
+            {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
             {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 4, 'placeholder': 'Décrivez cette catégorie...'}}) }}
             {{ form_errors(form.description) }}
+            <div class="form-text mt-2">
+                <i class="fas fa-align-left me-1"></i>Informations générales sur le type d'événements.
+            </div>
         </div>
     {% endif %}
 
     {% if form.events is defined %}
-        <div class="mb-3">
-            {{ form_label(form.events, 'Événements liés', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
-            {{ form_widget(form.events, {'attr': {'class': 'form-control'}}) }}
+        <div class="mb-0">
+            {{ form_label(form.events, 'Événements liés', {'label_attr': {'class': 'form-label'}}) }}
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-calendar-alt"></i>
+                </span>
+                {{ form_widget(form.events, {'attr': {'class': 'form-control'}}) }}
+            </div>
             {{ form_errors(form.events) }}
         </div>
     {% endif %}
@@ -35,32 +48,114 @@
 {{ form_end(form) }}
 
 <style>
-    /* Form Section styling matching events form */
-    .form-section {
-        background: #fff;
-        padding: 1.5rem;
-        border-radius: 8px;
-        border: 1px solid #e5e7eb;
-    }
-    
-    .form-section-title {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #1f2937;
-        margin-bottom: 1.25rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 2px solid #fce7f3;
+    /* PINK THEME VARIABLES */
+    :root {
+        --primary-pink: #ec4899;
+        --light-pink: #fce7f3;
+        --medium-pink: #fbcfe8;
+        --dark-pink: #be185d;
+        --text-dark: #1f2937;
+        --text-muted: #6b7280;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
 
-    .form-label {
-        color: #374151;
-        margin-bottom: 0.5rem;
+    /* PREMIUM FORM SECTIONS */
+    .form-section {
+        background: white;
+        border: 2px solid var(--light-pink);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
     }
-    
-    .form-control:focus,
-    .form-select:focus {
-        border-color: #ec4899;
-        box-shadow: 0 0 0 0.2rem rgba(236, 72, 153, 0.15);
+
+    .form-section:hover {
+        box-shadow: var(--shadow-md);
+        border-color: var(--medium-pink);
+    }
+
+    .form-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary-pink), var(--dark-pink));
+    }
+
+    .form-section-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--light-pink);
+        color: var(--dark-pink) !important;
+        font-size: 1.25rem;
+        font-weight: 600;
+        text-transform: none;
+    }
+
+    .form-section-title i {
+        background: linear-gradient(135deg, var(--primary-pink), var(--dark-pink));
+        color: white !important;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        box-shadow: 0 4px 8px rgba(236, 72, 153, 0.2);
+    }
+
+    /* POLISHED FORM CONTROLS */
+    .form-label {
+        color: var(--text-dark);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: block;
+        font-size: 0.95rem;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid var(--medium-pink);
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+        color: var(--text-dark);
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-pink);
+        box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.15);
+        outline: none;
+    }
+
+    .input-group-text {
+        border: 2px solid var(--medium-pink);
+        background-color: var(--light-pink);
+        color: var(--primary-pink);
+        border-right: none;
+        border-radius: 10px 0 0 10px;
+        padding: 0 1rem;
+    }
+
+    .input-group > .form-control {
+        border-left: none;
+        border-radius: 0 10px 10px 0;
+    }
+
+    .input-group:focus-within .input-group-text {
+        border-color: var(--primary-pink);
+        background-color: var(--medium-pink);
     }
 
     /* Remove default Bootstrap validation icons to prevent glitches */

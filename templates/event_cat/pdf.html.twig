@@ -2,87 +2,257 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Liste des Catégories</title>
+    <title>Maternia - Rapport des Catégories</title>
     <style>
+        @page { margin: 0; }
         body {
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-            color: #333;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #ec4899;
-            padding-bottom: 10px;
-        }
-        .header h1 {
-            color: #ec4899;
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 10pt;
+            color: #334155;
+            line-height: 1.4;
             margin: 0;
+            padding: 40px;
+            background: #ffffff;
         }
-        .date {
+
+        /* HEADER */
+        .header {
+            width: 100%;
+            border-bottom: 2px solid #ec4899;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24pt;
+            font-weight: bold;
+            color: #ec4899;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            font-size: 10pt;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+        .meta-info {
+            float: right;
             text-align: right;
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 15px;
+            font-size: 9pt;
+            color: #94a3b8;
+            margin-top: -35px;
         }
+
+        /* STATS CARDS */
+        .stats-container {
+            width: 100%;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        .stat-card {
+            float: left;
+            width: 23%;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-right: 2%;
+            box-sizing: border-box;
+        }
+        .stat-card:last-child { margin-right: 0; }
+        .stat-value {
+            font-size: 18pt;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 8pt;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* TABLE */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
+            margin-bottom: 40px;
         }
         th {
-            background-color: #fce7f3; /* Light Pink */
-            color: #be185d; /* Dark Pink */
+            background-color: #f1f5f9;
+            color: #475569;
             font-weight: bold;
+            text-transform: uppercase;
+            font-size: 8pt;
+            letter-spacing: 1px;
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 2px solid #cbd5e1;
         }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
         }
+        tr:nth-child(even) { background-color: #f8fafc; }
+
+        .cat-name {
+            font-weight: bold;
+            color: #0f172a;
+            font-size: 11pt;
+            margin-bottom: 4px;
+        }
+        .cat-desc {
+            font-size: 9pt;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        /* BADGES */
         .badge {
             display: inline-block;
-            padding: 3px 6px;
+            padding: 4px 8px;
             border-radius: 4px;
-            font-size: 12px;
-            background-color: #ec4899;
-            color: white;
+            font-size: 8pt;
+            font-weight: bold;
         }
+        .badge-count {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
+        .badge-participants {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        
+        .event-list {
+            margin-top: 5px;
+            font-size: 9pt;
+        }
+        .event-item {
+            margin-bottom: 4px;
+            padding-left: 10px;
+            border-left: 2px solid #ec4899;
+        }
+
+        /* FOOTER */
+        .footer {
+            position: fixed;
+            bottom: -40px;
+            left: 0;
+            right: 0;
+            height: 40px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 10px;
+            font-size: 8pt;
+            color: #94a3b8;
+            text-align: center;
+        }
+        .page-number:after { content: counter(page); }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Maternia - Liste des Catégories d'Événements</h1>
+        <div class="logo">MATERNIA</div>
+        <div class="subtitle">Rapport des Catégories d'Événements</div>
+        <div class="meta-info">
+            Généré le {{ "now"|date("d/m/Y") }} à {{ "now"|date("H:i") }}<br>
+            Export confidentiel
+        </div>
     </div>
 
-    <div class="date">
-        Généré le {{ "now"|date("d/m/Y à H:i") }}
+    <!-- Stats Calculation -->
+    {% set totalEventsAll = 0 %}
+    {% set totalParticipantsAll = 0 %}
+    {% set emptyCats = 0 %}
+    {% for cat in event_cats %}
+        {% set totalEventsAll = totalEventsAll + cat.events|length %}
+        {% if cat.events|length == 0 %}
+            {% set emptyCats = emptyCats + 1 %}
+        {% endif %}
+        {% for event in cat.events %}
+            {% set totalParticipantsAll = totalParticipantsAll + event.attendances|length %}
+        {% endfor %}
+    {% endfor %}
+
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-value">{{ event_cats|length }}</div>
+            <div class="stat-label">Catégories</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ totalEventsAll }}</div>
+            <div class="stat-label">Événements</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ totalParticipantsAll }}</div>
+            <div class="stat-label">Participants</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ emptyCats }}</div>
+            <div class="stat-label">Vides</div>
+        </div>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th>Nom</th>
-                <th>Description</th>
-                <th style="text-align: center;">Événements</th>
+                <th width="35%">Catégorie</th>
+                <th width="15%" style="text-align: center;">Métriques</th>
+                <th width="50%">Aperçu des Événements Récents</th>
             </tr>
         </thead>
         <tbody>
-            {% for category in event_cats %}
+            {% for cat in event_cats %}
                 <tr>
-                    <td><strong>{{ category.name }}</strong></td>
-                    <td>{{ category.description ? category.description : '—' }}</td>
-                    <td style="text-align: center;">{{ category.events|length }}</td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="3" style="text-align: center;">Aucune catégorie trouvée</td>
+                    <td>
+                        <div class="cat-name">{{ cat.name }}</div>
+                        <div class="cat-desc">{{ cat.description|default('Aucune description') }}</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <div style="margin-bottom: 5px;">
+                            <span class="badge badge-count">{{ cat.events|length }} Événements</span>
+                        </div>
+                        {% set pCount = 0 %}
+                        {% for e in cat.events %}{% set pCount = pCount + e.attendances|length %}{% endfor %}
+                        <div>
+                            <span class="badge badge-participants">{{ pCount }} Participants</span>
+                        </div>
+                    </td>
+                    <td>
+                        {% if cat.events|length > 0 %}
+                            <div class="event-list">
+                                {% for event in cat.events|slice(0, 3) %}
+                                    <div class="event-item">
+                                        <strong>{{ event.title }}</strong>
+                                        <div style="color: #64748b; font-size: 8pt;">
+                                            {{ event.isWeekly ? 'Hebdomadaire' : (event.startAt ? event.startAt|date('d/m/Y') : 'Date non définie') }}
+                                            • {{ event.attendances|length }} inscrit(s)
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                                {% if cat.events|length > 3 %}
+                                    <div style="color: #94a3b8; font-size: 8pt; margin-top: 5px;">
+                                        + {{ cat.events|length - 3 }} autres événements...
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <span style="color: #94a3b8; font-style: italic;">Aucun événement lié</span>
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <div class="footer">
+        Maternia © {{ "now"|date("Y") }} — Document généré automatiquement par le système d'administration.
+        <br>Page <span class="page-number"></span>
+    </div>
 </body>
 </html>

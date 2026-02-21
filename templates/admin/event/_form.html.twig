@@ -7,61 +7,196 @@
     <div class="col-lg-8">
         <div class="form-section mb-4">
             <h6 class="form-section-title">
-                <i class="fas fa-info-circle text-primary me-2"></i>Informations générales
+                <i class="fas fa-info-circle"></i>Informations générales
             </h6>
             
             {% if form.title is defined %}
-                <div class="mb-3">
-                    {{ form_label(form.title, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
-                    {{ form_widget(form.title, {'attr': {'class': 'form-control', 'placeholder': 'Titre de l\'événement'}}) }}
+                <div class="mb-4">
+                    {{ form_label(form.title, 'Titre de l\'événement', {'label_attr': {'class': 'form-label'}}) }}
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-font"></i>
+                        </span>
+                        {{ form_widget(form.title, {'attr': {'class': 'form-control', 'placeholder': 'Entrez le titre de l\'événement'}}) }}
+                    </div>
                     {{ form_errors(form.title) }}
                 </div>
             {% endif %}
 
             {% if form.description is defined %}
-                <div class="mb-3">
-                    {{ form_label(form.description, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
-                    {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 5, 'placeholder': 'Description détaillée de l\'événement'}}) }}
+                <div class="mb-4">
+                    {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 5, 'placeholder': 'Décrivez votre événement en détail...'}}) }}
                     {{ form_errors(form.description) }}
-                    <div class="form-text">Décrivez l'événement en détail pour informer les participants.</div>
+                    <div class="form-text mt-2">
+                        <i class="fas fa-align-left me-1"></i>Détails, programme et informations importantes.
+                    </div>
                 </div>
             {% endif %}
 
             {% if form.location is defined %}
-                <div class="mb-3">
-                    {{ form_label(form.location, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                <div class="mb-4">
+                    {{ form_label(form.location, 'Localisation', {'label_attr': {'class': 'form-label'}}) }}
                     <div class="input-group">
-                        <span class="input-group-text bg-white">
-                            <i class="fas fa-map-marker-alt text-danger"></i>
+                        <span class="input-group-text">
+                            <i class="fas fa-map-marker-alt"></i>
                         </span>
-                        {{ form_widget(form.location, {'attr': {'class': 'form-control', 'placeholder': 'Adresse ou lieu de l\'événement'}}) }}
+                        {{ form_widget(form.location, {'attr': {'class': 'form-control', 'placeholder': 'Adresse ou lien de visioconférence'}}) }}
                     </div>
                     {{ form_errors(form.location) }}
+                </div>
+            {% endif %}
+
+            {% if form.capacity is defined %}
+                <div class="mb-3">
+                    {{ form_label(form.capacity, 'Nombre maximum de participants', {'label_attr': {'class': 'form-label'}}) }}
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-users"></i>
+                        </span>
+                        {{ form_widget(form.capacity, {'attr': {'class': 'form-control', 'placeholder': 'ex: 20'}}) }}
+                    </div>
+                    {{ form_errors(form.capacity) }}
+                    <div class="form-text mt-2">
+                        <i class="fas fa-info-circle me-1"></i>Laissez vide pour un nombre de places illimité.
+                    </div>
                 </div>
             {% endif %}
         </div>
 
         <div class="form-section">
             <h6 class="form-section-title">
-                <i class="fas fa-calendar-alt text-primary me-2"></i>Date et heure
+                <i class="fas fa-calendar-alt"></i>Date et heure
+            </h6>
+
+            <!-- Weekly Toggle -->
+            <div class="mb-4">
+                <div class="mode-selector">
+                    <div class="form-check form-switch custom-switch-large reversed-layout">
+                        <span class="custom-switch-text fw-bold">Événement hebdomadaire</span>
+                        {{ form_widget(form.isWeekly, {'label': false, 'attr': {'class': 'form-check-input', 'id': 'admin-is-weekly-toggle'}}) }}
+                    </div>
+                </div>
+                <div class="form-text mt-2">
+                    <i class="fas fa-info-circle me-1"></i>Cochez pour un événement récurrent (ex: tous les lundis).
+                </div>
+            </div>
+            
+            <div id="admin-date-selection-section">
+                <div class="row">
+                    {% if form.startAt is defined %}
+                        <div class="col-md-6 mb-4">
+                            {{ form_label(form.startAt, 'Date et heure de début', {'label_attr': {'class': 'form-label'}}) }}
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-play-circle"></i>
+                                </span>
+                                {{ form_widget(form.startAt, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                            {{ form_errors(form.startAt) }}
+                        </div>
+                    {% endif %}
+
+                    {% if form.endAt is defined %}
+                        <div class="col-md-6 mb-4">
+                            {{ form_label(form.endAt, 'Date et heure de fin', {'label_attr': {'class': 'form-label'}}) }}
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-stop-circle"></i>
+                                </span>
+                                {{ form_widget(form.endAt, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                            {{ form_errors(form.endAt) }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div id="admin-weekly-selection-section" style="display: none;">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        {{ form_label(form.dayOfWeek, 'Jour de la semaine', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.dayOfWeek, {'attr': {'class': 'form-select'}}) }}
+                        {{ form_errors(form.dayOfWeek) }}
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        {{ form_label(form.startTime, 'Heure de début', {'label_attr': {'class': 'form-label'}}) }}
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-clock"></i>
+                            </span>
+                            {{ form_widget(form.startTime, {'attr': {'class': 'form-control time-input-admin'}}) }}
+                        </div>
+                        {{ form_errors(form.startTime) }}
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        {{ form_label(form.endTime, 'Heure de fin', {'label_attr': {'class': 'form-label'}}) }}
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-clock"></i>
+                            </span>
+                            {{ form_widget(form.endTime, {'attr': {'class': 'form-control time-input-admin'}}) }}
+                        </div>
+                        {{ form_errors(form.endTime) }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Duration Preview -->
+            <div id="admin-duration-preview">
+                <i class="fas fa-hourglass-half"></i>
+                <span class="fw-bold">Durée estimée :</span>
+                <span id="admin-duration-value">--</span>
+            </div>
+        </div>
+
+        {# Matériel Nécessaire Section (Moved to Main Column) #}
+        <div class="form-section mb-4">
+            <h6 class="form-section-title">
+                <i class="fas fa-box-open text-primary me-2"></i>Matériel Nécessaire
             </h6>
             
-            <div class="row">
-                {% if form.startAt is defined %}
-                    <div class="col-md-6 mb-3">
-                        {{ form_label(form.startAt, 'Date de début', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
-                        {{ form_widget(form.startAt, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_errors(form.startAt) }}
+            <div class="mb-4">
+                <div class="mode-selector">
+                    <div class="form-check form-switch custom-switch-large reversed-layout">
+                        <span class="custom-switch-text fw-bold">Besoin de matériel spécifique ?</span>
+                        {{ form_widget(form.showRequirements, {'label': false, 'attr': {'class': 'form-check-input requirements-toggle', 'id': 'requirement-toggle'}}) }}
                     </div>
-                {% endif %}
+                </div>
+                <div class="form-text mt-2 text-muted">
+                    <i class="fas fa-info-circle me-1"></i>Cochez si vous avez besoin que les participants apportent du matériel
+                </div>
+            </div>
 
-                {% if form.endAt is defined %}
-                    <div class="col-md-6 mb-3">
-                        {{ form_label(form.endAt, 'Date de fin', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
-                        {{ form_widget(form.endAt, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_errors(form.endAt) }}
+            <div id="requirements-selection-section" style="display: none;">
+                <div class="requirements-selection-grid mt-4">
+                    <div class="requirements-grid">
+                        {% for requirement in form.requirements %}
+                            <div class="requirement-card" data-id="{{ requirement.vars.id }}">
+                                <div class="requirement-card-body">
+                                    <div class="requirement-icon-wrapper">
+                                        <div class="requirement-icon">
+                                            <i class="fas fa-magic"></i>
+                                        </div>
+                                    </div>
+                                    <div class="requirement-info">
+                                        <span class="requirement-name">{{ requirement.vars.label }}</span>
+                                        <span class="requirement-details">Matériel à prévoir</span>
+                                    </div>
+                                    <div class="requirement-action">
+                                        {{ form_widget(requirement, {'label': false, 'attr': {'class': 'd-none requirement-checkbox'}}) }}
+                                        <div class="custom-checkbox-indicator">
+                                            <i class="fas fa-plus"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="requirement-selected-badge">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
-                {% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -70,22 +205,30 @@
     <div class="col-lg-4">
         <div class="form-section mb-4">
             <h6 class="form-section-title">
-                <i class="fas fa-tag text-primary me-2"></i>Catégorie
+                <i class="fas fa-tag"></i>Catégorie
             </h6>
             
             {% if form.eventCat is defined %}
                 <div class="mb-3">
-                    {{ form_label(form.eventCat, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
-                    {{ form_widget(form.eventCat, {'attr': {'class': 'form-select'}}) }}
+                    {{ form_label(form.eventCat, 'Sélectionnez une catégorie', {'label_attr': {'class': 'form-label'}}) }}
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-list"></i>
+                        </span>
+                        {{ form_widget(form.eventCat, {'attr': {'class': 'form-select'}}) }}
+                    </div>
                     {{ form_errors(form.eventCat) }}
-                    <div class="form-text">Sélectionnez la catégorie appropriée.</div>
+                    <div class="form-text mt-2">
+                        <i class="fas fa-tags me-1"></i>Choisissez la catégorie qui correspond le mieux.
+                    </div>
                 </div>
             {% endif %}
         </div>
 
+
         <div class="form-section">
             <h6 class="form-section-title">
-                <i class="fas fa-image text-primary me-2"></i>Image de l'événement
+                <i class="fas fa-image"></i>Image de l'événement
             </h6>
             
             {# Hidden field for the selected image #}
@@ -101,19 +244,19 @@
                                          class="gallery-image" 
                                          alt="{{ image }}">
                                     <div class="gallery-overlay">
-                                        <i class="fas fa-check-circle"></i>
+                                        <i class="fas fa-check"></i>
                                     </div>
                                 </div>
                             </div>
                         {% endfor %}
                     </div>
-                    <div class="form-text mt-2">
+                    <div class="form-text mt-3">
                         <i class="fas fa-info-circle me-1"></i>Cliquez sur une image pour la sélectionner.
                     </div>
                 </div>
             {% else %}
                 <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle me-2"></i>Aucune image disponible dans le dossier /public/img/events/
+                    <i class="fas fa-exclamation-triangle me-2"></i>Aucune image disponible dans /public/img/events/
                 </div>
             {% endif %}
         </div>
@@ -122,6 +265,146 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Weekly Toggle Admin Logic
+    // Even more robust selector for Symfony form fields
+    const adminWeeklyToggle = document.getElementById('admin-is-weekly-toggle') || 
+                            document.getElementById('event_isWeekly') || 
+                            document.querySelector('input[type="checkbox"][name*="isWeekly"]');
+                            
+    const adminDateSection = document.getElementById('admin-date-selection-section');
+    const adminWeeklySection = document.getElementById('admin-weekly-selection-section');
+    const adminDurationValue = document.getElementById('admin-duration-value');
+
+    function calculateAdminDuration() {
+        if (!adminDurationValue) return;
+        
+        const isWeekly = adminWeeklyToggle && adminWeeklyToggle.checked;
+        let startVal, endVal;
+        
+        if (isWeekly) {
+            startVal = document.querySelector('input[name*="startTime"]').value;
+            endVal = document.querySelector('input[name*="endTime"]').value;
+        } else {
+            startVal = document.querySelector('input[name*="startAt"]').value || document.querySelector('select[name*="startAt"]').value;
+            endVal = document.querySelector('input[name*="endAt"]').value || document.querySelector('select[name*="endAt"]').value;
+            // Handle Bootstrap / Symfony datetime widget if it's multiple selects (skip for now, assume single input)
+        }
+        
+        if (!startVal || !endVal) {
+            adminDurationValue.textContent = '--';
+            return;
+        }
+
+        let start, end;
+        if (isWeekly) {
+            start = new Date('2000-01-01T' + startVal);
+            end = new Date('2000-01-01T' + endVal);
+        } else {
+            start = new Date(startVal);
+            end = new Date(endVal);
+        }
+
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            adminDurationValue.textContent = 'Invalide';
+            return;
+        }
+
+        if (end <= start) {
+            adminDurationValue.textContent = 'Fin < Début';
+            return;
+        }
+
+        const diff = end - start;
+        const h = Math.floor(diff / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        
+        let text = '';
+        if (h > 0) text += h + 'h ';
+        if (m > 0) text += m + 'min';
+        
+        adminDurationValue.textContent = text || '0min';
+    }
+
+    function toggleAdminSections() {
+        if (!adminWeeklyToggle) {
+            console.error('Admin weekly toggle not found by any selector');
+            return;
+        }
+        
+        const isChecked = adminWeeklyToggle.checked;
+        console.log('Admin: Toggling sections, isWeekly:', isChecked);
+        
+        if (isChecked) {
+            if (adminDateSection) adminDateSection.style.display = 'none';
+            if (adminWeeklySection) adminWeeklySection.style.display = 'block';
+        } else {
+            if (adminDateSection) adminDateSection.style.display = 'block';
+            if (adminWeeklySection) adminWeeklySection.style.display = 'none';
+        }
+        calculateAdminDuration();
+    }
+
+    if (adminWeeklyToggle) {
+        // Use change and click for maximum compatibility
+        adminWeeklyToggle.addEventListener('change', toggleAdminSections);
+        adminWeeklyToggle.addEventListener('click', toggleAdminSections);
+        
+        // Add listeners to all relevant inputs for duration calculation
+        document.querySelectorAll('input[name*="start"], input[name*="end"]').forEach(el => {
+            el.addEventListener('input', calculateAdminDuration);
+            el.addEventListener('change', calculateAdminDuration);
+        });
+
+        toggleAdminSections(); // Initial state
+        console.log('Admin weekly toggle initialized');
+    }
+
+    // Requirements Logic - Synced from User Form
+    function initRequirementsLogic() {
+        const reqToggle = document.getElementById('requirement-toggle') || 
+                          document.querySelector('.requirements-toggle') || 
+                          document.querySelector('input[name*="showRequirements"]');
+        const reqSection = document.getElementById('requirements-selection-section');
+        const requirementCards = document.querySelectorAll('.requirement-card');
+
+        function updateVisibility() {
+            if (!reqSection) return;
+            const isChecked = reqToggle ? reqToggle.checked : false;
+            console.log('Requirements Visibility: isChecked =', isChecked);
+            if (isChecked) {
+                reqSection.style.setProperty('display', 'block', 'important');
+            } else {
+                reqSection.style.setProperty('display', 'none', 'important');
+            }
+        }
+
+        if (reqToggle) {
+            reqToggle.addEventListener('change', updateVisibility);
+            reqToggle.addEventListener('click', updateVisibility);
+            updateVisibility();
+        }
+
+        requirementCards.forEach(card => {
+            const checkbox = card.querySelector('.requirement-checkbox');
+            if (checkbox) {
+                card.addEventListener('click', function() {
+                    checkbox.checked = !checkbox.checked;
+                    card.classList.toggle('selected', checkbox.checked);
+                    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+                if (checkbox.checked) card.classList.add('selected');
+            }
+        });
+
+        const anyChecked = Array.from(requirementCards).some(c => c.querySelector('.requirement-checkbox')?.checked);
+        if (anyChecked && reqToggle && !reqToggle.checked) {
+            reqToggle.checked = true;
+            updateVisibility();
+        }
+    }
+    initRequirementsLogic();
+
+    // Existing Photo selection logic
     const galleryItems = document.querySelectorAll('.gallery-item-admin');
     const hiddenInput = document.getElementById('event_selectedImage');
     
@@ -159,102 +442,228 @@ document.addEventListener('DOMContentLoaded', function() {
 {{ form_end(form) }}
 
 <style>
-    /* Form Sections */
+    /* PINK THEME VARIABLES */
+    :root {
+        --primary-pink: #ec4899;
+        --light-pink: #fce7f3;
+        --medium-pink: #fbcfe8;
+        --dark-pink: #be185d;
+        --text-dark: #1f2937;
+        --text-muted: #6b7280;
+        --border-color: #e5e7eb;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    /* PREMIUM FORM SECTIONS */
     .form-section {
-        background: #fff;
-        padding: 1.5rem;
-        border-radius: 8px;
-        border: 1px solid #e5e7eb;
+        background: white;
+        border: 2px solid var(--light-pink);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
     }
-    
+
+    .form-section:hover {
+        box-shadow: var(--shadow-md);
+        border-color: var(--medium-pink);
+    }
+
+    .form-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary-pink), var(--dark-pink));
+    }
+
     .form-section-title {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #1f2937;
-        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
         padding-bottom: 0.75rem;
-        border-bottom: 2px solid #fce7f3;
+        border-bottom: 2px solid var(--light-pink);
+        color: var(--dark-pink) !important;
+        font-size: 1.25rem;
+        font-weight: 600;
+        text-transform: none;
     }
 
-    /* Form Controls */
+    .form-section-title i {
+        background: linear-gradient(135deg, var(--primary-pink), var(--dark-pink));
+        color: white !important;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        box-shadow: 0 4px 8px rgba(236, 72, 153, 0.2);
+    }
+
+    /* POLISHED FORM CONTROLS */
     .form-label {
-        color: #374151;
+        color: var(--text-dark);
+        font-weight: 600;
         margin-bottom: 0.5rem;
-    }
-    
-    .form-control:focus,
-    .form-select:focus {
-        border-color: #ec4899;
-        box-shadow: 0 0 0 0.2rem rgba(236, 72, 153, 0.15);
+        display: block;
+        font-size: 0.95rem;
     }
 
-    /* Image Gallery */
-    .image-gallery-wrapper {
-        background: #f9fafb;
-        padding: 1rem;
-        border-radius: 6px;
-        border: 1px solid #e5e7eb;
+    .form-control, .form-select {
+        border: 2px solid var(--medium-pink);
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+        color: var(--text-dark);
     }
-    
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-pink);
+        box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.15);
+        outline: none;
+    }
+
+    .input-group-text {
+        border: 2px solid var(--medium-pink);
+        background-color: var(--light-pink);
+        color: var(--primary-pink);
+        border-right: none;
+        border-radius: 10px 0 0 10px;
+        padding: 0 1rem;
+    }
+
+    .input-group > .form-control {
+        border-left: none;
+        border-radius: 0 10px 10px 0;
+    }
+
+    .input-group:focus-within .input-group-text {
+        border-color: var(--primary-pink);
+        background-color: var(--medium-pink);
+    }
+
+    /* PREMIUM IMAGE GALLERY */
+    .image-gallery-wrapper {
+        background: var(--light-pink);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 2px solid var(--medium-pink);
+    }
+
     .image-gallery-grid {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 1rem;
     }
-    
+
     .gallery-item-admin {
-        cursor: pointer;
-        transition: all 0.2s ease;
+        position: relative;
     }
-    
+
     .gallery-item-inner {
         position: relative;
-        border-radius: 6px;
+        border: 2px solid white;
+        border-radius: 10px;
         overflow: hidden;
         aspect-ratio: 1;
-        border: 2px solid transparent;
-        transition: all 0.2s ease;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: var(--shadow-sm);
     }
-    
+
     .gallery-item-admin:hover .gallery-item-inner {
-        border-color: #ec4899;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(236, 72, 153, 0.2);
+        transform: translateY(-4px);
+        border-color: var(--primary-pink);
+        box-shadow: var(--shadow-md);
     }
-    
+
+    .gallery-item-admin.selected .gallery-item-inner {
+        border-color: var(--primary-pink);
+        box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.2);
+    }
+
     .gallery-image {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        display: block;
+        transition: transform 0.5s ease;
     }
-    
+
+    .gallery-item-admin:hover .gallery-image {
+        transform: scale(1.1);
+    }
+
     .gallery-overlay {
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(236, 72, 153, 0.9);
+        background: rgba(236, 72, 153, 0.8);
         display: flex;
         align-items: center;
         justify-content: center;
         opacity: 0;
-        transition: opacity 0.2s ease;
+        transition: all 0.3s ease;
     }
-    
-    .gallery-overlay i {
-        color: white;
-        font-size: 2rem;
-    }
-    
+
     .gallery-item-admin.selected .gallery-overlay {
         opacity: 1;
     }
-    
-    .gallery-item-admin.selected .gallery-item-inner {
-        border-color: #ec4899;
-        box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.2);
+
+    .gallery-overlay i {
+        color: white;
+        font-size: 1.5rem;
+        transform: scale(0.5);
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .gallery-item-admin.selected .gallery-overlay i {
+        transform: scale(1);
+    }
+
+    /* PREMIUM DURATION PREVIEW */
+    #admin-duration-preview {
+        background: white !important;
+        border: 2px solid var(--light-pink) !important;
+        border-left: 4px solid var(--primary-pink) !important;
+        padding: 1rem !important;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        box-shadow: var(--shadow-sm);
+        margin-top: 1.5rem !important;
+    }
+
+    #admin-duration-preview i {
+        background: linear-gradient(135deg, var(--primary-pink), var(--dark-pink));
+        color: white !important;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+    }
+
+    #admin-duration-value {
+        color: var(--dark-pink);
+        font-weight: 800;
+        font-size: 1.1rem;
     }
 
     /* Remove default Bootstrap validation icons */
@@ -271,5 +680,185 @@ document.addEventListener('DOMContentLoaded', function() {
     
     .input-group:focus-within .input-group-text {
         border-color: #ec4899;
+    }
+
+    /* Mode Selector Styling - Synced from User Form */
+    .mode-selector {
+        background: var(--light-pink);
+        padding: 1.25rem;
+        border-radius: 12px;
+        border: 2px solid var(--medium-pink);
+        margin-bottom: 0.5rem;
+    }
+
+    .custom-switch-large.reversed-layout {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        justify-content: flex-start;
+        padding-left: 0 !important;
+        gap: 1rem;
+    }
+
+    .custom-switch-large.reversed-layout .custom-switch-text {
+        font-size: 1.1rem;
+        cursor: pointer;
+        color: var(--dark-pink);
+        order: 1;
+    }
+
+    .custom-switch-large.reversed-layout .form-check-input {
+        position: relative;
+        order: 2;
+        margin-left: 0 !important;
+        width: 3.5rem !important;
+        height: 1.75rem !important;
+        cursor: pointer;
+    }
+
+    /* Requirements Selection Grid - Synced from User Form */
+    .requirements-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .requirement-card {
+        position: relative;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(236, 72, 153, 0.1);
+        border-radius: 20px;
+        padding: 1.75rem 1.5rem;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    }
+
+    .requirement-card:hover {
+        border-color: var(--primary-pink);
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 0 15px 30px -10px rgba(236, 72, 153, 0.2);
+        background: white;
+    }
+
+    .requirement-card.selected {
+        border-color: var(--primary-pink);
+        background: linear-gradient(135deg, #fff 0%, var(--light-pink) 100%);
+        box-shadow: 0 12px 25px -5px rgba(236, 72, 153, 0.15), 0 0 0 1px rgba(236, 72, 153, 0.1);
+    }
+
+    .requirement-card-body {
+        display: flex;
+        align-items: center;
+        gap: 1.1rem;
+    }
+
+    .requirement-icon {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, white 0%, var(--light-pink) 100%);
+        color: var(--primary-pink);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 4px 8px -2px rgba(236, 72, 153, 0.1);
+        border: 1px solid rgba(236, 72, 153, 0.1);
+    }
+
+    .requirement-card:hover .requirement-icon {
+        background: linear-gradient(135deg, var(--primary-pink), var(--dark-pink));
+        color: white;
+        transform: rotate(8deg) scale(1.05);
+        box-shadow: 0 8px 15px -4px rgba(236, 72, 153, 0.3);
+        border-color: transparent;
+    }
+
+    .requirement-card.selected .requirement-icon {
+        background: var(--primary-pink);
+        color: white;
+    }
+
+    .requirement-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .requirement-name {
+        font-weight: 700;
+        color: var(--text-dark);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        line-height: 1.2;
+    }
+
+    .requirement-card.selected .requirement-name {
+        color: var(--dark-pink);
+        transform: translateX(2px);
+    }
+
+    .requirement-details {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+        font-weight: 500;
+    }
+
+    .custom-checkbox-indicator {
+        width: 28px;
+        height: 28px;
+        border: 2px solid #f1f5f9;
+        background: #f8fafc;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.850rem;
+        color: #cbd5e1;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .requirement-card:hover .custom-checkbox-indicator {
+        border-color: var(--medium-pink);
+        color: var(--primary-pink);
+        transform: scale(1.1);
+    }
+
+    .requirement-card.selected .custom-checkbox-indicator {
+        background: var(--primary-pink);
+        border-color: var(--primary-pink);
+        color: white;
+        transform: scale(1) rotate(90deg);
+    }
+
+    .requirement-selected-badge {
+        position: absolute;
+        top: -12px;
+        right: -12px;
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, var(--primary-pink), var(--dark-pink));
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        box-shadow: 0 6px 15px rgba(236, 72, 153, 0.4);
+        opacity: 0;
+        transform: scale(0.5) rotate(-90deg);
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: 10;
+        border: 3px solid white;
+    }
+
+    .requirement-card.selected .requirement-selected-badge {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
     }
 </style>

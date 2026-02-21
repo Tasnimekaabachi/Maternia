@@ -116,58 +116,109 @@
         </div>
         
         <div class="section-content">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="{{ form.startAt.vars.id }}" class="form-label">
-                            <i class="fas fa-play-circle"></i>
-                            Date et heure de début
-                        </label>
-                        <div class="datetime-card">
-                            <div class="datetime-input-wrapper">
-                                {{ form_widget(form.startAt, {'attr': {
-                                    'class': 'form-control datetime-input ' ~ (form.startAt.vars.valid ? '' : 'is-invalid'),
-                                    'placeholder': 'YYYY-MM-DD HH:MM'
-                                }}) }}
-                                <button type="button" class="datetime-trigger" data-target="{{ form.startAt.vars.id }}">
-                                    <i class="fas fa-calendar-alt"></i>
-                                </button>
-                            </div>
-                            <div class="datetime-preview" id="startAt-preview">
-                                <i class="fas fa-clock"></i>
-                                <span>Sélectionnez une date</span>
-                            </div>
-                        </div>
-                        {{ form_errors(form.startAt) }}
+            <!-- Mode Toggle -->
+            <div class="form-group mb-4">
+                <div class="mode-selector">
+                    <div class="form-check form-switch custom-switch-large">
+                        {{ form_widget(form.isWeekly, {'attr': {'class': 'form-check-input', 'id': 'is-weekly-toggle'}}) }}
+                        {{ form_label(form.isWeekly, 'Événement hebdomadaire', {'label_attr': {'class': 'form-check-label fw-bold'}}) }}
                     </div>
                 </div>
-                
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="{{ form.endAt.vars.id }}" class="form-label">
-                            <i class="fas fa-stop-circle"></i>
-                            Date et heure de fin
-                        </label>
-                        <div class="datetime-card">
-                            <div class="datetime-input-wrapper">
-                                {{ form_widget(form.endAt, {'attr': {
-                                    'class': 'form-control datetime-input ' ~ (form.endAt.vars.valid ? '' : 'is-invalid'),
-                                    'placeholder': 'YYYY-MM-DD HH:MM'
-                                }}) }}
-                                <button type="button" class="datetime-trigger" data-target="{{ form.endAt.vars.id }}">
-                                    <i class="fas fa-calendar-alt"></i>
-                                </button>
+                <div class="form-hint">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Choisissez si cet événement est une séance unique ou récurrente chaque semaine</span>
+                </div>
+            </div>
+
+            <!-- One-time Event Section -->
+            <div id="date-selection-section">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.startAt.vars.id }}" class="form-label">
+                                <i class="fas fa-play-circle"></i>
+                                Date et heure de début
+                            </label>
+                            <div class="datetime-card">
+                                <div class="datetime-input-wrapper">
+                                    {{ form_widget(form.startAt, {'attr': {
+                                        'class': 'form-control datetime-input ' ~ (form.startAt.vars.valid ? '' : 'is-invalid'),
+                                        'placeholder': 'YYYY-MM-DD HH:MM'
+                                    }}) }}
+                                    <button type="button" class="datetime-trigger" data-target="{{ form.startAt.vars.id }}">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
+                                <div class="datetime-preview" id="startAt-preview">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Sélectionnez une date</span>
+                                </div>
                             </div>
-                            <div class="datetime-preview" id="endAt-preview">
-                                <i class="fas fa-clock"></i>
-                                <span>Sélectionnez une date</span>
+                            {{ form_errors(form.startAt) }}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.endAt.vars.id }}" class="form-label">
+                                <i class="fas fa-stop-circle"></i>
+                                Date et heure de fin
+                            </label>
+                            <div class="datetime-card">
+                                <div class="datetime-input-wrapper">
+                                    {{ form_widget(form.endAt, {'attr': {
+                                        'class': 'form-control datetime-input ' ~ (form.endAt.vars.valid ? '' : 'is-invalid'),
+                                        'placeholder': 'YYYY-MM-DD HH:MM'
+                                    }}) }}
+                                    <button type="button" class="datetime-trigger" data-target="{{ form.endAt.vars.id }}">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
+                                <div class="datetime-preview" id="endAt-preview">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Sélectionnez une date</span>
+                                </div>
+                            </div>
+                            {{ form_errors(form.endAt) }}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Weekly Event Section -->
+            <div id="weekly-selection-section" style="display: none;">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            {{ form_label(form.dayOfWeek, 'Jour de la semaine', {'label_attr': {'class': 'form-label'}}) }}
+                            <div class="select-wrapper">
+                                {{ form_widget(form.dayOfWeek, {'attr': {'class': 'form-select'}}) }}
+                                <i class="fas fa-chevron-down select-arrow"></i>
                             </div>
                         </div>
-                        {{ form_errors(form.endAt) }}
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            {{ form_label(form.startTime, 'Heure de début', {'label_attr': {'class': 'form-label'}}) }}
+                            <div class="input-with-icon">
+                                {{ form_widget(form.startTime, {'attr': {'class': 'form-control'}}) }}
+                                <i class="fas fa-clock input-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            {{ form_label(form.endTime, 'Heure de fin', {'label_attr': {'class': 'form-label'}}) }}
+                            <div class="input-with-icon">
+                                {{ form_widget(form.endTime, {'attr': {'class': 'form-control'}}) }}
+                                <i class="fas fa-clock input-icon"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            
+
             <div class="duration-display" id="duration-display">
                 <div class="duration-card">
                     <div class="duration-icon">
@@ -177,6 +228,63 @@
                         <span class="duration-label">Durée estimée :</span>
                         <span class="duration-value" id="duration-value">--</span>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3.5: Matériel Nécessaire -->
+    <div class="form-section">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="fas fa-box-open"></i>
+            </div>
+            <h3>Matériel Nécessaire</h3>
+        </div>
+        
+        <div class="section-content">
+            <div class="form-group mb-4">
+                <div class="mode-selector">
+                    <div class="form-check form-switch custom-switch-large reversed-layout">
+                        <span class="custom-switch-text fw-bold">Besoin de matériel spécifique ?</span>
+                        {{ form_widget(form.showRequirements, {'label': false, 'attr': {'class': 'form-check-input requirements-toggle', 'id': 'requirement-toggle'}}) }}
+                    </div>
+                </div>
+                <div class="form-hint">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Cochez si vous avez besoin que les participants apportent du matériel</span>
+                </div>
+            </div>
+
+            <div id="requirements-selection-section" style="display: none;">
+                <div class="requirements-selection-grid mt-4">
+                    <div class="requirements-grid">
+                        {% for requirement in form.requirements %}
+                            <div class="requirement-card" data-id="{{ requirement.vars.id }}">
+                                <div class="requirement-card-body">
+                                    <div class="requirement-icon-wrapper">
+                                        <div class="requirement-icon">
+                                            <i class="fas fa-magic"></i>
+                                        </div>
+                                    </div>
+                                    <div class="requirement-info">
+                                        <span class="requirement-name">{{ requirement.vars.label }}</span>
+                                        <span class="requirement-details">Matériel à prévoir</span>
+                                    </div>
+                                    <div class="requirement-action">
+                                        {{ form_widget(requirement, {'label': false, 'attr': {'class': 'd-none requirement-checkbox'}}) }}
+                                        <div class="custom-checkbox-indicator">
+                                            <i class="fas fa-plus"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="requirement-selected-badge">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {{ form_errors(form.requirements) }}
                 </div>
             </div>
         </div>
@@ -233,6 +341,22 @@
                     <span>Choisissez la catégorie qui correspond le mieux à votre événement</span>
                 </div>
                 {{ form_errors(form.eventCat) }}
+            </div>
+            
+            <div class="form-group mt-3">
+                {{ form_label(form.capacity, 'Nombre maximum de participants', {'label_attr': {'class': 'form-label'}}) }}
+                <div class="input-with-icon">
+                    {{ form_widget(form.capacity, {'attr': {
+                        'class': 'form-control ' ~ (form.capacity.vars.valid ? '' : 'is-invalid'),
+                        'placeholder': 'ex: 20'
+                    }}) }}
+                    <i class="fas fa-users input-icon"></i>
+                </div>
+                <div class="form-hint">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Laissez vide pour un nombre de places illimité</span>
+                </div>
+                {{ form_errors(form.capacity) }}
             </div>
         </div>
     </div>
@@ -408,6 +532,45 @@
 
 .d-none {
     display: none !important;
+}
+
+/* Mode Selector Styling */
+.mode-selector {
+    background: var(--light-pink);
+    padding: 1.25rem;
+    border-radius: 12px;
+    border: 2px solid var(--medium-pink);
+    margin-bottom: 0.5rem;
+}
+
+.custom-switch-large.reversed-layout {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-start;
+    padding-left: 0 !important;
+    gap: 1rem;
+}
+
+.custom-switch-large.reversed-layout .custom-switch-text {
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: var(--dark-pink);
+    order: 1;
+}
+
+.custom-switch-large.reversed-layout .form-check-input {
+    position: relative;
+    order: 2;
+    margin-left: 0 !important;
+    width: 3.5rem !important;
+    height: 1.75rem !important;
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-pink);
+    border-color: var(--primary-pink);
 }
 
 /* Form Section Styling */
@@ -795,6 +958,173 @@
         font-size: 16px; /* Prevents zoom on iOS */
     }
 }
+
+/* Requirements Selection Grid */
+.requirements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+}
+
+.requirement-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(236, 72, 153, 0.1);
+    border-radius: 20px;
+    padding: 1.75rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+.requirement-card:hover {
+    border-color: var(--primary-pink);
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 15px 30px -10px rgba(236, 72, 153, 0.2);
+    background: white;
+}
+
+.requirement-card.selected {
+    border-color: var(--primary-pink);
+    background: linear-gradient(135deg, #fff 0%, var(--light-pink) 100%);
+    box-shadow: 0 12px 25px -5px rgba(236, 72, 153, 0.15), 0 0 0 1px rgba(236, 72, 153, 0.1);
+}
+
+.requirement-card-body {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+}
+
+.requirement-icon-wrapper {
+    position: relative;
+    z-index: 1;
+}
+
+.requirement-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, white 0%, var(--light-pink) 100%);
+    color: var(--primary-pink);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 8px -2px rgba(236, 72, 153, 0.1);
+    border: 1px solid rgba(236, 72, 153, 0.1);
+}
+
+.requirement-card:hover .requirement-icon {
+    background: linear-gradient(135deg, var(--primary-pink), var(--dark-pink));
+    color: white;
+    transform: rotate(8deg) scale(1.05);
+    box-shadow: 0 8px 15px -4px rgba(236, 72, 153, 0.3);
+    border-color: transparent;
+}
+
+.requirement-card.selected .requirement-icon {
+    background: var(--primary-pink);
+    color: white;
+}
+
+.requirement-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.requirement-name {
+    font-weight: 700;
+    color: var(--text-dark);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    line-height: 1.2;
+}
+
+.requirement-card.selected .requirement-name {
+    color: var(--dark-pink);
+    transform: translateX(2px);
+}
+
+.requirement-details {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.requirement-action {
+    display: flex;
+    align-items: center;
+}
+
+.custom-checkbox-indicator {
+    width: 28px;
+    height: 28px;
+    border: 2px solid #f1f5f9;
+    background: #f8fafc;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.850rem;
+    color: #cbd5e1;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.requirement-card:hover .custom-checkbox-indicator {
+    border-color: var(--medium-pink);
+    color: var(--primary-pink);
+    transform: scale(1.1);
+}
+
+.requirement-card.selected .custom-checkbox-indicator {
+    background: var(--primary-pink);
+    border-color: var(--primary-pink);
+    color: white;
+    transform: scale(1) rotate(90deg);
+}
+
+.requirement-selected-badge {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--primary-pink), var(--dark-pink));
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    box-shadow: 0 6px 15px rgba(236, 72, 153, 0.4);
+    opacity: 0;
+    transform: scale(0.5) rotate(-90deg);
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 10;
+    border: 3px solid white;
+}
+
+.requirement-card.selected .requirement-selected-badge {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 </style>
 
 <!-- Include Flatpickr -->
@@ -804,252 +1134,175 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded - initializing form scripts');
+    console.log('Maternia Form: Initializing all scripts...');
 
-    // --- Image Gallery Logic (FIXED) ---
+    // 1. Weekly Toggle Logic
+    const isWeeklyToggle = document.getElementById('is-weekly-toggle') || document.querySelector('[name*="[isWeekly]"]');
+    const dateSection = document.getElementById('date-selection-section');
+    const weeklySection = document.getElementById('weekly-selection-section');
+    const startAtInput = document.querySelector('[name*="[startAt]"]');
+    const endAtInput = document.querySelector('[name*="[endAt]"]');
+
+    function toggleSections() {
+        if (!isWeeklyToggle) return;
+        const isChecked = isWeeklyToggle.checked;
+        if (isChecked) {
+            if (dateSection) dateSection.style.display = 'none';
+            if (weeklySection) weeklySection.style.display = 'block';
+            if (startAtInput) startAtInput.required = false;
+            if (endAtInput) endAtInput.required = false;
+        } else {
+            if (dateSection) dateSection.style.display = 'block';
+            if (weeklySection) weeklySection.style.display = 'none';
+            if (startAtInput) startAtInput.required = true;
+            if (endAtInput) endAtInput.required = true;
+        }
+        updateDuration();
+    }
+
+    if (isWeeklyToggle) {
+        isWeeklyToggle.addEventListener('change', toggleSections);
+        isWeeklyToggle.addEventListener('click', toggleSections);
+        toggleSections();
+    }
+
+    // 2. Requirements Toggle Logic
+    function initRequirementsToggle() {
+        const reqToggle = document.getElementById('requirement-toggle') || 
+                          document.querySelector('.requirements-toggle') || 
+                          document.querySelector('input[name*="showRequirements"]');
+        const reqSection = document.getElementById('requirements-selection-section');
+        const requirementCards = document.querySelectorAll('.requirement-card');
+
+        function updateVisibility() {
+            if (!reqSection) return;
+            const isChecked = reqToggle ? reqToggle.checked : false;
+            console.log('Requirements Visibility: isChecked =', isChecked);
+            if (isChecked) {
+                reqSection.style.setProperty('display', 'block', 'important');
+                reqSection.classList.add('animate__animated', 'animate__fadeIn');
+            } else {
+                reqSection.style.setProperty('display', 'none', 'important');
+            }
+        }
+
+        if (reqToggle) {
+            reqToggle.addEventListener('change', updateVisibility);
+            reqToggle.addEventListener('click', updateVisibility);
+            updateVisibility();
+        }
+
+        requirementCards.forEach(card => {
+            const checkbox = card.querySelector('.requirement-checkbox');
+            if (checkbox) {
+                card.addEventListener('click', function() {
+                    checkbox.checked = !checkbox.checked;
+                    card.classList.toggle('selected', checkbox.checked);
+                    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+                if (checkbox.checked) card.classList.add('selected');
+            }
+        });
+
+        const anyChecked = Array.from(requirementCards).some(c => c.querySelector('.requirement-checkbox')?.checked);
+        if (anyChecked && reqToggle && !reqToggle.checked) {
+            reqToggle.checked = true;
+            updateVisibility();
+        }
+    }
+    initRequirementsToggle();
+
+    // 3. Image Gallery Logic
     function initImageGallery() {
         const galleryContainer = document.querySelector('.gallery-grid');
         const selectedImageInput = document.getElementById('event_selectedImage');
-        
-        if (!galleryContainer) {
-            console.log('Gallery container not found');
-            return;
-        }
-        
-        if (!selectedImageInput) {
-            console.error('Selected Image Input field not found! ID: event_selectedImage');
-            return;
-        }
+        if (!galleryContainer || !selectedImageInput) return;
 
-        console.log('Initializing image gallery with input:', selectedImageInput.id);
-
-        // Use event delegation for better performance and reliability
         galleryContainer.addEventListener('click', function(e) {
             const galleryItem = e.target.closest('.gallery-item');
             if (!galleryItem) return;
-
             const imageName = galleryItem.dataset.image;
-            console.log('Clicked gallery item:', imageName);
-            
-            // Remove 'selected' class from all cards
-            document.querySelectorAll('.gallery-card').forEach(card => {
-                card.classList.remove('selected');
-                // Also force style update just in case
-                card.style.borderColor = ''; 
-                card.style.background = '';
-            });
-
-            // Add 'selected' class to clicked card
+            document.querySelectorAll('.gallery-card').forEach(card => card.classList.remove('selected'));
             const card = galleryItem.querySelector('.gallery-card');
-            if (card) {
-                card.classList.add('selected');
-                // Force style update for immediate feedback
-                card.style.borderColor = 'var(--primary-pink)';
-                card.style.background = '#fdf2f8';
-            }
-
-            // Update hidden input
+            if (card) card.classList.add('selected');
             selectedImageInput.value = imageName;
-            console.log('Updated hidden input value to:', selectedImageInput.value);
-
-            // Trigger change event
             selectedImageInput.dispatchEvent(new Event('change', { bubbles: true }));
-
-            // Hide error if present
-             const errorElement = document.querySelector('.invalid-feedback');
-            if (errorElement && errorElement.textContent.includes('image')) {
-                errorElement.style.display = 'none';
-            }
         });
 
-        // Pre-select if value exists
         if (selectedImageInput.value) {
-            console.log('Pre-selecting image:', selectedImageInput.value);
-            const itemToSelect = galleryContainer.querySelector(`.gallery-item[data-image="${selectedImageInput.value}"]`);
-            if (itemToSelect) {
-                const card = itemToSelect.querySelector('.gallery-card');
-                if (card) {
-                    card.classList.add('selected');
-                    card.style.borderColor = 'var(--primary-pink)';
-                    card.style.background = '#fdf2f8';
-                }
-            }
+            const item = galleryContainer.querySelector(`.gallery-item[data-image="${selectedImageInput.value}"]`);
+            if (item) item.querySelector('.gallery-card')?.classList.add('selected');
         }
     }
-
-    // Initialize Gallery independently
     initImageGallery();
 
-    //Initialize Flatpickr with proper date format
-    const dateInputs = document.querySelectorAll('.datetime-input');
-    
-    dateInputs.forEach(input => {
-        const flatpickrInstance = flatpickr(input, {
-             enableTime: true,
-            dateFormat: "Y-m-d H:i", // Changed to match HTML5 datetime format
+    // 4. Flatpickr & Duration Logic
+    function updateDuration() {
+        const isWeekly = isWeeklyToggle && isWeeklyToggle.checked;
+        const durationValue = document.getElementById('duration-value');
+        if (!durationValue) return;
+
+        const startV = (isWeekly ? (document.querySelector('[name*="startTime"]')?.value) : (document.querySelector('[name*="startAt"]')?.value)) || '';
+        const endV = (isWeekly ? (document.querySelector('[name*="endTime"]')?.value) : (document.querySelector('[name*="endAt"]')?.value)) || '';
+
+        if (!startV || !endV) { durationValue.textContent = '--'; return; }
+
+        let startD = isWeekly ? new Date('2000-01-01T' + startV) : new Date(startV.replace(' ', 'T'));
+        let endD = isWeekly ? new Date('2000-01-01T' + endV) : new Date(endV.replace(' ', 'T'));
+
+        if (isNaN(startD.getTime()) || isNaN(endD.getTime())) { durationValue.textContent = 'Invalide'; return; }
+        if (endD <= startD) { durationValue.textContent = 'Fin après début'; return; }
+
+        const diffMs = endD - startD;
+        const h = Math.floor(diffMs / 3600000);
+        const m = Math.floor((diffMs % 3600000) / 60000);
+        durationValue.textContent = `${h}h ${m}m`;
+    }
+
+    document.querySelectorAll('.datetime-input').forEach(input => {
+        flatpickr(input, {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
             time_24hr: true,
             locale: "fr",
-            minuteIncrement: 15,
-            disableMobile: false,
-            onChange: function(selectedDates, dateStr, instance) {
-                updateDateTimePreview(input, selectedDates[0]);
-                updateDuration();
-            }
+            onChange: updateDuration
         });
-        
-        // Update preview on initialization
-        if (input.value) {
-            const date = new Date(input.value);
-            if (!isNaN(date.getTime())) {
-                updateDateTimePreview(input, date);
-            }
-        }
-        
-         // Make trigger button open Flatpickr
-        const triggerButton = input.closest('.datetime-input-wrapper').querySelector('.datetime-trigger');
-        if (triggerButton) {
-            triggerButton.addEventListener('click', function() {
-                flatpickrInstance.open();
-            });
-        }
     });
 
-    // Update character counter for description
-    const descriptionInput = document.querySelector('[name*="description"]');
-    if (descriptionInput) {
-        const charCounter = descriptionInput.closest('.form-group').querySelector('.char-counter');
-        
-        descriptionInput.addEventListener('input', function() {
-            const length = this.value.length;
-            charCounter.textContent = `${length}/1000`;
-            
-            if (length > 1000) {
-                charCounter.style.color = 'var(--error-red)';
-            } else if (length > 800) {
-                charCounter.style.color = '#f59e0b';
-            } else {
-                charCounter.style.color = 'var(--text-color)';
+    document.querySelectorAll('.datetime-trigger').forEach(trigger => {
+        trigger.addEventListener('click', function() {
+            const targetId = this.dataset.target;
+            const targetInput = document.getElementById(targetId);
+            if (targetInput && targetInput._flatpickr) {
+                targetInput._flatpickr.open();
             }
         });
-        
-        // Initial count
-        if (descriptionInput.value) {
-            charCounter.textContent = `${descriptionInput.value.length}/1000`;
+    });
+
+    document.querySelectorAll('[name*="startTime"], [name*="endTime"]').forEach(input => {
+        flatpickr(input, { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true, locale: "fr", onChange: updateDuration });
+    });
+
+    // 5. Misc Logic
+    const desc = document.querySelector('[name*="description"]');
+    if (desc) {
+        const counter = desc.closest('.form-group').querySelector('.char-counter');
+        if (counter) {
+            desc.addEventListener('input', () => { counter.textContent = `${desc.value.length}/1000`; });
+            counter.textContent = `${desc.value.length}/1000`;
         }
     }
 
-    
-    // Update duration display
-    function updateDuration() {
-        const startInput = document.querySelector('[name*="startAt"]');
-        const endInput = document.querySelector('[name*="endAt"]');
-        const durationValue = document.getElementById('duration-value');
-        
-        if (!startInput || !endInput || !durationValue || !startInput.value || !endInput.value) {
-            if (durationValue) {
-                durationValue.textContent = '--';
-                durationValue.style.color = 'var(--text-color)';
-            }
-            return;
-        }
-        
-        const startDate = new Date(startInput.value);
-        const endDate = new Date(endInput.value);
-        
-        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-            durationValue.textContent = 'Date invalide';
-            durationValue.style.color = 'var(--error-red)';
-            return;
-        }
-        
-        if (endDate <= startDate) {
-            durationValue.textContent = 'Date de fin doit être après date de début';
-            durationValue.style.color = 'var(--error-red)';
-            return;
-        }
-        
-        const diffMs = endDate - startDate;
-        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-        const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        
-        let durationText = '';
-        if (diffDays > 0) {
-            durationText += `${diffDays} jour${diffDays > 1 ? 's' : ''} `;
-        }
-        if (diffHours > 0) {
-            durationText += `${diffHours} heure${diffHours > 1 ? 's' : ''} `;
-        }
-        if (diffMinutes > 0 && diffDays === 0) {
-            durationText += `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''}`;
-        }
-        
-        durationValue.textContent = durationText.trim() || 'Quelques minutes';
-        durationValue.style.color = 'var(--dark-pink)';
-    }
-    
-    // Update datetime preview
-    function updateDateTimePreview(input, date) {
-        const previewId = `${input.id}-preview`;
-        const previewElement = document.getElementById(previewId);
-        
-        if (!previewElement) return;
-        
-        const formatDate = (date) => {
-            const options = { 
-                weekday: 'short',
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            };
-            return date.toLocaleDateString('fr-FR', options);
-        };
-        
-        const formattedDate = formatDate(date);
-        previewElement.querySelector('span').textContent = formattedDate;
-    }
-    
-    // Initialize duration display
-    updateDuration();
-    
-    // Show validation error for image selection if needed
-    const selectedImageError = document.querySelector('#event_selectedImage');
-    if (selectedImageError && selectedImageError.classList.contains('is-invalid')) {
-        console.log('Image selection validation error detected');
-        // Add red border to gallery container
-        const galleryContainer = document.querySelector('.image-gallery-container');
-        if (galleryContainer) {
-            galleryContainer.style.border = '2px solid var(--error-red)';
-            galleryContainer.style.borderRadius = '8px';
-            galleryContainer.style.padding = '1rem';
-        }
-    }
-    
-    // Form submission validation
-    const form = document.getElementById('event-form');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            const selectedImageInput = document.getElementById('event_selectedImage');
-            
-            // Check if image is selected
-            if (!selectedImageInput || !selectedImageInput.value) {
+    const mainForm = document.getElementById('event-form');
+    if (mainForm) {
+        mainForm.addEventListener('submit', function(e) {
+            if (!document.getElementById('event_selectedImage')?.value) {
                 e.preventDefault();
                 alert('Veuillez sélectionner une image pour l\'événement.');
-                
-                // Add visual feedback
-                const galleryContainer = document.querySelector('.image-gallery-container');
-                if (galleryContainer) {
-                    galleryContainer.style.border = '2px solid var(--error-red)';
-                    galleryContainer.style.borderRadius = '8px';
-                    galleryContainer.style.padding = '1rem';
-                    galleryContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-                
-                return false;
             }
         });
     }
+
+    updateDuration();
 });
 </script>

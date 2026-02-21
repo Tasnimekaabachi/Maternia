@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\EventRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -25,14 +27,10 @@ class Event
     #[Assert\Length(min: 10, minMessage: "La description doit faire au moins {{ limit }} caractères")]
     private ?string $description = null;
 
-    #[ORM\Column]
-    #[Assert\NotNull(message: "La date de début est obligatoire")]
-    #[Assert\GreaterThan("now", message: "La date de début doit être ultérieure à maintenant")]
+    #[ORM\Column(nullable: true)]
     private ?\DateTime $startAt = null;
 
-    #[ORM\Column]
-    #[Assert\NotNull(message: "La date de fin est obligatoire")]
-    #[Assert\GreaterThan(propertyPath: "startAt", message: "La date de fin doit être après la date de début")]
+    #[ORM\Column(nullable: true)]
     private ?\DateTime $endAt = null;
 
     #[ORM\Column(length: 255)]
@@ -46,6 +44,43 @@ class Event
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
+
+    #[ORM\Column(type: Types::BOOLEAN)]
+    private ?bool $isWeekly = false;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $creator = null;
+
+    #[ORM\Column(type: Types::INTEGER, nullable: false)]
+    #[Assert\NotBlank(message: "La capacité est obligatoire")]
+    #[Assert\GreaterThan(1, message: "La capacité doit être d'au moins 2 participants")]
+    private ?int $capacity = null;
+
+    /**
+     * @var Collection<int, Attendance>
+     */
+    #[ORM\OneToMany(targetEntity: Attendance::class, mappedBy: 'event', cascade: ['remove'])]
+    private Collection $attendances;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $dayOfWeek = null;
+
+    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $startTime = null;
+
+    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $endTime = null;
+
+    #[ORM\ManyToMany(targetEntity: Requirement::class, inversedBy: 'events')]
+    #[ORM\JoinTable(name: 'event_requirement')]
+    private Collection $requirements;
+
+    public function __construct()
+    {
+        $this->requirements = new ArrayCollection();
+        $this->attendances = new ArrayCollection();
+    }
 
     public function getImage(): ?string
     {
@@ -137,4 +172,129 @@ class Event
         return $this;
     }
 
+    public function isWeekly(): ?bool
+    {
+        return $this->isWeekly;
+    }
+
+    public function setIsWeekly(bool $isWeekly): static
+    {
+        $this->isWeekly = $isWeekly;
+
+        return $this;
+    }
+
+    public function getCreator(): ?User
+    {
+        return $this->creator;
+    }
+
+    public function setCreator(?User $creator): static
+    {
+        $this->creator = $creator;
+
+        return $this;
+    }
+
+    public function getCapacity(): ?int
+    {
+        return $this->capacity;
+    }
+
+    public function setCapacity(?int $capacity): static
+    {
+        $this->capacity = $capacity;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Requirement>
+     */
+    public function getRequirements(): Collection
+    {
+        return $this->requirements;
+    }
+
+    public function addRequirement(Requirement $requirement): static
+    {
+        if (!$this->requirements->contains($requirement)) {
+            $this->requirements->add($requirement);
+        }
+
+        return $this;
+    }
+
+    public function removeRequirement(Requirement $requirement): static
+    {
+        $this->requirements->removeElement($requirement);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Attendance>
+     */
+    public function getAttendances(): Collection
+    {
+        return $this->attendances;
+    }
+
+    public function addAttendance(Attendance $attendance): static
+    {
+        if (!$this->attendances->contains($attendance)) {
+            $this->attendances->add($attendance);
+            $attendance->setEvent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAttendance(Attendance $attendance): static
+    {
+        if ($this->attendances->removeElement($attendance)) {
+            // set the owning side to null (unless already changed)
+            if ($attendance->getEvent() === $this) {
+                $attendance->setEvent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getDayOfWeek(): ?string
+    {
+        return $this->dayOfWeek;
+    }
+
+    public function setDayOfWeek(?string $dayOfWeek): static
+    {
+        $this->dayOfWeek = $dayOfWeek;
+
+        return $this;
+    }
+
+    public function getStartTime(): ?\DateTimeInterface
+    {
+        return $this->startTime;
+    }
+
+    public function setStartTime(?\DateTimeInterface $startTime): static
+    {
+        $this->startTime = $startTime;
+
+        return $this;
+    }
+
+    public function getEndTime(): ?\DateTimeInterface
+    {
+        return $this->endTime;
+    }
+
+    public function setEndTime(?\DateTimeInterface $endTime): static
+    {
+        $this->endTime = $endTime;
+
+        return $this;
+    }
 }

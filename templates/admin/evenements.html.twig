@@ -4,11 +4,17 @@
 {% block page_title %}Événements & Catégories{% endblock %}
 
 {% block breadcrumb %}
-    <div class="admin-breadcrumb">
-        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
-        <span>/</span>
-        <span>Événements & Catégories</span>
-    </div>
+    <nav aria-label="breadcrumb" class="premium-breadcrumb-wrapper">
+        <ol class="premium-breadcrumb">
+            <li class="pb-item">
+                <a href="{{ path('admin_dashboard') }}">
+                    <i class="fas fa-home"></i>
+                </a>
+            </li>
+            <li class="pb-separator"><i class="fas fa-chevron-right"></i></li>
+            <li class="pb-item active" aria-current="page">Événements & Catégories</li>
+        </ol>
+    </nav>
 {% endblock %}
 
 {% block content %}

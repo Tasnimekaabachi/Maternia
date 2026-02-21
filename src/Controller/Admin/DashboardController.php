@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Repository\ConsultationCreneauRepository;
 use App\Repository\CommandeRepository;
 use App\Repository\ProduitRepository;
+use App\Repository\EventCatRepository;
 use App\Repository\EventRepository;
 use App\Repository\ConsultationRepository;
 use App\Repository\MamanRepository;
@@ -31,7 +32,8 @@ final class DashboardController extends AbstractController
         MamanRepository $mamanRepository,
         GrosesseRepository $grosesseRepository,
         ConsultationRepository $consultationRepository,
-        OffreBabySitterRepository $offreBabySitterRepository
+        OffreBabySitterRepository $offreBabySitterRepository,
+        EventCatRepository $eventCatRepository
     ): Response {
 
         // ===== Marketplace Stats =====
@@ -44,6 +46,7 @@ final class DashboardController extends AbstractController
 
         // ===== Events =====
         $eventCount = $eventRepository->count([]);
+        $eventCatCount = $eventCatRepository->count([]);
 
         // ===== Suivi Grossesse Stats =====
         $totalMamans = $mamanRepository->count([]);
@@ -57,34 +60,34 @@ final class DashboardController extends AbstractController
         // ===== BABYSITTING STATS - SANS createdAt =====
         // Total babysitters
         $totalBabysitters = $offreBabySitterRepository->count([]);
-        
+
         // Babysitters disponibles
         $babysittersDisponibles = $offreBabySitterRepository->count(['disponibilite' => true]);
-        
+
         // Total offres babysitting
         $offresBabysitting = $totalBabysitters;
-        
+
         // Nouvelles offres - DÉSACTIVÉ (pas de champ createdAt)
         $nouvellesOffresAujourdhui = 0;
         $offresNouvellesSemaine = 0;
-        
+
         // Statistiques de tarifs
         $tarifMoyen = $offreBabySitterRepository->createQueryBuilder('o')
             ->select('AVG(o.tarif)')
             ->getQuery()
             ->getSingleScalarResult() ?? 0;
-        
+
         $tarifMin = $offreBabySitterRepository->createQueryBuilder('o')
             ->select('MIN(o.tarif)')
             ->where('o.tarif > 0')
             ->getQuery()
             ->getSingleScalarResult() ?? 0;
-        
+
         $tarifMax = $offreBabySitterRepository->createQueryBuilder('o')
             ->select('MAX(o.tarif)')
             ->getQuery()
             ->getSingleScalarResult() ?? 0;
-        
+
         // Statistiques par ville pour le graphique
         $statsVilleBabysitters = $offreBabySitterRepository->createQueryBuilder('o')
             ->select('o.ville, COUNT(o.id) as nbOffres')
@@ -96,14 +99,14 @@ final class DashboardController extends AbstractController
             ->setMaxResults(10)
             ->getQuery()
             ->getResult();
-        
+
         // Top babysitters par expérience
         $topBabysittersExperience = $offreBabySitterRepository->findBy(
-            [], 
-            ['experience' => 'DESC'], 
+            [],
+            ['experience' => 'DESC'],
             5
         );
-        
+
         // Expérience moyenne
         $experienceMoyenne = $offreBabySitterRepository->createQueryBuilder('o')
             ->select('AVG(o.experience)')
@@ -119,9 +122,11 @@ final class DashboardController extends AbstractController
         $recentConsultations = $consultationRepository->findBy([], ['id' => 'DESC'], 10);
         $recentCommandes = $commandeRepository->findBy([], ['id' => 'DESC'], 10);
         $recentBabysitters = $offreBabySitterRepository->findBy([], ['id' => 'DESC'], 5);
+        $recentEventCats = $eventCatRepository->findBy([], ['id' => 'DESC'], 10);
 
         $activityLists = [
             'event' => [],
+            'event_cat' => [],
             'creneau' => [],
             'product' => [],
             'maman' => [],
@@ -135,13 +140,26 @@ final class DashboardController extends AbstractController
             $activityLists['event'][] = [
                 'type' => 'event',
                 'title' => $e->getTitle(),
-                'context' => $e->getEventCat()->getName(),
+                'context' => 'Catégorie: ' . ($e->getEventCat() ? $e->getEventCat()->getName() : 'N/A'),
                 'date' => $e->getStartAt(),
                 'url' => $this->generateUrl('app_event_show', ['id' => $e->getId()]),
                 'icon' => 'fa-calendar-alt',
                 'badge_text' => 'Événement',
                 'badge_class' => 'bg-pink-light',
                 'id' => $e->getId()
+            ];
+        }
+
+        foreach ($recentEventCats as $ec) {
+            $activityLists['event_cat'][] = [
+                'type' => 'event_cat',
+                'title' => $ec->getName(),
+                'context' => 'Nouvelle catégorie d\'événement',
+                'url' => $this->generateUrl('app_event_cat_show', ['id' => $ec->getId()]),
+                'icon' => 'fa-tags',
+                'badge_text' => 'Catégorie',
+                'badge_class' => 'bg-primary-light',
+                'id' => $ec->getId()
             ];
         }
 
@@ -271,6 +289,7 @@ final class DashboardController extends AbstractController
 
             // Events
             'eventCount' => $eventCount,
+            'eventCatCount' => $eventCatCount,
 
             // Suivi grossesse
             'total_mamans' => $totalMamans,
@@ -333,24 +352,24 @@ final class DashboardController extends AbstractController
         // Récupération des paramètres de filtre
         $ville = $request->query->get('ville');
         $tarifMax = $request->query->get('tarif');
-        
+
         // Construction de la requête avec filtres
         $qb = $offreBabySitterRepository->createQueryBuilder('o');
-        
+
         if ($ville) {
             $qb->andWhere('o.ville LIKE :ville')
-               ->setParameter('ville', '%' . $ville . '%');
+                ->setParameter('ville', '%' . $ville . '%');
         }
-        
+
         if ($tarifMax) {
             $qb->andWhere('o.tarif <= :tarif')
-               ->setParameter('tarif', $tarifMax);
+                ->setParameter('tarif', $tarifMax);
         }
-        
+
         $offres = $qb->orderBy('o.id', 'DESC')
-                     ->getQuery()
-                     ->getResult();
-        
+            ->getQuery()
+            ->getResult();
+
         // Statistiques par ville pour le template profil_bebe
         $statsVille = $offreBabySitterRepository->createQueryBuilder('o')
             ->select('o.ville, COUNT(o.id) as nbOffres, AVG(o.tarif) as tarifMoyen')
@@ -361,7 +380,7 @@ final class DashboardController extends AbstractController
             ->orderBy('nbOffres', 'DESC')
             ->getQuery()
             ->getResult();
-        
+
         return $this->render('admin/profil_bebe.html.twig', [
             'offre_baby_sitters' => $offres,
             'stats_ville' => $statsVille,

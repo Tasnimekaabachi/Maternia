@@ -24,9 +24,11 @@
                     <p class="text-muted mb-0">Tous nos événements sont dédiés aux futures et jeunes mamans. Inscription sur place ou en ligne selon l’événement.</p>
                 </div>
                 <div class="col-lg-4 text-lg-end mt-2 mt-lg-0">
-                    <a href="{{ path('app_event_user_new') }}" class="btn btn-primary px-4 py-2 btn-border-radius shadow-sm">
-                        <i class="fas fa-plus-circle me-2"></i>Créer un événement
-                    </a>
+                    {% if app.user %}
+                        <a href="{{ path('app_event_user_new') }}" class="btn btn-primary px-4 py-2 btn-border-radius shadow-sm">
+                            <i class="fas fa-plus-circle me-2"></i>Créer un événement
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -43,22 +45,7 @@
                 {{ render(controller('App\\Controller\\EventController::publicEvents')) }}
             </div>
 
-            <!-- Événements passés / à venir (bloc info) -->
-            <div class="row mt-5">
-                <div class="col-12">
-                    <div class="border border-primary rounded-3 bg-light p-4 p-lg-5 wow fadeIn" data-wow-delay="0.2s">
-                        <div class="row align-items-center">
-                            <div class="col-lg-8">
-                                <h5 class="text-primary mb-2">Vous organisez un événement pour mamans ?</h5>
-                                <p class="text-muted mb-0">Proposez votre atelier ou votre rencontre sur la plateforme Maternia et touchez les futures et jeunes mamans de votre région.</p>
-                            </div>
-                            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
-                                <a href="#contact" class="btn btn-primary px-4 py-3 btn-border-radius">Nous contacter</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
         </div>
     </section>
 {% endblock %}

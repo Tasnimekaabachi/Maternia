@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier l'événement - Event Manager{% endblock %}
+{% block title %}Modifier l'Événement{% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
@@ -12,17 +12,15 @@
         --light-pink: #fce7f3;
         --dark-pink: #be185d;
         --accent-pink: #db2777;
-        --warning-orange: #f59e0b;
-        --danger-red: #ef4444;
     }
     
-    .edit-form-container {
+    .event-form-container {
         max-width: 900px;
         margin: 2rem auto;
     }
     
-    .edit-header {
-        background: linear-gradient(135deg, var(--primary-pink) 0%, var(--dark-pink) 100%);
+    .event-header {
+        background: linear-gradient(135deg, var(--primary-pink) 0%, var(--secondary-pink) 100%);
         color: white;
         padding: 2rem;
         border-radius: 15px 15px 0 0;
@@ -30,7 +28,7 @@
         overflow: hidden;
     }
     
-    .edit-header::before {
+    .event-header::before {
         content: "✏️";
         position: absolute;
         font-size: 6rem;
@@ -40,7 +38,7 @@
         transform: translateY(-50%);
     }
     
-    .edit-form-card {
+    .event-form-card {
         background: white;
         border-radius: 0 0 15px 15px;
         box-shadow: 0 10px 30px rgba(236, 72, 153, 0.1);
@@ -49,32 +47,51 @@
         border-top: none;
     }
     
-    .back-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: var(--primary-pink);
-        text-decoration: none;
-        font-weight: 500;
+    .form-section {
+        margin-bottom: 2.5rem;
+        padding-bottom: 2rem;
+        border-bottom: 2px dashed #fce7f3;
+    }
+    
+    .form-section:last-child {
+        border-bottom: none;
+    }
+    
+    .section-title {
+        color: var(--dark-pink);
+        font-weight: 600;
         margin-bottom: 1.5rem;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        background-color: var(--light-pink);
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--light-pink);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .section-title i {
+        color: var(--primary-pink);
+    }
+    
+    .form-label {
+        font-weight: 500;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .form-control, .form-select {
+        border: 1px solid #fbcfe8;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
         transition: all 0.3s ease;
     }
     
-    .back-link:hover {
-        background-color: #fbcfe8;
-        transform: translateX(-5px);
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-pink);
+        box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
     }
     
-    .form-actions {
-        padding-top: 2rem;
-        margin-top: 2rem;
-        border-top: 2px dashed #fce7f3;
-    }
-    
-    .btn-update {
+    .btn-create {
         background: linear-gradient(135deg, var(--primary-pink) 0%, var(--accent-pink) 100%);
         border: none;
         color: white;
@@ -84,7 +101,7 @@
         transition: all 0.3s ease;
     }
     
-    .btn-update:hover {
+    .btn-create:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 20px rgba(236, 72, 153, 0.3);
         color: white;
@@ -105,188 +122,60 @@
         border-color: var(--dark-pink);
     }
     
-    .btn-danger {
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        border: none;
-        color: white;
-        padding: 0.875rem 2rem;
-        border-radius: 10px;
-        font-weight: 600;
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--primary-pink);
+        text-decoration: none;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        background-color: var(--light-pink);
         transition: all 0.3s ease;
     }
     
-    .btn-danger:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
-        color: white;
-    }
-    
-    .action-buttons {
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-    }
-    
-    .warning-card {
-        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-        border: 2px solid #f59e0b;
-        border-radius: 10px;
-        padding: 1.5rem;
-        margin-top: 2rem;
-    }
-    
-    .warning-card h5 {
-        color: #92400e;
-        margin-bottom: 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .warning-card p {
-        color: #92400e;
-        margin-bottom: 0;
-        opacity: 0.9;
-    }
-    
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .edit-form-container {
-            margin: 1rem;
-        }
-        
-        .edit-form-card {
-            padding: 1.5rem;
-        }
-        
-        .action-buttons {
-            flex-direction: column;
-        }
-        
-        .action-buttons .btn {
-            width: 100%;
-            text-align: center;
-        }
+    .back-link:hover {
+        background-color: #fbcfe8;
+        transform: translateX(-5px);
     }
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="edit-form-container">
+<div class="event-form-container">
     <!-- Back button -->
-    <a href="{{ path('app_event_index') }}" class="back-link">
+    <a href="{{ path('app_event_user_show', {'id': event.id}) }}" class="back-link">
         <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
         </svg>
-        Retour à la liste des événements
+        Retour à l'événement
     </a>
 
     <!-- Header -->
-    <div class="edit-header">
+    <div class="event-header">
         <h1 class="h2 mb-2 fw-bold">Modifier l'événement</h1>
         <p class="mb-0 opacity-90">Mettez à jour les informations de votre événement</p>
     </div>
     
     <!-- Form Card -->
-    <div class="edit-form-card">
-        <!-- Include your form -->
-        {{ include('event/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+    <div class="event-form-card">
+        {{ include('event/userform.html.twig') }}
         
         <!-- Form actions -->
-        <div class="form-actions">
+        <div class="form-actions mt-5 pt-4 border-top border-2">
             <div class="d-flex justify-content-between align-items-center">
+                <a href="{{ path('app_event_user_show', {'id': event.id}) }}" class="btn btn-outline-pink">
+                    Annuler
+                </a>
                 <div>
-                    <a href="{{ path('app_event_show', {'id': event.id}) }}" class="btn btn-outline-pink me-2">
-                        <i class="fas fa-eye me-2"></i>Voir l'événement
-                    </a>
-                    <a href="{{ path('app_event_index') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-times me-2"></i>Annuler
-                    </a>
-                </div>
-                <div class="action-buttons">
-                    <button type="submit" form="event-form" class="btn btn-update">
-                        <i class="fas fa-save me-2"></i>Mettre à jour
-                    </button>
-                    
-                    <!-- Delete button that triggers modal -->
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                        <i class="fas fa-trash me-2"></i>Supprimer
+                    <button type="submit" form="event-form" class="btn btn-create">
+                        Enregistrer les modifications
                     </button>
                 </div>
             </div>
         </div>
-        
-        <!-- Warning about changes -->
-        <div class="warning-card">
-            <h5><i class="fas fa-exclamation-triangle"></i> Attention</h5>
-            <p>Toutes les modifications seront immédiatement appliquées. Les participants seront notifiés des changements importants.</p>
-        </div>
     </div>
 </div>
-
-<!-- Delete Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-danger" id="deleteModalLabel">
-                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmer la suppression
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Êtes-vous sûr de vouloir supprimer cet événement ?</p>
-                <p class="fw-bold">{{ event.title }}</p>
-                <p class="text-muted small">Cette action est irréversible. Toutes les données associées à cet événement seront définitivement supprimées.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-2"></i>Annuler
-                </button>
-                {{ include('event/_delete_form.html.twig') }}
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-// Optional: Add confirmation for unsaved changes
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('event-form');
-    let formChanged = false;
-    
-    if (form) {
-        // Track form changes
-        const inputs = form.querySelectorAll('input, select, textarea');
-        inputs.forEach(input => {
-            input.addEventListener('change', function() {
-                formChanged = true;
-            });
-            
-            input.addEventListener('input', function() {
-                formChanged = true;
-            });
-        });
-        
-        // Warn before leaving if changes were made
-        window.addEventListener('beforeunload', function(e) {
-            if (formChanged) {
-                e.preventDefault();
-                e.returnValue = 'Vous avez des modifications non sauvegardées. Êtes-vous sûr de vouloir quitter ?';
-            }
-        });
-        
-        // Reset formChanged on submit
-        form.addEventListener('submit', function() {
-            formChanged = false;
-        });
-    }
-    
-    // Preview event before saving
-    window.previewChanges = function() {
-        alert('Aperçu des modifications (à implémenter selon vos besoins)');
-        // You could show a modal with before/after comparison
-    }
-});
-</script>
 {% endblock %}
