@@ -135,7 +135,7 @@
             <p class="small text-center mt-2 text-primary fw-bold" id="scanStatus">Initialisation de la caméra...</p>
         </div>
 
-        <form method="post" id="loginForm">
+        <form method="post" id="loginForm" novalidate>
             {% if error %}
                 <div class="alert alert-danger text-center small" style="border-radius: 15px;">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
             {% endif %}

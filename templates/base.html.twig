@@ -42,7 +42,7 @@
     {% block navbar %}
     <!-- Navbar start -->
     <div class="container-fluid border-bottom bg-light wow fadeIn" data-wow-delay="0.1s">
-        <div class="container topbar topbar-compact bg-primary d-none d-lg-block">
+        <div class="container-fluid topbar topbar-compact bg-primary d-none d-lg-block px-4">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="top-info">
                     <span class="topbar-item"><i class="fas fa-map-marker-alt me-1 opacity-75"></i><a href="#contact" class="text-white text-decoration-none">Contact</a></span>
@@ -56,7 +56,7 @@
                 </div>
             </div>
         </div>
-        <div class="container px-0">
+        <div class="container-fluid px-4">
             <nav class="navbar navbar-light navbar-expand-xl py-3">
                 <a href="{{ path('app_home') }}" class="navbar-brand">
                     <h1 class="text-primary display-6">Mater<span class="text-secondary">nia</span></h1>
@@ -122,7 +122,20 @@
                         {# Section Authentification & Profil #}
                         <div class="d-flex align-items-center ms-3">
                             {% if app.user %}
-                                <a href="{{ path('app_logout') }}" class="btn btn-outline-primary btn-border-radius px-3 me-2">Déconnexion</a>
+                                <div class="me-3 text-end d-none d-lg-block">
+                                    <span class="d-block text-muted small">Bienvenue,</span>
+                                    <span class="text-primary fw-bold">{{ app.user.prenom }} {{ app.user.nom }}</span>
+                                </div>
+                                
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <a href="{{ path('admin_dashboard') }}" class="btn btn-primary btn-sm btn-border-radius me-2" title="Dashboard Admin">
+                                        <i class="fas fa-tools"></i> Admin
+                                    </a>
+                                {% endif %}
+
+                                <a href="{{ path('app_logout') }}" class="btn btn-outline-primary btn-border-radius px-3 me-2" title="Déconnexion">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </a>
                                 <a href="{{ path('app_user_profile') }}" class="text-primary" title="Mon Profil Face ID">
                                     <i class="fas fa-user-circle fa-2x"></i>
                                 </a>
