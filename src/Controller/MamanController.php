@@ -101,14 +101,40 @@ final class MamanController extends AbstractController
                 if ($imcAlerte) {
                     $grossesseAlertes[] = 'IMC à risque : surveillez la prise de poids avec un professionnel de santé.';
                 }
-            } elseif ($statut === 'terminee') {
-                $bebeAgeMois = $conseilsSuiviService->getAgeBebeEnMois($grossesse);
-                if ($bebeAgeMois !== null) {
-                    $bebeConseil = $conseilsSuiviService->conseilsBebe($bebeAgeMois);
-                }
-            }
-        }
+           } elseif ($statut === 'terminee') {
+    $bebeAgeMois = $conseilsSuiviService->getAgeBebeEnMois($grossesse);
+    if ($bebeAgeMois !== null) {
+        $bebeConseil = $conseilsSuiviService->conseilsBebe($bebeAgeMois);
+    }
 
+    // Données courbe bébé
+    $sexe = $grossesse->getSexeBebe(); // 'M' ou 'F'
+
+    // Normes OMS à la naissance
+    $normes = [
+        'M' => ['poids_min' => 2.9, 'poids_max' => 4.0, 'taille_min' => 48.0, 'taille_max' => 52.0],
+        'F' => ['poids_min' => 2.8, 'poids_max' => 3.8, 'taille_min' => 47.0, 'taille_max' => 51.0],
+    ];
+
+    $normesBebe = $normes[$sexe] ?? $normes['M'];
+    $poidsBebe  = $grossesse->getPoidsNaissance();
+    $tailleBebe = $grossesse->getTailleNaissance();
+
+    // Évaluation poids
+    $evaluationPoids = 'normal';
+    if ($poidsBebe !== null) {
+        if ($poidsBebe < $normesBebe['poids_min']) $evaluationPoids = 'faible';
+        elseif ($poidsBebe > $normesBebe['poids_max']) $evaluationPoids = 'eleve';
+    }
+
+    // Évaluation taille
+$evaluationTaille = 'normal';
+    if ($tailleBebe !== null) {
+        if ($tailleBebe < $normesBebe['taille_min']) $evaluationTaille = 'faible';
+        elseif ($tailleBebe > $normesBebe['taille_max']) $evaluationTaille = 'eleve';
+    }
+        }
+        }
         return $this->render('pages/mon_profil_maman.html.twig', [
             'maman' => $maman,
             'mode' => 'show',
@@ -121,6 +147,9 @@ final class MamanController extends AbstractController
             'grossesse_alertes' => $grossesseAlertes,
             'bebe_age_mois' => $bebeAgeMois,
             'bebe_conseil' => $bebeConseil,
+            'normes_bebe'       => $normesBebe ?? null,
+'evaluation_poids'  => $evaluationPoids ?? null,
+'evaluation_taille' => $evaluationTaille ?? null,
         ]);
     }
 
