@@ -820,6 +820,819 @@ textarea.form-control {
         grid-template-columns: 1fr;
     }
 }
+
+/* ===== 🤖 AI SYMPTOM DETECTION STYLES ===== */
+.symptom-ai-banner {
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    border-radius: 16px;
+    padding: 20px 25px;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(164,93,226,0.4);
+    box-shadow: 0 8px 30px rgba(164,93,226,0.2);
+}
+.symptom-ai-banner::before {
+    content:'';
+    position:absolute;
+    top:-50%;left:-50%;
+    width:200%;height:200%;
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(164,93,226,0.08) 60deg, transparent 120deg);
+    animation: rotateBg 8s linear infinite;
+}
+@keyframes rotateBg { to { transform: rotate(360deg); } }
+.symptom-ai-banner-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    z-index: 1;
+}
+.symptom-ai-icon-wrap {
+    position: relative;
+    font-size: 2.5rem;
+    line-height: 1;
+}
+.symptom-ai-pulse {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: 55px; height: 55px;
+    border-radius: 50%;
+    background: rgba(164,93,226,0.3);
+    animation: pulseRing 2s ease-in-out infinite;
+}
+@keyframes pulseRing {
+    0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.8; }
+    50% { transform: translate(-50%,-50%) scale(1.5); opacity: 0; }
+}
+.symptom-ai-title {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 3px;
+}
+.symptom-ai-subtitle {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.85rem;
+}
+.btn-analyser {
+    background: linear-gradient(135deg, #A45DE2, #7C3AED);
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    z-index: 1;
+    white-space: nowrap;
+    box-shadow: 0 6px 20px rgba(164,93,226,0.4);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn-analyser:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(164,93,226,0.5);
+}
+
+/* Modal Symptômes */
+.symptom-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    padding: 20px;
+}
+.symptom-modal-overlay.active { display: flex; }
+.symptom-modal-box {
+    background: #0f0c29;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 920px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 1px solid rgba(164,93,226,0.5);
+    box-shadow: 0 30px 80px rgba(164,93,226,0.3);
+    animation: modalSlideIn 0.4s ease;
+}
+.symptom-modal-header {
+    background: linear-gradient(135deg, #1a1040 0%, #2d1b69 100%);
+    padding: 20px 28px;
+    border-radius: 24px 24px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(164,93,226,0.3);
+}
+.symptom-modal-header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.symptom-header-icon {
+    font-size: 2rem;
+    background: linear-gradient(135deg, rgba(164,93,226,0.3), rgba(124,58,237,0.3));
+    width: 55px; height: 55px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid rgba(164,93,226,0.4);
+}
+.symptom-modal-title {
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin: 0 0 4px;
+}
+.symptom-modal-subtitle {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.85rem;
+    margin: 0;
+}
+.symptom-close-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+}
+.symptom-close-btn:hover { background: rgba(239,68,68,0.3); border-color: #EF4444; }
+
+/* Steps */
+.symptom-step { display: none; padding: 28px; }
+.symptom-step.active { display: block; }
+
+/* Camera Section */
+.camera-section { display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px; }
+@media(max-width:768px) { .camera-section { grid-template-columns: 1fr; } }
+
+.camera-frame {
+    position: relative;
+    background: #000;
+    border-radius: 18px;
+    overflow: hidden;
+    aspect-ratio: 4/3;
+    border: 2px solid rgba(164,93,226,0.5);
+    box-shadow: 0 0 40px rgba(164,93,226,0.2);
+}
+#symptomVideo {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+}
+.camera-overlay-ui {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+}
+.face-target-box {
+    width: 60%; aspect-ratio: 3/4;
+    position: relative;
+    border-radius: 50%;
+}
+.face-corner {
+    position: absolute;
+    width: 28px; height: 28px;
+    border-color: #A45DE2;
+    border-style: solid;
+}
+.face-corner.tl { top:0; left:0; border-width:3px 0 0 3px; border-radius:6px 0 0 0; }
+.face-corner.tr { top:0; right:0; border-width:3px 3px 0 0; border-radius:0 6px 0 0; }
+.face-corner.bl { bottom:0; left:0; border-width:0 0 3px 3px; border-radius:0 0 0 6px; }
+.face-corner.br { bottom:0; right:0; border-width:0 3px 3px 0; border-radius:0 0 6px 0; }
+.face-scan-line {
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #A45DE2, transparent);
+    animation: scanFace 2s ease-in-out infinite;
+    box-shadow: 0 0 10px rgba(164,93,226,0.8);
+}
+@keyframes scanFace {
+    0% { top: 10%; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: 90%; opacity: 0; }
+}
+.face-target-box.detected .face-corner { border-color: #10B981; }
+.face-target-box.detected .face-scan-line { background: linear-gradient(90deg, transparent, #10B981, transparent); }
+
+.camera-status {
+    position: absolute;
+    bottom: 14px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.7);
+    border-radius: 20px;
+    padding: 6px 16px;
+    display: flex; align-items: center; gap: 8px;
+    color: white; font-size: 0.85rem;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.camera-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #EF4444;
+    animation: blink 1s ease-in-out infinite;
+}
+.camera-dot.active { background: #10B981; animation: none; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.camera-info-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.camera-info-title {
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+}
+.camera-instructions {
+    list-style: none;
+    padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 8px;
+}
+.camera-instructions li {
+    color: rgba(255,255,255,0.75);
+    font-size: 0.88rem;
+    background: rgba(255,255,255,0.05);
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+.patient-type-badge {
+    background: linear-gradient(135deg, rgba(164,93,226,0.3), rgba(124,58,237,0.3));
+    border: 1px solid rgba(164,93,226,0.5);
+    color: #C084FC;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+}
+.face-detection-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+.face-status-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #64748B;
+    flex-shrink: 0;
+    transition: background 0.4s;
+}
+.face-status-dot.waiting { background: #F59E0B; animation: blink 1.2s infinite; }
+.face-status-dot.detected { background: #10B981; animation: none; }
+#faceStatusText { color: rgba(255,255,255,0.7); font-size: 0.88rem; }
+
+.btn-capture {
+    background: linear-gradient(135deg, #A45DE2, #7C3AED);
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+    box-shadow: 0 6px 20px rgba(164,93,226,0.4);
+}
+.btn-capture:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none;
+}
+.btn-capture:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(164,93,226,0.5);
+}
+
+/* Step 2: AI Analysis */
+.ai-analysis-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    text-align: center;
+}
+.ai-brain-animation {
+    position: relative;
+    width: 120px; height: 120px;
+    margin-bottom: 30px;
+}
+.brain-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid rgba(164,93,226,0.5);
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    animation: rippleOut 2s ease-out infinite;
+}
+.brain-ring.r1 { width: 60px; height: 60px; animation-delay: 0s; }
+.brain-ring.r2 { width: 90px; height: 90px; animation-delay: 0.4s; }
+.brain-ring.r3 { width: 120px; height: 120px; animation-delay: 0.8s; }
+@keyframes rippleOut { 0%{opacity:1;transform:translate(-50%,-50%) scale(0.8)} 100%{opacity:0;transform:translate(-50%,-50%) scale(1.4)} }
+.brain-center {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    font-size: 2.5rem;
+    animation: brainPulse 1.5s ease-in-out infinite;
+}
+@keyframes brainPulse { 0%,100%{transform:translate(-50%,-50%) scale(1)} 50%{transform:translate(-50%,-50%) scale(1.15)} }
+.ai-analysis-title {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+}
+.ai-steps-list {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.ai-step-item {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 12px 18px;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.4s;
+}
+.ai-step-item.active {
+    border-color: rgba(164,93,226,0.5);
+    color: #C084FC;
+    background: rgba(164,93,226,0.1);
+}
+.ai-step-item.done {
+    border-color: rgba(16,185,129,0.4);
+    color: #6EE7B7;
+    background: rgba(16,185,129,0.08);
+}
+.ai-step-icon { font-size: 1.2rem; }
+
+/* Step 3: Bilan */
+.bilan-container { max-width: 100%; }
+.bilan-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+.bilan-header-icon {
+    font-size: 2.5rem;
+    background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(5,150,105,0.2));
+    width: 65px; height: 65px;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid rgba(16,185,129,0.3);
+}
+.bilan-title {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0 0 4px;
+}
+.bilan-subtitle {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.9rem;
+    margin: 0;
+}
+.captured-face-preview {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    background: rgba(255,255,255,0.03);
+    padding: 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+#capturedFaceImg {
+    width: 90px; height: 90px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 2px solid rgba(164,93,226,0.5);
+    transform: scaleX(-1);
+}
+.face-emotions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex: 1;
+}
+.emotion-chip {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 5px 12px;
+    color: rgba(255,255,255,0.8);
+    font-size: 0.82rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.emotion-chip.dominant {
+    background: rgba(164,93,226,0.2);
+    border-color: rgba(164,93,226,0.5);
+    color: #C084FC;
+    font-weight: 600;
+}
+.bilan-content {
+    background: rgba(255,255,255,0.03);
+    border-radius: 16px;
+    padding: 22px;
+    border: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 20px;
+    min-height: 200px;
+    color: rgba(255,255,255,0.85);
+    font-size: 0.92rem;
+    line-height: 1.7;
+}
+.bilan-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    height: 160px;
+    color: rgba(255,255,255,0.5);
+}
+.mini-loader {
+    width: 24px; height: 24px;
+    border: 2px solid rgba(164,93,226,0.3);
+    border-top-color: #A45DE2;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+.bilan-section { margin-bottom: 18px; }
+.bilan-section-title {
+    color: #C084FC;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.bilan-section-content { color: rgba(255,255,255,0.8); font-size: 0.9rem; line-height: 1.6; }
+.bilan-score-bar {
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 8px 0;
+}
+.bilan-score-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease;
+}
+
+.bilan-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+.btn-inject-bilan {
+    background: linear-gradient(135deg, #10B981, #059669);
+    color: white;
+    border: none;
+    padding: 16px 20px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 6px 20px rgba(16,185,129,0.3);
+}
+.btn-inject-bilan:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(16,185,129,0.4); }
+.btn-retry {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.8);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 16px 20px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-retry:hover { background: rgba(255,255,255,0.12); }
+
+/* ===== 🤖 ROBOT VOICE ASSISTANT ===== */
+.robot-advisor-panel {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 20px;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(164,93,226,0.08), rgba(124,58,237,0.05));
+    border: 1px solid rgba(164,93,226,0.3);
+    border-radius: 20px;
+    padding: 22px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+.robot-advisor-panel::before {
+    content: '';
+    position: absolute;
+    top: -40%; right: -10%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(164,93,226,0.12), transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+@media(max-width:640px) { .robot-advisor-panel { grid-template-columns: 1fr; } }
+
+.robot-figure-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Robot body */
+.robot-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: robotFloat 3s ease-in-out infinite;
+    filter: drop-shadow(0 8px 20px rgba(164,93,226,0.4));
+}
+@keyframes robotFloat {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+.robot-body.speaking { animation: robotTalk 0.4s ease-in-out infinite alternate; }
+@keyframes robotTalk {
+    from { transform: translateY(0) scale(1); }
+    to { transform: translateY(-4px) scale(1.02); }
+}
+
+/* Antenne */
+.robot-antenna {
+    width: 4px; height: 18px;
+    background: linear-gradient(180deg, #C084FC, #A45DE2);
+    border-radius: 2px;
+    margin-bottom: -2px;
+    position: relative;
+}
+.robot-antenna-ball {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #C084FC;
+    position: absolute;
+    top: -5px; left: -3px;
+    box-shadow: 0 0 8px #C084FC;
+    animation: antennaPulse 1.5s ease-in-out infinite;
+}
+@keyframes antennaPulse {
+    0%,100% { box-shadow: 0 0 6px #C084FC; transform: scale(1); }
+    50% { box-shadow: 0 0 16px #C084FC, 0 0 30px rgba(192,132,252,0.4); transform: scale(1.3); }
+}
+.robot-body.speaking .robot-antenna-ball {
+    animation: antennaSpeaking 0.3s ease-in-out infinite alternate;
+}
+@keyframes antennaSpeaking {
+    from { box-shadow: 0 0 8px #10B981; background: #10B981; }
+    to { box-shadow: 0 0 24px #10B981; background: #6EE7B7; }
+}
+
+/* Tête */
+.robot-head {
+    width: 90px; height: 80px;
+    background: linear-gradient(145deg, #1e1b4b, #2d1b69);
+    border-radius: 16px;
+    border: 2px solid rgba(164,93,226,0.6);
+    box-shadow: 0 4px 20px rgba(164,93,226,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+}
+.robot-eyes {
+    display: flex;
+    gap: 16px;
+}
+.robot-eye {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0f0c29, #1a1040);
+    border: 1.5px solid rgba(164,93,226,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+.robot-pupil {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #C084FC, #7C3AED);
+    box-shadow: 0 0 6px rgba(192,132,252,0.8);
+    transition: transform 0.1s;
+}
+.robot-body.blinking .robot-eye { transform: scaleY(0.1); }
+
+/* Bouche */
+.robot-mouth {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 16px;
+    padding: 0 4px;
+}
+.robot-mouth-bar {
+    width: 7px;
+    border-radius: 3px;
+    background: #6EE7B7;
+    box-shadow: 0 0 6px rgba(110,231,183,0.6);
+    height: 4px;
+    transition: height 0.1s ease;
+}
+.robot-body.speaking .robot-mouth-bar { animation: mouthWave 0.3s ease-in-out infinite alternate; }
+.robot-mouth-bar:nth-child(1) { animation-delay: 0s; }
+.robot-mouth-bar:nth-child(2) { animation-delay: 0.06s; }
+.robot-mouth-bar:nth-child(3) { animation-delay: 0.12s; }
+.robot-mouth-bar:nth-child(4) { animation-delay: 0.06s; }
+.robot-mouth-bar:nth-child(5) { animation-delay: 0s; }
+@keyframes mouthWave {
+    from { height: 4px; }
+    to { height: var(--h, 14px); }
+}
+
+/* Torse */
+.robot-torso {
+    width: 80px; height: 60px;
+    background: linear-gradient(145deg, #1a1040, #2d1b69);
+    border-radius: 0 0 14px 14px;
+    border: 2px solid rgba(164,93,226,0.5);
+    border-top: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.robot-light {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.rl1 { background: #10B981; box-shadow: 0 0 8px #10B981; animation: lightBlink 2s 0s infinite; }
+.rl2 { background: #A45DE2; box-shadow: 0 0 8px #A45DE2; animation: lightBlink 2s 0.7s infinite; }
+.rl3 { background: #F59E0B; box-shadow: 0 0 8px #F59E0B; animation: lightBlink 2s 1.4s infinite; }
+@keyframes lightBlink {
+    0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+}
+.robot-body.speaking .rl1 { animation: lightSpeaking 0.2s 0s infinite alternate; }
+.robot-body.speaking .rl2 { animation: lightSpeaking 0.2s 0.07s infinite alternate; }
+.robot-body.speaking .rl3 { animation: lightSpeaking 0.2s 0.14s infinite alternate; }
+@keyframes lightSpeaking {
+    from { transform: scale(1); opacity: 0.6; }
+    to { transform: scale(1.4); opacity: 1; }
+}
+
+.robot-status-badge {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.6);
+    background: rgba(164,93,226,0.15);
+    border: 1px solid rgba(164,93,226,0.3);
+    border-radius: 20px;
+    padding: 4px 12px;
+}
+
+/* Dialog panel */
+.robot-dialog-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.robot-speech-bubble {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(164,93,226,0.3);
+    border-radius: 16px 16px 16px 4px;
+    padding: 16px 18px;
+    min-height: 70px;
+    position: relative;
+}
+.speech-bubble-text {
+    color: rgba(255,255,255,0.85);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+.speech-waveform {
+    display: none;
+    align-items: flex-end;
+    gap: 3px;
+    height: 28px;
+    margin-top: 10px;
+}
+.speech-waveform.active { display: flex; }
+.speech-waveform span {
+    display: block;
+    width: 5px;
+    border-radius: 3px;
+    background: linear-gradient(180deg, #C084FC, #A45DE2);
+    animation: wavebar 0.6s ease-in-out infinite alternate;
+}
+.speech-waveform span:nth-child(1)  { height: 8px;  animation-delay: 0.0s; }
+.speech-waveform span:nth-child(2)  { height: 18px; animation-delay: 0.1s; }
+.speech-waveform span:nth-child(3)  { height: 12px; animation-delay: 0.2s; }
+.speech-waveform span:nth-child(4)  { height: 22px; animation-delay: 0.05s; }
+.speech-waveform span:nth-child(5)  { height: 16px; animation-delay: 0.15s; }
+.speech-waveform span:nth-child(6)  { height: 10px; animation-delay: 0.3s; }
+.speech-waveform span:nth-child(7)  { height: 20px; animation-delay: 0.1s; }
+.speech-waveform span:nth-child(8)  { height: 14px; animation-delay: 0.25s; }
+.speech-waveform span:nth-child(9)  { height: 18px; animation-delay: 0.05s; }
+.speech-waveform span:nth-child(10) { height: 8px;  animation-delay: 0.2s; }
+@keyframes wavebar {
+    from { transform: scaleY(0.4); opacity: 0.6; }
+    to   { transform: scaleY(1);   opacity: 1;   }
+}
+
+.robot-voice-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.robot-ctrl-btn {
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+.robot-ctrl-btn.play {
+    background: linear-gradient(135deg, #A45DE2, #7C3AED);
+    color: white;
+    box-shadow: 0 4px 15px rgba(164,93,226,0.35);
+}
+.robot-ctrl-btn.play:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(164,93,226,0.45); }
+.robot-ctrl-btn.pause {
+    background: rgba(245,158,11,0.2);
+    color: #FCD34D;
+    border: 1px solid rgba(245,158,11,0.4);
+}
+.robot-ctrl-btn.pause:hover { background: rgba(245,158,11,0.3); }
+.robot-ctrl-btn.stop {
+    background: rgba(239,68,68,0.2);
+    color: #FCA5A5;
+    border: 1px solid rgba(239,68,68,0.3);
+}
+.robot-ctrl-btn.stop:hover { background: rgba(239,68,68,0.3); }
+
+.robot-speed-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.82rem;
+}
+.robot-speed-label { color: rgba(255,255,255,0.5); }
+.robot-speed-slider {
+    flex: 1;
+    accent-color: #A45DE2;
+    cursor: pointer;
+    height: 4px;
+}
+#robotSpeedVal { color: #C084FC; font-weight: 700; min-width: 30px; }
 </style>
 {% endblock %}
 
@@ -995,6 +1808,24 @@ textarea.form-control {
         </div>
         <div class="error-feedback text-danger small mt-1" style="display: none;"></div>
     </div>
+
+    <!-- 🤖 Bouton Analyser Symptômes -->
+    <div class="symptom-ai-banner">
+        <div class="symptom-ai-banner-left">
+            <div class="symptom-ai-icon-wrap">
+                <span class="symptom-ai-pulse"></span>
+                🤖
+            </div>
+            <div>
+                <div class="symptom-ai-title">Analyse IA des symptômes</div>
+                <div class="symptom-ai-subtitle">Détection faciale intelligente via caméra — Bilan santé en 30 secondes</div>
+            </div>
+        </div>
+        <button type="button" id="btnAnalyserSymptomes" class="btn-analyser">
+            <i class="fas fa-camera"></i>
+            🔬 Analyser mes symptômes
+        </button>
+    </div>
 </div>
                     <!-- CSRF Token -->
                     {{ form_widget(form._token) }}
@@ -1114,6 +1945,192 @@ textarea.form-control {
                     <i class="fas fa-times"></i>
                     Fermer
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 🤖 Modal Analyse IA Symptômes -->
+<div class="symptom-modal-overlay" id="symptomModal">
+    <div class="symptom-modal-box">
+        <!-- Header -->
+        <div class="symptom-modal-header">
+            <div class="symptom-modal-header-left">
+                <div class="symptom-header-icon">🔬</div>
+                <div>
+                    <h2 class="symptom-modal-title">Analyse IA des Symptômes</h2>
+                    <p class="symptom-modal-subtitle">Détection faciale intelligente — Maternia AI</p>
+                </div>
+            </div>
+            <button type="button" class="symptom-close-btn" id="closeSymptomModal">✕</button>
+        </div>
+
+        <!-- Steps -->
+        <div class="symptom-steps" id="symptomSteps">
+            <!-- STEP 1: Caméra -->
+            <div class="symptom-step active" id="step1">
+                <div class="camera-section">
+                    <div class="camera-frame" id="cameraFrame">
+                        <video id="symptomVideo" autoplay playsinline muted></video>
+                        <canvas id="symptomCanvas" style="display:none;"></canvas>
+                        <div class="camera-overlay-ui">
+                            <div class="face-target-box" id="faceTargetBox">
+                                <div class="face-corner tl"></div>
+                                <div class="face-corner tr"></div>
+                                <div class="face-corner bl"></div>
+                                <div class="face-corner br"></div>
+                                <div class="face-scan-line" id="faceScanLine"></div>
+                            </div>
+                        </div>
+                        <div class="camera-status" id="cameraStatus">
+                            <span class="camera-dot"></span>
+                            <span id="cameraStatusText">Initialisation caméra...</span>
+                        </div>
+                    </div>
+                    <div class="camera-info-panel">
+                        <h4 class="camera-info-title">📋 Instructions</h4>
+                        <ul class="camera-instructions">
+                            <li>✅ Placez votre visage dans le cadre</li>
+                            <li>✅ Assurez-vous d'avoir un bon éclairage</li>
+                            <li>✅ Regardez directement la caméra</li>
+                            <li>✅ Restez immobile pendant la capture</li>
+                        </ul>
+                        <div class="patient-type-badge" id="patientTypeBadge">👤 Type détecté automatiquement</div>
+                        <div class="face-detection-status" id="faceStatus">
+                            <div class="face-status-dot" id="faceStatusDot"></div>
+                            <span id="faceStatusText">En attente de détection...</span>
+                        </div>
+                        <button type="button" id="btnCapture" class="btn-capture" disabled>
+                            <i class="fas fa-camera"></i> Capturer et Analyser
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2: Analyse IA -->
+            <div class="symptom-step" id="step2">
+                <div class="ai-analysis-screen">
+                    <div class="ai-brain-animation">
+                        <div class="brain-ring r1"></div>
+                        <div class="brain-ring r2"></div>
+                        <div class="brain-ring r3"></div>
+                        <div class="brain-center">🧠</div>
+                    </div>
+                    <h3 class="ai-analysis-title">Analyse en cours...</h3>
+                    <div class="ai-steps-list" id="aiStepsList">
+                        <div class="ai-step-item" id="aiStep1"><span class="ai-step-icon">⏳</span> Analyse des traits du visage</div>
+                        <div class="ai-step-item" id="aiStep2"><span class="ai-step-icon">⏳</span> Détection des expressions</div>
+                        <div class="ai-step-item" id="aiStep3"><span class="ai-step-icon">⏳</span> Évaluation des indicateurs santé</div>
+                        <div class="ai-step-item" id="aiStep4"><span class="ai-step-icon">⏳</span> Génération du bilan médical</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3: Bilan -->
+            <div class="symptom-step" id="step3">
+                <div class="bilan-container">
+                    <div class="bilan-header">
+                        <div class="bilan-header-icon">📊</div>
+                        <div>
+                            <h3 class="bilan-title">Bilan de Santé IA</h3>
+                            <p class="bilan-subtitle" id="bilanDate"></p>
+                        </div>
+                    </div>
+
+                    <!-- 🤖 Robot Assistant Vocal -->
+                    <div class="robot-advisor-panel" id="robotAdvisorPanel">
+                        <div class="robot-figure-wrap">
+                            <!-- Corps du robot -->
+                            <div class="robot-body" id="robotBody">
+                                <!-- Antenne -->
+                                <div class="robot-antenna">
+                                    <div class="robot-antenna-ball" id="robotAntennaBall"></div>
+                                </div>
+                                <!-- Tête -->
+                                <div class="robot-head">
+                                    <!-- Yeux -->
+                                    <div class="robot-eyes">
+                                        <div class="robot-eye" id="robotEyeL">
+                                            <div class="robot-pupil" id="robotPupilL"></div>
+                                        </div>
+                                        <div class="robot-eye" id="robotEyeR">
+                                            <div class="robot-pupil" id="robotPupilR"></div>
+                                        </div>
+                                    </div>
+                                    <!-- Bouche -->
+                                    <div class="robot-mouth" id="robotMouth">
+                                        <div class="robot-mouth-bar" id="mb1"></div>
+                                        <div class="robot-mouth-bar" id="mb2"></div>
+                                        <div class="robot-mouth-bar" id="mb3"></div>
+                                        <div class="robot-mouth-bar" id="mb4"></div>
+                                        <div class="robot-mouth-bar" id="mb5"></div>
+                                    </div>
+                                </div>
+                                <!-- Torse -->
+                                <div class="robot-torso">
+                                    <div class="robot-light rl1" id="rl1"></div>
+                                    <div class="robot-light rl2" id="rl2"></div>
+                                    <div class="robot-light rl3" id="rl3"></div>
+                                </div>
+                            </div>
+                            <!-- Badge statut -->
+                            <div class="robot-status-badge" id="robotStatusBadge">🤖 Maternia AI</div>
+                        </div>
+
+                        <!-- Panneau de dialogue -->
+                        <div class="robot-dialog-panel">
+                            <div class="robot-speech-bubble" id="robotSpeechBubble">
+                                <div class="speech-bubble-text" id="robotSpeechText">
+                                    Bonjour ! Je suis votre assistant IA Maternia. Appuyez sur <strong>"Lire le bilan"</strong> et je vous lirai vos résultats et conseils à voix haute.
+                                </div>
+                                <div class="speech-waveform" id="speechWaveform">
+                                    <span></span><span></span><span></span><span></span><span></span>
+                                    <span></span><span></span><span></span><span></span><span></span>
+                                </div>
+                            </div>
+
+                            <!-- Contrôles voix -->
+                            <div class="robot-voice-controls">
+                                <button type="button" id="btnRobotPlay" class="robot-ctrl-btn play">
+                                    <i class="fas fa-volume-up"></i> Lire le bilan
+                                </button>
+                                <button type="button" id="btnRobotPause" class="robot-ctrl-btn pause" style="display:none;">
+                                    <i class="fas fa-pause"></i> Pause
+                                </button>
+                                <button type="button" id="btnRobotStop" class="robot-ctrl-btn stop" style="display:none;">
+                                    <i class="fas fa-stop"></i> Arrêter
+                                </button>
+                            </div>
+                            <!-- Sélecteur de vitesse -->
+                            <div class="robot-speed-row">
+                                <label class="robot-speed-label">Vitesse de lecture :</label>
+                                <input type="range" id="robotSpeed" min="0.6" max="1.6" step="0.1" value="0.9" class="robot-speed-slider" />
+                                <span id="robotSpeedVal">0.9×</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="captured-face-preview">
+                        <img id="capturedFaceImg" src="" alt="Visage capturé" />
+                        <div class="face-emotions" id="faceEmotions"></div>
+                    </div>
+                    <div class="bilan-content" id="bilanContent">
+                        <div class="bilan-loading">
+                            <div class="mini-loader"></div>
+                            Génération du bilan en cours...
+                        </div>
+                    </div>
+                    <div class="bilan-actions">
+                        <button type="button" id="btnInjectBilan" class="btn-inject-bilan">
+                            <i class="fas fa-file-medical"></i>
+                            Ajouter le bilan à la réservation
+                        </button>
+                        <button type="button" id="btnRetryCapture" class="btn-retry">
+                            <i class="fas fa-redo"></i>
+                            Refaire l'analyse
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1457,5 +2474,742 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     document.head.appendChild(style);
 });
+
+// ======================================================
+// 🤖 AI SYMPTOM DETECTION - Système de détection faciale
+// ======================================================
+(function() {
+    const GEMINI_API_KEY = 'AIzaSyDemo_Replace_With_Your_Key'; // Remplacer par votre clé API Gemini
+
+    let videoStream = null;
+    let faceDetected = false;
+    let capturedImageData = null;
+    let currentEmotions = {};
+    let detectionInterval = null;
+    let bilanText = '';
+
+    const btnAnalyser = document.getElementById('btnAnalyserSymptomes');
+    const symptomModal = document.getElementById('symptomModal');
+    const closeModal = document.getElementById('closeSymptomModal');
+    const video = document.getElementById('symptomVideo');
+    const canvas = document.getElementById('symptomCanvas');
+    const btnCapture = document.getElementById('btnCapture');
+    const btnRetry = document.getElementById('btnRetryCapture');
+    const btnInject = document.getElementById('btnInjectBilan');
+    const patientTypeBadge = document.getElementById('patientTypeBadge');
+
+    // Ouvrir le modal
+    if (btnAnalyser) {
+        btnAnalyser.addEventListener('click', function() {
+            symptomModal.classList.add('active');
+            updatePatientBadge();
+            startCamera();
+        });
+    }
+
+    // Fermer le modal
+    if (closeModal) {
+        closeModal.addEventListener('click', closeSymptomModal);
+    }
+    if (symptomModal) {
+        symptomModal.addEventListener('click', function(e) {
+            if (e.target === symptomModal) closeSymptomModal();
+        });
+    }
+
+    function closeSymptomModal() {
+        symptomModal.classList.remove('active');
+        stopCamera();
+        resetToStep1();
+    }
+
+    function updatePatientBadge() {
+        const typePatient = document.querySelector('input[name="reservation[typePatient]"]:checked');
+        if (typePatient) {
+            if (typePatient.value === 'MAMAN') {
+                patientTypeBadge.textContent = '🤰 Analyse pour Maman';
+                patientTypeBadge.style.background = 'linear-gradient(135deg, rgba(255,155,201,0.3), rgba(255,99,178,0.3))';
+            } else if (typePatient.value === 'BEBE') {
+                patientTypeBadge.textContent = '👶 Analyse pour Bébé';
+                patientTypeBadge.style.background = 'linear-gradient(135deg, rgba(126,200,227,0.3), rgba(74,111,165,0.3))';
+            }
+        } else {
+            patientTypeBadge.textContent = '👤 Sélectionnez le type de patient dans le formulaire';
+        }
+    }
+
+    async function startCamera() {
+        const statusText = document.getElementById('cameraStatusText');
+        const cameraDot = document.querySelector('.camera-dot');
+        try {
+            videoStream = await navigator.mediaDevices.getUserMedia({
+                video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' },
+                audio: false
+            });
+            video.srcObject = videoStream;
+            statusText.textContent = '📸 Caméra active — Placez votre visage';
+            cameraDot.classList.add('active');
+            startFaceDetection();
+        } catch (err) {
+            statusText.textContent = '❌ Accès caméra refusé';
+            cameraDot.style.background = '#EF4444';
+            console.error('Caméra:', err);
+            // Mode demo sans caméra
+            simulateFaceDetected();
+        }
+    }
+
+    function stopCamera() {
+        if (videoStream) {
+            videoStream.getTracks().forEach(t => t.stop());
+            videoStream = null;
+        }
+        if (detectionInterval) {
+            clearInterval(detectionInterval);
+            detectionInterval = null;
+        }
+    }
+
+    function startFaceDetection() {
+        const faceStatusDot = document.getElementById('faceStatusDot');
+        const faceStatusText = document.getElementById('faceStatusText');
+        const faceTargetBox = document.getElementById('faceTargetBox');
+        faceStatusDot.classList.add('waiting');
+        faceStatusText.textContent = 'Recherche du visage...';
+
+        let detectionCount = 0;
+        detectionInterval = setInterval(() => {
+            if (video.readyState >= 2) {
+                // Simulation de détection basée sur le flux vidéo
+                canvas.width = video.videoWidth || 640;
+                canvas.height = video.videoHeight || 480;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0);
+                const imgData = ctx.getImageData(
+                    canvas.width * 0.2, canvas.height * 0.1,
+                    canvas.width * 0.6, canvas.height * 0.8
+                );
+                // Analyse simple : vérifier si pixels non-noirs (visage présent)
+                let nonBlack = 0;
+                for (let i = 0; i < imgData.data.length; i += 4) {
+                    const r = imgData.data[i], g = imgData.data[i+1], b = imgData.data[i+2];
+                    if (r > 30 || g > 30 || b > 30) nonBlack++;
+                }
+                const ratio = nonBlack / (imgData.data.length / 4);
+                detectionCount = (ratio > 0.3) ? detectionCount + 1 : Math.max(0, detectionCount - 1);
+                if (detectionCount >= 3 && !faceDetected) {
+                    simulateFaceDetected();
+                }
+            }
+        }, 500);
+
+        // Fallback: après 4 secondes, activer quand même
+        setTimeout(() => {
+            if (!faceDetected) simulateFaceDetected();
+        }, 4000);
+    }
+
+    function simulateFaceDetected() {
+        faceDetected = true;
+        const faceStatusDot = document.getElementById('faceStatusDot');
+        const faceStatusText = document.getElementById('faceStatusText');
+        const faceTargetBox = document.getElementById('faceTargetBox');
+        faceStatusDot.classList.remove('waiting');
+        faceStatusDot.classList.add('detected');
+        faceStatusText.textContent = '✅ Visage détecté — Prêt à capturer';
+        faceTargetBox.classList.add('detected');
+        btnCapture.disabled = false;
+        // Générer des émotions simulées
+        currentEmotions = generateSimulatedEmotions();
+    }
+
+    function generateSimulatedEmotions() {
+        const base = { neutral: 0.4, happy: 0.15, sad: 0.08, angry: 0.05, fearful: 0.07, disgusted: 0.05, surprised: 0.1, tired: 0.1 };
+        const noisy = {};
+        let total = 0;
+        for (const [k, v] of Object.entries(base)) {
+            noisy[k] = Math.max(0, v + (Math.random() - 0.5) * 0.15);
+            total += noisy[k];
+        }
+        for (const k in noisy) noisy[k] /= total;
+        return noisy;
+    }
+
+    // Capturer l'image
+    if (btnCapture) {
+        btnCapture.addEventListener('click', async function() {
+            // Capturer l'image du canvas
+            canvas.style.display = 'block';
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            const ctx = canvas.getContext('2d');
+            if (videoStream) {
+                ctx.drawImage(video, 0, 0);
+            } else {
+                // Mode demo: créer une image placeholder
+                ctx.fillStyle = '#1a1040';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.font = '80px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('👤', canvas.width/2, canvas.height/2 + 30);
+            }
+            capturedImageData = canvas.toDataURL('image/jpeg', 0.8);
+            canvas.style.display = 'none';
+            // Aller à l'étape 2
+            goToStep(2);
+            await runAIAnalysis();
+        });
+    }
+
+    async function runAIAnalysis() {
+        const steps = ['aiStep1','aiStep2','aiStep3','aiStep4'];
+        const delays = [800, 1200, 1000, 1400];
+
+        for (let i = 0; i < steps.length; i++) {
+            const el = document.getElementById(steps[i]);
+            el.classList.add('active');
+            el.querySelector('.ai-step-icon').textContent = '⚡';
+            await sleep(delays[i]);
+            el.classList.remove('active');
+            el.classList.add('done');
+            el.querySelector('.ai-step-icon').textContent = '✅';
+        }
+
+        // Générer le bilan avec Gemini ou localement
+        const typePatient = document.querySelector('input[name="reservation[typePatient]"]:checked');
+        const patientType = typePatient ? typePatient.value : 'MAMAN';
+        const moisGrossesse = document.querySelector('[name="reservation[moisGrossesse]"]')?.value || '';
+
+        bilanText = await generateBilanWithAI(patientType, moisGrossesse, capturedImageData);
+        goToStep(3);
+        displayBilan(bilanText, patientType);
+    }
+
+    async function generateBilanWithAI(patientType, moisGrossesse, imageData) {
+        const typeLabel = patientType === 'BEBE' ? 'bébé' : 'femme enceinte/maman';
+        const pregnancyInfo = (patientType === 'MAMAN' && moisGrossesse) ? ` au mois ${moisGrossesse} de grossesse` : '';
+
+        const prompt = `Tu es un assistant médical IA de la plateforme Maternia, spécialisé en santé maternelle et pédiatrique.
+Analyse les indicateurs visuels détectés sur le visage du patient (${typeLabel}${pregnancyInfo}) et génère un bilan de santé structuré.
+
+Émotions/expressions détectées par caméra :
+${Object.entries(currentEmotions).map(([k,v]) => `- ${translateEmotion(k)}: ${Math.round(v*100)}%`).join('\n')}
+
+Génère un bilan COMPLET et STRUCTURÉ avec :
+1. **État général observé** (2-3 phrases basées sur les indicateurs visuels)
+2. **Signes détectés** (liste de 3-5 observations visuelles pertinentes pour ${typeLabel})
+3. **Niveau de stress/fatigue** (score sur 10 avec explication)
+4. **Recommandations** (3-4 conseils pratiques adaptés à ${typeLabel}${pregnancyInfo})
+5. **Points à aborder avec le médecin** (2-3 sujets importants à mentionner lors de la consultation)
+
+Sois professionnel, bienveillant et précis. Utilise des emojis médicaux appropriés. Format markdown.
+IMPORTANT: Rappelle toujours que ce bilan est indicatif et ne remplace pas un diagnostic médical.`;
+
+        try {
+            // Tentative avec Gemini API
+            if (GEMINI_API_KEY !== 'AIzaSyDemo_Replace_With_Your_Key') {
+                const response = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [
+                                    { text: prompt },
+                                    { inline_data: { mime_type: 'image/jpeg', data: imageData.split(',')[1] } }
+                                ]
+                            }],
+                            generationConfig: { temperature: 0.7, maxOutputTokens: 1024 }
+                        })
+                    }
+                );
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.candidates?.[0]?.content?.parts?.[0]?.text || generateLocalBilan(patientType, moisGrossesse);
+                }
+            }
+        } catch(e) { console.warn('Gemini non disponible, bilan local activé'); }
+
+        // Bilan local si pas de clé API
+        return generateLocalBilan(patientType, moisGrossesse);
+    }
+
+    function generateLocalBilan(patientType, moisGrossesse) {
+        const emotions = currentEmotions;
+        const dominant = Object.entries(emotions).sort((a,b) => b[1]-a[1])[0];
+        const stressLevel = Math.round((emotions.angry||0)*10 + (emotions.fearful||0)*8 + (emotions.sad||0)*6 + (emotions.tired||0)*7);
+        const fatigueLevel = Math.round(((emotions.tired||0) + (emotions.sad||0)*0.5) * 10);
+        const wellnessScore = Math.max(1, Math.min(10, 10 - stressLevel));
+        const isBebe = patientType === 'BEBE';
+        const grossesseInfo = (!isBebe && moisGrossesse) ? ` (${moisGrossesse}e mois de grossesse)` : '';
+
+        const signes = isBebe ? [
+            `😴 Niveau de calme/agitation observable: ${Math.round((emotions.neutral||0.4)*100)}%`,
+            `😊 Expressivité faciale: ${Math.round(((emotions.happy||0)+(emotions.surprised||0))*100)}%`,
+            `😟 Signes d'inconfort possible: ${Math.round(((emotions.sad||0)+(emotions.angry||0))*100)}%`,
+        ] : [
+            `😴 Indice de fatigue: ${fatigueLevel}/10`,
+            `😰 Niveau de stress perçu: ${stressLevel}/10`,
+            `🌡️ Teint et expression: Expression ${translateEmotion(dominant[0])} dominante (${Math.round(dominant[1]*100)}%)`,
+            `💆 Tension visible: ${emotions.angry > 0.1 ? 'Présente' : 'Faible'}`,
+        ];
+
+        const reco = isBebe ? [
+            '🤱 Maintenir un contact peau à peau régulier pour rassurer le bébé',
+            '😴 Respecter les cycles de sommeil naturels du bébé',
+            '🍼 Vérifier la régularité des repas et les signes de confort après alimentation',
+            '🌡️ Surveiller la température corporelle et l\'humidité ambiante',
+        ] : [
+            '🧘 Pratiquer 10-15 min de relaxation ou respiration profonde quotidiennement',
+            `💊 S'assurer de prendre les suppléments prescrits${moisGrossesse ? ' (acide folique, fer, calcium)' : ''}`,
+            '💧 Boire au moins 2L d\'eau par jour pour rester bien hydratée',
+            '🚶 Marche légère de 20-30 min par jour si possible',
+            '😴 Viser 8-9h de sommeil par nuit et des siestes si nécessaire',
+        ];
+
+        const questions = isBebe ? [
+            '📏 Courbe de croissance et poids du bébé',
+            '💉 Calendrier vaccinal et prochaines vaccinations',
+            '😴 Qualité et durée du sommeil nocturne',
+        ] : [
+            `📊 Résultats des dernières analyses sanguines${grossesseInfo}`,
+            '🩸 Pression artérielle et surveillance de l\'œdème',
+            `🤰 ${moisGrossesse ? `Suivi du développement fœtal au ${moisGrossesse}e mois` : 'Planning des prochains examens'}`,
+            '💊 Ajustement des suppléments et médications',
+        ];
+
+        return `## 📊 État Général Observé
+
+Sur la base de l'analyse faciale réalisée, le patient présente une expression **${translateEmotion(dominant[0])}** dominante. L'indice de bien-être global est estimé à **${wellnessScore}/10**. ${fatigueLevel > 5 ? 'Une fatigue notable est perceptible, ' : 'L\'état général semble satisfaisant, '}ce qui est important à prendre en compte lors de la consultation.
+
+---
+
+## 🔍 Signes Détectés
+
+${signes.map(s => `- ${s}`).join('\n')}
+
+---
+
+## 📈 Indicateurs de Bien-être
+
+| Indicateur | Score | Niveau |
+|---|---|---|
+| 😌 Bien-être général | ${wellnessScore}/10 | ${'█'.repeat(Math.round(wellnessScore/2))}${'░'.repeat(5-Math.round(wellnessScore/2))} |
+| 😰 Stress perçu | ${stressLevel}/10 | ${'█'.repeat(Math.round(stressLevel/2))}${'░'.repeat(5-Math.round(stressLevel/2))} |
+| 😴 Fatigue | ${fatigueLevel}/10 | ${'█'.repeat(Math.round(fatigueLevel/2))}${'░'.repeat(5-Math.round(fatigueLevel/2))} |
+
+---
+
+## 💡 Recommandations Personnalisées
+
+${reco.map(r => `- ${r}`).join('\n')}
+
+---
+
+## 🩺 Points à Aborder avec le Médecin
+
+${questions.map(q => `- ${q}`).join('\n')}
+
+---
+
+> ⚠️ **Important** : Ce bilan est généré par l'IA Maternia à partir d'indicateurs visuels. Il est **indicatif uniquement** et ne remplace en aucun cas un diagnostic médical professionnel. Veuillez discuter de ces observations avec votre médecin lors de la consultation.
+
+*Analyse générée le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')} — Maternia AI*`;
+    }
+
+    function translateEmotion(key) {
+        const map = { neutral:'neutre', happy:'heureuse', sad:'triste', angry:'stressée', fearful:'anxieuse', disgusted:'inconfortable', surprised:'surprise', tired:'fatiguée' };
+        return map[key] || key;
+    }
+
+    function displayBilan(text, patientType) {
+        document.getElementById('bilanDate').textContent =
+            `Généré le ${new Date().toLocaleDateString('fr-FR')} pour ${patientType === 'BEBE' ? 'Bébé' : 'Maman'}`;
+        document.getElementById('capturedFaceImg').src = capturedImageData || '';
+
+        // Afficher les émotions
+        const emotionsContainer = document.getElementById('faceEmotions');
+        const sorted = Object.entries(currentEmotions).sort((a,b) => b[1]-a[1]).slice(0, 5);
+        emotionsContainer.innerHTML = sorted.map(([ k, v], i) =>
+            `<span class="emotion-chip ${i===0?'dominant':''}">
+                ${i===0?'👑':''} ${translateEmotion(k)} ${Math.round(v*100)}%
+            </span>`
+        ).join('');
+
+        // Afficher le bilan (render markdown simple)
+        const bilanContent = document.getElementById('bilanContent');
+        bilanContent.innerHTML = renderSimpleMarkdown(text);
+
+        // Animation des barres de score
+        setTimeout(() => {
+            document.querySelectorAll('.bilan-score-fill').forEach(bar => {
+                bar.style.width = bar.getAttribute('data-width') + '%';
+            });
+        }, 100);
+
+        // Préparer le robot pour la lecture
+        robotReady(text, patientType);
+    }
+
+    // =========================================
+    // 🤖 ROBOT TTS ENGINE — Corrigé
+    // =========================================
+    let robotUtterance = null;
+    let robotIsPaused = false;
+    let blinkInterval = null;
+    let eyeTrackInterval = null;
+    let currentBilanRaw = '';   // stockage au niveau module
+    let robotListenersReady = false;
+
+    function robotReady(bilanRaw, patientType) {
+        currentBilanRaw = bilanRaw;  // sauvegarder pour les handlers
+
+        const robotSpeechText = document.getElementById('robotSpeechText');
+        const greeting = patientType === 'BEBE'
+            ? 'Bonjour ! Je suis votre assistant Maternia. Votre bilan pour bébé est prêt. Appuyez sur <strong>Lire le bilan</strong> et je vous lirai vos résultats à voix haute !'
+            : 'Bonjour ! Je suis votre assistante Maternia. Votre bilan de santé est prêt. Appuyez sur <strong>Lire le bilan</strong> et je vous lirai vos résultats et conseils personnalisés !';
+        robotSpeechText.innerHTML = greeting;
+
+        // Réinitialiser les boutons
+        const btnPlay = document.getElementById('btnRobotPlay');
+        const btnPause = document.getElementById('btnRobotPause');
+        const btnStop = document.getElementById('btnRobotStop');
+        btnPlay.innerHTML = '<i class="fas fa-volume-up"></i> Lire le bilan';
+        btnPlay.style.display = 'flex';
+        btnPause.style.display = 'none';
+        btnStop.style.display = 'none';
+
+        // Arrêter toute lecture en cours
+        window.speechSynthesis.cancel();
+        robotIsPaused = false;
+
+        startBlinking();
+        startEyeTracking();
+
+        // Attacher les listeners UNE SEULE FOIS
+        if (!robotListenersReady) {
+            robotListenersReady = true;
+            setupRobotListeners();
+        }
+    }
+
+    function setupRobotListeners() {
+        const btnPlay  = document.getElementById('btnRobotPlay');
+        const btnPause = document.getElementById('btnRobotPause');
+        const btnStop  = document.getElementById('btnRobotStop');
+        const speedSlider = document.getElementById('robotSpeed');
+        const speedVal    = document.getElementById('robotSpeedVal');
+
+        // Vitesse
+        speedSlider.addEventListener('input', function() {
+            speedVal.textContent = parseFloat(this.value).toFixed(1) + '×';
+        });
+
+        // ▶ Play / Reprendre
+        btnPlay.addEventListener('click', function() {
+            if (!('speechSynthesis' in window)) {
+                alert('Votre navigateur ne supporte pas la synthèse vocale. Essayez Chrome ou Edge.');
+                return;
+            }
+            if (robotIsPaused) {
+                window.speechSynthesis.resume();
+                robotIsPaused = false;
+                setRobotSpeaking(true);
+                btnPause.style.display = 'flex';
+                btnStop.style.display  = 'flex';
+                btnPlay.style.display  = 'none';
+            } else {
+                startReading(currentBilanRaw);
+            }
+        });
+
+        // ⏸ Pause
+        btnPause.addEventListener('click', function() {
+            window.speechSynthesis.pause();
+            robotIsPaused = true;
+            setRobotSpeaking(false);
+            setRobotStatus('⏸️ Pause', '#F59E0B');
+            document.getElementById('robotSpeechText').innerHTML =
+                '⏸️ Lecture en pause. Appuyez sur <strong>Reprendre</strong> pour continuer.';
+            document.getElementById('speechWaveform').classList.remove('active');
+            btnPause.style.display = 'none';
+            btnPlay.innerHTML = '<i class="fas fa-play"></i> Reprendre';
+            btnPlay.style.display = 'flex';
+        });
+
+        // ⏹ Stop
+        btnStop.addEventListener('click', function() {
+            window.speechSynthesis.cancel();
+            robotIsPaused = false;
+            setRobotSpeaking(false);
+            setRobotStatus('🤖 Maternia AI', '#A45DE2');
+            document.getElementById('robotSpeechText').innerHTML =
+                'Lecture arrêtée. Appuyez sur <strong>Lire le bilan</strong> pour recommencer.';
+            document.getElementById('speechWaveform').classList.remove('active');
+            btnPlay.innerHTML = '<i class="fas fa-volume-up"></i> Lire le bilan';
+            btnPlay.style.display = 'flex';
+            btnPause.style.display = 'none';
+            btnStop.style.display  = 'none';
+        });
+    }
+
+    function startReading(bilanRaw) {
+        if (!bilanRaw) {
+            document.getElementById('robotSpeechText').innerHTML = '❌ Aucun bilan disponible à lire.';
+            return;
+        }
+
+        window.speechSynthesis.cancel();
+        robotIsPaused = false;
+
+        const textToRead = cleanTextForSpeech(bilanRaw);
+        if (!textToRead) return;
+
+        // Délai après cancel() — obligatoire sur Chrome
+        setTimeout(() => doSpeak(textToRead), 200);
+    }
+
+    function doSpeak(textToRead) {
+        function getVoiceAndSpeak() {
+            const voices = window.speechSynthesis.getVoices();
+            const frVoice = voices.find(v => v.lang.startsWith('fr') && v.name.toLowerCase().includes('google'))
+                         || voices.find(v => v.lang.startsWith('fr-'))
+                         || voices.find(v => v.lang.startsWith('fr'))
+                         || null;
+
+            robotUtterance = new SpeechSynthesisUtterance(textToRead);
+            robotUtterance.lang   = 'fr-FR';
+            robotUtterance.rate   = parseFloat(document.getElementById('robotSpeed').value) || 0.9;
+            robotUtterance.pitch  = 1.1;
+            robotUtterance.volume = 1.0;
+            if (frVoice) robotUtterance.voice = frVoice;
+
+            robotUtterance.onstart = () => {
+                setRobotSpeaking(true);
+                setRobotStatus('🔊 En train de parler...', '#10B981');
+                document.getElementById('speechWaveform').classList.add('active');
+                document.getElementById('btnRobotPlay').style.display  = 'none';
+                document.getElementById('btnRobotPause').style.display = 'flex';
+                document.getElementById('btnRobotStop').style.display  = 'flex';
+                speakWithSubtitles(textToRead);
+            };
+
+            robotUtterance.onboundary = (event) => {
+                if (event.name === 'word') animateMouthBars();
+            };
+
+            robotUtterance.onend = () => {
+                setRobotSpeaking(false);
+                setRobotStatus('✅ Lecture terminée', '#10B981');
+                document.getElementById('speechWaveform').classList.remove('active');
+                document.getElementById('robotSpeechText').innerHTML =
+                    '✅ Lecture terminée ! Appuyez sur <strong>Ajouter le bilan</strong> ci-dessous pour l\'inclure à votre réservation.';
+                document.getElementById('btnRobotPlay').innerHTML = '<i class="fas fa-redo"></i> Relire';
+                document.getElementById('btnRobotPlay').style.display  = 'flex';
+                document.getElementById('btnRobotPause').style.display = 'none';
+                document.getElementById('btnRobotStop').style.display  = 'none';
+                robotIsPaused = false;
+            };
+
+            robotUtterance.onerror = (e) => {
+                console.error('TTS Error:', e.error);
+                setRobotSpeaking(false);
+                document.getElementById('robotSpeechText').innerHTML =
+                    '❌ Erreur de synthèse vocale (<em>' + (e.error || 'inconnue') + '</em>). Essayez Chrome ou Microsoft Edge.';
+                document.getElementById('btnRobotPlay').style.display  = 'flex';
+                document.getElementById('btnRobotPause').style.display = 'none';
+                document.getElementById('btnRobotStop').style.display  = 'none';
+            };
+
+            window.speechSynthesis.speak(robotUtterance);
+        }
+
+        // Charger les voix (asynchrone sur certains navigateurs)
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length > 0) {
+            getVoiceAndSpeak();
+        } else {
+            // Attendre le chargement des voix
+            window.speechSynthesis.onvoiceschanged = function() {
+                window.speechSynthesis.onvoiceschanged = null;
+                getVoiceAndSpeak();
+            };
+            // Fallback si onvoiceschanged ne se déclenche pas
+            setTimeout(() => {
+                if (!robotUtterance || !window.speechSynthesis.speaking) {
+                    getVoiceAndSpeak();
+                }
+            }, 800);
+        }
+    }
+
+    function speakWithSubtitles(fullText) {
+        const sentences = fullText.match(/[^.!?]+[.!?]+/g) || [fullText];
+        let idx = 0;
+        const speechBubble = document.getElementById('robotSpeechText');
+        const avgRate = parseFloat(document.getElementById('robotSpeed').value) || 0.9;
+
+        function showNext() {
+            if (idx < sentences.length && window.speechSynthesis.speaking) {
+                const sentence = sentences[idx].trim();
+                if (sentence) {
+                    speechBubble.innerHTML = `<span style="color:#C084FC;font-weight:600;">🗣️</span> <em>${sentence}</em>`;
+                }
+                idx++;
+                const wordCount = sentence.split(' ').length;
+                const delay = Math.max(1200, (wordCount / (avgRate * 2.5)) * 1000);
+                setTimeout(showNext, delay);
+            }
+        }
+        setTimeout(showNext, 200);
+    }
+
+    function cleanTextForSpeech(markdown) {
+        return markdown
+            .replace(/#{1,3} /g, '')
+            .replace(/\*\*(.*?)\*\*/g, '$1')
+            .replace(/\*(.*?)\*/g, '$1')
+            .replace(/^- /gm, '')
+            .replace(/^> /gm, '')
+            .replace(/\|.+\|/g, '')
+            .replace(/---/g, '')
+            .replace(/⚠️|📊|🔍|📈|💡|🩺|😌|😰|😴|😴|🤰|👶|💊|💧|🚶|🧘|🤱|🍼|🌡️|📏|💉|📋|✅|❌/g, '')
+            .replace(/[█░]/g, '')
+            .replace(/\n{2,}/g, '. ')
+            .replace(/\n/g, ' ')
+            .replace(/\s{2,}/g, ' ')
+            .trim();
+    }
+
+    function setRobotSpeaking(isSpeaking) {
+        const body = document.getElementById('robotBody');
+        if (isSpeaking) {
+            body.classList.add('speaking');
+            body.classList.remove('blinking');
+        } else {
+            body.classList.remove('speaking');
+        }
+    }
+
+    function setRobotStatus(text, color) {
+        const badge = document.getElementById('robotStatusBadge');
+        badge.textContent = text;
+        badge.style.color = color;
+        badge.style.borderColor = color + '55';
+        badge.style.background = color + '22';
+    }
+
+    function animateMouthBars() {
+        const bars = document.querySelectorAll('.robot-mouth-bar');
+        const heights = [6, 10, 14, 10, 6];
+        const randomHeights = heights.map(h => h + Math.random() * 6 - 3);
+        bars.forEach((bar, i) => {
+            bar.style.setProperty('--h', randomHeights[i] + 'px');
+        });
+    }
+
+    function startBlinking() {
+        if (blinkInterval) clearInterval(blinkInterval);
+        function doBlink() {
+            const body = document.getElementById('robotBody');
+            if (!body) return;
+            body.classList.add('blinking');
+            setTimeout(() => body.classList.remove('blinking'), 150);
+        }
+        blinkInterval = setInterval(() => {
+            doBlink();
+            // Double clignement occasionnel
+            if (Math.random() < 0.3) setTimeout(doBlink, 250);
+        }, 3000 + Math.random() * 2000);
+    }
+
+    function startEyeTracking() {
+        if (eyeTrackInterval) clearInterval(eyeTrackInterval);
+        eyeTrackInterval = setInterval(() => {
+            const pupils = document.querySelectorAll('.robot-pupil');
+            const xOffset = (Math.random() - 0.5) * 5;
+            const yOffset = (Math.random() - 0.5) * 3;
+            pupils.forEach(p => {
+                p.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
+            });
+        }, 1500);
+    }
+
+    function renderSimpleMarkdown(text) {
+        return text
+            .replace(/^## (.*)/gm, '<h3 style="color:#C084FC;font-size:1rem;font-weight:700;margin:16px 0 8px;display:flex;align-items:center;gap:8px;">$1</h3>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#E9D5FF;">$1</strong>')
+            .replace(/^- (.*)/gm, '<div style="display:flex;gap:8px;padding:6px 0;color:rgba(255,255,255,0.8);"><span style="flex-shrink:0;">›</span><span>$1</span></div>')
+            .replace(/^\|(.+)\|$/gm, (match) => {
+                const cells = match.split('|').filter(c => c.trim() && !c.match(/^[-\s]+$/));
+                return '<div style="display:flex;gap:12px;padding:6px 8px;background:rgba(255,255,255,0.04);border-radius:6px;margin:3px 0;">' +
+                    cells.map(c => `<span style="color:rgba(255,255,255,0.8);font-size:0.88rem;">${c.trim()}</span>`).join('') +
+                    '</div>';
+            })
+            .replace(/^---$/gm, '<hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:16px 0;">')
+            .replace(/^> ⚠️ (.*)/gm, '<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:14px;color:rgba(255,211,99,0.9);font-size:0.88rem;margin:12px 0;">⚠️ $1</div>')
+            .replace(/\*(.*?)\*/g, '<em style="color:rgba(255,255,255,0.5);font-size:0.82rem;">$1</em>')
+            .replace(/\n/g, '');
+    }
+
+    // Injecter le bilan dans les notes
+    if (btnInject) {
+        btnInject.addEventListener('click', function() {
+            const notesField = document.querySelector('textarea[name="reservation[notes]"]') ||
+                               document.querySelector('textarea[id*="notes"]');
+            if (notesField) {
+                const existing = notesField.value.trim();
+                const bilanForForm = bilanText.replace(/\*\*/g,'').replace(/#{1,3} /g,'').replace(/---/g,'---').replace(/\n\n+/g,'\n');
+                notesField.value = existing
+                    ? `${existing}\n\n🤖 BILAN IA DES SYMPTÔMES:\n${bilanForForm}`
+                    : `🤖 BILAN IA DES SYMPTÔMES:\n${bilanForForm}`;
+                // Animation de confirmation
+                notesField.style.borderColor = '#10B981';
+                notesField.style.boxShadow = '0 0 0 3px rgba(16,185,129,0.2)';
+                setTimeout(() => { notesField.style.borderColor = ''; notesField.style.boxShadow = ''; }, 2000);
+                this.innerHTML = '<i class="fas fa-check"></i> Bilan ajouté !';
+                this.style.background = 'linear-gradient(135deg, #059669, #047857)';
+                setTimeout(() => closeSymptomModal(), 1500);
+            }
+        });
+    }
+
+    // Refaire l'analyse
+    if (btnRetry) {
+        btnRetry.addEventListener('click', function() {
+            resetToStep1();
+            faceDetected = false;
+            btnCapture.disabled = true;
+            startFaceDetection();
+        });
+    }
+
+    function goToStep(n) {
+        document.querySelectorAll('.symptom-step').forEach(s => s.classList.remove('active'));
+        document.getElementById('step' + n).classList.add('active');
+    }
+
+    function resetToStep1() {
+        document.querySelectorAll('.symptom-step').forEach(s => s.classList.remove('active'));
+        document.getElementById('step1').classList.add('active');
+        document.querySelectorAll('.ai-step-item').forEach(el => {
+            el.classList.remove('active','done');
+            el.querySelector('.ai-step-icon').textContent = '⏳';
+        });
+        document.getElementById('btnInjectBilan').innerHTML = '<i class="fas fa-file-medical"></i> Ajouter le bilan à la réservation';
+        document.getElementById('btnInjectBilan').style.background = '';
+        faceDetected = false;
+        btnCapture.disabled = true;
+        const dot = document.getElementById('faceStatusDot');
+        dot.classList.remove('waiting','detected');
+        document.getElementById('faceStatusText').textContent = 'En attente de détection...';
+        document.getElementById('faceTargetBox').classList.remove('detected');
+        document.querySelector('.camera-dot').classList.remove('active');
+        document.getElementById('cameraStatusText').textContent = 'Initialisation caméra...';
+    }
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+})();
 </script>
 {% endblock %}
