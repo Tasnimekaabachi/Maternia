@@ -71,306 +71,259 @@
                     </div>
                 {% endif %}
 
-                {# Résumé grossesse (pour confirmer que ça s'est bien enregistré) #}
-                        <div class="border border-primary rounded-3 bg-light p-4 mb-4 shadow-sm">
-                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
-                                <h4 class="text-primary mb-0"><i class="fas fa-baby-carriage me-2"></i> Suivi de grossesse</h4>
-                                <a href="{{ path('app_maman_grossesse_edit', { id: maman.id }) }}" class="btn admin-btn-rose btn-sm">
-                                    <i class="fas fa-edit me-1"></i> Modifier grossesse
-                                </a>
-                            </div>
-                            <hr class="my-3">
+                <div class="border border-primary rounded-3 bg-light p-4 mb-4 shadow-sm">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <h4 class="text-primary mb-0"><i class="fas fa-baby-carriage me-2"></i> Suivi de grossesse</h4>
+                        <a href="{{ path('app_maman_grossesse_edit', { id: maman.id }) }}" class="btn admin-btn-rose btn-sm">
+                            <i class="fas fa-edit me-1"></i> Modifier grossesse
+                        </a>
+                    </div>
+                    <hr class="my-3">
 
-                            {% if grossesse %}
-                                <div class="row g-3 align-items-end">
-                                    {% if grossesse.statutGrossesse != 'terminee' %}
-<div class="col-md-4">
-    <span class="text-muted small d-block">Semaine actuelle</span>
-    <strong>{{ grossesse.semaineActuelle ?? '—' }}</strong>
-</div>
-<div class="col-md-4">
-    <span class="text-muted small d-block">Trimestre</span>
-    <strong>{{ grossesse.trimestreActuel ?? '—' }}</strong>
-</div>
-{% endif %} 
-                                    <div class="col-md-4">
-                                        <span class="text-muted small d-block">Accouchement prévu</span>
-                                        <strong>
-                                            {% if grossesse.dateAccouchementPrevue %}
-                                                {{ grossesse.dateAccouchementPrevue|date('d/m/Y') }}
-                                            {% else %}
-                                                —
-                                            {% endif %}
-                                        </strong>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <span class="text-muted small d-block">Poids actuel (grossesse)</span>
-                                        <strong>{{ grossesse.poidsActuel is not null ? grossesse.poidsActuel ~ ' kg' : '—' }}</strong>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <span class="text-muted small d-block">Statut</span>
-                                        <strong>{{ grossesse.statutGrossesse ?? '—' }}</strong>
-                                    </div>
-                                    <div class="col-12">
-                                        <span class="text-muted small d-block">Symptômes</span>
-                                        <span>{{ grossesse.symptomesList|length > 0 ? grossesse.symptomesList|join(', ') : '—' }}</span>
-                                    </div>
-                                    {% if grossesse.riskLevel %}
-    <div class="col-12 mt-2">
-        {% if grossesse.riskLevel == 'High' %}
-            {% set color = 'danger' %}
-            {% set icon = '🚨' %}
-            {% set message = 'Risque élevé détecté ! Consultez un médecin immédiatement.' %}
-        {% elseif grossesse.riskLevel == 'Mid' %}
-            {% set color = 'warning' %}
-            {% set icon = '⚠️' %}
-            {% set message = 'Risque modéré détecté. Une consultation médicale est recommandée.' %}
-        {% else %}
-            {% set color = 'success' %}
-            {% set icon = '✅' %}
-            {% set message = 'Grossesse à faible risque. Continuez les consultations régulières.' %}
-        {% endif %}
-        <div class="alert alert-{{ color }} border-2 d-flex align-items-start mb-0" role="alert">
-            <span class="fs-4 me-3">{{ icon }}</span>
-            <div>
-                <h6 class="alert-heading mb-1">Niveau de risque ML : <strong>{{ grossesse.riskLevel }}</strong></h6>
-                <p class="mb-0 small">{{ message }}</p>
-            </div>
-        </div>
-    </div>
-{% endif %}
+                    {% if grossesse %}
+                        <div class="row g-3 align-items-end">
+                            {% if grossesse.statutGrossesse != 'terminee' %}
+                                <div class="col-md-4">
+                                    <span class="text-muted small d-block">Semaine actuelle</span>
+                                    <strong>{{ grossesse.semaineActuelle ?? '—' }}</strong>
                                 </div>
-
-                                <hr class="my-3">
-
-                                {# Bandeau d'information selon le trimestre de grossesse #}
-                               {% set trimestre = grossesse.trimestreActuel ?? null %}
-{% if trimestre and grossesse.statutGrossesse != 'terminee' %}
-                                    <div class="mb-3">
-                                        {% if trimestre == 1 %}
-                                            <div class="alert alert-success border-success border-2 mb-0">
-                                                <strong>🟢 Vous êtes dans le 1er trimestre de grossesse.</strong><br>
-                                                <span class="small text-muted">Cette phase correspond au début du développement du bébé.</span>
-                                            </div>
-                                        {% elseif trimestre == 2 %}
-                                            <div class="alert alert-warning border-warning border-2 mb-0">
-                                                <strong>🟠 Début du 2ème trimestre.</strong><br>
-                                                <span class="small text-muted">La grossesse évolue positivement. Pensez à planifier votre consultation de suivi.</span>
-                                            </div>
-                                        {% else %}
-                                            <div class="alert alert-danger border-danger border-2 mb-0">
-                                                <strong>🔴 Bienvenue au 3ème trimestre.</strong><br>
-                                                <span class="small text-muted">Préparez votre suivi final et les examens avant l’accouchement.</span>
-                                            </div>
-                                        {% endif %}
+                                <div class="col-md-4">
+                                    <span class="text-muted small d-block">Trimestre</span>
+                                    <strong>{{ grossesse.trimestreActuel ?? '—' }}</strong>
+                                </div>
+                            {% endif %}
+                            <div class="col-md-4">
+                                <span class="text-muted small d-block">Accouchement prévu</span>
+                                <strong>
+                                    {% if grossesse.dateAccouchementPrevue %}
+                                        {{ grossesse.dateAccouchementPrevue|date('d/m/Y') }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </strong>
+                            </div>
+                            <div class="col-md-6">
+                                <span class="text-muted small d-block">Poids actuel (grossesse)</span>
+                                <strong>{{ grossesse.poidsActuel is not null ? grossesse.poidsActuel ~ ' kg' : '—' }}</strong>
+                            </div>
+                            <div class="col-md-6">
+                                <span class="text-muted small d-block">Statut</span>
+                                <strong>{{ grossesse.statutGrossesse ?? '—' }}</strong>
+                            </div>
+                            <div class="col-12">
+                                <span class="text-muted small d-block">Symptômes</span>
+                                <span>{{ grossesse.symptomesList|length > 0 ? grossesse.symptomesList|join(', ') : '—' }}</span>
+                            </div>
+                            {% if grossesse.riskLevel %}
+                                <div class="col-12 mt-2">
+                                    {% if grossesse.riskLevel == 'High' %}
+                                        {% set color = 'danger' %}
+                                        {% set icon = '🚨' %}
+                                        {% set message = 'Risque élevé détecté ! Consultez un médecin immédiatement.' %}
+                                    {% elseif grossesse.riskLevel == 'Mid' %}
+                                        {% set color = 'warning' %}
+                                        {% set icon = '⚠️' %}
+                                        {% set message = 'Risque modéré détecté. Une consultation médicale est recommandée.' %}
+                                    {% else %}
+                                        {% set color = 'success' %}
+                                        {% set icon = '✅' %}
+                                        {% set message = 'Grossesse à faible risque. Continuez les consultations régulières.' %}
+                                    {% endif %}
+                                    <div class="alert alert-{{ color }} border-2 d-flex align-items-start mb-0" role="alert">
+                                        <span class="fs-4 me-3">{{ icon }}</span>
+                                        <div>
+                                            <h6 class="alert-heading mb-1">Niveau de risque ML : <strong>{{ grossesse.riskLevel }}</strong></h6>
+                                            <p class="mb-0 small">{{ message }}</p>
+                                        </div>
                                     </div>
-                                {% endif %}
-
-                                {% if grossesse.statutGrossesse != 'terminee' %}
-                                    <div class="row g-3">
-                                        {% if grossesse_alertes is defined and grossesse_alertes|length > 0 %}
-                                            <div class="col-md-6">
-                                                <h6 class="text-danger mb-2"><i class="fas fa-exclamation-triangle me-1"></i> Alertes maman</h6>
-                                                <ul class="small mb-0 ps-3">
-                                                    {% for alerte in grossesse_alertes %}
-                                                        <li>{{ alerte }}</li>
-                                                    {% endfor %}
-                                                </ul>
-                                            </div>
-                                        {% endif %}
-                                        {% if grossesse_conseil is defined and grossesse_conseil %}
-                                            <div class="col-md-6">
-                                                <h6 class="text-primary mb-2"><i class="fas fa-lightbulb me-1"></i> Conseil grossesse</h6>
-                                                <p class="small mb-0">{{ grossesse_conseil }}</p>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                {% elseif bebe_age_mois is defined and bebe_age_mois is not null %}
-                                    <div class="row g-3">
-                                       <div class="col-md-4">
-    <span class="text-muted small d-block">Âge du bébé</span>
-    {% if bebe_age_mois == 0 and grossesse.dateAccouchementReelle %}
-        {% set jours = date() | date_modify('0 days') %}
-        {% set joursAge = grossesse.dateAccouchementReelle | date_modify('0 days') %}
-        {% set diffJours = (date().timestamp - grossesse.dateAccouchementReelle.timestamp) / 86400 | round %}
-        {% if diffJours < 7 %}
-            <strong>{{ diffJours }} jour{{ diffJours > 1 ? 's' : '' }}</strong>
-        {% else %}
-            <strong>{{ (diffJours / 7) | round }} semaine{{ (diffJours / 7) | round > 1 ? 's' : '' }}</strong>
-        {% endif %}
-    {% else %}
-        <strong>{{ bebe_age_mois }} mois</strong>
-    {% endif %}
-</div>
-                                        {% if bebe_conseil is defined and bebe_conseil %}
-                                            <div class="col-md-8">
-                                                <h6 class="text-primary mb-2"><i class="fas fa-baby me-1"></i> Conseil bébé</h6>
-                                                <p class="small mb-0">{{ bebe_conseil }}</p>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    {# ===== COURBE BÉBÉ ===== #}
-{% if normes_bebe is defined and normes_bebe is not null and grossesse.poidsNaissance is not null %}
-    <div class="mt-4">
-        <h5 class="text-primary mb-3">
-            <i class="fas fa-chart-bar me-2"></i> 
-            Courbe de croissance — Normes OMS
-        </h5>
-
-        {# Évaluation globale #}
-        {% if evaluation_poids == 'normal' and evaluation_taille == 'normal' %}
-            <div class="alert alert-success border-2 mb-3">
-                ✅ <strong>Votre bébé est dans les normes OMS</strong> pour le poids et la taille.
-            </div>
-        {% else %}
-            <div class="alert alert-warning border-2 mb-3">
-                ⚠️ <strong>Attention :</strong> Certaines mesures sont en dehors des normes OMS. Consultez votre pédiatre.
-            </div>
-        {% endif %}
-
-        <div class="row g-4">
-            {# Graphique Poids #}
-            <div class="col-md-6">
-                <div class="border border-primary rounded-3 bg-white p-3 shadow-sm">
-                    <h6 class="text-primary mb-1 text-center">⚖️ Poids à la naissance</h6>
-                    <p class="text-center small text-muted mb-2">
-                        Norme OMS : {{ normes_bebe.poids_min }} — {{ normes_bebe.poids_max }} kg
-                    </p>
-                    <canvas id="chartPoids" height="200"></canvas>
-                    <p class="text-center mt-2 small fw-bold 
-                        {{ evaluation_poids == 'normal' ? 'text-success' : (evaluation_poids == 'faible' ? 'text-danger' : 'text-warning') }}">
-                        {% if evaluation_poids == 'normal' %}✅ Normal
-                        {% elseif evaluation_poids == 'faible' %}🔻 En dessous de la norme
-                        {% else %}🔺 Au dessus de la norme
-                        {% endif %}
-                    </p>
-                </div>
-            </div>
-
-            {# Graphique Taille #}
-            <div class="col-md-6">
-                <div class="border border-primary rounded-3 bg-white p-3 shadow-sm">
-                    <h6 class="text-primary mb-1 text-center">📏 Taille à la naissance</h6>
-                    <p class="text-center small text-muted mb-2">
-                        Norme OMS : {{ normes_bebe.taille_min }} — {{ normes_bebe.taille_max }} cm
-                    </p>
-                    <canvas id="chartTaille" height="200"></canvas>
-                    <p class="text-center mt-2 small fw-bold
-                        {{ evaluation_taille == 'normal' ? 'text-success' : (evaluation_taille == 'faible' ? 'text-danger' : 'text-warning') }}">
-                        {% if evaluation_taille == 'normal' %}✅ Normal
-                        {% elseif evaluation_taille == 'faible' %}🔻 En dessous de la norme
-                        {% else %}🔺 Au dessus de la norme
-                        {% endif %}
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        {# Chart.js #}
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script>
-        // Graphique Poids
-        new Chart(document.getElementById('chartPoids'), {
-            type: 'bar',
-            data: {
-                labels: ['Minimum OMS', 'Votre bébé', 'Maximum OMS'],
-                datasets: [{
-                    label: 'Poids (kg)',
-                    data: [
-                        {{ normes_bebe.poids_min }},
-                        {{ grossesse.poidsNaissance }},
-                        {{ normes_bebe.poids_max }}
-                    ],
-                    backgroundColor: [
-                        'rgba(54, 162, 235, 0.5)',
-                        '{{ evaluation_poids == "normal" ? "rgba(75, 192, 100, 0.8)" : "rgba(255, 99, 132, 0.8)" }}',
-                        'rgba(54, 162, 235, 0.5)'
-                    ],
-                    borderColor: [
-                        'rgba(54, 162, 235, 1)',
-                        '{{ evaluation_poids == "normal" ? "rgba(75, 192, 100, 1)" : "rgba(255, 99, 132, 1)" }}',
-                        'rgba(54, 162, 235, 1)'
-                    ],
-                    borderWidth: 2,
-                    borderRadius: 8,
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: ctx => ctx.parsed.y + ' kg'
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        min: 1.5,
-                        max: 5.5,
-                        ticks: { callback: val => val + ' kg' }
-                    }
-                }
-            }
-        });
-
-        // Graphique Taille
-        new Chart(document.getElementById('chartTaille'), {
-            type: 'bar',
-            data: {
-                labels: ['Minimum OMS', 'Votre bébé', 'Maximum OMS'],
-                datasets: [{
-                    label: 'Taille (cm)',
-                    data: [
-                        {{ normes_bebe.taille_min }},
-                        {{ grossesse.tailleNaissance ?? 0 }},
-                        {{ normes_bebe.taille_max }}
-                    ],
-                    backgroundColor: [
-                        'rgba(153, 102, 255, 0.5)',
-                        '{{ evaluation_taille == "normal" ? "rgba(75, 192, 100, 0.8)" : "rgba(255, 99, 132, 0.8)" }}',
-                        'rgba(153, 102, 255, 0.5)'
-                    ],
-                    borderColor: [
-                        'rgba(153, 102, 255, 1)',
-                        '{{ evaluation_taille == "normal" ? "rgba(75, 192, 100, 1)" : "rgba(255, 99, 132, 1)" }}',
-                        'rgba(153, 102, 255, 1)'
-                    ],
-                    borderWidth: 2,
-                    borderRadius: 8,
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: ctx => ctx.parsed.y + ' cm'
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        min: 40,
-                        max: 60,
-                        ticks: { callback: val => val + ' cm' }
-                    }
-                }
-            }
-        });
-        </script>
-    </div>
-{% endif %}
-{# ===== FIN COURBE BÉBÉ ===== #}
-                                {% endif %}
-                            {% else %}
-                                <p class="mb-0 text-muted">Aucune grossesse enregistrée pour le moment. Cliquez sur « Mon suivi de grossesse » pour la compléter.</p>
+                                </div>
                             {% endif %}
                         </div>
+
+                        <hr class="my-3">
+
+                        {% set trimestre = grossesse.trimestreActuel ?? null %}
+                        {% if trimestre and grossesse.statutGrossesse != 'terminee' %}
+                            <div class="mb-3">
+                                {% if trimestre == 1 %}
+                                    <div class="alert alert-success border-success border-2 mb-0">
+                                        <strong>🟢 Vous êtes dans le 1er trimestre de grossesse.</strong><br>
+                                        <span class="small text-muted">Cette phase correspond au début du développement du bébé.</span>
+                                    </div>
+                                {% elseif trimestre == 2 %}
+                                    <div class="alert alert-warning border-warning border-2 mb-0">
+                                        <strong>🟠 Début du 2ème trimestre.</strong><br>
+                                        <span class="small text-muted">La grossesse évolue positivement. Pensez à planifier votre consultation de suivi.</span>
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-danger border-danger border-2 mb-0">
+                                        <strong>🔴 Bienvenue au 3ème trimestre.</strong><br>
+                                        <span class="small text-muted">Préparez votre suivi final et les examens avant l'accouchement.</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                        {% if grossesse.statutGrossesse != 'terminee' %}
+                            <div class="row g-3">
+                                {% if grossesse_alertes is defined and grossesse_alertes|length > 0 %}
+                                    <div class="col-md-6">
+                                        <h6 class="text-danger mb-2"><i class="fas fa-exclamation-triangle me-1"></i> Alertes maman</h6>
+                                        <ul class="small mb-0 ps-3">
+                                            {% for alerte in grossesse_alertes %}
+                                                <li>{{ alerte }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                                {% if grossesse_conseil is defined and grossesse_conseil %}
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary mb-2"><i class="fas fa-lightbulb me-1"></i> Conseil grossesse</h6>
+                                        <p class="small mb-0">{{ grossesse_conseil }}</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% elseif bebe_age_mois is defined and bebe_age_mois is not null %}
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <span class="text-muted small d-block">Âge du bébé</span>
+                                    {% if bebe_age_mois == 0 and grossesse.dateAccouchementReelle %}
+                                        {% set diffJours = (date().timestamp - grossesse.dateAccouchementReelle.timestamp) / 86400 | round %}
+                                        {% if diffJours < 7 %}
+                                            <strong>{{ diffJours }} jour{{ diffJours > 1 ? 's' : '' }}</strong>
+                                        {% else %}
+                                            <strong>{{ (diffJours / 7) | round }} semaine{{ (diffJours / 7) | round > 1 ? 's' : '' }}</strong>
+                                        {% endif %}
+                                    {% else %}
+                                        <strong>{{ bebe_age_mois }} mois</strong>
+                                    {% endif %}
+                                </div>
+                                {% if bebe_conseil is defined and bebe_conseil %}
+                                    <div class="col-md-8">
+                                        <h6 class="text-primary mb-2"><i class="fas fa-baby me-1"></i> Conseil bébé</h6>
+                                        <p class="small mb-0">{{ bebe_conseil }}</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            {# ===== COURBE BÉBÉ ===== #}
+                            {% if normes_bebe is defined and normes_bebe is not null and grossesse.poidsNaissance is not null %}
+                                <div class="mt-4">
+                                    <h5 class="text-primary mb-3">
+                                        <i class="fas fa-chart-bar me-2"></i>
+                                        Courbe de croissance — Normes OMS
+                                    </h5>
+                                    {% if evaluation_poids == 'normal' and evaluation_taille == 'normal' %}
+                                        <div class="alert alert-success border-2 mb-3">
+                                            ✅ <strong>Votre bébé est dans les normes OMS</strong> pour le poids et la taille.
+                                        </div>
+                                    {% else %}
+                                        <div class="alert alert-warning border-2 mb-3">
+                                            ⚠️ <strong>Attention :</strong> Certaines mesures sont en dehors des normes OMS. Consultez votre pédiatre.
+                                        </div>
+                                    {% endif %}
+                                    <div class="row g-4">
+                                        <div class="col-md-6">
+                                            <div class="border border-primary rounded-3 bg-white p-3 shadow-sm">
+                                                <h6 class="text-primary mb-1 text-center">⚖️ Poids à la naissance</h6>
+                                                <p class="text-center small text-muted mb-2">
+                                                    Norme OMS : {{ normes_bebe.poids_min }} — {{ normes_bebe.poids_max }} kg
+                                                </p>
+                                                <canvas id="chartPoids" height="200"></canvas>
+                                                <p class="text-center mt-2 small fw-bold {{ evaluation_poids == 'normal' ? 'text-success' : (evaluation_poids == 'faible' ? 'text-danger' : 'text-warning') }}">
+                                                    {% if evaluation_poids == 'normal' %}✅ Normal
+                                                    {% elseif evaluation_poids == 'faible' %}🔻 En dessous de la norme
+                                                    {% else %}🔺 Au dessus de la norme
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="border border-primary rounded-3 bg-white p-3 shadow-sm">
+                                                <h6 class="text-primary mb-1 text-center">📏 Taille à la naissance</h6>
+                                                <p class="text-center small text-muted mb-2">
+                                                    Norme OMS : {{ normes_bebe.taille_min }} — {{ normes_bebe.taille_max }} cm
+                                                </p>
+                                                <canvas id="chartTaille" height="200"></canvas>
+                                                <p class="text-center mt-2 small fw-bold {{ evaluation_taille == 'normal' ? 'text-success' : (evaluation_taille == 'faible' ? 'text-danger' : 'text-warning') }}">
+                                                    {% if evaluation_taille == 'normal' %}✅ Normal
+                                                    {% elseif evaluation_taille == 'faible' %}🔻 En dessous de la norme
+                                                    {% else %}🔺 Au dessus de la norme
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                                    <script>
+                                  new Chart(document.getElementById('chartPoids'), {
+    type: 'line',
+    data: {
+        labels: ['Minimum OMS', 'Votre bébé', 'Maximum OMS'],
+        datasets: [{
+            label: 'Poids (kg)',
+            data: [{{ normes_bebe.poids_min }}, {{ grossesse.poidsNaissance }}, {{ normes_bebe.poids_max }}],
+            backgroundColor: 'rgba(233, 30, 140, 0.1)',
+            borderColor: '#e91e8c',
+            borderWidth: 3,
+            pointBackgroundColor: ['#4a90d9', '{{ evaluation_poids == "normal" ? "#4caf50" : "#f44336" }}', '#4a90d9'],
+            pointRadius: [8, 12, 8],
+            pointBorderColor: 'white',
+            pointBorderWidth: 3,
+            fill: true,
+            tension: 0.4,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => ctx.parsed.y + ' kg' } }
+        },
+        scales: {
+            y: { beginAtZero: false, min: 1.5, max: 5.5, ticks: { callback: val => val + ' kg' } }
+        }
+    }
+});
+
+new Chart(document.getElementById('chartTaille'), {
+    type: 'line',
+    data: {
+        labels: ['Minimum OMS', 'Votre bébé', 'Maximum OMS'],
+        datasets: [{
+            label: 'Taille (cm)',
+            data: [{{ normes_bebe.taille_min }}, {{ grossesse.tailleNaissance ?? 0 }}, {{ normes_bebe.taille_max }}],
+            backgroundColor: 'rgba(74, 144, 217, 0.1)',
+            borderColor: '#4a90d9',
+            borderWidth: 3,
+            pointBackgroundColor: ['#9c27b0', '{{ evaluation_taille == "normal" ? "#4caf50" : "#f44336" }}', '#9c27b0'],
+            pointRadius: [8, 12, 8],
+            pointBorderColor: 'white',
+            pointBorderWidth: 3,
+            fill: true,
+            tension: 0.4,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => ctx.parsed.y + ' cm' } }
+        },
+        scales: {
+            y: { beginAtZero: false, min: 40, max: 60, ticks: { callback: val => val + ' cm' } }
+        }
+    }
+});
+                                    </script>
+                                </div>
+                            {% endif %}
+                            {# ===== FIN COURBE BÉBÉ ===== #}
+                        {% endif %}
+                    {% else %}
+                        <p class="mb-0 text-muted">Aucune grossesse enregistrée pour le moment. Cliquez sur « Mon suivi de grossesse » pour la compléter.</p>
+                    {% endif %}
+                </div>
 
                 <div class="row g-4 mb-4">
                     <div class="col-lg-6">
@@ -387,8 +340,202 @@
 
                 <div class="row g-4" id="informations-maman">
                     <div class="col-lg-8">
+
+                        {# ===== CARTE HÔPITAUX ===== #}
                         <div class="border border-primary rounded-3 bg-light p-4 mb-4 shadow-sm">
-                            <h4 class="text-primary mb-3"><i class="fas fa-phone-alt me-2"></i> Informations grossesse & contact</h4>
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-map-marker-alt me-2"></i> Hôpitaux & cliniques proches
+                            </h5>
+                            <p class="small text-muted mb-3">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Carte des établissements de santé proches de votre position.
+                            </p>
+                            <div id="map" style="height: 350px; border-radius: 12px;"></div>
+                            {# Légende #}
+<div class="d-flex flex-wrap gap-3 mt-3 mb-3">
+    <span><span style="background:#e91e8c;border-radius:50%;display:inline-block;width:14px;height:14px;"></span> Hôpital</span>
+    <span><span style="background:#ff9800;border-radius:50%;display:inline-block;width:14px;height:14px;"></span> Clinique</span>
+    <span><span style="background:#4caf50;border-radius:50%;display:inline-block;width:14px;height:14px;"></span> Pharmacie</span>
+    <span><span style="background:#4a90d9;border-radius:50%;display:inline-block;width:14px;height:14px;"></span> Votre position</span>
+</div>
+
+{# Liste triée par distance #}
+<h6 class="text-primary mt-3 mb-2"><i class="fas fa-list me-1"></i> Établissements proches — triés par distance</h6>
+<div id="hospitals-list">
+    <p class="small text-muted">Chargement en cours...</p>
+</div>
+
+                            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+                            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+                            <script>
+document.addEventListener('DOMContentLoaded', function () {
+    var map = L.map('map').setView([36.8065, 10.1815], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Icônes par type
+    var icons = {
+        hospital: L.divIcon({
+            html: '<div style="background:#e91e8c;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);font-size:18px;">🏥</div>',
+            iconSize: [36, 36], iconAnchor: [18, 18], className: ''
+        }),
+        clinic: L.divIcon({
+            html: '<div style="background:#ff9800;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);font-size:18px;">🏨</div>',
+            iconSize: [36, 36], iconAnchor: [18, 18], className: ''
+        }),
+        pharmacy: L.divIcon({
+            html: '<div style="background:#4caf50;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);font-size:18px;">💊</div>',
+            iconSize: [36, 36], iconAnchor: [18, 18], className: ''
+        }),
+        maman: L.divIcon({
+            html: '<div style="background:#4a90d9;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);font-size:18px;">👩</div>',
+            iconSize: [36, 36], iconAnchor: [18, 18], className: ''
+        })
+    };
+
+    // Calcul distance en km
+ function calcDistance(lat1, lon1, lat2, lon2) {
+    var R = 6371;
+    var dLat = (lat2 - lat1) * Math.PI / 180;
+    var dLon = (lon2 - lon1) * Math.PI / 180;
+    var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+   return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1);
+}
+
+    // Déterminer le type d'établissement
+    function getType(categories) {
+        var cat = categories ? categories.join(',') : '';
+        if (cat.includes('pharmacy')) return 'pharmacy';
+        if (cat.includes('clinic_or_praxis')) return 'clinic';
+        return 'hospital';
+    }
+
+    function getTypeLabel(type) {
+        if (type === 'pharmacy') return '💊 Pharmacie';
+        if (type === 'clinic') return '🏨 Clinique';
+        return '🏥 Hôpital';
+    }
+
+    function loadHospitals(userLat, userLng) {
+       fetch(`https://api.geoapify.com/v2/places?categories=healthcare.hospital,healthcare.clinic_or_praxis,healthcare.pharmacy&filter=circle:${userLng},${userLat},7000&limit=15&apiKey=1175ae2fbe7c4881803c31dae105044d`)
+            .then(r => r.json())
+            .then(data => {
+                var results = [];
+
+                (data.features || []).forEach(function(f) {
+                    var name     = f.properties.name || 'Établissement de santé';
+                    var address  = f.properties.formatted || '';
+                    var fLat     = f.geometry.coordinates[1];
+                    var fLon     = f.geometry.coordinates[0];
+                    var distance = calcDistance(userLat, userLng, fLat, fLon);
+                    var cats     = f.properties.categories || [];
+                    var type     = getType(cats);
+                    var label    = getTypeLabel(type);
+                    var mapsUrl  = `https://www.google.com/maps/dir/?api=1&destination=${fLat},${fLon}`;
+
+                    // Marqueur sur la carte
+                    L.marker([fLat, fLon], {icon: icons[type]})
+                        .addTo(map)
+.bindPopup(`
+    <div style="min-width:200px">
+        <strong>${label}</strong><br>
+        <strong>${name}</strong><br>
+        <small style="color:#888">${address}</small><br>
+        <a href="${mapsUrl}" target="_blank" style="display:block;margin-top:8px;background:#e91e8c;color:white;text-align:center;padding:6px;border-radius:8px;text-decoration:none;font-size:13px;">
+            🗺️ Y aller
+        </a>
+    </div>
+`);
+
+                    results.push({ name, address, distance, type, label, mapsUrl });
+                });
+
+                // Trier par distance
+                results.sort((a, b) => a.distance - b.distance);
+
+                // Afficher la liste sous la carte
+var listEl = document.getElementById('hospitals-list');
+if (listEl) {
+    var visibleCount = 5;
+    
+function renderList(count) {
+    var html = results.slice(0, count).map((h, i) => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;margin-bottom:8px;background:white;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:4px solid ${h.type === 'hospital' ? '#e91e8c' : h.type === 'pharmacy' ? '#4caf50' : '#ff9800'}">
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-size:22px">${h.type === 'hospital' ? '🏥' : h.type === 'pharmacy' ? '💊' : '🏨'}</span>
+                <div>
+                    <div style="font-weight:600;font-size:13px">${h.name}</div>
+                    <div style="font-size:11px;color:#888;margin-top:2px">${h.label}</div>
+                    <div style="font-size:11px;color:#aaa;margin-top:1px">${h.address.substring(0, 50)}${h.address.length > 50 ? '...' : ''}</div>
+                </div>
+            </div>
+            <div style="text-align:center;flex-shrink:0;margin-left:10px">
+                <div style="background:#f0f4ff;border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600;color:#4a90d9;margin-bottom:6px">📍 ${h.distance} km</div>
+                <a href="${h.mapsUrl}" target="_blank" style="display:block;background:#e91e8c;color:white;padding:5px 10px;border-radius:8px;text-decoration:none;font-size:11px;font-weight:600">🗺️ Y aller</a>
+            </div>
+        </div>
+    `).join('');
+
+    if (results.length > 5) {
+        if (count < results.length) {
+            html += `<button onclick="showMore()" style="width:100%;padding:10px;margin-top:4px;background:white;border:2px dashed #4a90d9;color:#4a90d9;border-radius:10px;cursor:pointer;font-weight:600">
+                ⬇️ Voir plus (${results.length - count} autres établissements)
+            </button>`;
+        } else {
+            html += `<button onclick="showLess()" style="width:100%;padding:10px;margin-top:4px;background:white;border:2px dashed #888;color:#888;border-radius:10px;cursor:pointer;font-weight:600">
+                ⬆️ Voir moins
+            </button>`;
+        }
+    }
+    listEl.innerHTML = html;
+}
+
+    window.showMore = function() { renderList(results.length); };
+    window.showLess = function() { renderList(5); };
+    
+    renderList(visibleCount);
+}
+            })
+            .catch(err => console.log('Erreur Geoapify:', err));
+    }
+
+    var userLat = 36.8065, userLng = 10.1815;
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(pos) {
+            userLat = pos.coords.latitude;
+            userLng = pos.coords.longitude;
+            map.setView([userLat, userLng], 13);
+            L.marker([userLat, userLng], {icon: icons.maman})
+                .addTo(map)
+                .bindPopup('<strong>📍 Votre position</strong>')
+                .openPopup();
+            loadHospitals(userLat, userLng);
+        }, function() {
+            L.marker([userLat, userLng], {icon: icons.maman})
+                .addTo(map)
+                .bindPopup('<strong>📍 Tunis (position par défaut)</strong>')
+                .openPopup();
+            loadHospitals(userLat, userLng);
+        });
+    } else {
+        L.marker([userLat, userLng], {icon: icons.maman})
+            .addTo(map)
+            .bindPopup('<strong>📍 Tunis (position par défaut)</strong>')
+            .openPopup();
+        loadHospitals(userLat, userLng);
+    }
+});
+                            </script>
+                        </div>
+                        {# ===== FIN CARTE HÔPITAUX ===== #}
+
+                        <div class="border border-primary rounded-3 bg-light p-4 mb-4 shadow-sm">
+                            <h4 class="text-primary mb-3"><i class="fas fa-phone-alt me-2"></i> Informations personnelles & contact</h4>
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <span class="text-muted small d-block">Numéro d'urgence</span>
@@ -535,11 +682,15 @@
                         <li class="breadcrumb-item active">Modifier</li>
                     </ol>
                 </nav>
-
                 <div class="row justify-content-center">
                     <div class="col-lg-9">
                         <div class="border border-primary rounded-3 bg-light p-4 p-lg-5 shadow-sm">
-                            {{ form_start(form, {'attr': {'class': 'needs-validation'}, 'attr': {'novalidate': 'novalidate'}}) }}
+                            {{ form_start(form, {
+    'attr': {
+        'class': 'needs-validation',
+        'novalidate': 'novalidate'
+    }
+}) }}
                             <div class="mb-4">
                                 <h5 class="text-primary mb-3">Contact & santé</h5>
                                 <div class="row g-3">
@@ -552,9 +703,7 @@
                                             </div>
                                             {{ form_errors(form.numeroUrgence) }}
                                         </div>
-                                        <div class="mb-3">
-                                            {{ form_row(form.email) }}
-                                        </div>
+                                        <div class="mb-3">{{ form_row(form.email) }}</div>
                                     </div>
                                     <div class="col-md-6">{{ form_row(form.groupeSanguin) }}</div>
                                     <div class="col-md-6">{{ form_row(form.taille) }}</div>
@@ -607,9 +756,7 @@
                 <div class="row justify-content-center">
                     <div class="col-lg-8 text-center">
                         <div class="border border-primary rounded-3 bg-light p-5">
-                            <div class="mb-4">
-                                <i class="fas fa-check-circle fa-5x text-primary"></i>
-                            </div>
+                            <div class="mb-4"><i class="fas fa-check-circle fa-5x text-primary"></i></div>
                             <h2 class="mb-3">Vos informations ont bien été enregistrées</h2>
                             <p class="text-muted mb-4">L'équipe Maternia pourra utiliser ces données pour vous accompagner dans votre suivi de grossesse.</p>
                             {% if imc is defined and imc is not null %}
@@ -633,76 +780,138 @@
         </section>
 
     {% else %}
-        {# ——— MODE CRÉATION ——— #}
-        <div class="container-fluid py-5 hero-header wow fadeIn" data-wow-delay="0.1s">
-            <div class="container py-5">
-                <div class="row g-5">
-                    <div class="col-lg-8 col-md-12">
-                        <h1 class="mb-3 text-primary">Mon profil maman</h1>
-                        <h1 class="mb-4 display-1 text-white">Complétez votre profil</h1>
-                        <p class="lead text-white mb-0">Ces informations permettent à l'équipe Maternia de mieux vous accompagner tout au long de votre grossesse.</p>
+{# ——— MODE CRÉATION ——— #}
+<div class="container-fluid py-5 hero-header wow fadeIn" data-wow-delay="0.1s">
+    <div class="container py-5">
+        <div class="row g-5">
+            <div class="col-lg-8 col-md-12">
+                <h1 class="mb-3 text-primary">Mon profil maman</h1>
+                <h1 class="mb-4 display-1 text-white">Complétez votre profil</h1>
+                <p class="lead text-white mb-0">Ces informations permettent à l'équipe Maternia de mieux vous accompagner tout au long de votre grossesse.</p>
+            </div>
+        </div>
+    </div>
+</div>
+<section class="py-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+
+                {# Progress Steps #}
+                <div class="d-flex justify-content-between align-items-center mb-5 position-relative px-3">
+                    <div style="position:absolute;top:20px;left:0;right:0;height:3px;background:#f0d6e8;z-index:0;"></div>
+                    <div style="position:absolute;top:20px;left:0;width:100%;height:3px;background:#e91e8c;z-index:1;"></div>
+                    {% for step in [
+                        {num: '1', label: 'Contact & santé'},
+                        {num: '2', label: 'Antécédents'},
+                        {num: '3', label: 'Mode de vie'}
+                    ] %}
+                        <div class="text-center" style="z-index:2">
+                            <div style="width:42px;height:42px;border-radius:50%;background:#e91e8c;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;margin:0 auto 8px;box-shadow:0 2px 8px rgba(233,30,140,0.3);">
+                                {{ step.num }}
+                            </div>
+                            <small style="color:#e91e8c;font-weight:600;font-size:11px;">{{ step.label }}</small>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="border border-primary rounded-3 bg-light p-4 p-lg-5 shadow-sm">
+                    <div class="d-flex align-items-center mb-4">
+                        <div style="width:48px;height:48px;background:linear-gradient(135deg,#e91e8c,#ff6bb3);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-right:14px;flex-shrink:0;">🤱</div>
+                        <div>
+                            <h4 class="text-primary mb-0">Vos informations</h4>
+                            <small class="text-muted">Données enregistrées de manière confidentielle</small>
+                        </div>
                     </div>
+
+                    <div class="alert alert-info py-2 mb-4 small">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Déjà un profil ?</strong> Après enregistrement, vous recevrez un lien personnel (ex. <code>/suivi_grossesse/1</code>). Conservez-le pour consulter ou modifier vos informations à tout moment.
+                    </div>
+
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+
+                    {# Section 1 #}
+                    <div class="p-4 mb-4 rounded-3" style="background:linear-gradient(135deg,rgba(233,30,140,0.05),rgba(255,107,179,0.05));border:1px solid rgba(233,30,140,0.15);">
+                        <div class="d-flex align-items-center mb-3">
+                            <span style="font-size:20px;margin-right:10px;">👩‍⚕️</span>
+                            <h5 class="text-primary mb-0">Contact & santé</h5>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form_label(form.numeroUrgence) }}
+                                    <div class="input-group input-group-lg">
+                                        <span class="input-group-text" style="background:#e91e8c;color:white;border:none;border-radius:12px 0 0 12px;">+216</span>
+                                        {{ form_widget(form.numeroUrgence, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'xx xxx xxx', 'maxlength': 11, 'style': 'border-radius:0 12px 12px 0;'}}) }}
+                                    </div>
+                                    <div class="form-text">8 chiffres, commençant par 2, 4, 5 ou 9</div>
+                                    {{ form_errors(form.numeroUrgence) }}
+                                </div>
+                                <div class="mb-3">{{ form_row(form.email) }}</div>
+                            </div>
+                            <div class="col-md-6">{{ form_row(form.groupeSanguin) }}</div>
+                            <div class="col-md-6">{{ form_row(form.taille) }}</div>
+                            <div class="col-md-6">{{ form_row(form.poids) }}</div>
+                        </div>
+                    </div>
+
+                    {# Section 2 #}
+                    <div class="p-4 mb-4 rounded-3" style="background:linear-gradient(135deg,rgba(156,39,176,0.05),rgba(206,147,216,0.05));border:1px solid rgba(156,39,176,0.15);">
+                        <div class="d-flex align-items-center mb-3">
+                            <span style="font-size:20px;margin-right:10px;">📋</span>
+                            <h5 class="text-primary mb-0">Antécédents & traitements</h5>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-semibold small">🌿 Allergies connues</label>
+                                {{ form_widget(form.allergies, {'attr': {'class': 'form-control', 'rows': 2, 'placeholder': 'Ex. pénicilline, arachides, latex...', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);resize:none;'}}) }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold small">🏥 Antécédents médicaux</label>
+                                {{ form_widget(form.antecedentsMedicaux, {'attr': {'class': 'form-control', 'rows': 2, 'placeholder': 'Ex. diabète gestationnel, hypertension...', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);resize:none;'}}) }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold small">💊 Maladies chroniques</label>
+                                {{ form_widget(form.maladiesChroniques, {'attr': {'class': 'form-control', 'rows': 2, 'placeholder': 'Ex. diabète de type 2, asthme...', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);resize:none;'}}) }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold small">💉 Médicaments actuels</label>
+                                {{ form_widget(form.medicamentsActuels, {'attr': {'class': 'form-control', 'rows': 2, 'placeholder': 'Ex. acide folique, fer, vitamine D...', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);resize:none;'}}) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Section 3 #}
+                    <div class="p-4 mb-4 rounded-3" style="background:linear-gradient(135deg,rgba(76,175,80,0.05),rgba(165,214,167,0.05));border:1px solid rgba(76,175,80,0.15);">
+                        <div class="d-flex align-items-center mb-3">
+                            <span style="font-size:20px;margin-right:10px;">🌿</span>
+                            <h5 class="text-primary mb-0">Mode de vie</h5>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">{{ form_row(form.fumeur) }}</div>
+                            <div class="col-md-6">{{ form_row(form.consommationAlcool) }}</div>
+                            <div class="col-12">{{ form_row(form.niveauActivitePhysique) }}</div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold small">🥗 Habitudes alimentaires</label>
+                                {{ form_widget(form.habitudesAlimentaires, {'attr': {'class': 'form-control', 'placeholder': 'Ex. végétarienne, sans gluten, méditerranéenne...', 'style': 'border-radius:12px;border:2px solid rgba(76,175,80,0.3);'}}) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Boutons #}
+                    <div class="d-flex flex-wrap gap-3 mt-2">
+                        <button type="submit" class="btn px-5 py-3 btn-border-radius" style="background:linear-gradient(135deg,#e91e8c,#ff6bb3);border:none;color:white;font-weight:600;font-size:15px;box-shadow:0 4px 15px rgba(233,30,140,0.4);">
+                            <i class="fas fa-check me-2"></i>Enregistrer mon profil
+                        </button>
+                        <a href="{{ path('app_home') }}" class="btn btn-outline-secondary px-4 py-3 btn-border-radius">Annuler</a>
+                    </div>
+
+                    {{ form_end(form) }}
                 </div>
             </div>
         </div>
-        <section class="py-5 wow fadeIn" data-wow-delay="0.1s">
-            <div class="container py-5">
-                <div class="row justify-content-center">
-                    <div class="col-lg-9">
-                        <div class="border border-primary rounded-3 bg-light p-4 p-lg-5 shadow-sm">
-                            <h4 class="text-primary mb-4 border-bottom border-primary border-2 d-inline-block p-2 title-border-radius">Vos informations</h4>
-                            <p class="text-muted mb-4">Tous les champs marqués d'un <span class="text-primary">*</span> sont obligatoires. Les données sont enregistrées de manière confidentielle.</p>
-                            <div class="alert alert-info py-2 mb-4 small"><i class="fas fa-info-circle me-2"></i><strong>Déjà un profil ?</strong> Après enregistrement, vous recevrez un lien personnel (ex. <code>/suivi_grossesse/1</code>). Conservez-le pour consulter ou modifier vos informations à tout moment.</div>
-                            {{ form_start(form, {'attr': {'class': 'needs-validation'}, 'attr': {'novalidate': 'novalidate'}}) }}
-                            <div class="mb-4">
-                                <h5 class="text-primary mb-3">Contact & santé</h5>
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            {{ form_label(form.numeroUrgence) }}
-                                            <div class="input-group input-group-lg">
-                                                <span class="input-group-text">+216</span>
-                                                {{ form_widget(form.numeroUrgence, {'attr': {'class': 'form-control form-control-lg', 'placeholder': '9 12 34 56 78', 'maxlength': 11}}) }}
-                                            </div>
-                                            <div class="form-text">8 chiffres, commençant par 2, 4, 5 ou 9</div>
-                                            {{ form_errors(form.numeroUrgence) }}
-                                        </div>
-                                        <div class="mb-3">
-                                            {{ form_row(form.email) }}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">{{ form_row(form.groupeSanguin) }}</div>
-                                    <div class="col-md-6">{{ form_row(form.taille) }}</div>
-                                    <div class="col-md-6">{{ form_row(form.poids) }}</div>
-                                </div>
-                            </div>
-                            <div class="mb-4">
-                                <h5 class="text-primary mb-3">Antécédents & traitements</h5>
-                                <div class="row g-3">
-                                    <div class="col-12">{{ form_row(form.allergies) }}</div>
-                                    <div class="col-12">{{ form_row(form.antecedentsMedicaux) }}</div>
-                                    <div class="col-12">{{ form_row(form.maladiesChroniques) }}</div>
-                                    <div class="col-12">{{ form_row(form.medicamentsActuels) }}</div>
-                                </div>
-                            </div>
-                            <div class="mb-4">
-                                <h5 class="text-primary mb-3">Mode de vie</h5>
-                                <div class="row g-3">
-                                    <div class="col-md-6">{{ form_row(form.fumeur) }}</div>
-                                    <div class="col-md-6">{{ form_row(form.consommationAlcool) }}</div>
-                                    <div class="col-12">{{ form_row(form.niveauActivitePhysique) }}</div>
-                                    <div class="col-12">{{ form_row(form.habitudesAlimentaires) }}</div>
-                                </div>
-                            </div>
-                            <div class="d-flex flex-wrap gap-2 mt-4">
-                                <button type="submit" class="btn btn-primary px-5 py-3 btn-border-radius"><i class="fas fa-check me-2"></i>Enregistrer mon profil</button>
-                                <a href="{{ path('app_home') }}" class="btn btn-outline-secondary px-4 py-3 btn-border-radius">Annuler</a>
-                            </div>
-                            {{ form_end(form) }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+    </div>
+</section>
     {% endif %}
 {% endblock %}

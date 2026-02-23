@@ -7,6 +7,7 @@ use App\Form\MamanType;
 use App\Repository\GrosesseRepository;
 use App\Service\ConseilsSuiviService;
 use App\Service\MailerService;
+use App\Service\HospitalmapService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -71,8 +72,7 @@ final class MamanController extends AbstractController
      * /suivi_grossesse/{id}
      */
     #[Route('/suivi_grossesse/{id}', name: 'app_suivi_grossesse_show', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function suiviGrossesseShow(Maman $maman, GrosesseRepository $grosesseRepository, ConseilsSuiviService $conseilsSuiviService): Response
-    {
+public function suiviGrossesseShow(Maman $maman, GrosesseRepository $grosesseRepository, ConseilsSuiviService $conseilsSuiviService, HospitalmapService $hospitalService): Response    {
         $imc = $maman->getImc();
         $imcCategorie = $maman->getImcCategorie();
         $imcAlerte = $maman->isImcAlerte();
@@ -135,6 +135,8 @@ $evaluationTaille = 'normal';
     }
         }
         }
+                // Hôpitaux proches via Geoapify
+$hospitals = $hospitalService->getHospitalsNear(36.8065, 10.1815);
         return $this->render('pages/mon_profil_maman.html.twig', [
             'maman' => $maman,
             'mode' => 'show',
@@ -150,6 +152,7 @@ $evaluationTaille = 'normal';
             'normes_bebe'       => $normesBebe ?? null,
 'evaluation_poids'  => $evaluationPoids ?? null,
 'evaluation_taille' => $evaluationTaille ?? null,
+'hospitals' => $hospitals,
         ]);
     }
 
