@@ -115,31 +115,32 @@
                                 <span>{{ grossesse.symptomesList|length > 0 ? grossesse.symptomesList|join(', ') : '—' }}</span>
                             </div>
                             {% if grossesse.riskLevel %}
-                                <div class="col-12 mt-2">
-                                    {% if grossesse.riskLevel == 'High' %}
-                                        {% set color = 'danger' %}
-                                        {% set icon = '🚨' %}
-                                        {% set message = 'Risque élevé détecté ! Consultez un médecin immédiatement.' %}
-                                    {% elseif grossesse.riskLevel == 'Mid' %}
-                                        {% set color = 'warning' %}
-                                        {% set icon = '⚠️' %}
-                                        {% set message = 'Risque modéré détecté. Une consultation médicale est recommandée.' %}
-                                    {% else %}
-                                        {% set color = 'success' %}
-                                        {% set icon = '✅' %}
-                                        {% set message = 'Grossesse à faible risque. Continuez les consultations régulières.' %}
-                                    {% endif %}
-                                    <div class="alert alert-{{ color }} border-2 d-flex align-items-start mb-0" role="alert">
-                                        <span class="fs-4 me-3">{{ icon }}</span>
-                                        <div>
-                                            <h6 class="alert-heading mb-1">Niveau de risque ML : <strong>{{ grossesse.riskLevel }}</strong></h6>
-                                            <p class="mb-0 small">{{ message }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        </div>
-
+    <div class="col-12 mt-2">
+        {% if grossesse.riskLevel == 'High' %}
+            {% set color = 'danger' %}
+            {% set icon = '🚨' %}
+            {% set titre = 'Votre grossesse nécessite un suivi rapproché' %}
+            {% set message = 'Notre analyse indique certains facteurs de risque importants. Nous vous recommandons fortement de consulter votre médecin ou sage-femme dans les plus brefs délais.' %}
+        {% elseif grossesse.riskLevel == 'Mid' %}
+            {% set color = 'warning' %}
+            {% set icon = '⚠️' %}
+            {% set titre = 'Quelques points importants à surveiller' %}
+            {% set message = 'Notre analyse détecte quelques facteurs à surveiller. Une consultation prochaine avec votre médecin est recommandée pour un suivi adapté.' %}
+        {% else %}
+            {% set color = 'success' %}
+            {% set icon = '✅' %}
+            {% set titre = 'Votre grossesse se déroule bien' %}
+            {% set message = 'Notre analyse ne détecte aucun facteur de risque particulier. Continuez vos consultations régulières et prenez soin de vous 💕' %}
+        {% endif %}
+        <div class="alert alert-{{ color }} border-2 d-flex align-items-start mb-0" role="alert">
+            <span class="fs-4 me-3">{{ icon }}</span>
+            <div>
+                <h6 class="alert-heading mb-1">{{ titre }}</h6>
+                <p class="mb-0 small">{{ message }}</p>
+            </div>
+        </div>
+    </div>
+{% endif %}
                         <hr class="my-3">
 
                         {% set trimestre = grossesse.trimestreActuel ?? null %}
@@ -182,6 +183,128 @@
                                         <p class="small mb-0">{{ grossesse_conseil }}</p>
                                     </div>
                                 {% endif %}
+                                {# ===== GRAPHIQUE PRISE DE POIDS ===== #}
+{% if prise_poids is defined and prise_poids is not null %}
+    <div class="col-12 mt-3">
+        <div class="border border-primary rounded-3 bg-white p-3 shadow-sm">
+            <h6 class="text-primary mb-3">
+                <i class="fas fa-weight me-2"></i> Suivi de prise de poids — Normes OMS
+            </h6>
+
+            {# Évaluation #}
+            {% if evaluation_prise == 'normal' %}
+                <div class="alert alert-success border-2 py-2 mb-3">✅ Prise de poids normale selon les normes OMS.</div>
+            {% elseif evaluation_prise == 'insuffisant' %}
+                <div class="alert alert-info border-2 py-2 mb-3">ℹ️ Prise de poids insuffisante. Consultez votre médecin.</div>
+            {% elseif evaluation_prise == 'attention' %}
+                <div class="alert alert-warning border-2 py-2 mb-3">⚠️ Prise de poids élevée. Surveillance recommandée.</div>
+            {% elseif evaluation_prise == 'excessif' %}
+                <div class="alert alert-danger border-2 py-2 mb-3">🚨 Prise de poids excessive. Consultez un médecin.</div>
+            {% elseif evaluation_prise == 'perte' %}
+                <div class="alert alert-danger border-2 py-2 mb-3">🚨 Perte de poids détectée. Consultez un médecin.</div>
+            {% endif %}
+
+            {# Infos chiffres #}
+            <div class="row g-2 mb-3 text-center">
+                <div class="col-4">
+                    <div class="p-2 rounded-3" style="background:rgba(74,144,217,0.1);">
+                        <div class="fw-bold text-primary">{{ poids_avant }} kg</div>
+                        <small class="text-muted">Avant grossesse</small>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="p-2 rounded-3" style="background:rgba(233,30,140,0.1);">
+                        <div class="fw-bold" style="color:#e91e8c;">{{ poids_actuel_g }} kg</div>
+                        <small class="text-muted">Poids actuel</small>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="p-2 rounded-3" style="background:rgba(76,175,80,0.1);">
+                        <div class="fw-bold text-success">+{{ prise_poids }} kg</div>
+                        <small class="text-muted">Prise de poids</small>
+                    </div>
+                </div>
+            </div>
+
+            {# Graphique #}
+            <canvas id="chartPrisePoids" height="120"></canvas>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+            new Chart(document.getElementById('chartPrisePoids'), {
+                type: 'line',
+                data: {
+                    labels: ['Avant grossesse', 'Zone insuffisante', 'Zone normale OMS', 'Zone attention', 'Zone excessive'],
+                    datasets: [
+                        {
+                            label: 'Zones OMS',
+                            data: [
+                                {{ poids_avant }},
+                                {{ poids_avant + 8 }},
+                                {{ poids_avant + 16 }},
+                                {{ poids_avant + 20 }},
+                                {{ poids_avant + 25 }}
+                            ],
+                            borderColor: 'rgba(200,200,200,0.5)',
+                            backgroundColor: 'rgba(200,200,200,0.1)',
+                            borderDash: [5,5],
+                            pointRadius: 0,
+                            fill: false,
+                            tension: 0.3,
+                        },
+                        {
+                            label: 'Votre poids',
+                            data: [
+                                {{ poids_avant }},
+                                null,
+                                {{ poids_actuel_g }},
+                                null,
+                                null
+                            ],
+                            borderColor: '#e91e8c',
+                            backgroundColor: 'rgba(233,30,140,0.1)',
+                            borderWidth: 3,
+                            pointBackgroundColor: ['#4a90d9', null, '{{ evaluation_prise == "normal" ? "#4caf50" : (evaluation_prise == "attention" or evaluation_prise == "excessif") ? "#f44336" : "#ff9800" }}', null, null],
+                            pointRadius: [8, 0, 12, 0, 0],
+                            pointBorderColor: 'white',
+                            pointBorderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            spanGaps: true,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ctx.parsed.y ? ctx.parsed.y + ' kg' : null
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { callback: val => val + ' kg' },
+                            min: {{ poids_avant - 5 }},
+                            max: {{ poids_avant + 30 }}
+                        }
+                    }
+                }
+            });
+            </script>
+
+            {# Légende OMS #}
+            <div class="d-flex flex-wrap gap-2 mt-3 small">
+                <span class="badge" style="background:rgba(74,144,217,0.2);color:#4a90d9;">⬤ Insuffisant : 0–8 kg</span>
+                <span class="badge" style="background:rgba(76,175,80,0.2);color:#4caf50;">⬤ Normal OMS : 8–16 kg</span>
+                <span class="badge" style="background:rgba(255,152,0,0.2);color:#ff9800;">⬤ Attention : 16–20 kg</span>
+                <span class="badge" style="background:rgba(244,67,54,0.2);color:#f44336;">⬤ Excessif : +20 kg</span>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{# ===== FIN GRAPHIQUE PRISE DE POIDS ===== #}
                             </div>
                         {% elseif bebe_age_mois is defined and bebe_age_mois is not null %}
                             <div class="row g-3">
@@ -340,6 +463,223 @@ new Chart(document.getElementById('chartTaille'), {
 
                 <div class="row g-4" id="informations-maman">
                     <div class="col-lg-8">
+{# ===== CHATBOT POPOUT ===== #}
+{% if mode == 'show' %}
+
+<style>
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+}
+.typing-dot {
+    width: 8px; height: 8px;
+    background: #e91e8c;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0 2px;
+    animation: typing 1.2s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+.chat-message { animation: slideUp 0.3s ease; }
+#chat-window { display: none; flex-direction: column; }
+#chat-window.open {
+    display: flex !important;
+    animation: slideUp 0.3s ease;
+}
+</style>
+
+{# Bouton flottant #}
+<button onclick="toggleChat()" id="chat-btn" style="position:fixed;bottom:30px;right:30px;width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,#e91e8c,#ff6bb3);border:none;color:white;font-size:26px;box-shadow:0 4px 20px rgba(233,30,140,0.5);cursor:pointer;z-index:9999;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.12)'" onmouseout="this.style.transform='scale(1)'">
+    🤱
+</button>
+
+{# Badge #}
+<div id="chat-badge" style="position:fixed;bottom:84px;right:28px;background:#ff4444;color:white;border-radius:50%;width:20px;height:20px;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700;z-index:10000;">1</div>
+
+{# Fenêtre chat #}
+<div id="chat-window" style="position:fixed;bottom:105px;right:30px;width:370px;height:530px;background:white;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,0.18);z-index:9998;overflow:hidden;">
+
+    {# Header #}
+    <div style="background:linear-gradient(135deg,#e91e8c,#ff6bb3);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:42px;height:42px;background:rgba(255,255,255,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;">🤱</div>
+            <div>
+                <div style="color:white;font-weight:700;font-size:14px;">Maternia AI</div>
+                <div style="color:rgba(255,255,255,0.85);font-size:11px;">● En ligne — Je connais votre profil</div>
+            </div>
+        </div>
+        <div style="display:flex;gap:8px;">
+            <button onclick="clearChat()" title="Nouvelle conversation" style="background:rgba(255,255,255,0.2);border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:13px;">🗑️</button>
+            <button onclick="toggleChat()" style="background:rgba(255,255,255,0.2);border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;">✕</button>
+        </div>
+    </div>
+
+    {# Messages #}
+    <div id="chatbot-messages" style="height:310px;overflow-y:auto;padding:14px;background:#f9f9f9;scroll-behavior:smooth;">
+        <div class="chat-message" style="display:flex;align-items:flex-start;margin-bottom:12px;">
+            <div style="width:28px;height:28px;background:linear-gradient(135deg,#e91e8c,#ff6bb3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-right:8px;">🤱</div>
+            <div>
+                <div style="background:white;border-radius:0 12px 12px 12px;padding:10px 13px;max-width:100%;box-shadow:0 1px 4px rgba(0,0,0,0.07);font-size:13px;color:#333;line-height:1.5;">
+                    Bonjour ! Je suis Maternia AI 💕 Je connais votre profil médical et je suis là pour vous aider.
+                </div>
+                <div style="font-size:10px;color:#aaa;margin-top:3px;margin-left:4px;" id="msg-time-0"></div>
+            </div>
+        </div>
+    </div>
+
+    {# Suggestions #}
+    <div style="padding:8px 12px;background:white;border-top:1px solid #f0f0f0;display:flex;gap:5px;flex-wrap:wrap;">
+        {% for suggestion in ['Aliments a eviter ?', 'Exercices ?', 'Vitamines ?', 'Signes alarme ?'] %}
+            <button onclick="askSuggestion('{{ suggestion }}')" style="background:rgba(233,30,140,0.07);color:#e91e8c;border:1px solid rgba(233,30,140,0.2);border-radius:20px;padding:3px 9px;font-size:11px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(233,30,140,0.15)'" onmouseout="this.style.background='rgba(233,30,140,0.07)'">{{ suggestion }}</button>
+        {% endfor %}
+    </div>
+
+    {# Input #}
+    <div style="padding:10px 14px;background:white;border-top:1px solid #f0f0f0;display:flex;gap:8px;align-items:center;">
+        <input type="text" id="chatbot-input" placeholder="Posez votre question..." style="flex:1;border:2px solid rgba(233,30,140,0.2);border-radius:25px;padding:8px 15px;font-size:13px;outline:none;transition:border 0.2s;" onfocus="this.style.borderColor='#e91e8c'" onblur="this.style.borderColor='rgba(233,30,140,0.2)'">
+        <button onclick="sendMessage()" style="width:38px;height:38px;background:linear-gradient(135deg,#e91e8c,#ff6bb3);border:none;border-radius:50%;color:white;cursor:pointer;font-size:15px;flex-shrink:0;box-shadow:0 2px 8px rgba(233,30,140,0.3);">➤</button>
+    </div>
+</div>
+
+<script>
+function getTime() {
+    var now = new Date();
+    return now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+}
+
+document.getElementById('msg-time-0').textContent = getTime();
+
+function toggleChat() {
+    var win = document.getElementById('chat-window');
+    var badge = document.getElementById('chat-badge');
+    win.classList.toggle('open');
+    if (badge) badge.style.display = 'none';
+}
+
+function clearChat() {
+    var box = document.getElementById('chatbot-messages');
+    box.innerHTML = `
+        <div class="chat-message" style="display:flex;align-items:flex-start;margin-bottom:12px;">
+            <div style="width:28px;height:28px;background:linear-gradient(135deg,#e91e8c,#ff6bb3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-right:8px;">🤱</div>
+            <div>
+                <div style="background:white;border-radius:0 12px 12px 12px;padding:10px 13px;box-shadow:0 1px 4px rgba(0,0,0,0.07);font-size:13px;color:#333;">
+                    Nouvelle conversation ! Comment puis-je vous aider ? 💕
+                </div>
+                <div style="font-size:10px;color:#aaa;margin-top:3px;margin-left:4px;">${getTime()}</div>
+            </div>
+        </div>`;
+}
+
+function sendMessage() {
+    var input = document.getElementById('chatbot-input');
+    var question = input.value.trim();
+    if (!question) return;
+    appendMessage(question, 'user');
+    input.value = '';
+    appendTyping();
+
+    var prompt = "Tu es une assistante medicale specialisee en grossesse pour Maternia. ";
+    prompt += "Reponds en maximum 3-4 phrases courtes et directes. ";
+    prompt += "Pas de listes longues ni de titres. Reste bienveillante mais concise. ";
+    prompt += "Voici le profil de la maman : ";
+    prompt += "Groupe sanguin : {{ maman.groupeSanguin }}. ";
+    prompt += "Allergies : {{ maman.allergies ?: 'aucune' }}. ";
+    prompt += "Maladies chroniques : {{ maman.maladiesChroniques ?: 'aucune' }}. ";
+    prompt += "Antecedents : {{ maman.antecedentsMedicaux ?: 'aucun' }}. ";
+    prompt += "Fumeuse : {{ maman.fumeur ? 'oui' : 'non' }}. ";
+    prompt += "IMC : {{ imc ?? 'non calcule' }}. ";
+    {% if grossesse %}
+    prompt += "Semaine : {{ grossesse.semaineActuelle ?? 'inconnue' }}. ";
+    prompt += "Trimestre : {{ grossesse.trimestreActuel ?? 'inconnu' }}. ";
+    prompt += "Risque ML : {{ grossesse.riskLevel ?? 'non evalue' }}. ";
+    {% endif %}
+    prompt += "Question : " + question;
+
+    fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={{ gemini_api_key }}', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+    })
+    .then(r => {
+        if (!r.ok) return r.json().then(e => { throw new Error(JSON.stringify(e)); });
+        return r.json();
+    })
+    .then(data => {
+        removeTyping();
+        var reponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Desole, une erreur est survenue.';
+        reponse = reponse.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+        appendMessage(reponse, 'bot');
+    })
+    .catch(err => {
+        removeTyping();
+        appendMessage('Service momentanement indisponible. Reessayez dans quelques secondes.', 'bot');
+    });
+}
+
+function askSuggestion(text) {
+    document.getElementById('chatbot-input').value = text;
+    sendMessage();
+}
+
+function appendMessage(text, sender) {
+    var box = document.getElementById('chatbot-messages');
+    var time = getTime();
+    if (sender === 'user') {
+        box.innerHTML += `
+            <div class="chat-message" style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+                <div>
+                    <div style="background:linear-gradient(135deg,#e91e8c,#ff6bb3);color:white;border-radius:12px 0 12px 12px;padding:10px 13px;max-width:260px;font-size:13px;line-height:1.5;">${text}</div>
+                    <div style="font-size:10px;color:#aaa;margin-top:3px;text-align:right;margin-right:4px;">${time}</div>
+                </div>
+            </div>`;
+    } else {
+        box.innerHTML += `
+            <div class="chat-message" style="display:flex;align-items:flex-start;margin-bottom:12px;">
+                <div style="width:28px;height:28px;background:linear-gradient(135deg,#e91e8c,#ff6bb3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-right:8px;">🤱</div>
+                <div>
+                    <div style="background:white;border-radius:0 12px 12px 12px;padding:10px 13px;max-width:260px;box-shadow:0 1px 4px rgba(0,0,0,0.07);font-size:13px;color:#333;line-height:1.5;">${text}</div>
+                    <div style="font-size:10px;color:#aaa;margin-top:3px;margin-left:4px;">${time}</div>
+                </div>
+            </div>`;
+    }
+    box.scrollTop = box.scrollHeight;
+}
+
+function appendTyping() {
+    var box = document.getElementById('chatbot-messages');
+    box.innerHTML += `
+        <div id="typing-indicator" style="display:flex;align-items:flex-start;margin-bottom:12px;">
+            <div style="width:28px;height:28px;background:linear-gradient(135deg,#e91e8c,#ff6bb3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-right:8px;">🤱</div>
+            <div style="background:white;border-radius:0 12px 12px 12px;padding:12px 16px;box-shadow:0 1px 4px rgba(0,0,0,0.07);">
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+            </div>
+        </div>`;
+    box.scrollTop = box.scrollHeight;
+}
+
+function removeTyping() {
+    var el = document.getElementById('typing-indicator');
+    if (el) el.remove();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var input = document.getElementById('chatbot-input');
+    if (input) {
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+    }
+});
+</script>
+{% endif %}
+{# ===== FIN CHATBOT POPOUT ===== #}
 
                         {# ===== CARTE HÔPITAUX ===== #}
                         <div class="border border-primary rounded-3 bg-light p-4 mb-4 shadow-sm">

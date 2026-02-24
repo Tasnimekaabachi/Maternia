@@ -15,3 +15,7 @@ services:
     App\Service\HospitalmapService:
         arguments:
             $apiKey: '%env(GEOAPIFY_API_KEY)%'
+
+    App\Service\ChatbotService:
+        arguments:
+            $apiKey: '%env(GEMINI_API_KEY)%'
