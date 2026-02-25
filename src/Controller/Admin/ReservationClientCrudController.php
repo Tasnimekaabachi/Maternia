@@ -5,8 +5,10 @@ namespace App\Controller\Admin;
 use App\Entity\ReservationClient;
 use App\Form\ReservationClientType;
 use App\Repository\ReservationClientRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -29,21 +31,21 @@ class ReservationClientCrudController extends AbstractController
         
         // Stats pour le plateau
         $stats = [
-            'total' => count($reservations),
+            'total'     => count($reservations),
             'confirmed' => count(array_filter($reservations, fn($r) => $r->getStatutReservation() === 'CONFIRME')),
-            'pending' => count(array_filter($reservations, fn($r) => $r->getStatutReservation() === 'DISPONIBLE' || $r->getStatutReservation() === 'RESERVE')),
-            'bebe' => count(array_filter($reservations, fn($r) => $r->getTypePatient() === 'BEBE')),
-            'maman' => count(array_filter($reservations, fn($r) => $r->getTypePatient() === 'MAMAN')),
+            'pending'   => count(array_filter($reservations, fn($r) => in_array($r->getStatutReservation(), ['DISPONIBLE', 'RESERVE']))),
+            'bebe'      => count(array_filter($reservations, fn($r) => $r->getTypePatient() === 'BEBE')),
+            'maman'     => count(array_filter($reservations, fn($r) => $r->getTypePatient() === 'MAMAN')),
         ];
 
         // Données pour le graphique (6 derniers mois)
         $chartData = $this->getChartData($repository);
 
         return $this->render('admin/reservation_client/index.html.twig', [
-            'reservations' => $reservations,
-            'stats' => $stats,
-            'chartData' => $chartData,
-            'currentSort' => $sort,
+            'reservations'     => $reservations,
+            'stats'            => $stats,
+            'chartData'        => $chartData,
+            'currentSort'      => $sort,
             'currentDirection' => $direction,
         ]);
     }
@@ -80,18 +82,23 @@ class ReservationClientCrudController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $creneau = $reservation->getConsultationCreneau();
+            if ($creneau) {
+                $creneau->setStatutReservation('RESERVE');
+            }
+            
             $entityManager->persist($reservation);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Réservation créée avec succès.');
-            return $this->redirectToRoute('app_admin_reservation_client_index');
+            $this->addFlash('success', 'Réservation créée avec succès. Référence : #' . $reservation->getReference());
+            return $this->redirectToRoute('app_admin_reservation_client_edit', ['id' => $reservation->getId()]);
         } elseif ($form->isSubmitted()) {
             $this->addFlash('error', 'Le formulaire contient des erreurs. Veuillez les corriger.');
         }
 
         return $this->render('admin/reservation_client/new.html.twig', [
             'reservation' => $reservation,
-            'form' => $form->createView(),
+            'form'        => $form->createView(),
         ]);
     }
 
@@ -104,7 +111,6 @@ class ReservationClientCrudController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-
             $this->addFlash('success', 'Réservation mise à jour avec succès.');
             return $this->redirectToRoute('app_admin_reservation_client_index');
         } elseif ($form->isSubmitted()) {
@@ -113,7 +119,7 @@ class ReservationClientCrudController extends AbstractController
 
         return $this->render('admin/reservation_client/edit.html.twig', [
             'reservation' => $reservation,
-            'form' => $form->createView(),
+            'form'        => $form->createView(),
         ]);
     }
 
@@ -131,5 +137,65 @@ class ReservationClientCrudController extends AbstractController
         }
 
         return $this->redirectToRoute('app_admin_reservation_client_index');
+    }
+
+    /**
+     * Endpoint AJAX : envoyer email de confirmation avec lien Google Meet
+     */
+    #[Route('/{id}/send-notification', name: 'app_admin_reservation_send_notification', methods: ['POST'])]
+    public function sendNotification(
+        Request $request,
+        ReservationClient $reservation,
+        NotificationService $notificationService
+    ): JsonResponse {
+        if (!$this->isCsrfTokenValid('notify_' . $reservation->getId(), $request->request->get('_token'))) {
+            return $this->json(['success' => false, 'message' => 'Token de sécurité invalide.'], 403);
+        }
+
+        $type     = $request->request->get('type', 'email');      // 'email' | 'sms'
+        $meetLink = trim($request->request->get('meet_link', ''));
+        $email    = trim($request->request->get('custom_email', ''));
+        $phone    = trim($request->request->get('custom_phone', ''));
+        $smsType  = $request->request->get('sms_type', 'normal'); // 'normal' | 'meet'
+
+        $results = [];
+
+        if ($type === 'email' || $type === 'both') {
+            // Utiliser email custom ou email de la réservation
+            $targetEmail = !empty($email) ? $email : $reservation->getEmailClient();
+            $result = $notificationService->sendConfirmationEmail(
+                $reservation,
+                !empty($meetLink) ? $meetLink : null,
+                $targetEmail
+            );
+            $results['email'] = $result;
+        }
+
+        if ($type === 'sms' || $type === 'both') {
+            // Pour SMS avec lien Meet, inclure le lien s'il y en a un
+            $smsLink = ($smsType === 'meet' && !empty($meetLink)) ? $meetLink : null;
+            $targetPhone = !empty($phone) ? $phone : $reservation->getTelephoneClient();
+            $result = $notificationService->sendConfirmationSms(
+                $reservation,
+                $smsLink,
+                $targetPhone
+            );
+            $results['sms'] = $result;
+        }
+
+        // Déterminer le succès global
+        $allSuccess = !empty($results) && !in_array(false, array_column($results, 'success'));
+
+        $messages = [];
+        foreach ($results as $channel => $res) {
+            $prefix = $channel === 'email' ? '📧' : '📱';
+            $messages[] = $prefix . ' ' . $res['message'];
+        }
+
+        return $this->json([
+            'success'  => $allSuccess,
+            'message'  => implode("\n", $messages),
+            'results'  => $results,
+        ]);
     }
 }

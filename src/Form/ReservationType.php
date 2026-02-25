@@ -70,6 +70,16 @@ class ReservationType extends AbstractType
                     'class' => 'form-control',
                     'rows' => 4
                 ]
+            ])
+            ->add('receiveEmail', CheckboxType::class, [
+                'label' => 'Recevoir une confirmation par Email',
+                'required' => false,
+                'data' => true,
+            ])
+            ->add('receiveSms', CheckboxType::class, [
+                'label' => 'Recevoir une confirmation par SMS',
+                'required' => false,
+                'data' => true,
             ]);
     }
 
