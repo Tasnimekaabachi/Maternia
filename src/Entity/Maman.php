@@ -17,8 +17,7 @@ class Maman
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
-    /** Téléphone Tunisie : 8 chiffres, premier chiffre 2, 4, 5 ou 9. Préfixe +216 affiché côté front. */
+    
     #[ORM\Column(length: 30)]
     #[Assert\NotBlank(message: 'Le numéro d\'urgence est obligatoire.')]
     #[Assert\Regex(
@@ -245,7 +244,12 @@ private ?\DateTimeInterface $dateMiseAJour = null;
 /**
  * @var Collection<int, Grosesse>
  */
-#[ORM\OneToMany(targetEntity: Grosesse::class, mappedBy: 'maman')]
+#[ORM\OneToMany(
+    targetEntity: Grosesse::class,
+    mappedBy: 'maman',
+    cascade: ['remove'],
+    orphanRemoval: true
+)]
 private Collection $grosesses;
 
 public function __construct()
