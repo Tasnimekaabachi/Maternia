@@ -14,217 +14,853 @@
 {% endblock %}
 
 {% block header_actions %}
-    <a href="{{ path('admin_grosesse_index') }}" class="btn btn-outline-secondary me-2"><i class="fas fa-arrow-left me-1"></i> Retour à la liste</a>
-    <a href="{{ path('admin_grosesse_edit', { id: grossesse.id }) }}" class="btn btn-outline-primary"><i class="fas fa-edit me-1"></i> Modifier</a>
-    <a href="{{ path('admin_grosesse_pdf', { id: grossesse.id }) }}" class="btn btn-outline-primary" target="_blank"><i class="fas fa-file-pdf me-1"></i> PDF</a>
+    <a href="{{ path('admin_grosesse_index') }}" class="btn btn-outline-secondary me-2">
+        <i class="fas fa-arrow-left me-1"></i> Retour
+    </a>
+    <a href="{{ path('admin_grosesse_edit', { id: grossesse.id }) }}" class="btn btn-outline-primary me-2">
+        <i class="fas fa-edit me-1"></i> Modifier
+    </a>
+    <a href="{{ path('admin_grosesse_pdf', { id: grossesse.id }) }}" class="btn btn-outline-danger" target="_blank">
+        <i class="fas fa-file-pdf me-1"></i> PDF
+    </a>
 {% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="admin-card mb-4">
-                <div class="admin-card-header"><i class="fas fa-heart me-2"></i> Informations grossesse</div>
-                <div class="admin-card-body">
+<style>
+    /* ===== VARIABLES ===== */
+    :root {
+        --rose: #e91e8c;
+        --rose-light: rgba(233,30,140,0.1);
+        --rose-mid: rgba(233,30,140,0.2);
+        --blue: #4a90d9;
+        --blue-light: rgba(74,144,217,0.1);
+        --green: #22c55e;
+        --green-light: rgba(34,197,94,0.1);
+        --orange: #f97316;
+        --orange-light: rgba(249,115,22,0.1);
+        --red: #ef4444;
+        --red-light: rgba(239,68,68,0.1);
+        --card-radius: 16px;
+        --shadow: 0 4px 20px rgba(0,0,0,0.07);
+        --shadow-hover: 0 8px 30px rgba(0,0,0,0.12);
+    }
+
+    /* ===== HERO BANNER ===== */
+    .show-hero {
+        background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 60%, #e8eaf6 100%);
+        border-radius: var(--card-radius);
+        padding: 1.75rem 2rem;
+        margin-bottom: 1.75rem;
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        box-shadow: var(--shadow);
+        position: relative;
+        overflow: hidden;
+    }
+    .show-hero::before {
+        content: '';
+        position: absolute;
+        right: -30px; top: -30px;
+        width: 200px; height: 200px;
+        background: radial-gradient(circle, rgba(233,30,140,0.08) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .show-hero-icon {
+        width: 64px; height: 64px;
+        background: linear-gradient(135deg, var(--rose), #ff6bb3);
+        border-radius: 18px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 28px;
+        box-shadow: 0 4px 16px rgba(233,30,140,0.35);
+        flex-shrink: 0;
+    }
+    .show-hero-title { font-size: 1.4rem; font-weight: 700; color: #111827; margin: 0; }
+    .show-hero-subtitle { color: #6b7280; font-size: .9rem; margin: .2rem 0 0; }
+    .show-hero-badges { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .5rem; }
+
+    /* ===== STATUS BADGE ===== */
+    .badge-statut {
+        padding: .3rem .75rem;
+        border-radius: 999px;
+        font-size: .75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+    }
+    .badge-statut.enCours  { background: #e0f2fe; color: #1d4ed8; }
+    .badge-statut.aRisque  { background: #fef3c7; color: #b45309; }
+    .badge-statut.terminee { background: #dcfce7; color: #15803d; }
+
+    .badge-risk {
+        padding: .3rem .75rem;
+        border-radius: 999px;
+        font-size: .75rem;
+        font-weight: 700;
+    }
+    .badge-risk.High { background: var(--red-light); color: var(--red); }
+    .badge-risk.Mid  { background: var(--orange-light); color: var(--orange); }
+    .badge-risk.Low  { background: var(--green-light); color: var(--green); }
+
+    /* ===== CARDS ===== */
+    .show-card {
+        background: #fff;
+        border-radius: var(--card-radius);
+        border: 1px solid #f0f0f0;
+        box-shadow: var(--shadow);
+        margin-bottom: 1.25rem;
+        overflow: hidden;
+        transition: box-shadow .2s ease;
+    }
+    .show-card:hover { box-shadow: var(--shadow-hover); }
+    .show-card-header {
+        padding: .9rem 1.25rem;
+        font-weight: 700;
+        font-size: .9rem;
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        border-bottom: 1px solid #f5f5f5;
+        background: #fafafa;
+    }
+    .show-card-header .header-icon {
+        width: 30px; height: 30px;
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px;
+    }
+    .show-card-body { padding: 1.25rem; }
+
+    /* ===== FIELD GRID ===== */
+    .field-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: .75rem;
+    }
+    .field-item {
+        background: #f9fafb;
+        border-radius: 10px;
+        padding: .65rem .85rem;
+        border: 1px solid #f0f0f0;
+    }
+    .field-label {
+        display: block;
+        font-size: .68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: #9ca3af;
+        margin-bottom: .2rem;
+    }
+    .field-value {
+        font-weight: 600;
+        color: #111827;
+        font-size: .88rem;
+    }
+    .field-item.accent-rose   { background: var(--rose-light); border-color: var(--rose-mid); }
+    .field-item.accent-blue   { background: var(--blue-light); border-color: rgba(74,144,217,0.2); }
+    .field-item.accent-green  { background: var(--green-light); border-color: rgba(34,197,94,0.2); }
+    .field-item.accent-orange { background: var(--orange-light); border-color: rgba(249,115,22,0.2); }
+
+    /* ===== SYMPTOMES PILLS ===== */
+    .symptom-pill {
+        display: inline-flex; align-items: center; gap: .3rem;
+        background: #fff3f8; color: var(--rose);
+        border: 1px solid rgba(233,30,140,0.2);
+        padding: .2rem .6rem;
+        border-radius: 999px;
+        font-size: .78rem;
+        font-weight: 600;
+    }
+
+    /* ===== BÉBÉ CARD ===== */
+    .bebe-card {
+        background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+        border: 1px solid rgba(34,197,94,0.2);
+        border-radius: 12px;
+        padding: 1rem;
+    }
+
+    /* ===== CHART CONTAINER ===== */
+    .chart-wrap {
+        background: #fff;
+        border-radius: 14px;
+        border: 1px solid #f0f0f0;
+        padding: 1.25rem;
+        box-shadow: var(--shadow);
+    }
+    .chart-title {
+        font-weight: 700;
+        font-size: .9rem;
+        color: #111827;
+        margin-bottom: .25rem;
+    }
+    .chart-subtitle {
+        font-size: .78rem;
+        color: #9ca3af;
+        margin-bottom: 1rem;
+    }
+    .eval-badge {
+        display: inline-flex; align-items: center; gap: .3rem;
+        padding: .3rem .75rem;
+        border-radius: 999px;
+        font-size: .78rem;
+        font-weight: 700;
+        margin-bottom: .75rem;
+    }
+    .eval-badge.normal  { background: var(--green-light); color: #15803d; }
+    .eval-badge.faible  { background: var(--red-light); color: var(--red); }
+    .eval-badge.eleve   { background: var(--orange-light); color: var(--orange); }
+    .eval-badge.insuffisant { background: var(--blue-light); color: var(--blue); }
+    .eval-badge.attention   { background: var(--orange-light); color: var(--orange); }
+    .eval-badge.excessif    { background: var(--red-light); color: var(--red); }
+    .eval-badge.perte       { background: var(--red-light); color: var(--red); }
+
+    /* ===== SIDEBAR SYSTEM INFO ===== */
+    .sys-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: .6rem 0;
+        border-bottom: 1px solid #f5f5f5;
+        font-size: .85rem;
+    }
+    .sys-item:last-child { border-bottom: none; }
+    .sys-label { color: #9ca3af; font-weight: 600; font-size: .78rem; text-transform: uppercase; }
+    .sys-value { font-weight: 600; color: #374151; }
+
+    /* ===== TRIMESTRE ALERT ===== */
+    .trimestre-banner {
+        border-radius: 12px;
+        padding: .85rem 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        font-size: .88rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    .trimestre-banner.t1 { background: var(--green-light); color: #15803d; border: 1px solid rgba(34,197,94,0.25); }
+    .trimestre-banner.t2 { background: var(--orange-light); color: #c2410c; border: 1px solid rgba(249,115,22,0.25); }
+    .trimestre-banner.t3 { background: var(--red-light); color: var(--red); border: 1px solid rgba(239,68,68,0.25); }
+
+    /* ===== POIDS STATS ROW ===== */
+    .poids-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: .75rem;
+        margin-bottom: 1rem;
+    }
+    .poids-stat-item {
+        text-align: center;
+        padding: .75rem;
+        border-radius: 10px;
+    }
+    .poids-stat-val { font-size: 1.15rem; font-weight: 800; }
+    .poids-stat-lbl { font-size: .72rem; color: #9ca3af; font-weight: 600; margin-top: .15rem; }
+</style>
+
+{# ===== HERO ===== #}
+{% set trimestre = grossesse.trimestreActuel ?? null %}
+{% set isRisk = grossesse.statutGrossesse == 'aRisque' or (trimestre == 3 and grossesse.statutGrossesse != 'terminee') %}
+
+<div class="show-hero">
+    <div class="show-hero-icon">
+        {{ grossesse.statutGrossesse == 'terminee' ? '👶' : (isRisk ? '⚠️' : '🤰') }}
+    </div>
+    <div>
+        <h2 class="show-hero-title">
+            Grossesse #{{ grossesse.id }}
+            {% if grossesse.maman %} — Maman #{{ grossesse.maman.id }}{% endif %}
+        </h2>
+        <p class="show-hero-subtitle">
+            {{ grossesse.typeGrossesse ?? '—' }} •
+            {% if grossesse.statutGrossesse != 'terminee' %}
+                Semaine {{ grossesse.semaineActuelle ?? '?' }} / Trimestre {{ grossesse.trimestreActuel ?? '?' }}
+            {% else %}
+                Accouchement le {{ grossesse.dateAccouchementReelle ? grossesse.dateAccouchementReelle|date('d/m/Y') : '—' }}
+            {% endif %}
+        </p>
+        <div class="show-hero-badges">
+            <span class="badge-statut {{ grossesse.statutGrossesse }}">
+                {% if grossesse.statutGrossesse == 'enCours' %}🔵 En cours
+                {% elseif grossesse.statutGrossesse == 'aRisque' %}🟠 À risque
+                {% else %}🟢 Terminée{% endif %}
+            </span>
+            {% if grossesse.riskLevel %}
+                <span class="badge-risk {{ grossesse.riskLevel }}">
+                    {% if grossesse.riskLevel == 'High' %}🚨 Risque élevé
+                    {% elseif grossesse.riskLevel == 'Mid' %}⚠️ Risque modéré
+                    {% else %}✅ Faible risque{% endif %}
+                </span>
+            {% endif %}
+            {% if trimestre == 3 and grossesse.statutGrossesse != 'terminee' %}
+                <span class="badge-risk High">🔴 3ème trimestre</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    {# ===== COLONNE PRINCIPALE ===== #}
+    <div class="col-lg-8">
+
+        {# --- INFOS GROSSESSE --- #}
+        <div class="show-card">
+            <div class="show-card-header">
+                <div class="header-icon" style="background:var(--rose-light);color:var(--rose);">❤️</div>
+                Informations grossesse
+            </div>
+            <div class="show-card-body">
+
+{# Bannière trimestre #}
+{% if trimestre and grossesse.statutGrossesse != 'terminee' %}
+    <div class="trimestre-banner t{{ trimestre }}">
+        {% if trimestre == 1 %}🟢 1er trimestre — Début du développement du bébé.
+        {% elseif trimestre == 2 %}🟠 2ème trimestre — Grossesse en évolution, planifiez vos consultations.
+        {% else %}🔴 3ème trimestre — Préparez le suivi final et l'accouchement.{% endif %}
+    </div>
+{% endif %}
+
+{# ← AJOUTER ICI — Alerte semaine #}
+{% if alerte_semaine is not null %}
+    <div class="d-flex align-items-center gap-2 p-3 rounded-3 mb-3"
+         style="background:{% if alerte_semaine.niveau == 'danger' %}var(--red-light){% elseif alerte_semaine.niveau == 'warning' %}var(--orange-light){% else %}var(--blue-light){% endif %};
+                border:1px solid {% if alerte_semaine.niveau == 'danger' %}rgba(239,68,68,0.25){% elseif alerte_semaine.niveau == 'warning' %}rgba(249,115,22,0.25){% else %}rgba(74,144,217,0.25){% endif %};">
+        <span style="font-size:1.2rem;">
+            {% if alerte_semaine.niveau == 'danger' %}🚨
+            {% elseif alerte_semaine.niveau == 'warning' %}⚠️
+            {% else %}ℹ️{% endif %}
+        </span>
+        <div>
+            <div style="font-weight:700;font-size:.88rem;color:{% if alerte_semaine.niveau == 'danger' %}var(--red){% elseif alerte_semaine.niveau == 'warning' %}var(--orange){% else %}var(--blue){% endif %};">
+                {{ alerte_semaine.message }}
+            </div>
+            <div class="small text-muted mt-1">Semaine {{ grossesse.semaineActuelle }} — calculée automatiquement</div>
+        </div>
+    </div>
+{% endif %}
+
+{# ← AJOUTER ICI — Barre de progression #}
+{% if grossesse.statutGrossesse != 'terminee' and grossesse.semaineActuelle %}
+    {% set progression = ((grossesse.semaineActuelle / 40) * 100)|round %}
+    <div class="mb-3 p-3 rounded-3" style="background:#f9fafb;border:1px solid #f0f0f0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;">
+            <span style="font-size:.8rem;font-weight:700;color:#374151;">📅 Progression grossesse</span>
+            <span style="font-size:.8rem;font-weight:700;color:var(--rose);">Semaine {{ grossesse.semaineActuelle }} / 40 — {{ progression }}%</span>
+        </div>
+        {# Barre principale #}
+        <div style="background:#f0f0f0;border-radius:999px;height:12px;overflow:hidden;position:relative;">
+            <div style="width:{{ progression }}%;height:100%;background:linear-gradient(90deg,#4a90d9 0%,#e91e8c 100%);border-radius:999px;transition:width .5s ease;"></div>
+            {# Marqueurs trimestres #}
+            <div style="position:absolute;top:0;left:32.5%;width:2px;height:100%;background:white;opacity:0.6;"></div>
+            <div style="position:absolute;top:0;left:67.5%;width:2px;height:100%;background:white;opacity:0.6;"></div>
+        </div>
+        {# Labels trimestres #}
+        <div style="display:flex;justify-content:space-between;margin-top:.4rem;">
+            <span style="font-size:.68rem;color:{% if trimestre == 1 %}#15803d{% else %}#9ca3af{% endif %};font-weight:{% if trimestre == 1 %}700{% else %}500{% endif %};">T1 (1–13)</span>
+            <span style="font-size:.68rem;color:{% if trimestre == 2 %}#c2410c{% else %}#9ca3af{% endif %};font-weight:{% if trimestre == 2 %}700{% else %}500{% endif %};">T2 (14–27)</span>
+            <span style="font-size:.68rem;color:{% if trimestre == 3 %}var(--red){% else %}#9ca3af{% endif %};font-weight:{% if trimestre == 3 %}700{% else %}500{% endif %};">T3 (28–40)</span>
+        </div>
+    </div>
+{% endif %}
+
+
+                <div class="field-grid">
+                    <div class="field-item accent-rose">
+                        <span class="field-label">Statut</span>
+                        <span class="field-value">{{ grossesse.statutGrossesse }}</span>
+                    </div>
+                    <div class="field-item">
+                        <span class="field-label">Type</span>
+                        <span class="field-value">{{ grossesse.typeGrossesse }}</span>
+                    </div>
+                    <div class="field-item">
+                        <span class="field-label">Nb bébés</span>
+                        <span class="field-value">{{ grossesse.nombreBebes ?? '—' }}</span>
+                    </div>
+                    {% if grossesse.statutGrossesse != 'terminee' %}
+                        <div class="field-item accent-blue">
+                            <span class="field-label">Semaine</span>
+                            <span class="field-value">{{ grossesse.semaineActuelle ?? '—' }}</span>
+                        </div>
+                        <div class="field-item accent-blue">
+                            <span class="field-label">Trimestre</span>
+                            <span class="field-value">{{ grossesse.trimestreActuel ?? '—' }}</span>
+                        </div>
+                    {% endif %}
+                    <div class="field-item">
+                        <span class="field-label">Poids actuel</span>
+                        <span class="field-value">{{ grossesse.poidsActuel is not null ? grossesse.poidsActuel ~ ' kg' : '—' }}</span>
+                    </div>
+                    <div class="field-item">
+                        <span class="field-label">DDR / Début</span>
+                        <span class="field-value">
+                            {% if grossesse.dateDebutGrossesse %}{{ grossesse.dateDebutGrossesse|date('d/m/Y') }}
+                            {% elseif grossesse.dateDernieresRegles %}{{ grossesse.dateDernieresRegles|date('d/m/Y') }}
+                            {% else %}—{% endif %}
+                        </span>
+                    </div>
+                    <div class="field-item {% if grossesse.dateAccouchementReelle %}accent-green{% endif %}">
+                        <span class="field-label">Accouchement réel</span>
+                        <span class="field-value">{{ grossesse.dateAccouchementReelle ? grossesse.dateAccouchementReelle|date('d/m/Y') : '—' }}</span>
+                    </div>
+                </div>
+
+                {# Symptômes #}
+                {% set symptomesList = grossesse.symptomesList %}
+                {% if symptomesList|length > 0 %}
+                    <div class="mt-3">
+                        <span class="field-label d-block mb-2">Symptômes</span>
+                        {% for s in symptomesList %}
+                            <span class="symptom-pill me-1 mb-1">⚡ {{ s }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {# Commentaire #}
+                {% if grossesse.commentaireGeneral %}
+                    <div class="mt-3 p-3 rounded-3" style="background:#f9fafb;border:1px solid #f0f0f0;">
+                        <span class="field-label d-block mb-1">Commentaire général</span>
+                        <p class="small mb-0 text-muted">{{ grossesse.commentaireGeneral }}</p>
+                    </div>
+                {% endif %}
+
+                {# Risque ML #}
+                {% if grossesse.riskLevel %}
+                    <div class="mt-3 p-3 rounded-3 {% if grossesse.riskLevel == 'High' %}bg-danger bg-opacity-10{% elseif grossesse.riskLevel == 'Mid' %}bg-warning bg-opacity-10{% else %}bg-success bg-opacity-10{% endif %}" style="border:1px solid {% if grossesse.riskLevel == 'High' %}rgba(239,68,68,0.2){% elseif grossesse.riskLevel == 'Mid' %}rgba(249,115,22,0.2){% else %}rgba(34,197,94,0.2){% endif %};">
+                        <div class="d-flex align-items-center gap-2">
+                            <span style="font-size:1.3rem;">{% if grossesse.riskLevel == 'High' %}🚨{% elseif grossesse.riskLevel == 'Mid' %}⚠️{% else %}✅{% endif %}</span>
+                            <div>
+                                <div class="fw-700" style="font-size:.88rem;font-weight:700;">
+                                    {% if grossesse.riskLevel == 'High' %}Risque élevé — suivi rapproché requis
+                                    {% elseif grossesse.riskLevel == 'Mid' %}Risque modéré — consultation recommandée
+                                    {% else %}Faible risque — grossesse bien suivie{% endif %}
+                                </div>
+                                <div class="small text-muted">Évaluation ML basée sur les symptômes déclarés</div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# --- GRAPHIQUE PRISE DE POIDS (en cours) --- #}
+        {% if grossesse.statutGrossesse != 'terminee' and prise_poids is not null %}
+            <div class="show-card">
+                <div class="show-card-header">
+                    <div class="header-icon" style="background:var(--rose-light);color:var(--rose);">⚖️</div>
+                    Suivi prise de poids — Normes OMS
+                </div>
+                <div class="show-card-body">
+                    {% if evaluation_prise == 'normal' %}
+                        <div class="eval-badge normal">✅ Prise de poids normale selon les normes OMS</div>
+                    {% elseif evaluation_prise == 'insuffisant' %}
+                        <div class="eval-badge insuffisant">ℹ️ Prise de poids insuffisante — consultez votre médecin</div>
+                    {% elseif evaluation_prise == 'attention' %}
+                        <div class="eval-badge attention">⚠️ Prise de poids élevée — surveillance recommandée</div>
+                    {% elseif evaluation_prise == 'excessif' %}
+                        <div class="eval-badge excessif">🚨 Prise de poids excessive — consultez un médecin</div>
+                    {% elseif evaluation_prise == 'perte' %}
+                        <div class="eval-badge perte">🚨 Perte de poids détectée — consultez un médecin</div>
+                    {% endif %}
+
+                    <div class="poids-stats">
+                        <div class="poids-stat-item" style="background:var(--blue-light);">
+                            <div class="poids-stat-val" style="color:var(--blue);">{{ poids_avant }} kg</div>
+                            <div class="poids-stat-lbl">Avant grossesse</div>
+                        </div>
+                        <div class="poids-stat-item" style="background:var(--rose-light);">
+                            <div class="poids-stat-val" style="color:var(--rose);">{{ poids_actuel_g }} kg</div>
+                            <div class="poids-stat-lbl">Poids actuel</div>
+                        </div>
+                        <div class="poids-stat-item" style="background:var(--green-light);">
+                            <div class="poids-stat-val" style="color:var(--green);">+{{ prise_poids }} kg</div>
+                            <div class="poids-stat-lbl">Prise de poids</div>
+                        </div>
+                    </div>
+
+                    <canvas id="chartPrisePoids" height="110"></canvas>
+
+                    <div class="d-flex flex-wrap gap-2 mt-3">
+                        <span class="eval-badge insuffisant" style="font-size:.72rem;">⬤ Insuffisant : 0–8 kg</span>
+                        <span class="eval-badge normal" style="font-size:.72rem;">⬤ Normal OMS : 8–16 kg</span>
+                        <span class="eval-badge attention" style="font-size:.72rem;">⬤ Attention : 16–20 kg</span>
+                        <span class="eval-badge excessif" style="font-size:.72rem;">⬤ Excessif : +20 kg</span>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {# --- COURBES BÉBÉ (terminée) --- #}
+        {% if grossesse.statutGrossesse == 'terminee' and normes_bebe is not null and grossesse.poidsNaissance is not null %}
+            <div class="show-card">
+                <div class="show-card-header">
+                    <div class="header-icon" style="background:var(--green-light);color:var(--green);">📈</div>
+                    Courbes de croissance bébé — Normes OMS
+                </div>
+                <div class="show-card-body">
+                    {% if evaluation_poids == 'normal' and evaluation_taille == 'normal' %}
+                        <div class="eval-badge normal mb-3">✅ Poids et taille dans les normes OMS</div>
+                    {% else %}
+                        <div class="eval-badge attention mb-3">⚠️ Certaines mesures hors normes OMS — consultez un pédiatre</div>
+                    {% endif %}
+
                     <div class="row g-3">
-                        <div class="col-md-4">
-                            <div class="admin-field">
-                                <span class="admin-field-label">Statut</span>
-                                <span class="admin-field-value">{{ grossesse.statutGrossesse }}</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="admin-field">
-                                <span class="admin-field-label">Type</span>
-                                <span class="admin-field-value">{{ grossesse.typeGrossesse }}</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="admin-field">
-                                <span class="admin-field-label">Nombre de bébés</span>
-                                <span class="admin-field-value">{{ grossesse.nombreBebes ?? '—' }}</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="admin-field">
-                                <span class="admin-field-label">Semaine actuelle</span>
-                                <span class="admin-field-value">{{ grossesse.semaineActuelle ?? '—' }}</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="admin-field">
-                                <span class="admin-field-label">Trimestre</span>
-                                <span class="admin-field-value">{{ grossesse.trimestreActuel ?? '—' }}</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="admin-field">
-                                <span class="admin-field-label">Poids actuel</span>
-                                <span class="admin-field-value">{{ grossesse.poidsActuel ?? '—' }} kg</span>
+                        <div class="col-md-6">
+                            <div class="chart-wrap">
+                                <div class="chart-title">⚖️ Poids à la naissance</div>
+                                <div class="chart-subtitle">Norme OMS : {{ normes_bebe.poids_min }} — {{ normes_bebe.poids_max }} kg</div>
+                                <div class="eval-badge {{ evaluation_poids }}">
+                                    {% if evaluation_poids == 'normal' %}✅ Normal
+                                    {% elseif evaluation_poids == 'faible' %}🔻 En dessous de la norme
+                                    {% else %}🔺 Au dessus de la norme{% endif %}
+                                </div>
+                                <canvas id="chartPoids" height="180"></canvas>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="admin-field">
-                                <span class="admin-field-label">Date début grossesse / DDR</span>
-                                <span class="admin-field-value">
-                                    {% if grossesse.dateDebutGrossesse %}
-                                        {{ grossesse.dateDebutGrossesse|date('d/m/Y') }}
-                                    {% elseif grossesse.dateDernieresRegles %}
-                                        {{ grossesse.dateDernieresRegles|date('d/m/Y') }}
-                                    {% else %}
-                                        —
-                                    {% endif %}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="admin-field">
-                                <span class="admin-field-label">Date accouchement réelle</span>
-                                <span class="admin-field-value">
-                                    {{ grossesse.dateAccouchementReelle ? grossesse.dateAccouchementReelle|date('d/m/Y') : '—' }}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="admin-field">
-                                <span class="admin-field-label">Symptômes</span>
-                                <span class="admin-field-value">{{ grossesse.symptomesList|length > 0 ? grossesse.symptomesList|join(', ') : '—' }}</span>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="admin-field">
-                                <span class="admin-field-label">Commentaire général</span>
-                                <span class="admin-field-value">{{ grossesse.commentaireGeneral ?? '—' }}</span>
+                            <div class="chart-wrap">
+                                <div class="chart-title">📏 Taille à la naissance</div>
+                                <div class="chart-subtitle">Norme OMS : {{ normes_bebe.taille_min }} — {{ normes_bebe.taille_max }} cm</div>
+                                <div class="eval-badge {{ evaluation_taille }}">
+                                    {% if evaluation_taille == 'normal' %}✅ Normal
+                                    {% elseif evaluation_taille == 'faible' %}🔻 En dessous de la norme
+                                    {% else %}🔺 Au dessus de la norme{% endif %}
+                                </div>
+                                <canvas id="chartTaille" height="180"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        {% endif %}
 
-            <div class="admin-card mb-4">
-                <div class="admin-card-header"><i class="fas fa-baby me-2"></i> Bébés</div>
-                <div class="admin-card-body">
-                    {% set bebesData = grossesse.bebes %}
-                    {% if bebesData is iterable and bebesData|length > 0 %}
-                        <div class="row g-3">
-                            {% for bebe in bebesData %}
-                                <div class="col-md-6">
-                                    <div class="border rounded-3 p-3 h-100">
-                                        <div class="admin-field mb-2">
-                                            <span class="admin-field-label">Prénom</span>
-                                            <span class="admin-field-value">{{ bebe.nom ?? 'Bébé' }}</span>
+        {# --- BÉBÉS --- #}
+        <div class="show-card">
+            <div class="show-card-header">
+                <div class="header-icon" style="background:var(--green-light);color:var(--green);">👶</div>
+                Bébés
+            </div>
+            <div class="show-card-body">
+                {% set bebesData = grossesse.bebes %}
+                {% if bebesData is iterable and bebesData|length > 0 %}
+                    <div class="row g-3">
+                        {% for bebe in bebesData %}
+                            <div class="col-md-6">
+                                <div class="bebe-card">
+                                    <div class="d-flex align-items-center gap-2 mb-3">
+                                        <span style="font-size:1.5rem;">{{ bebe.sexe is defined and bebe.sexe == 'F' ? '👧' : '👦' }}</span>
+                                        <div>
+                                            <div class="fw-bold">{{ bebe.nom ?? 'Bébé' }}</div>
+                                            <div class="small text-muted">{{ bebe.sexe is defined ? (bebe.sexe == 'F' ? 'Fille' : 'Garçon') : '—' }}</div>
                                         </div>
-                                        <div class="admin-field mb-2">
-                                            <span class="admin-field-label">Sexe</span>
-                                            <span class="admin-field-value">
-                                                {% if bebe.sexe is defined %}
-                                                    {{ bebe.sexe == 'F' ? 'Fille' : (bebe.sexe == 'M' ? 'Garçon' : bebe.sexe) }}
-                                                {% else %}
-                                                    —
-                                                {% endif %}
-                                            </span>
+                                    </div>
+                                    <div class="field-grid">
+                                        <div class="field-item">
+                                            <span class="field-label">Poids</span>
+                                            <span class="field-value">{{ bebe.poids is defined and bebe.poids is not null ? bebe.poids ~ ' kg' : '—' }}</span>
                                         </div>
-                                        <div class="admin-field mb-2">
-                                            <span class="admin-field-label">Poids</span>
-                                            <span class="admin-field-value">
-                                                {% if bebe.poids is defined and bebe.poids is not null %}
-                                                    {{ bebe.poids }} kg
-                                                {% else %}
-                                                    —
-                                                {% endif %}
-                                            </span>
+                                        <div class="field-item">
+                                            <span class="field-label">Taille</span>
+                                            <span class="field-value">{{ bebe.taille is defined and bebe.taille is not null ? bebe.taille ~ ' cm' : '—' }}</span>
                                         </div>
-                                        <div class="admin-field mb-2">
-                                            <span class="admin-field-label">Taille</span>
-                                            <span class="admin-field-value">
-                                                {% if bebe.taille is defined and bebe.taille is not null %}
-                                                    {{ bebe.taille }} cm
-                                                {% else %}
-                                                    —
-                                                {% endif %}
-                                            </span>
-                                        </div>
-                                        <div class="admin-field">
-                                            <span class="admin-field-label">État</span>
-                                            <span class="admin-field-value">{{ bebe.etat ?? '—' }}</span>
+                                        <div class="field-item">
+                                            <span class="field-label">État</span>
+                                            <span class="field-value">{{ bebe.etat ?? '—' }}</span>
                                         </div>
                                     </div>
                                 </div>
-                            {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% elseif grossesse.nomBebe %}
+                    <div class="bebe-card">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span style="font-size:1.5rem;">{{ grossesse.sexeBebe == 'F' ? '👧' : '👦' }}</span>
+                            <div>
+                                <div class="fw-bold">{{ grossesse.nomBebe }}</div>
+                                <div class="small text-muted">{{ grossesse.sexeBebe == 'F' ? 'Fille' : (grossesse.sexeBebe == 'M' ? 'Garçon' : '—') }}</div>
+                            </div>
                         </div>
-                    {% elseif grossesse.nomBebe %}
-                        <p>
-                            👶 {{ grossesse.nomBebe }}
-                            {% if grossesse.poidsNaissance %} ({{ grossesse.poidsNaissance }} kg){% endif %}
-                            {% if grossesse.tailleNaissance %} – {{ grossesse.tailleNaissance }} cm{% endif %}
-                            {% if grossesse.etatNaissance %} – {{ grossesse.etatNaissance }}{% endif %}
-                        </p>
-                    {% else %}
-                        <p class="text-muted mb-0">Aucune information bébé disponible.</p>
-                    {% endif %}
-                </div>
+                        <div class="field-grid">
+                            <div class="field-item">
+                                <span class="field-label">Poids naissance</span>
+                                <span class="field-value">{{ grossesse.poidsNaissance ? grossesse.poidsNaissance ~ ' kg' : '—' }}</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-label">Taille naissance</span>
+                                <span class="field-value">{{ grossesse.tailleNaissance ? grossesse.tailleNaissance ~ ' cm' : '—' }}</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-label">État naissance</span>
+                                <span class="field-value">{{ grossesse.etatNaissance ?? '—' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0 small">Aucune information bébé disponible.</p>
+                {% endif %}
             </div>
+        </div>
 
-            <div class="admin-card mb-4">
-                <div class="admin-card-header"><i class="fas fa-lightbulb me-2"></i> Alertes & conseils</div>
-                <div class="admin-card-body">
-                    {% if grossesse.statutGrossesse != 'terminee' %}
-                        {% if grossesse_conseil %}
-                            <p class="mb-1"><strong>Conseil grossesse :</strong></p>
+        {# --- ALERTES & CONSEILS --- #}
+        <div class="show-card">
+            <div class="show-card-header">
+                <div class="header-icon" style="background:#fef9c3;color:#ca8a04;">💡</div>
+                Alertes & conseils
+            </div>
+            <div class="show-card-body">
+                {% if grossesse.statutGrossesse != 'terminee' %}
+                    {% if grossesse_conseil %}
+                        <div class="p-3 rounded-3" style="background:linear-gradient(135deg,rgba(74,144,217,0.07),rgba(74,144,217,0.03));border:1px solid rgba(74,144,217,0.15);">
+                            <div class="fw-bold small mb-1" style="color:var(--blue);">💡 Conseil semaine {{ grossesse.semaineActuelle }}</div>
                             <p class="small mb-0">{{ grossesse_conseil }}</p>
-                        {% else %}
-                            <p class="text-muted mb-0 small">Aucun conseil spécifique pour cette grossesse.</p>
-                        {% endif %}
+                        </div>
                     {% else %}
-                        {% if bebe_age_mois is not null %}
-                            <p class="mb-1"><strong>Âge du bébé :</strong> {{ bebe_age_mois }} mois</p>
-                        {% endif %}
-                        {% if bebe_conseil %}
-                            <p class="mb-1"><strong>Conseil bébé :</strong></p>
-                            <p class="small mb-0">{{ bebe_conseil }}</p>
-                        {% else %}
-                            <p class="text-muted mb-0 small">Aucun conseil spécifique pour le bébé.</p>
-                        {% endif %}
+                        <p class="text-muted small mb-0">Aucun conseil spécifique.</p>
                     {% endif %}
+                {% else %}
+                    {% if bebe_age_mois is not null %}
+                        <div class="field-item accent-green mb-3 d-inline-block">
+                            <span class="field-label">Âge du bébé</span>
+                            <span class="field-value">{{ bebe_age_mois }} mois</span>
+                        </div>
+                    {% endif %}
+                    {% if bebe_conseil %}
+                        <div class="p-3 rounded-3" style="background:var(--green-light);border:1px solid rgba(34,197,94,0.2);">
+                            <div class="fw-bold small mb-1" style="color:#15803d;">👶 Conseil bébé</div>
+                            <p class="small mb-0">{{ bebe_conseil }}</p>
+                        </div>
+                    {% else %}
+                        <p class="text-muted small mb-0">Aucun conseil spécifique pour le bébé.</p>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+    </div>{# fin col-lg-8 #}
+
+    {# ===== SIDEBAR ===== #}
+    <div class="col-lg-4">
+
+        {# Infos système #}
+        <div class="show-card">
+            <div class="show-card-header">
+                <div class="header-icon" style="background:#f3f4f6;color:#6b7280;">🔧</div>
+                Informations système
+            </div>
+            <div class="show-card-body">
+                <div class="sys-item">
+                    <span class="sys-label">ID</span>
+                    <span class="sys-value">#{{ grossesse.id }}</span>
+                </div>
+                <div class="sys-item">
+                    <span class="sys-label">Maman liée</span>
+                    <span class="sys-value">
+                        {% if grossesse.maman %}Maman #{{ grossesse.maman.id }}{% else %}—{% endif %}
+                    </span>
+                </div>
+                <div class="sys-item">
+                    <span class="sys-label">Création</span>
+                    <span class="sys-value">{{ grossesse.dateCreation ? grossesse.dateCreation|date('d/m/Y H:i') : '—' }}</span>
+                </div>
+                <div class="sys-item">
+                    <span class="sys-label">Mise à jour</span>
+                    <span class="sys-value">{{ grossesse.dateMiseAJour ? grossesse.dateMiseAJour|date('d/m/Y H:i') : '—' }}</span>
+                </div>
+                <div class="mt-3">
+                    {{ include('admin/grossesse/_delete_form.html.twig') }}
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-4">
-            <div class="admin-card mb-4">
-                <div class="admin-card-header">Informations système</div>
-                <div class="admin-card-body">
-                    <div class="admin-field mb-2">
-                        <span class="admin-field-label">ID</span>
-                        <span class="admin-field-value">#{{ grossesse.id }}</span>
-                    </div>
-                    <div class="admin-field mb-2">
-                        <span class="admin-field-label">Maman liée</span>
-                        <span class="admin-field-value">
-                            {% if grossesse.maman %}
-                                Maman #{{ grossesse.maman.id }}
-                            {% else %}
-                                —
-                            {% endif %}
-                        </span>
-                    </div>
-                    <div class="admin-field mb-2">
-                        <span class="admin-field-label">Date création</span>
-                        <span class="admin-field-value">
-                            {{ grossesse.dateCreation ? grossesse.dateCreation|date('d/m/Y H:i') : '—' }}
-                        </span>
-                    </div>
-                    <div class="admin-field mb-4">
-                        <span class="admin-field-label">Dernière mise à jour</span>
-                        <span class="admin-field-value">
-                            {{ grossesse.dateMiseAJour ? grossesse.dateMiseAJour|date('d/m/Y H:i') : '—' }}
-                        </span>
-                    </div>
-                    <div class="admin-show-actions">
-                        {{ include('admin/grossesse/_delete_form.html.twig') }}
+        {# Résumé poids maman #}
+        {% if grossesse.maman and grossesse.maman.poids %}
+            <div class="show-card">
+                <div class="show-card-header">
+                    <div class="header-icon" style="background:var(--rose-light);color:var(--rose);">👩</div>
+                    Maman — Profil santé
+                </div>
+                <div class="show-card-body">
+                    <div class="field-grid">
+                        <div class="field-item">
+                            <span class="field-label">Poids initial</span>
+                            <span class="field-value">{{ grossesse.maman.poids }} kg</span>
+                        </div>
+                        {% if grossesse.maman.taille %}
+                            <div class="field-item">
+                                <span class="field-label">Taille</span>
+                                <span class="field-value">{{ grossesse.maman.taille }} cm</span>
+                            </div>
+                        {% endif %}
+                        {% if grossesse.maman.groupeSanguin %}
+                            <div class="field-item accent-rose">
+                                <span class="field-label">Groupe sanguin</span>
+                                <span class="field-value">{{ grossesse.maman.groupeSanguin }}</span>
+                            </div>
+                        {% endif %}
+                        {% if grossesse.maman.isFumeur is defined %}
+                            <div class="field-item {% if grossesse.maman.isFumeur() %}accent-orange{% endif %}">
+                                <span class="field-label">Fumeuse</span>
+                                <span class="field-value">{{ grossesse.maman.isFumeur() ? '⚠️ Oui' : '✅ Non' }}</span>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        {% endif %}
+
+        {# Accouchement prévu #}
+        {% if grossesse.statutGrossesse != 'terminee' %}
+            {% set datePrevue = grossesse.dateAccouchementPrevue %}
+            {% if datePrevue %}
+                <div class="show-card">
+                    <div class="show-card-header">
+                        <div class="header-icon" style="background:var(--blue-light);color:var(--blue);">📅</div>
+                        Accouchement prévu
+                    </div>
+                    <div class="show-card-body text-center py-3">
+                        <div style="font-size:2rem;font-weight:800;color:var(--rose);">{{ datePrevue|date('d') }}</div>
+                        <div style="font-size:1rem;font-weight:600;color:#374151;">{{ datePrevue|date('F Y') }}</div>
+                        {% set today = date() %}
+                        {% set diff = datePrevue|date('U') - today|date('U') %}
+                        {% if diff > 0 %}
+                            <div class="mt-2 small text-muted">Dans environ {{ (diff / 604800)|round }} semaines</div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+
+    </div>{# fin col-lg-4 #}
+</div>{# fin row #}
+
+{# ===== SCRIPTS CHARTS ===== #}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    {% if grossesse.statutGrossesse != 'terminee' and prise_poids is not null %}
+    // ===== GRAPHIQUE PRISE DE POIDS =====
+    new Chart(document.getElementById('chartPrisePoids'), {
+        type: 'line',
+        data: {
+            labels: ['Avant grossesse', 'Zone insuffisante', 'Zone normale OMS', 'Zone attention', 'Zone excessive'],
+            datasets: [
+                {
+                    label: 'Zones OMS',
+                    data: [
+                        {{ poids_avant }},
+                        {{ poids_avant + 8 }},
+                        {{ poids_avant + 16 }},
+                        {{ poids_avant + 20 }},
+                        {{ poids_avant + 25 }}
+                    ],
+                    borderColor: 'rgba(200,200,200,0.5)',
+                    backgroundColor: 'rgba(200,200,200,0.05)',
+                    borderDash: [5,5],
+                    pointRadius: 0,
+                    fill: false,
+                    tension: 0.3,
+                },
+                {
+                    label: 'Poids maman',
+                    data: [{{ poids_avant }}, null, {{ poids_actuel_g }}, null, null],
+                    borderColor: '#e91e8c',
+                    backgroundColor: 'rgba(233,30,140,0.08)',
+                    borderWidth: 3,
+                    pointBackgroundColor: ['#4a90d9', null, '{{ evaluation_prise == "normal" ? "#22c55e" : (evaluation_prise in ["attention","excessif","perte"]) ? "#ef4444" : "#f97316" }}', null, null],
+                    pointRadius: [8, 0, 12, 0, 0],
+                    pointBorderColor: 'white',
+                    pointBorderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    spanGaps: true,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: ctx => ctx.parsed.y ? ctx.parsed.y + ' kg' : null } }
+            },
+            scales: {
+                y: {
+                    ticks: { callback: val => val + ' kg' },
+                    min: {{ poids_avant - 5 }},
+                    max: {{ poids_avant + 30 }}
+                }
+            }
+        }
+    });
+    {% endif %}
+
+    {% if grossesse.statutGrossesse == 'terminee' and normes_bebe is not null and grossesse.poidsNaissance is not null %}
+    // ===== COURBE POIDS BÉBÉ =====
+    new Chart(document.getElementById('chartPoids'), {
+        type: 'line',
+        data: {
+            labels: ['Minimum OMS', 'Votre bébé', 'Maximum OMS'],
+            datasets: [{
+                label: 'Poids (kg)',
+                data: [{{ normes_bebe.poids_min }}, {{ grossesse.poidsNaissance }}, {{ normes_bebe.poids_max }}],
+                backgroundColor: 'rgba(233,30,140,0.08)',
+                borderColor: '#e91e8c',
+                borderWidth: 3,
+                pointBackgroundColor: ['#4a90d9', '{{ evaluation_poids == "normal" ? "#22c55e" : "#ef4444" }}', '#4a90d9'],
+                pointRadius: [8, 12, 8],
+                pointBorderColor: 'white',
+                pointBorderWidth: 3,
+                fill: true,
+                tension: 0.4,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: ctx => ctx.parsed.y + ' kg' } }
+            },
+            scales: {
+                y: { beginAtZero: false, min: 1.5, max: 5.5, ticks: { callback: val => val + ' kg' } }
+            }
+        }
+    });
+
+    // ===== COURBE TAILLE BÉBÉ =====
+    new Chart(document.getElementById('chartTaille'), {
+        type: 'line',
+        data: {
+            labels: ['Minimum OMS', 'Votre bébé', 'Maximum OMS'],
+            datasets: [{
+                label: 'Taille (cm)',
+                data: [{{ normes_bebe.taille_min }}, {{ grossesse.tailleNaissance ?? 0 }}, {{ normes_bebe.taille_max }}],
+                backgroundColor: 'rgba(74,144,217,0.08)',
+                borderColor: '#4a90d9',
+                borderWidth: 3,
+                pointBackgroundColor: ['#9c27b0', '{{ evaluation_taille == "normal" ? "#22c55e" : "#ef4444" }}', '#9c27b0'],
+                pointRadius: [8, 12, 8],
+                pointBorderColor: 'white',
+                pointBorderWidth: 3,
+                fill: true,
+                tension: 0.4,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: ctx => ctx.parsed.y + ' cm' } }
+            },
+            scales: {
+                y: { beginAtZero: false, min: 40, max: 60, ticks: { callback: val => val + ' cm' } }
+            }
+        }
+    });
+    {% endif %}
+
+});
+</script>
 {% endblock %}
-

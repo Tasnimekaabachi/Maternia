@@ -359,10 +359,12 @@
                 {% set trimestre = g.trimestreActuel ?? null %}
                 {# high-risk si statut à risque, ou 3e trimestre uniquement si la grossesse n'est pas encore terminée #}
                 {% set isRisk = g.statutGrossesse == 'aRisque' or (trimestre == 3 and g.statutGrossesse != 'terminee') %}
-                <div class="pregnancy-card {% if g.statutGrossesse == 'terminee' %}completed{% endif %} {% if isRisk %}high-risk{% endif %}"
-                     data-statut="{{ g.statutGrossesse }}"
-                     data-created="{{ g.dateCreation ? g.dateCreation|date('U') : 0 }}"
-                     data-priority="{% if g.statutGrossesse == 'aRisque' %}1{% elseif g.statutGrossesse == 'enCours' %}2{% else %}3{% endif %}">
+         <div class="pregnancy-card {% if g.statutGrossesse == 'terminee' %}completed{% endif %} {% if isRisk %}high-risk{% endif %}"
+     data-statut="{{ g.statutGrossesse }}"
+     data-created="{{ g.dateCreation ? g.dateCreation|date('U') : 0 }}"
+     data-priority="{% if g.statutGrossesse == 'aRisque' %}1{% elseif g.statutGrossesse == 'enCours' %}2{% else %}3{% endif %}"
+     data-trimestre="{{ g.trimestreActuel ?? 0 }}"
+     data-semaine="{{ g.semaineActuelle ?? 0 }}">
                     <div class="pregnancy-card-header">
                         <div>
                             <span class="pregnancy-id">#{{ g.id }}</span>
@@ -485,24 +487,39 @@
                 });
             }
 
-            function sortCards(mode) {
-                if (!grid) return;
-                const sorted = cards.slice().sort((a, b) => {
-                    if (mode === 'date') {
-                        const da = parseInt(a.dataset.created || '0', 10);
-                        const db = parseInt(b.dataset.created || '0', 10);
-                        return db - da; // plus récent d'abord
-                    }
-                    if (mode === 'statut') {
-                        return (a.dataset.statut || '').localeCompare(b.dataset.statut || '');
-                    }
-                    // priorité par défaut
-                    const pa = parseInt(a.dataset.priority || '3', 10);
-                    const pb = parseInt(b.dataset.priority || '3', 10);
-                    return pa - pb;
-                });
-                sorted.forEach(card => grid.appendChild(card));
-            }
+function sortCards(mode) {
+    if (!grid) return;
+    const sorted = cards.slice().sort((a, b) => {
+        if (mode === 'date') {
+            const da = parseInt(a.dataset.created || '0', 10);
+            const db = parseInt(b.dataset.created || '0', 10);
+            return db - da;
+        }
+        if (mode === 'statut') {
+            return (a.dataset.statut || '').localeCompare(b.dataset.statut || '');
+        }
+
+        // Priorité par défaut (avec trimestre + semaine pour les enCours)
+        const pa = parseInt(a.dataset.priority || '3', 10);
+        const pb = parseInt(b.dataset.priority || '3', 10);
+
+        if (pa !== pb) return pa - pb;
+
+        // À priorité égale et les deux enCours → trimestre DESC puis semaine DESC
+        if (a.dataset.statut === 'enCours' && b.dataset.statut === 'enCours') {
+            const ta = parseInt(a.dataset.trimestre || '0', 10);
+            const tb = parseInt(b.dataset.trimestre || '0', 10);
+            if (ta !== tb) return tb - ta;
+
+            const sa = parseInt(a.dataset.semaine || '0', 10);
+            const sb = parseInt(b.dataset.semaine || '0', 10);
+            return sb - sa;
+        }
+
+        return 0;
+    });
+    sorted.forEach(card => grid.appendChild(card));
+}
 
             sortButtons.forEach(btn => {
                 btn.addEventListener('click', () => {

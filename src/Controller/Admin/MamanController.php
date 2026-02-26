@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Maman;
 use App\Form\MamanType;
 use App\Repository\MamanRepository;
+use App\Repository\GrosesseRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -58,13 +59,19 @@ final class MamanController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'show', methods: ['GET'])]
-    public function show(Maman $maman): Response
-    {
-        return $this->render('admin/maman/show.html.twig', [
-            'maman' => $maman,
-        ]);
-    }
+#[Route('/{id}', name: 'show', methods: ['GET'])]
+public function show(Maman $maman, EntityManagerInterface $entityManager): Response
+{
+    $grossesse = $entityManager->getRepository(\App\Entity\Grosesse::class)->findOneBy(
+        ['maman' => $maman],
+        ['dateCreation' => 'DESC']
+    );
+
+    return $this->render('admin/maman/show.html.twig', [
+        'maman' => $maman,
+        'grossesse' => $grossesse,
+    ]);
+}
 
     #[Route('/{id}/pdf', name: 'pdf', methods: ['GET'])]
     public function pdf(Maman $maman): Response

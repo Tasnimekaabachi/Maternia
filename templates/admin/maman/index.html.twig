@@ -18,9 +18,88 @@
 {% endblock %}
 
 {% block content %}
+
+<style>
+.maman-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e91e8c, #ff6bb3);
+    color: white;
+    font-weight: 700;
+    font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.badge-groupe {
+    background: rgba(233,30,140,0.1);
+    color: #e91e8c;
+    border: 1px solid rgba(233,30,140,0.25);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 700;
+}
+.badge-imc-normal { background: rgba(76,175,80,0.12); color: #388e3c; border: 1px solid rgba(76,175,80,0.3); border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 600; }
+.badge-imc-warning { background: rgba(255,152,0,0.12); color: #e65100; border: 1px solid rgba(255,152,0,0.3); border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 600; }
+.badge-imc-danger { background: rgba(244,67,54,0.12); color: #c62828; border: 1px solid rgba(244,67,54,0.3); border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 600; }
+.badge-activite { background: rgba(74,144,217,0.1); color: #1565c0; border: 1px solid rgba(74,144,217,0.25); border-radius: 20px; padding: 3px 10px; font-size: 12px; }
+.admin-table tbody tr { transition: background 0.15s; }
+.admin-table tbody tr:hover { background: rgba(233,30,140,0.03); }
+.stat-bar { height: 6px; border-radius: 3px; background: linear-gradient(90deg, #e91e8c, #ff6bb3); margin-top: 6px; }
+</style>
+
+    {# Stats rapides en haut #}
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="admin-card h-100" style="border-left: 4px solid #e91e8c;">
+                <div class="admin-card-body d-flex align-items-center gap-3 py-3">
+                    <div style="width:48px;height:48px;background:linear-gradient(135deg,#e91e8c,#ff6bb3);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🤱</div>
+                    <div>
+                        <div style="font-size:24px;font-weight:800;color:#e91e8c;">{{ mamans|length }}</div>
+                        <div style="font-size:12px;color:#888;">Total mamans</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="admin-card h-100" style="border-left: 4px solid #f44336;">
+                <div class="admin-card-body d-flex align-items-center gap-3 py-3">
+                    <div style="width:48px;height:48px;background:rgba(244,67,54,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">⚠️</div>
+                    <div>
+                        <div style="font-size:24px;font-weight:800;color:#f44336;">{{ mamans|filter(m => m.imcAlerte)|length }}</div>
+                        <div style="font-size:12px;color:#888;">Alertes IMC</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="admin-card h-100" style="border-left: 4px solid #ff9800;">
+                <div class="admin-card-body d-flex align-items-center gap-3 py-3">
+                    <div style="width:48px;height:48px;background:rgba(255,152,0,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🚬</div>
+                    <div>
+                        <div style="font-size:24px;font-weight:800;color:#ff9800;">{{ stats_fumeur.oui }}</div>
+                        <div style="font-size:12px;color:#888;">Fumeuses</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="admin-card h-100" style="border-left: 4px solid #4caf50;">
+                <div class="admin-card-body d-flex align-items-center gap-3 py-3">
+                    <div style="width:48px;height:48px;background:rgba(76,175,80,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">✅</div>
+                    <div>
+                        <div style="font-size:24px;font-weight:800;color:#4caf50;">{{ stats_fumeur.non }}</div>
+                        <div style="font-size:12px;color:#888;">Non fumeuses</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="admin-card admin-card-list">
         <div class="admin-card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
-            <span>Liste des mamans</span>
+            <span><i class="fas fa-heart me-2" style="color:#e91e8c;"></i> Liste des mamans</span>
+            <span class="badge" style="background:rgba(233,30,140,0.1);color:#e91e8c;border-radius:20px;padding:5px 14px;">{{ mamans|length }} enregistrées</span>
         </div>
 
         <div class="admin-list-toolbar">
@@ -29,14 +108,9 @@
                     <label for="groupe_sanguin" class="admin-list-toolbar-label">Groupe sanguin</label>
                     <select name="groupe_sanguin" id="groupe_sanguin" class="form-select form-select-sm admin-list-toolbar-select">
                         <option value="">Tous</option>
-                        <option value="A+" {{ filtre_groupe == 'A+' ? 'selected' : '' }}>A+</option>
-                        <option value="A-" {{ filtre_groupe == 'A-' ? 'selected' : '' }}>A-</option>
-                        <option value="B+" {{ filtre_groupe == 'B+' ? 'selected' : '' }}>B+</option>
-                        <option value="B-" {{ filtre_groupe == 'B-' ? 'selected' : '' }}>B-</option>
-                        <option value="AB+" {{ filtre_groupe == 'AB+' ? 'selected' : '' }}>AB+</option>
-                        <option value="AB-" {{ filtre_groupe == 'AB-' ? 'selected' : '' }}>AB-</option>
-                        <option value="O+" {{ filtre_groupe == 'O+' ? 'selected' : '' }}>O+</option>
-                        <option value="O-" {{ filtre_groupe == 'O-' ? 'selected' : '' }}>O-</option>
+                        {% for g in ['A+','A-','B+','B-','AB+','AB-','O+','O-'] %}
+                            <option value="{{ g }}" {{ filtre_groupe == g ? 'selected' : '' }}>{{ g }}</option>
+                        {% endfor %}
                     </select>
                 </div>
                 <div class="admin-list-toolbar-group">
@@ -68,47 +142,77 @@
                     <thead>
                     <tr>
                         <th>#</th>
-                        <th>Numéro urgence</th>
+                        <th>Maman</th>
                         <th>Groupe sanguin</th>
                         <th>Taille / Poids</th>
                         <th>IMC</th>
-                        <th>Activité physique</th>
-                        <th>Date enregistrement</th>
-                        <th width="140"></th>
+                        <th>Activité</th>
+                        <th>Enregistrée le</th>
+                        <th width="100"></th>
                     </tr>
                     </thead>
                     <tbody>
                     {% if mamans|length == 0 %}
                         <tr>
                             <td colspan="8">
-                                <div class="admin-empty py-4">
-                                    <i class="fas fa-heart"></i>
-                                    <p>Aucune maman enregistrée pour le moment.</p>
+                                <div class="admin-empty py-5 text-center">
+                                    <div style="font-size:3rem;margin-bottom:12px;">🤱</div>
+                                    <p class="text-muted">Aucune maman enregistrée pour le moment.</p>
                                 </div>
                             </td>
                         </tr>
                     {% else %}
                         {% for maman in mamans %}
                             <tr>
-                                <td>{{ maman.id }}</td>
-                                <td>{{ maman.numeroUrgence }}</td>
-                                <td>{{ maman.groupeSanguin }}</td>
-                                <td>{{ maman.taille }} cm / {{ maman.poids ?? '—' }} kg</td>
+                                <td><span style="color:#aaa;font-size:12px;">#{{ maman.id }}</span></td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="maman-avatar">{{ maman.id }}</div>
+                                        <div>
+                                            <div style="font-weight:600;font-size:13px;">Maman #{{ maman.id }}</div>
+                                            <div style="font-size:11px;color:#aaa;">📞 +216 {{ maman.numeroUrgence }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge-groupe">🩸 {{ maman.groupeSanguin }}</span>
+                                </td>
+                                <td>
+                                    <div style="font-size:13px;">
+                                        <span style="font-weight:600;">{{ maman.taille }} cm</span>
+                                        <span style="color:#ccc;margin:0 4px;">/</span>
+                                        <span style="font-weight:600;">{{ maman.poids ?? '—' }} kg</span>
+                                    </div>
+                                </td>
                                 <td>
                                     {% if maman.imc %}
-                                        {{ maman.imc }} ({{ maman.imcCategorie }})
-                                        {% if maman.imcAlerte %}
-                                            <span class="admin-badge admin-badge-warning ms-1" title="Alerte IMC">⚠️</span>
+                                        {% set imc = maman.imc %}
+                                        {% if imc < 18.5 or imc >= 30 %}
+                                            <span class="badge-imc-danger">⚠️ {{ imc }} — {{ maman.imcCategorie }}</span>
+                                        {% elseif imc >= 25 %}
+                                            <span class="badge-imc-warning">{{ imc }} — {{ maman.imcCategorie }}</span>
+                                        {% else %}
+                                            <span class="badge-imc-normal">✅ {{ imc }} — {{ maman.imcCategorie }}</span>
                                         {% endif %}
                                     {% else %}
-                                        —
+                                        <span style="color:#ccc;">—</span>
                                     {% endif %}
                                 </td>
-                                <td>{{ maman.niveauActivitePhysique }}</td>
-                                <td>{{ maman.dateCreation ? maman.dateCreation|date('d/m/Y H:i') : '—' }}</td>
                                 <td>
-                                    <a href="{{ path('admin_maman_show', { id: maman.id }) }}" class="btn btn-sm btn-outline-primary me-1" title="Voir"><i class="fas fa-eye"></i></a>
-                                    <a href="{{ path('admin_maman_edit', { id: maman.id }) }}" class="btn btn-sm btn-outline-secondary" title="Modifier"><i class="fas fa-edit"></i></a>
+                                    <span class="badge-activite">{{ maman.niveauActivitePhysique }}</span>
+                                </td>
+                                <td style="font-size:12px;color:#888;">
+                                    <i class="fas fa-calendar-alt me-1" style="color:#e91e8c;"></i>
+                                    {{ maman.dateCreation ? maman.dateCreation|date('d/m/Y') : '—' }}
+                                    <div style="font-size:11px;color:#bbb;">{{ maman.dateCreation ? maman.dateCreation|date('H:i') : '' }}</div>
+                                </td>
+                                <td>
+                                    <a href="{{ path('admin_maman_show', { id: maman.id }) }}" class="btn btn-sm admin-btn-rose me-1" title="Voir" style="width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ path('admin_maman_edit', { id: maman.id }) }}" class="btn btn-sm btn-outline-secondary" title="Modifier" style="width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -119,6 +223,7 @@
         </div>
     </div>
 
+    {# Stats en bas #}
     <div class="row g-3 mt-2">
         <div class="col-md-6">
             <div class="admin-card admin-card-stats h-100">
@@ -127,11 +232,17 @@
                 </div>
                 <div class="admin-card-body">
                     {% if stats_groupe_sanguin|length > 0 %}
-                        <ul class="admin-stats-list">
+                        {% set total = mamans|length %}
+                        <ul class="admin-stats-list" style="list-style:none;padding:0;margin:0;">
                             {% for groupe, nb in stats_groupe_sanguin %}
                                 <li class="d-flex justify-content-between align-items-center py-2">
-                                    <span>{{ groupe }}</span>
-                                    <span class="admin-stats-badge">{{ nb }}</span>
+                                    <div class="d-flex align-items-center gap-2" style="flex:1;">
+                                        <span class="badge-groupe" style="min-width:42px;text-align:center;">{{ groupe }}</span>
+                                        <div style="flex:1;">
+                                            <div class="stat-bar" style="width:{{ total > 0 ? (nb / total * 100)|round : 0 }}%;"></div>
+                                        </div>
+                                    </div>
+                                    <span class="admin-stats-badge ms-2">{{ nb }}</span>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -147,14 +258,25 @@
                     <i class="fas fa-smoking me-2"></i> Mode de vie (fumeuse)
                 </div>
                 <div class="admin-card-body">
-                    <ul class="admin-stats-list">
+                    {% set totalFumeur = stats_fumeur.oui + stats_fumeur.non %}
+                    <ul class="admin-stats-list" style="list-style:none;padding:0;margin:0;">
                         <li class="d-flex justify-content-between align-items-center py-2">
-                            <span>Oui</span>
-                            <span class="admin-stats-badge">{{ stats_fumeur.oui }}</span>
+                            <div class="d-flex align-items-center gap-2" style="flex:1;">
+                                <span style="font-size:13px;">🚬 Oui</span>
+                                <div style="flex:1;">
+                                    <div style="height:6px;border-radius:3px;background:#f44336;margin-top:6px;width:{{ totalFumeur > 0 ? (stats_fumeur.oui / totalFumeur * 100)|round : 0 }}%;"></div>
+                                </div>
+                            </div>
+                            <span class="admin-stats-badge ms-2">{{ stats_fumeur.oui }}</span>
                         </li>
                         <li class="d-flex justify-content-between align-items-center py-2">
-                            <span>Non</span>
-                            <span class="admin-stats-badge">{{ stats_fumeur.non }}</span>
+                            <div class="d-flex align-items-center gap-2" style="flex:1;">
+                                <span style="font-size:13px;">✅ Non</span>
+                                <div style="flex:1;">
+                                    <div style="height:6px;border-radius:3px;background:#4caf50;margin-top:6px;width:{{ totalFumeur > 0 ? (stats_fumeur.non / totalFumeur * 100)|round : 0 }}%;"></div>
+                                </div>
+                            </div>
+                            <span class="admin-stats-badge ms-2">{{ stats_fumeur.non }}</span>
                         </li>
                     </ul>
                 </div>
@@ -162,4 +284,3 @@
         </div>
     </div>
 {% endblock %}
-
