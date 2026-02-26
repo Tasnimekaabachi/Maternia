@@ -97,7 +97,7 @@
                 <p class="text-muted small">L'aventure Maternia commence ici</p>
             </div>
 
-            {{ form_start(registrationForm) }}
+            {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate'}}) }}
                 {{ form_errors(registrationForm) }}
                 <div class="row g-3">
                     <div class="col-6">
