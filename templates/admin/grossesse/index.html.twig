@@ -423,7 +423,7 @@
                             <div>
                                 <span class="meta-label">Symptômes</span>
                                 <span class="meta-value">
-                                    {{ g.symptomes ?: '—' }}
+                                    {{ g.symptomesList|length > 0 ? g.symptomesList|join(', ') : '—' }}
                                 </span>
                             </div>
                         {% endif %}

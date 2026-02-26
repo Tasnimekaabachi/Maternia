@@ -87,7 +87,7 @@
                         <div class="col-12">
                             <div class="admin-field">
                                 <span class="admin-field-label">Symptômes</span>
-                                <span class="admin-field-value">{{ grossesse.symptomes ?? '—' }}</span>
+                                <span class="admin-field-value">{{ grossesse.symptomesList|length > 0 ? grossesse.symptomesList|join(', ') : '—' }}</span>
                             </div>
                         </div>
                         <div class="col-12">

@@ -62,7 +62,7 @@
                         </p>
                         <p class="mb-0">
                             <strong>Symptômes :</strong><br>
-                            {{ metrics.symptomes ?: 'Aucun symptôme renseigné.' }}
+                            {{ (metrics.symptomes is iterable and metrics.symptomes is not string) ? metrics.symptomes|join(', ') : (metrics.symptomes|default('Aucun symptôme renseigné.')) }}
                         </p>
                     </div>
                 </div>

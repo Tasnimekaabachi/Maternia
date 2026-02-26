@@ -25,7 +25,6 @@ body.admin-body {
     color: #374151;
     -webkit-font-smoothing: antialiased;
 }
-
 .admin-wrapper {
     display: flex;
     min-height: 100vh;
@@ -163,7 +162,6 @@ body.admin-body {
     background: white;
     color: var(--admin-pink);
 }
-
 .admin-sidebar-nav .nav-link.active {
     color: var(--admin-pink);
     background: var(--admin-pink-light);
@@ -322,12 +320,10 @@ body.admin-body {
     color: #1f2937;
     letter-spacing: -0.3px;
 }
-
 .admin-header-actions .btn {
     border-radius: 10px;
     font-weight: 600;
 }
-
 .admin-content {
     flex: 1;
     padding: 2rem;
@@ -375,7 +371,6 @@ body.admin-body {
     margin-bottom: 1.5rem;
     overflow: hidden;
 }
-
 .admin-card-header {
     padding: 1rem 1.25rem;
     border-bottom: 1px solid var(--admin-border);
@@ -384,7 +379,6 @@ body.admin-body {
     color: #1f2937;
     background: #fafbfc;
 }
-
 .admin-card-body {
     padding: 1.25rem;
 }
@@ -417,7 +411,6 @@ body.admin-body {
     gap: 1rem;
     margin-bottom: 1.5rem;
 }
-
 .admin-stat {
     background: white;
     border-radius: 16px;
@@ -426,7 +419,6 @@ body.admin-body {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-
 .admin-stat:hover {
     box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
     transform: translateY(-3px);
@@ -448,7 +440,6 @@ body.admin-body {
     color: var(--admin-pink);
     line-height: 1.2;
 }
-
 .admin-stat-label {
     font-size: 0.8rem;
     color: #9ca3af;
@@ -464,14 +455,12 @@ body.admin-body {
     border-collapse: collapse;
     font-size: 0.9rem;
 }
-
 .admin-table th,
 .admin-table td {
     padding: 0.75rem 1rem;
     text-align: left;
     border-bottom: 1px solid var(--admin-border);
 }
-
 .admin-table th {
     font-weight: 600;
     color: #9ca3af;
@@ -480,11 +469,9 @@ body.admin-body {
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
-
 .admin-table tr:hover td {
     background: rgba(236, 72, 153, 0.02);
 }
-
 .admin-table .btn-sm {
     padding: 0.35rem 0.75rem;
     font-size: 0.8rem;
@@ -502,7 +489,6 @@ body.admin-body {
     color: #6b7280;
     margin-bottom: 1rem;
 }
-
 .admin-breadcrumb a {
     color: var(--admin-pink);
     text-decoration: none;
@@ -576,7 +562,6 @@ body.admin-body {
     padding: 3rem 2rem;
     color: #6b7280;
 }
-
 .admin-empty i {
     font-size: 3rem;
     color: #d1d5db;
@@ -848,13 +833,11 @@ body.admin-body {
     font-size: 0.9rem;
     transition: all 0.3s ease;
 }
-
 .admin-btn-primary:hover {
     color: #fff;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(236, 72, 153, 0.35);
 }
-
 .admin-btn-secondary {
     background: var(--admin-dark-2);
     color: #fff;
@@ -865,7 +848,6 @@ body.admin-body {
     font-size: 0.9rem;
     transition: all 0.2s ease;
 }
-
 .admin-btn-secondary:hover {
     background: var(--admin-dark);
     color: #fff;

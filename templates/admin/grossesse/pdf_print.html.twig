@@ -56,7 +56,7 @@
         </tr>
         <tr><th>Date accouchement réelle</th><td>{{ grossesse.dateAccouchementReelle ? grossesse.dateAccouchementReelle|date('d/m/Y') : '—' }}</td></tr>
         <tr><th>Poids actuel</th><td>{{ grossesse.poidsActuel is not null ? grossesse.poidsActuel ~ ' kg' : '—' }}</td></tr>
-        <tr><th>Symptômes</th><td>{{ grossesse.symptomes ?? '—' }}</td></tr>
+        <tr><th>Symptômes</th><td>{{ grossesse.symptomesList|length > 0 ? grossesse.symptomesList|join(', ') : '—' }}</td></tr>
         <tr><th>Commentaire général</th><td>{{ grossesse.commentaireGeneral ?? '—' }}</td></tr>
     </table>
 

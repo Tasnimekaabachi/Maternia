@@ -101,7 +101,18 @@
                                     {{ form_row(form.poidsActuel) }}
                                 </div>
                                 <div class="col-12">
-                                    {{ form_row(form.symptomes) }}
+                                    <fieldset class="border border-primary rounded-3 p-3 mb-0">
+                                        <legend class="text-primary fw-semibold mb-2 w-auto px-2">Symptomes</legend>
+                                        <div class="row g-2">
+                                            <div class="col-md-6 col-lg-4">{{ form_row(form.nausee) }}</div>
+                                            <div class="col-md-6 col-lg-4">{{ form_row(form.vomissement) }}</div>
+                                            <div class="col-md-6 col-lg-4">{{ form_row(form.saignement) }}</div>
+                                            <div class="col-md-6 col-lg-4">{{ form_row(form.fievre) }}</div>
+                                            <div class="col-md-6 col-lg-4">{{ form_row(form.douleurAbdominale) }}</div>
+                                            <div class="col-md-6 col-lg-4">{{ form_row(form.fatigue) }}</div>
+                                            <div class="col-md-6 col-lg-4">{{ form_row(form.vertiges) }}</div>
+                                        </div>
+                                    </fieldset>
                                 </div>
                                 <div class="col-12">
                                     {{ form_row(form.commentaireGeneral) }}
