@@ -19,7 +19,6 @@ class GrosesseRepository extends ServiceEntityRepository
     public function save(Grosesse $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
-
         if ($flush) {
             $this->getEntityManager()->flush();
         }
@@ -28,7 +27,6 @@ class GrosesseRepository extends ServiceEntityRepository
     public function remove(Grosesse $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
-
         if ($flush) {
             $this->getEntityManager()->flush();
         }
@@ -36,17 +34,13 @@ class GrosesseRepository extends ServiceEntityRepository
 
     /**
      * Liste des grossesses triées par priorité/urgence pour l'admin.
-     * Ordre :
-     *  - grossesses à risque d'abord
-     *  - puis en cours
-     *  - terminées à la fin
-     *  À priorité égale, les plus avancées (dateDebut la plus ancienne) d'abord.
+     * aRisque → enCours (trimestre DESC, semaine DESC) → terminee
      *
      * @return Grosesse[]
      */
     public function findForAdminSorted(): array
     {
-        $qb = $this->createQueryBuilder('g')
+        $results = $this->createQueryBuilder('g')
             ->addSelect(
                 "CASE 
                     WHEN g.statutGrossesse = 'aRisque' THEN 1
@@ -55,15 +49,41 @@ class GrosesseRepository extends ServiceEntityRepository
                 END AS HIDDEN priority"
             )
             ->orderBy('priority', 'ASC')
-            ->addOrderBy('g.dateDebutGrossesse', 'DESC')
-            ->addOrderBy('g.dateDernieresRegles', 'DESC')
-        ;
+            ->getQuery()
+            ->getResult();
 
-        return $qb->getQuery()->getResult();
+        usort($results, function (Grosesse $a, Grosesse $b) {
+            $priorityMap = ['aRisque' => 1, 'enCours' => 2, 'terminee' => 3];
+            $pa = $priorityMap[$a->getStatutGrossesse()] ?? 3;
+            $pb = $priorityMap[$b->getStatutGrossesse()] ?? 3;
+
+            // 1. Trier par statut
+            if ($pa !== $pb) {
+                return $pa <=> $pb;
+            }
+
+            // 2. Pour les enCours : trimestre DESC puis semaine DESC
+            if ($a->getStatutGrossesse() === 'enCours' && $b->getStatutGrossesse() === 'enCours') {
+                $trimestreA = $a->getTrimestreActuel() ?? 0;
+                $trimestreB = $b->getTrimestreActuel() ?? 0;
+
+                if ($trimestreA !== $trimestreB) {
+                    return $trimestreB <=> $trimestreA;
+                }
+
+                $semaineA = $a->getSemaineActuelle() ?? 0;
+                $semaineB = $b->getSemaineActuelle() ?? 0;
+                return $semaineB <=> $semaineA;
+            }
+
+            return 0;
+        });
+
+        return $results;
     }
 
     /**
-     * Statistiques par statut (enCours, aRisque, terminee) pour dashboard admin.
+     * Statistiques par statut pour dashboard admin.
      *
      * @return array<string,int>
      */
@@ -71,14 +91,13 @@ class GrosesseRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('g')
             ->select('g.statutGrossesse AS statut, COUNT(g.id) AS total')
-            ->groupBy('g.statutGrossesse')
-        ;
+            ->groupBy('g.statutGrossesse');
 
         $rows = $qb->getQuery()->getScalarResult();
 
         $result = [
-            'enCours' => 0,
-            'aRisque' => 0,
+            'enCours'  => 0,
+            'aRisque'  => 0,
             'terminee' => 0,
         ];
 
@@ -91,29 +110,4 @@ class GrosesseRepository extends ServiceEntityRepository
 
         return $result;
     }
-
-    //    /**
-    //     * @return Grosesse[] Returns an array of Grosesse objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('g')
-    //            ->andWhere('g.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('g.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Grosesse
-    //    {
-    //        return $this->createQueryBuilder('g')
-    //            ->andWhere('g.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }

@@ -15,40 +15,109 @@ use Symfony\Component\Routing\Attribute\Route;
 final class GrosesseController extends AbstractController
 {
     #[Route('', name: 'index', methods: ['GET'])]
-        public function index(GrosesseRepository $grosesseRepository): Response
-        {
-            // Tri principal par date d'ajout de la grossesse (dateCreation DESC)
-            $grossesses = $grosesseRepository->findBy([], ['dateCreation' => 'DESC']);
-            $statsStatut = $grosesseRepository->getStatsByStatut();
+    public function index(GrosesseRepository $grosesseRepository): Response
+    {
+        $grossesses  = $grosesseRepository->findForAdminSorted();
+        $statsStatut = $grosesseRepository->getStatsByStatut();
 
-            return $this->render('admin/grossesse/index.html.twig', [
-                'grossesses' => $grossesses,
-                'stats_statut' => $statsStatut,
-            ]);
-        }
+        return $this->render('admin/grossesse/index.html.twig', [
+            'grossesses'   => $grossesses,
+            'stats_statut' => $statsStatut,
+        ]);
+    }
 
     #[Route('/{id}', name: 'show', methods: ['GET'])]
     public function show(Grosesse $grosesse, ConseilsSuiviService $conseilsSuiviService): Response
     {
         $grossesseConseil = null;
-        $bebeAgeMois = null;
-        $bebeConseil = null;
+        $bebeAgeMois      = null;
+        $bebeConseil      = null;
+        $normesBebe       = null;
+        $evaluationPoids  = null;
+        $evaluationTaille = null;
+        $poidsAvant       = null;
+        $poidsActuelG     = null;
+        $prisePoids       = null;
+        $evaluationPrise  = null;
+        $alerteSemaine    = null; // ← NOUVEAU
 
         $semaine = $grosesse->getSemaineActuelle();
-        if ($grosesse->getStatutGrossesse() !== 'terminee' && $semaine !== null) {
+        $statut  = $grosesse->getStatutGrossesse();
+        $maman   = $grosesse->getMaman();
+
+        if ($statut !== 'terminee' && $semaine !== null) {
             $grossesseConseil = $conseilsSuiviService->conseilsGrossesse($semaine);
-        } elseif ($grosesse->getStatutGrossesse() === 'terminee') {
+
+            // Graphique prise de poids
+            $poidsAvant   = $maman?->getPoids();
+            $poidsActuelG = $grosesse->getPoidsActuel();
+            $prisePoids   = ($poidsAvant && $poidsActuelG)
+                ? round($poidsActuelG - $poidsAvant, 1)
+                : null;
+
+            if ($prisePoids !== null) {
+                if ($prisePoids < 0)       $evaluationPrise = 'perte';
+                elseif ($prisePoids < 8)   $evaluationPrise = 'insuffisant';
+                elseif ($prisePoids <= 16) $evaluationPrise = 'normal';
+                elseif ($prisePoids <= 20) $evaluationPrise = 'attention';
+                else                       $evaluationPrise = 'excessif';
+            }
+
+            // ← NOUVEAU : Alerte selon semaine
+            if ($semaine >= 40) {
+                $alerteSemaine = [
+                    'niveau'  => 'danger',
+                    'message' => '🚨 Terme dépassé — suivi urgent recommandé',
+                ];
+            } elseif ($semaine >= 36) {
+                $alerteSemaine = [
+                    'niveau'  => 'warning',
+                    'message' => '⚠️ Grossesse proche du terme — préparez le suivi final',
+                ];
+            } 
+
+        } elseif ($statut === 'terminee') {
             $bebeAgeMois = $conseilsSuiviService->getAgeBebeEnMois($grosesse);
             if ($bebeAgeMois !== null) {
                 $bebeConseil = $conseilsSuiviService->conseilsBebe($bebeAgeMois);
             }
+
+            $sexe   = $grosesse->getSexeBebe();
+            $normes = [
+                'M' => ['poids_min' => 2.9, 'poids_max' => 4.0, 'taille_min' => 48.0, 'taille_max' => 52.0],
+                'F' => ['poids_min' => 2.8, 'poids_max' => 3.8, 'taille_min' => 47.0, 'taille_max' => 51.0],
+            ];
+            $normesBebe = $normes[$sexe] ?? $normes['M'];
+
+            $poidsBebe  = $grosesse->getPoidsNaissance();
+            $tailleBebe = $grosesse->getTailleNaissance();
+
+            $evaluationPoids = 'normal';
+            if ($poidsBebe !== null) {
+                if ($poidsBebe < $normesBebe['poids_min'])     $evaluationPoids = 'faible';
+                elseif ($poidsBebe > $normesBebe['poids_max']) $evaluationPoids = 'eleve';
+            }
+
+            $evaluationTaille = 'normal';
+            if ($tailleBebe !== null) {
+                if ($tailleBebe < $normesBebe['taille_min'])     $evaluationTaille = 'faible';
+                elseif ($tailleBebe > $normesBebe['taille_max']) $evaluationTaille = 'eleve';
+            }
         }
 
         return $this->render('admin/grossesse/show.html.twig', [
-            'grossesse' => $grosesse,
+            'grossesse'         => $grosesse,
             'grossesse_conseil' => $grossesseConseil,
-            'bebe_age_mois' => $bebeAgeMois,
-            'bebe_conseil' => $bebeConseil,
+            'bebe_age_mois'     => $bebeAgeMois,
+            'bebe_conseil'      => $bebeConseil,
+            'normes_bebe'       => $normesBebe,
+            'evaluation_poids'  => $evaluationPoids,
+            'evaluation_taille' => $evaluationTaille,
+            'poids_avant'       => $poidsAvant,
+            'poids_actuel_g'    => $poidsActuelG,
+            'prise_poids'       => $prisePoids,
+            'evaluation_prise'  => $evaluationPrise,
+            'alerte_semaine'    => $alerteSemaine, // ← NOUVEAU
         ]);
     }
 
@@ -58,7 +127,7 @@ final class GrosesseController extends AbstractController
         $bebeAgeMois = $conseilsSuiviService->getAgeBebeEnMois($grosesse);
 
         return $this->render('admin/grossesse/pdf_print.html.twig', [
-            'grossesse' => $grosesse,
+            'grossesse'     => $grosesse,
             'bebe_age_mois' => $bebeAgeMois,
         ]);
     }
@@ -73,15 +142,13 @@ final class GrosesseController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $grosesseRepository->save($grosesse, true);
-
             $this->addFlash('success', 'Grossesse mise à jour avec succès.');
-
             return $this->redirectToRoute('admin_grosesse_index');
         }
 
         return $this->render('admin/grossesse/edit.html.twig', [
             'grossesse' => $grosesse,
-            'form' => $form->createView(),
+            'form'      => $form->createView(),
         ]);
     }
 
@@ -89,10 +156,7 @@ final class GrosesseController extends AbstractController
     public function delete(Grosesse $grosesse, GrosesseRepository $grosesseRepository): Response
     {
         $grosesseRepository->remove($grosesse, true);
-
         $this->addFlash('success', 'Grossesse supprimée avec succès.');
-
         return $this->redirectToRoute('admin_grosesse_index');
     }
 }
-
