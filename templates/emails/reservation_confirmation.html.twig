@@ -5,555 +5,604 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirmation de Réservation - Maternia</title>
     <style>
-        /* Reset */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f0f4f8; color: #2d3748; -webkit-font-smoothing: antialiased; }
-
-        /* Wrapper */
-        .email-wrapper { max-width: 640px; margin: 0 auto; padding: 32px 16px; }
-
-        /* Card principale */
-        .email-card {
+        /* RESET COMPLET */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f0ff;
+            padding: 30px 20px;
+        }
+        
+        /* CONTAINER PRINCIPAL */
+        .container {
+            max-width: 580px;
+            margin: 0 auto;
             background: #ffffff;
             border-radius: 24px;
             overflow: hidden;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            box-shadow: 0 15px 35px rgba(255, 105, 180, 0.15);
         }
-
-        /* ====== HEADER ====== */
+        
+        /* HEADER SANS CADRE */
         .header {
-            background: linear-gradient(135deg, #f472b6 0%, #ec4899 40%, #c026d3 100%);
-            padding: 0;
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(135deg, #ff7eb3 0%, #ff4d94 50%, #a05aff 100%);
+            padding: 40px 35px;
         }
-        .header-inner {
-            padding: 40px 40px 50px;
-            position: relative;
-            z-index: 2;
-            text-align: center;
-        }
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -60px; right: -60px;
-            width: 220px; height: 220px;
-            background: rgba(255,255,255,0.07);
-            border-radius: 50%;
-        }
-        .header::after {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 40px;
-            background: white;
-            border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-        }
+        
         .brand {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 22px;
-        }
-        .brand-icon {
-            width: 46px; height: 46px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 14px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 22px;
-            border: 1.5px solid rgba(255,255,255,0.3);
-        }
-        .brand-name {
-            font-size: 26px;
-            font-weight: 900;
+            font-size: 32px;
+            font-weight: 800;
             color: white;
+            margin-bottom: 8px;
             letter-spacing: -0.5px;
         }
-        .header-badge {
+        
+        .badge {
             display: inline-block;
-            background: rgba(255,255,255,0.18);
-            border: 1px solid rgba(255,255,255,0.35);
-            border-radius: 50px;
-            padding: 6px 18px;
-            color: rgba(255,255,255,0.92);
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 16px;
+            border-radius: 40px;
+            color: white;
             font-size: 13px;
             font-weight: 600;
             letter-spacing: 0.5px;
         }
-
-        /* ====== HERO STATUS ====== */
-        .hero {
-            padding: 32px 40px 24px;
+        
+        /* SECTION SUCCÈS */
+        .success {
+            padding: 40px 35px 25px;
             text-align: center;
+            border-bottom: 1px solid #f0e6ff;
         }
-        .check-circle {
-            width: 76px; height: 76px;
-            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-            border-radius: 50%;
-            display: inline-flex; align-items: center; justify-content: center;
-            font-size: 36px;
-            margin-bottom: 18px;
-            box-shadow: 0 8px 24px rgba(16,185,129,0.2);
+        
+        .check {
+            font-size: 50px;
+            margin-bottom: 15px;
         }
-        .hero-title {
-            font-size: 24px;
+        
+        .success h1 {
+            font-size: 26px;
             font-weight: 800;
-            color: #1a202c;
-            margin-bottom: 6px;
+            color: #ff4d94;
+            margin-bottom: 10px;
         }
-        .hero-sub {
-            font-size: 15px;
-            color: #64748b;
+        
+        .greeting {
+            color: #555;
+            font-size: 16px;
             line-height: 1.5;
+            margin-bottom: 25px;
         }
-        .hero-sub strong {
-            color: #ec4899;
+        
+        .greeting strong {
+            color: #ff4d94;
         }
-        .ref-pill {
+        
+        /* RÉFÉRENCE */
+        .ref-box {
+            background: #fff5fa;
+            padding: 18px 25px;
             display: inline-block;
-            margin-top: 16px;
-            background: linear-gradient(135deg, #fdf2f8, #fce7f3);
-            border: 2px solid #f9a8d4;
             border-radius: 50px;
-            padding: 8px 24px;
-            font-size: 17px;
-            font-weight: 900;
-            color: #be185d;
-            letter-spacing: 1.5px;
+            margin-top: 5px;
         }
-
-        /* ====== DIVIDER ====== */
-        .divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, #f3e8ff, #fce7f3, #f3e8ff, transparent);
-            margin: 0 40px;
+        
+        .ref-label {
+            font-size: 11px;
+            color: #ff4d94;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
         }
-
-        /* ====== SECTION ====== */
+        
+        .ref-code {
+            font-size: 22px;
+            font-weight: 800;
+            color: #a05aff;
+            letter-spacing: 1px;
+        }
+        
+        /* SECTIONS GÉNÉRIQUES */
         .section {
-            padding: 28px 40px;
+            padding: 30px 35px;
+            border-bottom: 1px solid #f0e6ff;
         }
-        .section-header {
+        
+        .section:last-of-type {
+            border-bottom: none;
+        }
+        
+        .section-title {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 18px;
+            margin-bottom: 25px;
         }
-        .section-icon {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, #fdf2f8, #fce7f3);
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
+        
+        .title-icon {
+            font-size: 24px;
+        }
+        
+        .title-text {
             font-size: 18px;
-            flex-shrink: 0;
+            font-weight: 700;
+            color: #333;
+            letter-spacing: -0.3px;
         }
-        .section-label {
-            font-size: 12px;
-            font-weight: 800;
-            color: #ec4899;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-        }
-
-        /* ====== INFO GRID ====== */
-        .info-grid {
+        
+        /* GRILLE 2 COLONNES */
+        .grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 20px;
         }
-        .info-cell {
-            background: #fafbfc;
-            border: 1px solid #f1f5f9;
-            border-radius: 12px;
-            padding: 14px 16px;
+        
+        .info-item {
+            margin-bottom: 0;
         }
-        .info-cell.full {
-            grid-column: 1 / -1;
-        }
-        .cell-label {
-            font-size: 10px;
+        
+        .info-label {
+            font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: #94a3b8;
-            margin-bottom: 4px;
+            color: #999;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
         }
-        .cell-value {
-            font-size: 14px;
-            font-weight: 700;
-            color: #1e293b;
+        
+        .info-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            line-height: 1.4;
         }
-        .cell-value.accent {
-            color: #ec4899;
+        
+        .info-value.pink {
+            color: #ff4d94;
         }
-        .cell-value.highlight {
-            font-size: 15px;
+        
+        .info-value.purple {
+            color: #a05aff;
         }
-
-        /* ====== STATUT BADGE ====== */
-        .statut-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-            color: #065f46;
+        
+        /* BADGE STATUT */
+        .status {
+            background: #e3f7e7;
+            color: #1e7b4c;
             padding: 4px 12px;
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        /* ====== MEET BLOCK ====== */
-        .meet-block {
-            margin: 0 24px 28px;
-            border-radius: 20px;
-            overflow: hidden;
-            background: linear-gradient(135deg, #1a73e8 0%, #0d5cb6 50%, #5e35b1 100%);
-            box-shadow: 0 10px 32px rgba(26,115,232,0.3);
-            position: relative;
-        }
-        .meet-block::before {
-            content: '';
-            position: absolute;
-            top: -40px; right: -40px;
-            width: 160px; height: 160px;
-            background: rgba(255,255,255,0.06);
-            border-radius: 50%;
-        }
-        .meet-inner {
-            padding: 30px 32px;
-            position: relative;
-            z-index: 1;
-            text-align: center;
-        }
-        .meet-logo {
-            font-size: 44px;
-            margin-bottom: 10px;
-            display: block;
-        }
-        .meet-heading {
-            color: white;
-            font-size: 19px;
-            font-weight: 800;
-            margin-bottom: 6px;
-        }
-        .meet-desc {
-            color: rgba(255,255,255,0.75);
+            border-radius: 40px;
             font-size: 13px;
-            margin-bottom: 22px;
-            line-height: 1.5;
+            font-weight: 700;
+            display: inline-block;
         }
-        .meet-cta {
+        
+        /* MEET CARD */
+        .meet {
+            background: linear-gradient(135deg, #1a73e8 0%, #8a4fff 100%);
+            padding: 35px;
+            border-radius: 20px;
+            text-align: center;
+            color: white;
+        }
+        
+        .meet-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .meet h3 {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        
+        .meet p {
+            font-size: 15px;
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        
+        .meet-btn {
             display: inline-block;
             background: white;
             color: #1a73e8;
-            font-weight: 800;
-            font-size: 15px;
-            padding: 14px 36px;
-            border-radius: 50px;
+            font-weight: 700;
+            font-size: 16px;
+            padding: 14px 35px;
+            border-radius: 40px;
             text-decoration: none;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.18);
-            letter-spacing: 0.3px;
+            margin-bottom: 15px;
         }
-        .meet-link-text {
-            color: rgba(255,255,255,0.55);
+        
+        .meet-link {
             font-size: 11px;
-            margin-top: 14px;
+            color: rgba(255,255,255,0.6);
             word-break: break-all;
         }
-
-        /* ====== STEPS ====== */
-        .steps-list { padding: 0; }
-        .step-row {
+        
+        /* ÉTAPES SANS AUCUN CADRE */
+        .step-item {
             display: flex;
-            align-items: flex-start;
-            gap: 14px;
-            padding: 12px 0;
-            border-bottom: 1px solid #f1f5f9;
+            gap: 15px;
+            margin-bottom: 25px;
         }
-        .step-row:last-child { border-bottom: none; }
+        
+        .step-item:last-child {
+            margin-bottom: 0;
+        }
+        
         .step-num {
-            width: 30px; height: 30px; min-width: 30px;
-            background: linear-gradient(135deg, #f472b6, #ec4899);
-            color: white;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800;
-            font-size: 13px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #ff4d94;
+            min-width: 30px;
         }
-        .step-text {
-            font-size: 13.5px;
-            color: #475569;
-            line-height: 1.55;
-            padding-top: 4px;
+        
+        .step-desc {
+            flex: 1;
         }
-        .step-text strong { color: #1e293b; }
-
-        /* ====== ALERT ====== */
-        .alert-row {
-            margin: 0 24px 28px;
-            background: #fffbeb;
-            border: 1px solid #fde68a;
-            border-left: 4px solid #f59e0b;
-            border-radius: 12px;
-            padding: 16px 20px;
-            font-size: 13.5px;
-            color: #78350f;
-            line-height: 1.6;
+        
+        .step-desc strong {
+            display: block;
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 5px;
         }
-        .alert-row strong { color: #92400e; }
-
-        /* ====== FOOTER ====== */
-        .footer {
-            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-            padding: 36px 40px;
-            text-align: center;
-        }
-        .footer-brand {
-            font-size: 20px;
-            font-weight: 900;
-            color: #f9a8d4;
-            margin-bottom: 6px;
-            letter-spacing: -0.3px;
-        }
-        .footer-tagline {
-            font-size: 12px;
-            color: rgba(255,255,255,0.45);
-            margin-bottom: 22px;
-        }
-        .footer-sep {
-            height: 1px;
-            background: rgba(255,255,255,0.1);
-            margin: 20px 0;
-        }
-        .footer-links {
-            margin-bottom: 16px;
-        }
-        .footer-link {
-            color: rgba(255,255,255,0.35);
-            font-size: 11px;
-            text-decoration: none;
-            margin: 0 10px;
-        }
-        .footer-copy {
-            color: rgba(255,255,255,0.2);
-            font-size: 11px;
+        
+        .step-desc p {
+            font-size: 14px;
+            color: #666;
             line-height: 1.5;
         }
-
-        /* ====== RESPONSIVE ====== */
+        
+        .phone {
+            color: #a05aff;
+            font-weight: 600;
+        }
+        
+        /* ALERTE */
+        .alert {
+            background: #fff9e6;
+            padding: 20px;
+            border-radius: 16px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .alert-icon {
+            font-size: 22px;
+        }
+        
+        .alert-text strong {
+            display: block;
+            color: #b45b0a;
+            margin-bottom: 5px;
+            font-size: 15px;
+        }
+        
+        .alert-text p {
+            color: #7a4d0e;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .ref-highlight {
+            background: #b45b0a;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+        
+        /* FOOTER */
+        .footer {
+            background: #1a0b2e;
+            padding: 40px 35px;
+            text-align: center;
+        }
+        
+        .footer-brand {
+            font-size: 26px;
+            font-weight: 800;
+            color: #ff99c8;
+            margin-bottom: 8px;
+        }
+        
+        .footer-tag {
+            color: #aaa;
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .footer-links a {
+            color: #777;
+            text-decoration: none;
+            font-size: 12px;
+        }
+        
+        .copyright {
+            color: #555;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+        
+        .footer-email {
+            color: #ff99c8;
+            font-size: 12px;
+            margin-top: 15px;
+            opacity: 0.8;
+        }
+        
+        /* RESPONSIVE */
         @media (max-width: 480px) {
-            .email-wrapper { padding: 16px 8px; }
-            .header-inner, .hero, .section, .footer { padding-left: 24px; padding-right: 24px; }
-            .divider { margin: 0 24px; }
-            .info-grid { grid-template-columns: 1fr; }
-            .meet-block { margin: 0 16px 24px; }
-            .alert-row { margin: 0 16px 24px; }
+            .grid-2 {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .section {
+                padding: 25px 20px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
     </style>
 </head>
 <body>
-<div class="email-wrapper">
-<div class="email-card">
-
-    <!-- ===== HEADER ===== -->
-    <div class="header">
-        <div class="header-inner">
-            <div class="brand">
-                <div class="brand-icon">🌸</div>
-                <span class="brand-name">Maternia</span>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="brand">🌸 Maternia</div>
+            <div class="badge">✨ CONFIRMATION DE RÉSERVATION</div>
+        </div>
+        
+        <!-- SUCCÈS -->
+        <div class="success">
+            <div class="check">✅</div>
+            <h1>Rendez-vous confirmé !</h1>
+            <div class="greeting">
+                Bonjour <strong>{{ reservation.prenomClient }} {{ reservation.nomClient }}</strong>,<br>
+                votre réservation a bien été enregistrée.
             </div>
-            <div class="header-badge">✉️ &nbsp;Confirmation de Réservation</div>
-        </div>
-    </div>
-
-    <!-- ===== HERO ===== -->
-    <div class="hero">
-        <div class="check-circle">✅</div>
-        <div class="hero-title">Votre rendez-vous est confirmé !</div>
-        <div class="hero-sub">
-            Bonjour <strong>{{ reservation.prenomClient }} {{ reservation.nomClient }}</strong>,<br>
-            votre réservation a bien été enregistrée.
-        </div>
-        <div class="ref-pill">Réf : #{{ reservation.reference }}</div>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- ===== INFOS PATIENT ===== -->
-    <div class="section">
-        <div class="section-header">
-            <div class="section-icon">👤</div>
-            <span class="section-label">Informations Patient</span>
-        </div>
-        <div class="info-grid">
-            <div class="info-cell">
-                <div class="cell-label">Nom complet</div>
-                <div class="cell-value highlight">{{ reservation.prenomClient }} {{ reservation.nomClient }}</div>
+            <div class="ref-box">
+                <div class="ref-label">Référence</div>
+                <div class="ref-code">#{{ reservation.reference }}</div>
             </div>
-            <div class="info-cell">
-                <div class="cell-label">Type de patient</div>
-                <div class="cell-value">
-                    {% if reservation.typePatient == 'BEBE' %}
-                        👶 Bébé
-                    {% else %}
-                        🤰 Maman
-                    {% endif %}
+        </div>
+        
+        <!-- INFOS PATIENT -->
+        <div class="section">
+            <div class="section-title">
+                <span class="title-icon">👤</span>
+                <span class="title-text">Informations Personnelles</span>
+            </div>
+            
+            <div class="grid-2">
+                <div class="info-item">
+                    <div class="info-label">Nom complet</div>
+                    <div class="info-value">{{ reservation.prenomClient }} {{ reservation.nomClient }}</div>
                 </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Type de patient</div>
+                    <div class="info-value pink">
+                        {% if reservation.typePatient == 'BEBE' %}👶 Bébé{% else %}🤰 Maman{% endif %}
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div class="info-value purple">{{ reservation.emailClient }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Téléphone</div>
+                    <div class="info-value">{{ reservation.telephoneClient }}</div>
+                </div>
+                
+                {% if reservation.typePatient == 'MAMAN' and reservation.moisGrossesse %}
+                <div class="info-item">
+                    <div class="info-label">Mois de grossesse</div>
+                    <div class="info-value pink">{{ reservation.moisGrossesse }} mois</div>
+                </div>
+                {% endif %}
+                
+                {% if reservation.typePatient == 'BEBE' and reservation.dateNaissanceBebe %}
+                <div class="info-item">
+                    <div class="info-label">Date de naissance</div>
+                    <div class="info-value">{{ reservation.dateNaissanceBebe|date('d/m/Y') }}</div>
+                </div>
+                {% endif %}
             </div>
-            <div class="info-cell">
-                <div class="cell-label">Email</div>
-                <div class="cell-value accent">{{ reservation.emailClient }}</div>
-            </div>
-            <div class="info-cell">
-                <div class="cell-label">Téléphone</div>
-                <div class="cell-value">{{ reservation.telephoneClient }}</div>
-            </div>
-            {% if reservation.typePatient == 'MAMAN' and reservation.moisGrossesse %}
-            <div class="info-cell">
-                <div class="cell-label">Mois de grossesse</div>
-                <div class="cell-value accent">{{ reservation.moisGrossesse }} mois</div>
-            </div>
-            {% endif %}
-            {% if reservation.typePatient == 'BEBE' and reservation.dateNaissanceBebe %}
-            <div class="info-cell">
-                <div class="cell-label">Date de naissance</div>
-                <div class="cell-value">{{ reservation.dateNaissanceBebe|date('d/m/Y') }}</div>
-            </div>
-            {% endif %}
         </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- ===== DÉTAILS RDV ===== -->
-    {% if reservation.consultationCreneau %}
-    <div class="section">
-        <div class="section-header">
-            <div class="section-icon">📅</div>
-            <span class="section-label">Détails du Rendez-vous</span>
-        </div>
-        <div class="info-grid">
-            <div class="info-cell">
-                <div class="cell-label">Médecin</div>
-                <div class="cell-value highlight">Dr. {{ reservation.consultationCreneau.nomMedecin }}</div>
+        
+        <!-- DÉTAILS RENDEZ-VOUS -->
+        {% if reservation.consultationCreneau %}
+        <div class="section">
+            <div class="section-title">
+                <span class="title-icon">📅</span>
+                <span class="title-text">Détails du Rendez-vous</span>
             </div>
-            <div class="info-cell">
-                <div class="cell-label">Spécialité</div>
-                <div class="cell-value">{{ reservation.consultationCreneau.consultation.categorie }}</div>
-            </div>
-            <div class="info-cell">
-                <div class="cell-label">Date</div>
-                <div class="cell-value accent highlight">
-                    {% if reservation.consultationCreneau.jour %}
-                        📆 {{ reservation.consultationCreneau.jour|date('d/m/Y') }}
-                    {% else %}
-                        📆 {{ reservation.dateReservation|date('d/m/Y') }}
-                    {% endif %}
+            
+            <div class="grid-2">
+                <div class="info-item">
+                    <div class="info-label">Médecin</div>
+                    <div class="info-value pink">Dr. {{ reservation.consultationCreneau.nomMedecin }}</div>
                 </div>
-            </div>
-            <div class="info-cell">
-                <div class="cell-label">Horaire</div>
-                <div class="cell-value accent highlight">
-                    {% if reservation.consultationCreneau.heureDebut and reservation.consultationCreneau.heureFin %}
-                        🕐 {{ reservation.consultationCreneau.heureDebut|date('H:i') }} — {{ reservation.consultationCreneau.heureFin|date('H:i') }}
-                    {% else %}
-                        À confirmer
-                    {% endif %}
+                
+                <div class="info-item">
+                    <div class="info-label">Spécialité</div>
+                    <div class="info-value">{{ reservation.consultationCreneau.consultation.categorie }}</div>
                 </div>
-            </div>
-            <div class="info-cell">
-                <div class="cell-label">Statut</div>
-                <div class="cell-value">
-                    <span class="statut-badge">✅ {{ reservation.statutReservation }}</span>
+                
+                <div class="info-item">
+                    <div class="info-label">Date</div>
+                    <div class="info-value purple">
+                        {% if reservation.consultationCreneau.jour %}
+                            📆 {{ reservation.consultationCreneau.jour|date('d/m/Y') }}
+                        {% else %}
+                            📆 {{ reservation.dateReservation|date('d/m/Y') }}
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
-            <div class="info-cell">
-                <div class="cell-label">Durée estimée</div>
-                <div class="cell-value">
-                    ⏱
-                    {% if reservation.consultationCreneau.dureeMinutes %}
-                        {{ reservation.consultationCreneau.dureeMinutes }} min
-                    {% else %}
-                        30 min
-                    {% endif %}
+                
+                <div class="info-item">
+                    <div class="info-label">Horaire</div>
+                    <div class="info-value purple">
+                        {% if reservation.consultationCreneau.heureDebut and reservation.consultationCreneau.heureFin %}
+                            🕐 {{ reservation.consultationCreneau.heureDebut|date('H:i') }} — {{ reservation.consultationCreneau.heureFin|date('H:i') }}
+                        {% else %}
+                            À confirmer
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Statut</div>
+                    <div class="info-value">
+                        <span class="status">✅ {{ reservation.statutReservation }}</span>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Durée</div>
+                    <div class="info-value">
+                        ⏱ {% if reservation.consultationCreneau.dureeMinutes %}{{ reservation.consultationCreneau.dureeMinutes }} min{% else %}30 min{% endif %}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="divider"></div>
-    {% endif %}
-
-    <!-- ===== GOOGLE MEET ===== -->
-    {% if meetLink %}
-    <div style="padding: 28px 0 4px;">
-        <div class="meet-block">
-            <div class="meet-inner">
-                <span class="meet-logo">📹</span>
-                <div class="meet-heading">Consultation en vidéoconférence</div>
-                <div class="meet-desc">
+        {% endif %}
+        
+        <!-- GOOGLE MEET -->
+        {% if meetLink %}
+        <div class="section">
+            <div class="meet">
+                <div class="meet-icon">📹</div>
+                <h3>Consultation Vidéo</h3>
+                <p>
                     Votre rendez-vous se déroule en ligne via <strong>Google Meet</strong>.<br>
                     Cliquez sur le bouton ci-dessous pour rejoindre la salle.
+                </p>
+                <a href="{{ meetLink }}" class="meet-btn" target="_blank">📹 Rejoindre Google Meet</a>
+                <div class="meet-link">{{ meetLink }}</div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- ÉTAPES - SANS AUCUN CADRE NI CERCLE -->
+        <div class="section">
+            <div class="section-title">
+                <span class="title-icon">📋</span>
+                <span class="title-text">À faire avant votre consultation</span>
+            </div>
+            
+            <!-- Étape 1 -->
+            <div class="step-item">
+                <div class="step-num">1.</div>
+                <div class="step-desc">
+                    <strong>📋 Préparez vos documents</strong>
+                    <p>Carnet de santé, ordonnances récentes, résultats d'analyses</p>
                 </div>
-                <a href="{{ meetLink }}" class="meet-cta">📹 &nbsp;Rejoindre Google Meet</a>
-                <div class="meet-link-text">{{ meetLink }}</div>
             </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- ===== ÉTAPES À SUIVRE ===== -->
-    <div class="section">
-        <div class="section-header">
-            <div class="section-icon">📋</div>
-            <span class="section-label">À faire avant votre consultation</span>
-        </div>
-        <div class="steps-list">
-            <div class="step-row">
-                <div class="step-num">1</div>
-                <div class="step-text"><strong>Préparez vos documents :</strong> Carnet de santé, ordonnances récentes, résultats d'analyses.</div>
+            
+            <!-- Étape 2 -->
+            <div class="step-item">
+                <div class="step-num">2.</div>
+                <div class="step-desc">
+                    <strong>⏰ Soyez ponctuel(le)</strong>
+                    <p>Présentez-vous 10 minutes avant le début de la consultation</p>
+                </div>
             </div>
-            <div class="step-row">
-                <div class="step-num">2</div>
-                <div class="step-text"><strong>Arrivez à l'heure :</strong> Présentez-vous 10 minutes avant le début de votre rendez-vous.</div>
-            </div>
+            
             {% if meetLink %}
-            <div class="step-row">
-                <div class="step-num">3</div>
-                <div class="step-text"><strong>Testez votre connexion :</strong> Assurez-vous que votre caméra et microphone fonctionnent correctement.</div>
+            <!-- Étape 3 -->
+            <div class="step-item">
+                <div class="step-num">3.</div>
+                <div class="step-desc">
+                    <strong>🎥 Testez votre matériel</strong>
+                    <p>Vérifiez votre caméra, microphone et connexion internet</p>
+                </div>
             </div>
-            <div class="step-row">
-                <div class="step-num">4</div>
-                <div class="step-text"><strong>Rejoignez le Meet :</strong> Cliquez sur le lien Google Meet ci-dessus 5 minutes avant le début.</div>
+            
+            <!-- Étape 4 -->
+            <div class="step-item">
+                <div class="step-num">4.</div>
+                <div class="step-desc">
+                    <strong>🔗 Rejoignez le Meet</strong>
+                    <p>Cliquez sur le lien Google Meet 5 minutes avant l'heure prévue</p>
+                </div>
+            </div>
+            
+            <!-- Étape 5 -->
+            <div class="step-item">
+                <div class="step-num">5.</div>
+                <div class="step-desc">
+                    <strong>📞 En cas d'empêchement</strong>
+                    <p>Contactez-nous au <span class="phone">+216 XX XXX XXX</span> au moins 24h à l'avance</p>
+                </div>
+            </div>
+            {% else %}
+            <!-- Étape 3 (sans Meet) -->
+            <div class="step-item">
+                <div class="step-num">3.</div>
+                <div class="step-desc">
+                    <strong>📞 En cas d'empêchement</strong>
+                    <p>Contactez-nous au <span class="phone">+216 XX XXX XXX</span> au moins 24h à l'avance</p>
+                </div>
             </div>
             {% endif %}
-            <div class="step-row">
-                <div class="step-num">{% if meetLink %}5{% else %}3{% endif %}</div>
-                <div class="step-text"><strong>En cas d'empêchement :</strong> Annulez au moins 24h à l'avance en contactant le <strong>+216 XX XXX XXX</strong>.</div>
+        </div>
+        
+        <!-- ALERTE -->
+        <div class="section">
+            <div class="alert">
+                <div class="alert-icon">⚠️</div>
+                <div class="alert-text">
+                    <strong>Important</strong>
+                    <p>
+                        Conservez votre numéro de référence <span class="ref-highlight">#{{ reservation.reference }}</span> 
+                        — il est indispensable pour toute modification ou annulation.
+                    </p>
+                </div>
             </div>
         </div>
-    </div>
-
-    <!-- ===== ALERTE IMPORTANTE ===== -->
-    <div class="alert-row">
-        ⚠️ <strong>Important :</strong> Conservez votre numéro de référence <strong>#{{ reservation.reference }}</strong> — il vous sera indispensable pour modifier ou annuler votre rendez-vous. Cet email constitue votre preuve de réservation officielle.
-    </div>
-
-    <!-- ===== FOOTER ===== -->
-    <div class="footer">
-        <div class="footer-brand">🌸 Maternia</div>
-        <div class="footer-tagline">Votre santé maternelle &amp; pédiatrique, notre priorité</div>
-        <div class="footer-sep"></div>
-        <div class="footer-links">
-            <a href="#" class="footer-link">Centre d'aide</a>
-            <a href="#" class="footer-link">Conditions d'utilisation</a>
-            <a href="#" class="footer-link">Confidentialité</a>
-        </div>
-        <div class="footer-copy">
-            © {{ "now"|date("Y") }} Maternia Clinique. Tous droits réservés.<br>
-            Cet email a été envoyé à {{ reservation.emailClient }}
+        
+        <!-- FOOTER -->
+        <div class="footer">
+            <div class="footer-brand">🌸 Maternia</div>
+            <div class="footer-tag">Votre santé maternelle & pédiatrique</div>
+            <div class="footer-links">
+                <a href="#">Aide</a>
+                <a href="#">Conditions</a>
+                <a href="#">Confidentialité</a>
+            </div>
+            <div class="copyright">
+                © {{ "now"|date("Y") }} Maternia Clinique<br>
+                Tous droits réservés
+            </div>
+            <div class="footer-email">{{ reservation.emailClient }}</div>
         </div>
     </div>
-
-</div>
-</div>
 </body>
 </html>
