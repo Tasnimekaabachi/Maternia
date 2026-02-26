@@ -12,13 +12,18 @@ use App\Repository\MamanRepository;
 use App\Repository\GrosesseRepository;
 use App\Repository\OffreBabySitterRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 #[Route('/admin', name: 'admin_')]
 final class DashboardController extends AbstractController
 {
+    public function __construct(
+        private readonly ConsultationCreneauRepository $consultationCreneauRepository
+    ) {
+    }
+
     #[Route('', name: 'dashboard', methods: ['GET'])]
     public function dashboard(
         EventRepository $eventRepository,
@@ -28,8 +33,7 @@ final class DashboardController extends AbstractController
         GrosesseRepository $grosesseRepository,
         ConsultationRepository $consultationRepository,
         OffreBabySitterRepository $offreBabySitterRepository,
-        EventCatRepository $eventCatRepository,
-        ConsultationCreneauRepository $consultationCreneauRepository
+        EventCatRepository $eventCatRepository
     ): Response {
 
         // ===== Marketplace Stats =====
@@ -53,7 +57,7 @@ final class DashboardController extends AbstractController
             ($statsStatut['enCours'] ?? 0) +
             ($statsStatut['aRisque'] ?? 0);
 
-        // ===== BABYSITTING STATS =====
+        // ===== BABYSITTING STATS - SANS createdAt =====
         // Total babysitters
         $totalBabysitters = $offreBabySitterRepository->count([]);
 
@@ -110,7 +114,7 @@ final class DashboardController extends AbstractController
             ->getSingleScalarResult() ?? 0;
 
         // ===== Recent Activity (Interleaved) =====
-        $recentCreneaux = $consultationCreneauRepository->findBy([], ['id' => 'DESC'], 10);
+        $recentCreneaux = $this->consultationCreneauRepository->findBy([], ['id' => 'DESC'], 10);
         $recentEvents = $eventRepository->findBy([], ['id' => 'DESC'], 10);
         $recentProduits = $produitRepository->findBy([], ['id' => 'DESC'], 10);
         $recentMamans = $mamanRepository->findBy([], ['id' => 'DESC'], 10);
@@ -291,41 +295,31 @@ final class DashboardController extends AbstractController
             'total_mamans' => $totalMamans,
             'total_grossesses' => $totalGrossesses,
             'suivis_grossesse_actifs' => $suivisActifs,
-            
-            // Babysitting stats
+
+            // BABYSITTING STATS - Sans createdAt
             'total_babysitters' => $totalBabysitters,
             'babysitters_disponibles' => $babysittersDisponibles,
             'offres_babysitting' => $offresBabysitting,
-            'tarif_moyen' => $tarifMoyen,
-            'tarif_min' => $tarifMin,
-            'tarif_max' => $tarifMax,
+            'offres_nouvelles' => $offresNouvellesSemaine,
+            'nouvelles_offres_aujourdhui' => $nouvellesOffresAujourdhui,
+            'tarif_moyen_babysitting' => $tarifMoyen,
+            'tarif_min_babysitting' => $tarifMin,
+            'tarif_max_babysitting' => $tarifMax,
+            'experience_moyenne_babysitting' => $experienceMoyenne,
             'stats_ville_babysitters' => $statsVilleBabysitters,
             'top_babysitters_experience' => $topBabysittersExperience,
-            'experience_moyenne' => $experienceMoyenne,
-            
-            // Recent activity
-            'activity' => $activity,
-        ]);
-    }
 
-    #[Route('/suivi', name: 'suivi', methods: ['GET'])]
-    public function suivi(MamanRepository $mamanRepository, GrosesseRepository $grosesseRepository): Response
-    {
-        $totalMamans = $mamanRepository->count([]);
-        $totalGrossesses = $grosesseRepository->count([]);
-        $statsStatut = $grosesseRepository->getStatsByStatut();
-
-        return $this->render('admin/suivi_choice.html.twig', [
-            'total_mamans' => $totalMamans,
-            'total_grossesses' => $totalGrossesses,
-            'grossesses_en_cours' => $statsStatut['enCours'] ?? 0,
-            'grossesses_terminees' => $statsStatut['terminee'] ?? 0,
+            // Existing dashboard data
+            'creneaux_ce_mois' => $this->consultationCreneauRepository->countCeMois(),
+            'recent_activity' => $activity,
         ]);
     }
 
     #[Route('/suivi-grossesse', name: 'suivi_grossesse', methods: ['GET'])]
-    public function suiviGrossesse(MamanRepository $mamanRepository, GrosesseRepository $grosesseRepository): Response
-    {
+    public function suiviGrossesse(
+        MamanRepository $mamanRepository,
+        GrosesseRepository $grosesseRepository
+    ): Response {
         $totalMamans = $mamanRepository->count([]);
         $totalGrossesses = $grosesseRepository->count([]);
         $statsStatut = $grosesseRepository->getStatsByStatut();
@@ -338,22 +332,16 @@ final class DashboardController extends AbstractController
         ]);
     }
 
-    #[Route('/marketplace', name: 'marketplace', methods: ['GET'])]
-    public function marketplace(): Response
+    #[Route('/marketplace-legacy', name: 'marketplace_legacy', methods: ['GET'])]
+    public function marketplaceLegacy(): Response
     {
-        return $this->render('admin/marketplace.html.twig');
+        return $this->redirectToRoute('admin_marketplace');
     }
 
     #[Route('/evenements', name: 'evenements', methods: ['GET'])]
     public function evenements(): Response
     {
         return $this->render('admin/evenements.html.twig');
-    }
-
-    #[Route('/consultations', name: 'consultations', methods: ['GET'])]
-    public function consultations(): Response
-    {
-        return $this->render('admin/consultations.html.twig');
     }
 
     #[Route('/profil-bebe', name: 'profil_bebe', methods: ['GET'])]
