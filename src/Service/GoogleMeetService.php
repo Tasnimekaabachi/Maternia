@@ -77,19 +77,19 @@ class GoogleMeetService
                 'description' => $description,
                 'start' => new EventDateTime([
                     'dateTime' => $start->format(DATE_RFC3339),
+                    'timeZone' => 'Africa/Tunis',
                 ]),
                 'end' => new EventDateTime([
                     'dateTime' => $end->format(DATE_RFC3339),
+                    'timeZone' => 'Africa/Tunis',
                 ]),
             ]);
 
-            $solutionKey = new ConferenceSolutionKey();
-            $solutionKey->setType('hangoutsMeet');
-
             $conferenceRequest = new CreateConferenceRequest();
             $conferenceRequest->setRequestId('maternia-' . uniqid('', true));
-            $conferenceRequest->setConferenceSolutionKey($solutionKey);
-
+            
+            // On essaie de créer une conférence sans spécifier le type explicitement
+            // Si l'agenda a Google Meet activé par défaut, il le choisira.
             $conferenceData = new ConferenceData();
             $conferenceData->setCreateRequest($conferenceRequest);
 
@@ -101,28 +101,39 @@ class GoogleMeetService
                 ['conferenceDataVersion' => 1]
             );
 
+            // Retry jusqu'à 5 fois (Google est parfois lent à générer le lien)
             $meetLink = null;
-            $conf = $created->getConferenceData();
-            if ($conf && $conf->getEntryPoints()) {
-                foreach ($conf->getEntryPoints() as $ep) {
-                    if ($ep->getEntryPointType() === 'video' && $ep->getUri()) {
-                        $meetLink = $ep->getUri();
-                        break;
+            for ($attempt = 0; $attempt < 5; $attempt++) {
+                if ($attempt > 0) {
+                    sleep(1); 
+                    $created = $service->events->get($calendarId, $created->getId());
+                }
+
+                // Priorité au HangoutLink (le vrai lien Meet)
+                $hangoutLink = $created->getHangoutLink();
+                if (!empty($hangoutLink)) {
+                    $meetLink = (string) $hangoutLink;
+                    break;
+                }
+
+                // Alternative : EntryPoints
+                $conf = $created->getConferenceData();
+                if ($conf && $conf->getEntryPoints()) {
+                    foreach ($conf->getEntryPoints() as $ep) {
+                        if ($ep->getEntryPointType() === 'video' && $ep->getUri()) {
+                            $meetLink = (string) $ep->getUri();
+                            break;
+                        }
                     }
                 }
-            }
 
-            if (!$meetLink) {
-                $hangoutLink = $created->getHangoutLink();
-                if (is_string($hangoutLink) && $hangoutLink !== '') {
-                    $meetLink = $hangoutLink;
-                }
+                if ($meetLink) break;
             }
 
             if (!$meetLink) {
                 return [
                     'success' => false,
-                    'message' => 'Événement créé, mais lien Google Meet introuvable.',
+                    'message' => 'Événement créé, mais lien Google Meet introuvable. Vérifiez que l\'agenda est partagé avec le compte de service.',
                     'eventId' => $created->getId(),
                 ];
             }

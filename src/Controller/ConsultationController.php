@@ -184,36 +184,44 @@ class ConsultationController extends AbstractController
                     $entityManager->persist($reservation);
                     $entityManager->flush();
                     
-                    // --- � GOOGLE MEET (auto) + fallback lien fixe ---
+                    // --- GOOGLE MEET (auto) + fallback lien fixe ---
                     $meetStatus = null;
                     $meetLink = null;
                     try {
                         $meetStatus = $googleMeetService->createMeetLink($reservation);
                         if (($meetStatus['success'] ?? false) && !empty($meetStatus['meetLink'])) {
                             $meetLink = (string) $meetStatus['meetLink'];
+                            $this->addFlash('info', 'Lien Meet généré avec succès.');
                         }
                     } catch (\Throwable $e) {
                         $meetStatus = ['success' => false, 'message' => $e->getMessage()];
                     }
 
+                    // Fallback : utiliser le lien Meet fixe défini dans .env
                     if (!$meetLink) {
                         try {
-                            $meetLink = $this->getParameter('app.online_meet_link') ?: null;
+                            $fallbackLink = $this->getParameter('app.online_meet_link');
+                            if (!empty($fallbackLink)) {
+                                $meetLink = (string) $fallbackLink;
+                            }
                         } catch (\Throwable) {
                             $meetLink = null;
                         }
                     }
 
                     // --- 🔔 ENVOI DES NOTIFICATIONS ---
+                    // On envoie d'abord le mail (en tâche synchrone mais on ne bloque pas si c'est réussi)
                     $notifStatus = ['email' => null, 'sms' => null];
-                    if ($data['receiveEmail'] ?? false) {
+                    try {
                         $notifStatus['email'] = $notificationService->sendConfirmationEmail($reservation, $meetLink);
-                    }
-                    if ($data['receiveSms'] ?? false) {
-                        $notifStatus['sms'] = $notificationService->sendConfirmationSms($reservation, $meetLink);
+                        if ($data['receiveSms'] ?? false) {
+                            $notifStatus['sms'] = $notificationService->sendConfirmationSms($reservation, $meetLink);
+                        }
+                    } catch (\Throwable) {
+                        // On continue pour ne pas bloquer l'utilisateur
                     }
 
-                    // Réponse AJAX
+                    // Réponse AJAX IMMÉDIATE
                     if ($request->isXmlHttpRequest()) {
                         return $this->json([
                             'success' => true,
@@ -221,8 +229,6 @@ class ConsultationController extends AbstractController
                             'reference' => $reference,
                             'patientName' => $data['prenom'] . ' ' . $data['nom'],
                             'meetLink' => $meetLink,
-                            'meetStatus' => $meetStatus,
-                            'notifStatus' => $notifStatus,
                             'redirectUrl' => $this->generateUrl('app_reservation_confirmation', ['id' => $creneau->getId()])
                         ]);
                     }
