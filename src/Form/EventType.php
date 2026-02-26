@@ -31,10 +31,12 @@ class EventType extends AbstractType
             ->add('startAt', null, [
                 'label' => 'Date et heure de début',
                 'widget' => 'single_text',
+                'required' => false,
             ])
             ->add('endAt', null, [
                 'label' => 'Date et heure de fin',
                 'widget' => 'single_text',
+                'required' => false,
             ])
             ->add('location', null, [
                 'label' => 'Lieu',
@@ -46,7 +48,7 @@ class EventType extends AbstractType
                 'label' => 'Catégorie',
                 'placeholder' => 'Choisir une catégorie',
             ])
-            ->add('isWeekly', null, [
+            ->add('isWeekly', CheckboxType::class, [
                 'label' => 'Événement hebdomadaire',
                 'required' => false,
                 'attr' => ['class' => 'weekly-toggle']
@@ -103,6 +105,11 @@ class EventType extends AbstractType
                 'constraints' => [
                     new Assert\NotBlank(['message' => 'Veuillez sélectionner une image']),
                 ],
+            ])
+            ->add('isOutdoor', CheckboxType::class, [
+                'label' => 'Événement en extérieur ?',
+                'required' => false,
+                'attr' => ['class' => 'indoor-toggle']
             ]);
         ;
     }

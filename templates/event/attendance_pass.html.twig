@@ -1,0 +1,266 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Pass d'entrée - {{ event.title }}{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    :root {
+        --pass-pink: #ec4899;
+        --pass-dark: #831843;
+        --pass-light: #fdf2f8;
+        --pass-accent: #f472b6;
+    }
+
+    body {
+        background: #f3f4f6;
+    }
+
+    .pass-page-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .ticket-container {
+        max-width: 450px;
+        width: 100%;
+        filter: drop-shadow(0 20px 25px rgba(0, 0, 0, 0.1));
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .ticket-top {
+        background: linear-gradient(135deg, var(--pass-pink), var(--pass-dark));
+        color: white;
+        padding: 40px 30px;
+        border-radius: 24px 24px 0 0;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ticket-top::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .pass-brand {
+        font-weight: 800;
+        letter-spacing: 2px;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+        display: block;
+        opacity: 0.9;
+    }
+
+    .event-title-pass {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+        line-height: 1.2;
+    }
+
+    .event-cat-pass {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 4px 12px;
+        border-radius: 99px;
+        font-size: 0.8rem;
+        backdrop-filter: blur(4px);
+    }
+
+    .ticket-middle {
+        background: white;
+        position: relative;
+        padding: 10px 0;
+    }
+
+    /* Perforated edge effect */
+    .ticket-middle::before, .ticket-middle::after {
+        content: '';
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        background: #f3f4f6;
+        border-radius: 50%;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 2;
+    }
+
+    .ticket-middle::before { left: -15px; }
+    .ticket-middle::after { right: -15px; }
+
+    .ticket-divider {
+        border-bottom: 2px dashed #e5e7eb;
+        position: absolute;
+        top: 50%;
+        width: 100%;
+        z-index: 1;
+    }
+
+    .ticket-bottom {
+        background: white;
+        padding: 30px;
+        border-radius: 0 0 24px 24px;
+    }
+
+    .info-row {
+        margin-bottom: 25px;
+    }
+
+    .info-label {
+        color: #9ca3af;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    .info-value {
+        color: #111827;
+        font-weight: 700;
+        font-size: 1.1rem;
+        display: block;
+    }
+
+    .qr-container {
+        background: var(--pass-light);
+        padding: 20px;
+        border-radius: 20px;
+        margin-top: 10px;
+        text-align: center;
+        border: 2px solid #fce7f3;
+    }
+
+    .qr-image {
+        width: 150px;
+        height: 150px;
+        border-radius: 12px;
+        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));
+    }
+
+    .pass-footer {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .btn-save {
+        background: var(--pass-pink);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 99px;
+        font-weight: 700;
+        box-shadow: 0 10px 15px -3px rgba(236, 72, 153, 0.3);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-save:hover {
+        background: var(--pass-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 20px -3px rgba(236, 72, 153, 0.4);
+        color: white;
+    }
+
+    @media print {
+        .btn-save, .pass-footer { display: none; }
+        body { background: white; }
+        .pass-page-container { padding: 0; align-items: flex-start; }
+        .ticket-container { filter: none; box-shadow: none; }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="pass-page-container">
+    <div class="ticket-container">
+        <!-- Top Section -->
+        <div class="ticket-top">
+            <span class="pass-brand">Maternia Events</span>
+            <h1 class="event-title-pass">{{ event.title }}</h1>
+            {% if event.eventCat %}
+                <span class="event-cat-pass">{{ event.eventCat.name }}</span>
+            {% endif %}
+        </div>
+
+        <!-- Perforated Middle -->
+        <div class="ticket-middle">
+            <div class="ticket-divider"></div>
+        </div>
+
+        <!-- Bottom Section -->
+        <div class="ticket-bottom">
+            <div class="row info-row">
+                <div class="col-6">
+                    <span class="info-label">Participant</span>
+                    <span class="info-value">{{ user.prenom }} {{ user.nom }}</span>
+                </div>
+                <div class="col-6 text-end">
+                    <span class="info-label">Pass ID</span>
+                    <span class="info-value">#{{ "%05d"|format(attendance.id) }}</span>
+                </div>
+            </div>
+
+            <div class="row info-row">
+                <div class="col-7">
+                    <span class="info-label">Date & Heure</span>
+                    <span class="info-value">
+                        {% if event.isWeekly %}
+                            Tous les {{ event.dayOfWeek|replace({'Monday': 'Lundi', 'Tuesday': 'Mardi', 'Wednesday': 'Mercredi', 'Thursday': 'Jeudi', 'Friday': 'Vendredi', 'Saturday': 'Samedi', 'Sunday': 'Dimanche'}) }}<br>
+                            à {{ event.startTime|date('H:i') }}
+                        {% else %}
+                            {{ event.startAt|date('d/m/Y') }}<br>
+                            à {{ event.startAt|date('H:i') }}
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="col-5 text-end">
+                    <span class="info-label">Lieu</span>
+                    <span class="info-value">{{ event.location|slice(0, 20) }}{{ event.location|length > 20 ? '...' : '' }}</span>
+                </div>
+            </div>
+
+            <div class="qr-container">
+                {% set passUrl = url('app_attendance_pass', {id: attendance.id}) %}
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ passUrl|url_encode }}" 
+                     alt="Validation QR Code" 
+                     class="qr-image" />
+                <p class="mt-3 mb-0 text-muted small">Présentez ce QR Code à l'entrée</p>
+            </div>
+
+            <div class="pass-footer">
+                <a href="javascript:window.print()" class="btn-save">
+                    <i class="fas fa-print me-2"></i>Imprimer mon pass
+                </a>
+                <p class="mt-3 text-muted" style="font-size: 0.8rem;">
+                    Inscrit le {{ attendance.createdAt|date('d/m/Y') }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

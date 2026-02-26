@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #4b5563; background-color: #fce7f3; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        .wrapper { width: 100%; table-layout: fixed; background-color: #fdf2f8; padding-bottom: 40px; }
+        .main { background-color: #ffffff; margin: 0 auto; width: 100%; max-width: 600px; border-spacing: 0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); margin-top: 40px; }
+        .header { background: linear-gradient(135deg, #ec4899 0%, #d946ef 100%); text-align: center; padding: 40px 20px; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .content { padding: 40px 30px; }
+        .footer { text-align: center; padding: 20px; font-size: 13px; color: #9ca3af; }
+        .btn { display: inline-block; padding: 14px 28px; background-color: #ec4899; color: #ffffff !important; font-weight: 700; text-decoration: none; border-radius: 50px; margin: 20px 0; box-shadow: 0 10px 15px -3px rgba(236, 72, 153, 0.3); }
+        .event-card { background-color: #f9fafb; border: 1px solid #f3f4f6; border-left: 4px solid #ec4899; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .event-info { margin-bottom: 12px; display: flex; align-items: start; }
+        .event-info strong { color: #1f2937; width: 100px; flex-shrink: 0; }
+        .event-info span { color: #4b5563; }
+        hr { border: 0; border-top: 1px solid #f3f4f6; margin: 25px 0; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
+        .badge-pink { background-color: #fdf2f8; color: #db2777; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <table class="main">
+            <tr>
+                <td class="header">
+                    <div style="font-family: 'Fredoka', 'Segoe UI', sans-serif; font-size: 32px; font-weight: 700; color: #7dd3fc; text-align: center;">
+                        Mater<span style="color: #ffffff;">nia</span>
+                    </div>
+                    <div style="width: 8px; height: 8px; background: #ffffff; border-radius: 50%; margin: 8px auto 0; box-shadow: 0 0 10px rgba(255,255,255,0.8);"></div>
+                </td>
+            </tr>
+            <tr>
+                <td class="content">
+                    {% block body %}{% endblock %}
+                </td>
+            </tr>
+            <tr>
+                <td class="footer">
+                    <p>&copy; {{ "now"|date("Y") }} Maternia. Fait avec passion pour les futures mamans.</p>
+                    <p>Vous recevez cet email car vous avez un compte sur Maternia.</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

@@ -661,9 +661,13 @@
                             <i class="fas fa-user"></i> Organisé par {{ event.creator.nom }} {{ event.creator.prenom }}
                         </div>
                     {% endif %}
+
+                    <div class="d-flex gap-2 mt-3">
+                        <a href="{{ path('app_event_ics', {'id': event.id}) }}" class="action-btn btn-calendar-sm" style="background: #ffffff; color: #ec4899; border: 1px solid #ec4899;">
+                            <i class="fas fa-calendar-plus"></i> Ajouter au calendrier
+                        </a>
+                    </div>
                 </div>
-
-
             </div>
         </div>
     </div>
@@ -765,6 +769,24 @@
                 <p>{{ event.price }} €</p>
             </div>
             {% endif %}
+
+            {% if event.isOutdoor %}
+            <div class="info-card" id="show-weather-card">
+                <h3><i class="fas fa-cloud-sun"></i> Météo prévue</h3>
+                <div id="show-weather-loading">
+                    <div class="spinner-border text-pink spinner-border-sm" role="status"></div>
+                </div>
+                <div id="show-weather-content" style="display: none;">
+                    <div class="d-flex align-items-center gap-3">
+                        <img id="show-weather-icon" src="" alt="Icon" style="width: 50px;" />
+                        <div>
+                            <span id="show-weather-temp" class="fw-bold" style="font-size: 1.2rem;"></span><br>
+                            <span id="show-weather-desc" class="text-muted small"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </div>
         
         <!-- Description -->
@@ -796,9 +818,11 @@
         <div class="action-section mt-4">
             <div class="participation-status">
                 {% set isAttending = false %}
+                {% set userAttendance = null %}
                 {% for attendance in event.attendances %}
                     {% if app.user and attendance.user.id == app.user.id %}
                         {% set isAttending = true %}
+                        {% set userAttendance = attendance %}
                     {% endif %}
                 {% endfor %}
 
@@ -816,14 +840,22 @@
             <div class="btn-group">
                 {% if app.user %}
                     {% if isAttending %}
-                        <form action="{{ path('app_event_unattend', {id: event.id}) }}" method="POST" style="display: inline;">
-                            <button type="submit" class="btn btn-delete">
-                                <i class="fas fa-user-minus"></i> Annuler ma participation
+                        <div class="qr-code-section text-center p-3 bg-white rounded-lg border border-pink-200 mt-3">
+                            <h6 class="text-pink font-bold mb-2 small"><i class="fas fa-qrcode"></i> Votre passe d'entrée</h6>
+                            {% set passUrl = url('app_attendance_pass', {id: userAttendance.id}) %}
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ passUrl|url_encode }}" 
+                                 alt="QR Code" 
+                                 class="mx-auto shadow-sm rounded" />
+                            <p class="text-xs text-muted mt-2">Présentez ce code à l'entrée</p>
+                        </div>
+
+                        <form action="{{ path('app_event_unattend', {'id': event.id}) }}" method="POST" class="mt-3">
+                            <button type="submit" class="btn btn-outline-danger w-full justify-center">
+                                <i class="fas fa-user-minus"></i> Se désister
                             </button>
                         </form>
                     {% elseif not event.capacity or event.attendances|length < event.capacity %}
                         {% if not event.isWeekly and event.endAt and event.endAt < date() %}
-                            {# No button for past events #}
                         {% else %}
                             <form action="{{ path('app_event_attend', {id: event.id}) }}" method="POST" style="display: inline;">
                                 <button type="submit" class="btn btn-edit">
@@ -846,20 +878,16 @@
 
 <script>
 function goBack() {
-    // Simple browser back function - goes to whatever page user was on
     if (document.referrer && document.referrer !== window.location.href) {
         window.location.href = document.referrer;
     } else {
-        // Fallback to events list if no referrer or same page
         window.location.href = "{{ path('app_event_index') }}";
     }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Simple Back Button - goes to browser history back
     const smartBackButton = document.getElementById('smartBackButton');
     
-    // Use simple JavaScript history back
     smartBackButton.onclick = function(e) {
         e.preventDefault();
         goBack();
@@ -901,7 +929,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Optional: Add subtle hover effect for date cards
     const dateCards = document.querySelectorAll('.date-card');
     dateCards.forEach(card => {
         card.addEventListener('mouseenter', function() {
@@ -914,4 +941,129 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
+{% if event.isOutdoor %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const location = "{{ event.location|escape('js') }}";
+    
+    const wmoDescriptions = {
+        0: 'Ciel dégagé', 1: 'Principalement dégagé', 2: 'Partiellement nuageux', 3: 'Couvert',
+        45: 'Brouillard', 48: 'Brouillard givrant',
+        51: 'Bruine légère', 53: 'Bruine modérée', 55: 'Bruine forte',
+        61: 'Pluie légère', 63: 'Pluie modérée', 65: 'Pluie forte',
+        71: 'Neige légère', 73: 'Neige modérée', 75: 'Neige forte',
+        80: 'Averses légères', 81: 'Averses modérées', 82: 'Averses violentes',
+        95: 'Orage', 96: 'Orage avec grêle légère', 99: 'Orage avec grêle forte'
+    };
+
+    function wmoToIcon(code, isDay) {
+        const prefix = isDay ? 'd' : 'n';
+        if (code === 0) return '01' + prefix;
+        if (code <= 2) return '02' + prefix;
+        if (code === 3) return '04' + prefix;
+        if (code <= 48) return '50' + prefix;
+        if (code <= 55) return '09' + prefix;
+        if (code <= 65) return '10' + prefix;
+        if (code <= 75) return '13' + prefix;
+        if (code <= 82) return '09' + prefix;
+        return '11' + prefix;
+    }
+
+    function getEventDateTime() {
+        const isWeekly = {{ event.isWeekly ? 'true' : 'false' }};
+        
+        if (isWeekly) {
+            const dayOfWeek = "{{ event.dayOfWeek|escape('js') }}";
+            const startTime = "{{ event.startTime ? event.startTime|date('H:i') : '' }}";
+            
+            if (dayOfWeek && startTime) {
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                const targetDay = days.indexOf(dayOfWeek);
+                
+                if (targetDay !== -1) {
+                    const now = new Date();
+                    const resultDate = new Date();
+                    let diff = (targetDay - now.getDay() + 7) % 7;
+                    const hour = parseInt(startTime.split(':')[0], 10);
+                    if (diff === 0 && hour <= now.getHours()) {
+                        diff = 7;
+                    }
+                    resultDate.setDate(now.getDate() + diff);
+                    return { date: resultDate.toISOString().split('T')[0], hour: hour };
+                }
+            }
+        } else {
+            const startAt = "{{ event.startAt ? event.startAt|date('Y-m-d H:i') : '' }}";
+            if (startAt) {
+                const parts = startAt.split(' ');
+                return { date: parts[0], hour: parseInt(parts[1].split(':')[0], 10) };
+            }
+        }
+        return null;
+    }
+
+    async function fetchShowWeather() {
+        if (!location) return;
+
+        try {
+            const geoUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`;
+            const geoResponse = await fetch(geoUrl);
+            const geoData = await geoResponse.json();
+            
+            if (geoData.length === 0) throw new Error('Location not found');
+            
+            const lat = geoData[0].lat;
+            const lon = geoData[0].lon;
+            const eventDT = getEventDateTime();
+            
+            let url;
+            if (eventDT) {
+                url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,is_day&start_date=${eventDT.date}&end_date=${eventDT.date}&timezone=auto`;
+            } else {
+                url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,is_day&timezone=auto`;
+            }
+
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data.hourly && data.hourly.time && data.hourly.time.length > 0) {
+                const targetHour = (eventDT && eventDT.hour !== null) ? eventDT.hour : 12;
+                const h = data.hourly;
+                const idx = Math.min(targetHour, h.time.length - 1);
+                
+                const dateObj = new Date(eventDT.date + 'T12:00:00');
+                const datePart = dateObj.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+                displayShowWeather({
+                    temp: h.temperature_2m[idx],
+                    desc: wmoDescriptions[h.weather_code[idx]] || 'Inconnu',
+                    icon: wmoToIcon(h.weather_code[idx], h.is_day[idx] === 1)
+                }, `${datePart} à ${targetHour}h`);
+            } else if (data.current) {
+                const c = data.current;
+                displayShowWeather({
+                    temp: c.temperature_2m,
+                    desc: wmoDescriptions[c.weather_code] || 'Inconnu',
+                    icon: wmoToIcon(c.weather_code, c.is_day === 1)
+                });
+            }
+        } catch (e) {
+            document.getElementById('show-weather-loading').style.display = 'none';
+            console.error('Weather fetch error:', e);
+        }
+    }
+
+    function displayShowWeather(data, label) {
+        document.getElementById('show-weather-temp').textContent = Math.round(data.temp) + '°C';
+        document.getElementById('show-weather-desc').textContent = (label ? label + ' - ' : '') + data.desc;
+        document.getElementById('show-weather-icon').src = `https://openweathermap.org/img/wn/${data.icon}@2x.png`;
+        document.getElementById('show-weather-loading').style.display = 'none';
+        document.getElementById('show-weather-content').style.display = 'block';
+    }
+
+    fetchShowWeather();
+});
+</script>
+{% endif %}
 {% endblock %}

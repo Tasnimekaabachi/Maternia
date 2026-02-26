@@ -8,8 +8,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
+#[Assert\Callback(callback: 'validateTiming')]
 class Event
 {
     #[ORM\Id]
@@ -46,7 +48,7 @@ class Event
     private ?string $image = null;
 
     #[ORM\Column(type: Types::BOOLEAN)]
-    private ?bool $isWeekly = false;
+    private bool $isWeekly = false;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
@@ -75,6 +77,9 @@ class Event
     #[ORM\ManyToMany(targetEntity: Requirement::class, inversedBy: 'events')]
     #[ORM\JoinTable(name: 'event_requirement')]
     private Collection $requirements;
+
+    #[ORM\Column(options: ["default" => false])]
+    private ?bool $isOutdoor = false;
 
     public function __construct()
     {
@@ -172,7 +177,7 @@ class Event
         return $this;
     }
 
-    public function isWeekly(): ?bool
+    public function isWeekly(): bool
     {
         return $this->isWeekly;
     }
@@ -253,7 +258,6 @@ class Event
     public function removeAttendance(Attendance $attendance): static
     {
         if ($this->attendances->removeElement($attendance)) {
-            // set the owning side to null (unless already changed)
             if ($attendance->getEvent() === $this) {
                 $attendance->setEvent(null);
             }
@@ -296,5 +300,48 @@ class Event
         $this->endTime = $endTime;
 
         return $this;
+    }
+
+    public function isOutdoor(): ?bool
+    {
+        return $this->isOutdoor;
+    }
+
+    public function setIsOutdoor(bool $isOutdoor): self
+    {
+        $this->isOutdoor = $isOutdoor;
+        return $this;
+    }
+
+    public function validateTiming(ExecutionContextInterface $context, $payload): void
+    {
+        if ($this->isWeekly === true) {
+            if (!$this->dayOfWeek) {
+                $context->buildViolation('Veuillez sélectionner un jour de la semaine pour un événement hebdomadaire.')
+                    ->atPath('dayOfWeek')
+                    ->addViolation();
+            }
+            if (!$this->startTime) {
+                $context->buildViolation('L\'heure de début est obligatoire pour un événement hebdomadaire.')
+                    ->atPath('startTime')
+                    ->addViolation();
+            }
+            if (!$this->endTime) {
+                $context->buildViolation('L\'heure de fin est obligatoire pour un événement hebdomadaire.')
+                    ->atPath('endTime')
+                    ->addViolation();
+            }
+        } else {
+            if (!$this->startAt) {
+                $context->buildViolation('La date et l\'heure de début sont obligatoires.')
+                    ->atPath('startAt')
+                    ->addViolation();
+            }
+            if (!$this->endAt) {
+                $context->buildViolation('La date et l\'heure de fin sont obligatoires.')
+                    ->atPath('endAt')
+                    ->addViolation();
+            }
+        }
     }
 }

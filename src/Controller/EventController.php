@@ -12,6 +12,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Finder\Finder;
 use Dompdf\Dompdf;
@@ -54,10 +56,8 @@ class EventController extends AbstractController
         $response = new StreamedResponse(function () use ($events) {
             $handle = fopen('php://output', 'w');
 
-            // Add BOM for Excel compatibility
             fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
-            // Header
             fputcsv($handle, [
                 'ID',
                 'Titre',
@@ -97,13 +97,11 @@ class EventController extends AbstractController
 
                 $type = $event->isWeekly() ? 'Hebdomadaire' : 'Ponctuel';
 
-                // One-time event times
                 $startDate = $event->getStartAt()?->format('Y-m-d') ?? '';
                 $startTimeOneTime = $event->getStartAt()?->format('H:i') ?? '';
                 $endDate = $event->getEndAt()?->format('Y-m-d') ?? '';
                 $endTimeOneTime = $event->getEndAt()?->format('H:i') ?? '';
 
-                // Weekly event times
                 $dayOfWeek = $event->getDayOfWeek() ? ($daysMap[$event->getDayOfWeek()] ?? $event->getDayOfWeek()) : '';
                 $startTime = $event->getStartTime()?->format('H:i') ?? '';
                 $endTime = $event->getEndTime()?->format('H:i') ?? '';
@@ -143,7 +141,6 @@ class EventController extends AbstractController
         $sortBy = $request->query->get('sort_by', 'startAt');
         $sortOrder = $request->query->get('sort_order', 'DESC');
 
-        // Filters
         $categoryId = $request->query->get('category_id');
         $status = $request->query->get('status');
         $organizer = $request->query->get('organizer');
@@ -181,19 +178,7 @@ class EventController extends AbstractController
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $selectedImage = $form->get('selectedImage')->getData();
-
-            if ($selectedImage) {
-                $event->setImage($selectedImage);
-            }
-
-            // Set creator if user is logged in
-            if ($this->getUser()) {
-                $event->setCreator($this->getUser());
-            }
-
-            // Conditional nulling based on isWeekly
+        if ($form->isSubmitted()) {
             if ($event->isWeekly()) {
                 $event->setStartAt(null);
                 $event->setEndAt(null);
@@ -203,11 +188,22 @@ class EventController extends AbstractController
                 $event->setEndTime(null);
             }
 
-            $entityManager->persist($event);
-            $entityManager->flush();
+            if ($form->isValid()) {
+                $selectedImage = $form->get('selectedImage')->getData();
+                if ($selectedImage) {
+                    $event->setImage($selectedImage);
+                }
 
-            $this->addFlash('success', 'L\'événement a été créé avec succès.');
-            return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
+                if ($this->getUser()) {
+                    $event->setCreator($this->getUser());
+                }
+
+                $entityManager->persist($event);
+                $entityManager->flush();
+
+                $this->addFlash('success', 'L\'événement a été créé avec succès.');
+                return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
+            }
         }
 
         return $this->render('admin/event/new.html.twig', [
@@ -218,7 +214,7 @@ class EventController extends AbstractController
     }
 
     #[Route('/event/new', name: 'app_event_user_new', methods: ['GET', 'POST'])]
-    public function new1(Request $request, EntityManagerInterface $entityManager): Response
+    public function new1(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer): Response
     {
         $event = new Event();
         $form = $this->createForm(EventType::class, $event);
@@ -227,19 +223,8 @@ class EventController extends AbstractController
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $selectedImage = $form->get('selectedImage')->getData();
-
-            if ($selectedImage) {
-                $event->setImage($selectedImage);
-            }
-
-            // Set creator
-            if ($this->getUser()) {
-                $event->setCreator($this->getUser());
-            }
-
-            // Conditional nulling based on isWeekly
+        if ($form->isSubmitted()) {
+            // Conditional nulling based on isWeekly (before validation)
             if ($event->isWeekly()) {
                 $event->setStartAt(null);
                 $event->setEndAt(null);
@@ -249,11 +234,33 @@ class EventController extends AbstractController
                 $event->setEndTime(null);
             }
 
-            $entityManager->persist($event);
-            $entityManager->flush();
+            if ($form->isValid()) {
+                $selectedImage = $form->get('selectedImage')->getData();
 
-            $this->addFlash('success', 'Votre événement a été créé avec succès.');
-            return $this->redirectToRoute('app_event_user_show', ['id' => $event->getId()], Response::HTTP_SEE_OTHER);
+                if ($selectedImage) {
+                    $event->setImage($selectedImage);
+                }
+
+                if ($this->getUser()) {
+                    $event->setCreator($this->getUser());
+                }
+
+                $entityManager->persist($event);
+                $entityManager->flush();
+
+                $email = (new Email())
+                    ->from('contact@maternia.fr')
+                    ->to($this->getUser()->getUserIdentifier())
+                    ->subject('Votre événement est en ligne : ' . $event->getTitle())
+                    ->html($this->renderView('emails/event_created_confirmation.html.twig', [
+                        'event' => $event,
+                        'user' => $this->getUser(),
+                    ]));
+                $mailer->send($email);
+
+                $this->addFlash('success', 'Votre événement a été créé avec succès.');
+                return $this->redirectToRoute('app_event_user_show', ['id' => $event->getId()], Response::HTTP_SEE_OTHER);
+            }
         }
 
         return $this->render('event/usernew.html.twig', [
@@ -292,14 +299,8 @@ class EventController extends AbstractController
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $selectedImage = $form->get('selectedImage')->getData();
-
-            if ($selectedImage && $selectedImage !== $currentImage) {
-                $event->setImage($selectedImage);
-            }
-
-            // Conditional nulling based on isWeekly
+        if ($form->isSubmitted()) {
+            // Conditional nulling based on isWeekly (before validation)
             if ($event->isWeekly()) {
                 $event->setStartAt(null);
                 $event->setEndAt(null);
@@ -309,10 +310,18 @@ class EventController extends AbstractController
                 $event->setEndTime(null);
             }
 
-            $entityManager->flush();
+            if ($form->isValid()) {
+                $selectedImage = $form->get('selectedImage')->getData();
 
-            $this->addFlash('success', 'L\'événement a été modifié avec succès.');
-            return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
+                if ($selectedImage && $selectedImage !== $currentImage) {
+                    $event->setImage($selectedImage);
+                }
+
+                $entityManager->flush();
+
+                $this->addFlash('success', 'L\'événement a été modifié avec succès.');
+                return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
+            }
         }
 
         return $this->render('admin/event/edit.html.twig', [
@@ -326,7 +335,6 @@ class EventController extends AbstractController
     #[Route('/event/{id}/edit', name: 'app_event_user_edit', methods: ['GET', 'POST'])]
     public function userEdit(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
-        // Permission check: only creator or admin
         if ($event->getCreator() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
             $this->addFlash('error', 'Vous n\'êtes pas autorisé à modifier cet événement.');
             return $this->redirectToRoute('app_events');
@@ -349,7 +357,6 @@ class EventController extends AbstractController
                 $event->setImage($selectedImage);
             }
 
-            // Conditional nulling based on isWeekly
             if ($event->isWeekly()) {
                 $event->setStartAt(null);
                 $event->setEndAt(null);
@@ -404,7 +411,7 @@ class EventController extends AbstractController
     }
 
     #[Route('/event/{id}/attend', name: 'app_event_attend', methods: ['POST'])]
-    public function attend(Event $event, EntityManagerInterface $entityManager, AttendanceRepository $attendanceRepository): Response
+    public function attend(Event $event, EntityManagerInterface $entityManager, AttendanceRepository $attendanceRepository, MailerInterface $mailer): Response
     {
         $user = $this->getUser();
         if (!$user) {
@@ -412,20 +419,17 @@ class EventController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        // Check if already attending
         $existing = $attendanceRepository->findOneBy(['user' => $user, 'event' => $event]);
         if ($existing) {
             $this->addFlash('warning', 'Vous participez déjà à cet événement.');
             return $this->redirectToRoute('app_event_user_show', ['id' => $event->getId()]);
         }
 
-        // Check if event has passed (only for one-time events)
         if (!$event->isWeekly() && $event->getEndAt() < new \DateTime()) {
             $this->addFlash('error', 'Cet événement est déjà terminé.');
             return $this->redirectToRoute('app_event_user_show', ['id' => $event->getId()]);
         }
 
-        // Check capacity
         if ($event->getCapacity() !== null && $event->getAttendances()->count() >= $event->getCapacity()) {
             $this->addFlash('error', 'Cet événement est complet.');
             return $this->redirectToRoute('app_event_user_show', ['id' => $event->getId()]);
@@ -438,7 +442,18 @@ class EventController extends AbstractController
         $entityManager->persist($attendance);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Votre participation a été enregistrée.');
+        $emailParticipant = (new Email())
+            ->from('contact@maternia.fr')
+            ->to($user->getUserIdentifier())
+            ->subject('Confirmation de participation : ' . $event->getTitle())
+            ->html($this->renderView('emails/attendance_confirmation.html.twig', [
+                'event' => $event,
+                'user' => $user,
+                'attendance' => $attendance,
+            ]));
+        $mailer->send($emailParticipant);
+
+        $this->addFlash('success', 'Votre participation a été enregistrée et un email de confirmation vous a été envoyé.');
         return $this->redirectToRoute('app_event_user_show', ['id' => $event->getId()]);
     }
 
@@ -460,11 +475,53 @@ class EventController extends AbstractController
         return $this->redirectToRoute('app_event_user_show', ['id' => $event->getId()]);
     }
 
+    #[Route('/event/{id}/ics', name: 'app_event_ics', methods: ['GET'])]
+    public function icsExport(Event $event): Response
+    {
+        $dtStart = $event->isWeekly() ? $event->getStartTime() : $event->getStartAt();
+        $dtEnd = $event->isWeekly() ? $event->getEndTime() : $event->getEndAt();
+
+        if (!$dtStart) {
+            $this->addFlash('error', 'Impossible de générer le calendrier (dates manquantes).');
+            return $this->redirectToRoute('app_event_user_show', ['id' => $event->getId()]);
+        }
+
+        $ics = [
+            "BEGIN:VCALENDAR",
+            "VERSION:2.0",
+            "PRODID:-//Maternia//Event Calendar//FR",
+            "BEGIN:VEVENT",
+            "UID:" . uniqid() . "@maternia.com",
+            "DTSTAMP:" . date('Ymd\THis\Z'),
+            "DTSTART:" . $dtStart->format('Ymd\THis\Z'),
+            "DTEND:" . ($dtEnd ? $dtEnd->format('Ymd\THis\Z') : $dtStart->format('Ymd\THis\Z')),
+            "SUMMARY:" . $event->getTitle(),
+            "DESCRIPTION:" . str_replace(["\r", "\n"], ["", "\\n"], $event->getDescription()),
+            "LOCATION:" . $event->getLocation(),
+            "END:VEVENT",
+            "END:VCALENDAR"
+        ];
+
+        $response = new Response(implode("\r\n", $ics));
+        $response->headers->set('Content-Type', 'text/calendar; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="event-' . $event->getId() . '.ics"');
+
+        return $response;
+    }
+
+    #[Route('/attendance/{id}/pass', name: 'app_attendance_pass', methods: ['GET'])]
+    public function attendancePass(Attendance $attendance): Response
+    {
+        return $this->render('event/attendance_pass.html.twig', [
+            'attendance' => $attendance,
+            'event' => $attendance->getEvent(),
+            'user' => $attendance->getUser(),
+        ]);
+    }
+
     #[Route('/admin/attendance/{id}/remove', name: 'admin_attendance_remove', methods: ['POST'])]
     public function removeParticipant(Request $request, Attendance $attendance, EntityManagerInterface $entityManager): Response
     {
-        // Note: Strict ROLE_ADMIN check removed to allow the administrator to manage attendance
-        // Access should be handled at the firewall level for the /admin prefix.
 
         $eventId = $attendance->getEvent()->getId();
 

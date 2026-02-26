@@ -1,0 +1,72 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block body %}
+    <h2 style="color: #111827; margin-top: 0;">Super nouvelle ! Votre participation est confirmée.</h2>
+    <p>Bonjour {{ user.prenom }} {{ user.nom }},</p>
+    <p>Nous sommes ravis de vous confirmer que votre place est réservée pour l'événement suivant. Voici tous les détails pour vous préparer au mieux :</p>
+    
+    <div class="event-card">
+        <div class="badge badge-pink">{{ event.eventCat ? event.eventCat.name : 'Événement' }}</div>
+        <h3 style="margin: 0 0 15px 0; color: #ec4899; font-size: 20px;">{{ event.title }}</h3>
+        
+        <div class="event-info">
+            <strong>Date :</strong>
+            <span>
+                {% if event.isWeekly %}
+                    Tous les {{ event.dayOfWeek|trans }} à {{ event.startTime|date('H:i') }}
+                {% else %}
+                    Le {{ event.startAt|date('d/m/Y') }} à {{ event.startAt|date('H:i') }}
+                {% endif %}
+            </span>
+        </div>
+        
+        <div class="event-info">
+            <strong>Lieu :</strong>
+            <span>{{ event.location }}</span>
+        </div>
+        
+        {% if event.requirements is not empty %}
+            <div style="margin-top: 15px; background: #fff1f2; padding: 12px; border-radius: 6px; border: 1px solid #fecdd3;">
+                <strong style="color: #e11d48; display: block; margin-bottom: 5px;">⚠️ Prérequis :</strong>
+                <ul style="margin: 0; padding-left: 20px; color: #4b5563; font-size: 14px;">
+                    {% for req in event.requirements %}
+                        <li>{{ req.name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {% if event.description %}
+            <div style="margin-top: 15px; font-style: italic; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 10px;">
+                {{ event.description|nl2br }}
+            </div>
+        {% endif %}
+    </div>
+
+    <div style="text-align: center; margin: 30px 0; background: #fdf2f8; padding: 25px; border-radius: 12px; border: 2px dashed #f9a8d4;">
+        <h4 style="margin: 0 0 15px 0; color: #831843;">Votre Passe d'Entrée Digitale</h4>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ url('app_attendance_pass', {id: attendance.id})|url_encode }}" 
+             alt="QR Code" 
+             style="width: 150px; height: 150px; border-radius: 10px; margin-bottom: 15px; border: 4px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+        <div style="margin-top: 10px;">
+            <a href="{{ url('app_attendance_pass', {id: attendance.id}) }}" class="btn">Télécharger / Voir mon pass</a>
+        </div>
+        <p style="font-size: 12px; color: #9d174d; margin-top: 10px;">Présentez ce code à l'entrée de l'événement.</p>
+    </div>
+
+    <div style="text-align: center;">
+        <a href="{{ url('app_event_user_show', {id: event.id}) }}" style="color: #6b7280; font-size: 14px; text-decoration: none;">Voir les détails de l'événement</a>
+    </div>
+
+    <p style="text-align: center; margin-top: 10px;">
+        <a href="https://www.google.com/maps/search/?api=1&query={{ event.location|url_encode }}" style="color: #ec4899; font-size: 14px; text-decoration: underline;">
+            📍 Ouvrir dans Google Maps
+        </a>
+    </p>
+
+    <hr>
+    
+    <p style="font-size: 14px;"><strong>Note importante :</strong> Si vous ne pouvez plus venir, merci de vous désinscrire directement sur le site pour libérer la place pour un autre parent.</p>
+    
+    <p>À très bientôt,<br>L'équipe Maternia</p>
+{% endblock %}

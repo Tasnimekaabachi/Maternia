@@ -1,6 +1,28 @@
-{% form_theme form 'bootstrap_5_layout.html.twig' %}
+{% block stylesheets %}
+    <style>
+        .map-picker-header { background: var(--light-pink); padding: 0.5rem 1rem; border-radius: 8px 8px 0 0; }
+        .btn-light-pink { background: var(--light-pink); color: var(--primary-pink); border: 1px solid var(--medium-pink); }
+        .btn-light-pink:hover { background: var(--medium-pink); color: var(--dark-pink); }
+        #location-map { transition: opacity 0.3s ease; height: 350px; width: 100%; border-radius: 0 0 12px 12px; border: 2px solid var(--light-pink); z-index: 10; }
+        .invalid-feedback, .alert-danger, .text-danger, ul li { color: #dc3545 !important; }
+        .form-group ul { list-style: none; padding-left: 0; margin-top: 5px; }
+    </style>
+{% endblock %}
 
 {{ form_start(form, {'attr': {'class': 'event-form', 'id': 'event-form', 'novalidate': 'novalidate'}}) }}
+
+{% if not form.vars.valid %}
+    <div class="alert alert-danger mb-4 shadow-sm border-0" style="border-radius: 12px;">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-circle fa-2x me-3"></i>
+            <div>
+                <h5 class="alert-heading mb-1">Attention</h5>
+                <p class="mb-0">Veuillez corriger les erreurs dans le formulaire pour continuer.</p>
+                {{ form_errors(form) }}
+            </div>
+        </div>
+    </div>
+{% endif %}
 
 <div class="form-sections">
     <!-- Section 1: Informations de base -->
@@ -196,6 +218,7 @@
                                 {{ form_widget(form.dayOfWeek, {'attr': {'class': 'form-select'}}) }}
                                 <i class="fas fa-chevron-down select-arrow"></i>
                             </div>
+                            {{ form_errors(form.dayOfWeek) }}
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -205,6 +228,7 @@
                                 {{ form_widget(form.startTime, {'attr': {'class': 'form-control'}}) }}
                                 <i class="fas fa-clock input-icon"></i>
                             </div>
+                            {{ form_errors(form.startTime) }}
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -214,6 +238,7 @@
                                 {{ form_widget(form.endTime, {'attr': {'class': 'form-control'}}) }}
                                 <i class="fas fa-clock input-icon"></i>
                             </div>
+                            {{ form_errors(form.endTime) }}
                         </div>
                     </div>
                 </div>
@@ -302,18 +327,76 @@
         <div class="section-content">
             <div class="form-group">
                 {{ form_label(form.location, 'Lieu', {'label_attr': {'class': 'form-label'}}) }}
-                <div class="input-with-icon">
-                    {{ form_widget(form.location, {'attr': {
-                        'class': 'form-control ' ~ (form.location.vars.valid ? '' : 'is-invalid'),
-                        'placeholder': 'Adresse complète ou lien de visioconférence'
-                    }}) }}
-                    <i class="fas fa-search-location input-icon"></i>
+                <div class="input-with-button">
+                    {{ form_widget(form.location, {'attr': {'class': 'form-control', 'placeholder': 'ex: Salle A, Rez-de-chaussée', 'id': 'event_location_input'}}) }}
+                    <button class="btn btn-integrated" type="button" id="toggle-map-picker" 
+                            title="Choisir sur la carte">
+                        <i class="fas fa-map-marked-alt"></i> Carte
+                    </button>
+                </div>
+                
+                <div id="map-picker-container" style="display: none; margin-top: 1rem;">
+                    <div class="map-picker-header mb-2 d-flex justify-content-between align-items-center">
+                        <span class="text-xs text-muted"><i class="fas fa-info-circle me-1"></i> Cliquez ou déplacez le marqueur pour définir l'adresse</span>
+                        <button type="button" class="btn btn-sm btn-light-pink rounded-pill" id="close-map-picker">Fermer</button>
+                    </div>
+                    <div id="location-map" style="height: 300px; width: 100%; border-radius: 12px; border: 2px solid var(--light-pink); z-index: 10;"></div>
                 </div>
                 <div class="form-hint">
                     <i class="fas fa-info-circle"></i>
                     <span>Entrez une adresse physique ou un lien pour un événement en ligne</span>
                 </div>
                 {{ form_errors(form.location) }}
+            </div>
+
+            <!-- Indoor/Outdoor Toggle & Weather -->
+            <div class="form-group mt-4" id="outdoor-section">
+                <div class="mode-selector">
+                    <div class="form-check form-switch custom-switch-large reversed-layout">
+                        <span class="custom-switch-text fw-bold">Événement en extérieur ?</span>
+                        {{ form_widget(form.isOutdoor, {'label': false, 'attr': {'class': 'form-check-input', 'id': 'outdoor-toggle'}}) }}
+                    </div>
+                </div>
+                
+                <div id="weather-widget-container" style="display: none; margin-top: 1rem;">
+                    <div class="weather-widget premium-weather-card">
+                        <div class="weather-card-header">
+                            <span class="weather-title"><i class="fas fa-cloud-sun me-2"></i>Météo prévue</span>
+                            <span id="weather-date" class="weather-date-badge"></span>
+                        </div>
+                        <div class="weather-card-body">
+                            <div id="weather-loading" class="text-center py-3">
+                                <div class="spinner-border text-pink spinner-border-sm" role="status"></div>
+                                <span class="ms-2">Chargement de la météo...</span>
+                            </div>
+                            <div id="weather-data" style="display: none;">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="weather-main">
+                                        <img id="weather-icon" src="" alt="Icon" />
+                                        <div class="weather-temp-group">
+                                            <span id="weather-temp" class="weather-temp">--°C</span>
+                                            <span id="weather-desc" class="weather-desc">--</span>
+                                        </div>
+                                    </div>
+                                    <div class="weather-details">
+                                        <div class="weather-detail-item">
+                                            <i class="fas fa-tint"></i>
+                                            <span id="weather-humidity">--%</span>
+                                        </div>
+                                        <div class="weather-detail-item">
+                                            <i class="fas fa-wind"></i>
+                                            <span id="weather-wind">-- km/h</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="weather-error" class="alert alert-soft-danger py-2 mb-0 mt-2" style="display: none; font-size: 0.85rem;">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                <span id="weather-error-msg">Impossible de récupérer la météo.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -810,6 +893,46 @@
     padding-left: 2.75rem;
 }
 
+/* Input with Integrated Button */
+.input-with-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-with-button .form-control {
+    padding-right: 6rem;
+}
+
+.input-with-button .btn-integrated {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: var(--light-pink);
+    color: var(--primary-pink);
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border-radius: 8px;
+    z-index: 4;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.input-with-button .btn-integrated:hover {
+    background: var(--medium-pink);
+    color: var(--dark-pink);
+    transform: translateY(-50%) scale(1.02);
+}
+
+.input-with-button .btn-integrated i {
+    font-size: 0.9rem;
+}
+
 /* Form Hints */
 .form-hint {
     display: flex;
@@ -951,6 +1074,93 @@
     padding-left: 0.5rem;
     padding-right: 0.5rem;
 }
+
+/* Premium Weather Card Styling */
+.premium-weather-card {
+    background: white;
+    border-radius: 16px;
+    border: 2px solid var(--light-pink);
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.premium-weather-card:hover {
+    box-shadow: 0 10px 15px -3px rgba(236, 72, 153, 0.1);
+    border-color: var(--medium-pink);
+}
+
+.weather-card-header {
+    background: var(--light-pink);
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--medium-pink);
+}
+
+.weather-title {
+    font-weight: 700;
+    color: var(--dark-pink);
+    font-size: 0.95rem;
+}
+
+.weather-date-badge {
+    background: white;
+    color: var(--primary-pink);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.weather-card-body {
+    padding: 1.25rem;
+}
+
+.weather-main {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.weather-temp-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.weather-temp {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-dark);
+}
+
+.weather-desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-transform: capitalize;
+}
+
+.weather-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.weather-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.weather-detail-item i {
+    color: var(--primary-pink);
+    width: 16px;
+}
+
 
 /* Make sure form controls are properly sized on mobile */
 @media (max-width: 576px) {
@@ -1136,26 +1346,40 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Maternia Form: Initializing all scripts...');
 
-    // 1. Weekly Toggle Logic
+    // ===== 1. Weekly Toggle Logic =====
     const isWeeklyToggle = document.getElementById('is-weekly-toggle') || document.querySelector('[name*="[isWeekly]"]');
     const dateSection = document.getElementById('date-selection-section');
     const weeklySection = document.getElementById('weekly-selection-section');
     const startAtInput = document.querySelector('[name*="[startAt]"]');
     const endAtInput = document.querySelector('[name*="[endAt]"]');
+    const dayOfWeekSelect = document.querySelector('[name*="[dayOfWeek]"]');
+    const startTimeInput = document.querySelector('[name*="[startTime]"]');
+    const endTimeInput = document.querySelector('[name*="[endTime]"]');
 
     function toggleSections() {
         if (!isWeeklyToggle) return;
         const isChecked = isWeeklyToggle.checked;
+        const outdoorSection = document.getElementById('outdoor-section');
         if (isChecked) {
             if (dateSection) dateSection.style.display = 'none';
             if (weeklySection) weeklySection.style.display = 'block';
-            if (startAtInput) startAtInput.required = false;
-            if (endAtInput) endAtInput.required = false;
+            if (startAtInput) { startAtInput.required = false; startAtInput.value = ''; }
+            if (endAtInput) { endAtInput.required = false; endAtInput.value = ''; }
+            if (dayOfWeekSelect) dayOfWeekSelect.required = true;
+            if (startTimeInput) startTimeInput.required = true;
+            if (endTimeInput) endTimeInput.required = true;
+            // Hide outdoor/weather for weekly events (no specific date)
+            if (outdoorSection) outdoorSection.style.display = 'none';
         } else {
             if (dateSection) dateSection.style.display = 'block';
             if (weeklySection) weeklySection.style.display = 'none';
             if (startAtInput) startAtInput.required = true;
             if (endAtInput) endAtInput.required = true;
+            if (dayOfWeekSelect) { dayOfWeekSelect.required = false; dayOfWeekSelect.value = ''; }
+            if (startTimeInput) { startTimeInput.required = false; startTimeInput.value = ''; }
+            if (endTimeInput) { endTimeInput.required = false; endTimeInput.value = ''; }
+            // Show outdoor/weather for one-time events
+            if (outdoorSection) outdoorSection.style.display = 'block';
         }
         updateDuration();
     }
@@ -1163,7 +1387,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (isWeeklyToggle) {
         isWeeklyToggle.addEventListener('change', toggleSections);
         isWeeklyToggle.addEventListener('click', toggleSections);
-        toggleSections();
+        toggleSections(); // Initial state
     }
 
     // 2. Requirements Toggle Logic
@@ -1212,7 +1436,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     initRequirementsToggle();
 
-    // 3. Image Gallery Logic
     function initImageGallery() {
         const galleryContainer = document.querySelector('.gallery-grid');
         const selectedImageInput = document.getElementById('event_selectedImage');
@@ -1236,7 +1459,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     initImageGallery();
 
-    // 4. Flatpickr & Duration Logic
     function updateDuration() {
         const isWeekly = isWeeklyToggle && isWeeklyToggle.checked;
         const durationValue = document.getElementById('duration-value');
@@ -1265,7 +1487,15 @@ document.addEventListener('DOMContentLoaded', function() {
             dateFormat: "Y-m-d H:i",
             time_24hr: true,
             locale: "fr",
-            onChange: updateDuration
+            onChange: function() {
+                updateDuration();
+                if (input.name && input.name.includes('startAt')) {
+                    const outdoorToggle = document.getElementById('outdoor-toggle');
+                    if (outdoorToggle && outdoorToggle.checked) {
+                        if (typeof fetchWeatherForLocation === 'function') fetchWeatherForLocation();
+                    }
+                }
+            }
         });
     });
 
@@ -1283,10 +1513,10 @@ document.addEventListener('DOMContentLoaded', function() {
         flatpickr(input, { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true, locale: "fr", onChange: updateDuration });
     });
 
-    // 5. Misc Logic
     const desc = document.querySelector('[name*="description"]');
     if (desc) {
-        const counter = desc.closest('.form-group').querySelector('.char-counter');
+        const formGroup = desc.closest('.form-group');
+        const counter = formGroup ? formGroup.querySelector('.char-counter') : null;
         if (counter) {
             desc.addEventListener('input', () => { counter.textContent = `${desc.value.length}/1000`; });
             counter.textContent = `${desc.value.length}/1000`;
@@ -1303,6 +1533,352 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    const locationInput = document.getElementById('event_location_input') || document.querySelector('[name*="[location]"]');
+    const outdoorToggle = document.getElementById('outdoor-toggle') || document.querySelector('.indoor-toggle') || document.querySelector('[name*="[isOutdoor]"]');
+    const weatherContainer = document.getElementById('weather-widget-container');
+
+    let selectedLat = null;
+    let selectedLng = null;
+
+    const wmoDescriptions = {
+        0: 'Ciel dégagé', 1: 'Principalement dégagé', 2: 'Partiellement nuageux', 3: 'Couvert',
+        45: 'Brouillard', 48: 'Brouillard givrant',
+        51: 'Bruine légère', 53: 'Bruine modérée', 55: 'Bruine forte',
+        61: 'Pluie légère', 63: 'Pluie modérée', 65: 'Pluie forte',
+        71: 'Neige légère', 73: 'Neige modérée', 75: 'Neige forte',
+        80: 'Averses légères', 81: 'Averses modérées', 82: 'Averses violentes',
+        95: 'Orage', 96: 'Orage avec grêle légère', 99: 'Orage avec grêle forte'
+    };
+
+    function wmoToIcon(code, isDay) {
+        const prefix = isDay ? 'd' : 'n';
+        if (code === 0) return '01' + prefix;
+        if (code <= 2) return '02' + prefix;
+        if (code === 3) return '04' + prefix;
+        if (code <= 48) return '50' + prefix;
+        if (code <= 55) return '09' + prefix;
+        if (code <= 65) return '10' + prefix;
+        if (code <= 75) return '13' + prefix;
+        if (code <= 82) return '09' + prefix;
+        return '11' + prefix;
+    }
+
+    function displayWeatherData(data, dateLabel) {
+        if (!document.getElementById('weather-temp')) return;
+        document.getElementById('weather-temp').textContent = Math.round(data.temp) + '°C';
+        document.getElementById('weather-desc').textContent = data.desc;
+        document.getElementById('weather-humidity').textContent = Math.round(data.humidity) + '%';
+        document.getElementById('weather-wind').textContent = Math.round(data.wind) + ' km/h';
+        document.getElementById('weather-icon').src = `https://openweathermap.org/img/wn/${data.icon}@2x.png`;
+        
+        if (dateLabel) {
+            document.getElementById('weather-date').textContent = dateLabel;
+        } else {
+            document.getElementById('weather-date').textContent = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+        }
+
+        document.getElementById('weather-loading').style.display = 'none';
+        document.getElementById('weather-data').style.display = 'block';
+    }
+
+    // Get the event start date and time from the form for weather forecast
+    function getEventDateTime() {
+        const isWeeklyToggle = document.getElementById('is-weekly-toggle');
+        const isWeekly = isWeeklyToggle && isWeeklyToggle.checked;
+        
+        if (isWeekly) {
+            const daySelect = document.querySelector('select[name*="dayOfWeek"]');
+            const timeInput = document.querySelector('input[name*="startTime"]');
+            
+            if (daySelect && daySelect.value && timeInput && timeInput.value) {
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                const targetDay = days.indexOf(daySelect.value);
+                
+                if (targetDay !== -1) {
+                    const now = new Date();
+                    const resultDate = new Date();
+                    // Move to the next occurrence of this day
+                    let diff = (targetDay - now.getDay() + 7) % 7;
+                    // If it's today but the time has passed, move to next week
+                    const hour = parseInt(timeInput.value.split(':')[0], 10);
+                    if (diff === 0 && hour <= now.getHours()) {
+                        diff = 7;
+                    }
+                    resultDate.setDate(now.getDate() + diff);
+                    
+                    const dateStr = resultDate.toISOString().split('T')[0];
+                    return { date: dateStr, hour: hour };
+                }
+            }
+        } else {
+            const startInput = document.querySelector('[name*="[startAt]"]');
+            if (startInput && startInput.value) {
+                const parts = startInput.value.split(' '); // "YYYY-MM-DD HH:MM"
+                const dateStr = parts[0];
+                const timeStr = parts[1] || null;
+                if (dateStr && dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    const hour = timeStr ? parseInt(timeStr.split(':')[0], 10) : null;
+                    return { date: dateStr, hour: hour };
+                }
+            }
+        }
+        return null;
+    }
+
+    async function fetchWeatherByCoords(lat, lon) {
+        if (!document.getElementById('weather-loading')) return;
+        document.getElementById('weather-loading').style.display = 'block';
+        document.getElementById('weather-data').style.display = 'none';
+        const errorEl = document.getElementById('weather-error');
+        if (errorEl) errorEl.style.display = 'none';
+
+        try {
+            const eventDT = getEventDateTime();
+            let url;
+            if (eventDT) {
+                // Hourly forecast for the specific event date
+                url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,is_day&start_date=${eventDT.date}&end_date=${eventDT.date}&timezone=auto`;
+            } else {
+                // No date set yet, show current weather
+                url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,is_day&timezone=auto`;
+            }
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data.hourly && data.hourly.time && data.hourly.time.length > 0) {
+                // Find the closest hour to the event start time
+                const targetHour = (eventDT && eventDT.hour !== null) ? eventDT.hour : 12;
+                const h = data.hourly;
+                // Hours are 0-23 in the array for that day
+                const idx = Math.min(targetHour, h.time.length - 1);
+                
+                // Format the date + time label
+                const dateObj = new Date(eventDT.date + 'T12:00:00');
+                const datePart = dateObj.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                const dateLabel = `${datePart} à ${targetHour}h`;
+
+                displayWeatherData({
+                    temp: h.temperature_2m[idx],
+                    desc: wmoDescriptions[h.weather_code[idx]] || 'Inconnu',
+                    humidity: h.relative_humidity_2m[idx],
+                    wind: h.wind_speed_10m[idx],
+                    icon: wmoToIcon(h.weather_code[idx], h.is_day[idx] === 1)
+                }, dateLabel);
+            } else if (data.current) {
+                const c = data.current;
+                displayWeatherData({
+                    temp: c.temperature_2m,
+                    desc: wmoDescriptions[c.weather_code] || 'Inconnu',
+                    humidity: c.relative_humidity_2m,
+                    wind: c.wind_speed_10m,
+                    icon: wmoToIcon(c.weather_code, c.is_day === 1)
+                });
+            } else {
+                throw new Error('Données météo indisponibles');
+            }
+        } catch (error) {
+            document.getElementById('weather-loading').style.display = 'none';
+            if (errorEl) {
+                errorEl.style.display = 'block';
+                const errorMsg = document.getElementById('weather-error-msg');
+                if (errorMsg) errorMsg.textContent = error.message;
+            }
+        }
+    }
+
+    async function fetchWeatherForLocation() {
+        // Priority 1: Use coordinates from the map marker
+        if (selectedLat && selectedLng) {
+            fetchWeatherByCoords(selectedLat, selectedLng);
+            return;
+        }
+
+        // Priority 2: Geocode the text in the location input
+        if (locationInput && locationInput.value && locationInput.value.trim()) {
+            try {
+                const geoUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationInput.value)}&limit=1`;
+                const geoResponse = await fetch(geoUrl);
+                const geoData = await geoResponse.json();
+                if (geoData.length > 0) {
+                    fetchWeatherByCoords(parseFloat(geoData[0].lat), parseFloat(geoData[0].lon));
+                    return;
+                }
+            } catch (err) {
+                console.error('Geocoding for weather failed:', err);
+            }
+        }
+
+        // Priority 3: Default to Tunis
+        fetchWeatherByCoords(36.8065, 10.1815);
+    }
+
+    function toggleWeatherWidget() {
+        if (!weatherContainer) return;
+        if (outdoorToggle && outdoorToggle.checked) {
+            weatherContainer.style.display = 'block';
+            fetchWeatherForLocation();
+        } else {
+            weatherContainer.style.display = 'none';
+        }
+    }
+
+    if (outdoorToggle) {
+        outdoorToggle.addEventListener('change', toggleWeatherWidget);
+        toggleWeatherWidget();
+    }
+
+    // Update weather when location or time/date changes
+    if (locationInput) {
+        locationInput.addEventListener('change', () => {
+            if (outdoorToggle && outdoorToggle.checked) fetchWeatherForLocation();
+        });
+    }
+
+    // Refresh weather when date or time changes
+    document.querySelectorAll('input[name*="startAt"], select[name*="dayOfWeek"], input[name*="startTime"]').forEach(el => {
+        el.addEventListener('change', () => {
+            if (outdoorToggle && outdoorToggle.checked) fetchWeatherForLocation();
+        });
+    });
+
+
+    // 7. Leaflet Map Picker Logic
+    const toggleMapBtn = document.getElementById('toggle-map-picker');
+    const closeMapBtn = document.getElementById('close-map-picker');
+    const mapPickerContainer = document.getElementById('map-picker-container');
+    const mapDiv = document.getElementById('location-map');
+    
+    console.log('MAP DEBUG: toggleMapBtn =', toggleMapBtn);
+    console.log('MAP DEBUG: closeMapBtn =', closeMapBtn);
+    console.log('MAP DEBUG: mapPickerContainer =', mapPickerContainer);
+    console.log('MAP DEBUG: mapDiv =', mapDiv);
+
+    let leafletMap, leafletMarker;
+
+    function initLeafletMap() {
+        console.log('MAP DEBUG: initLeafletMap called, leafletMap =', leafletMap);
+        if (leafletMap) return;
+
+        // Fix default marker icon (broken when Leaflet loaded via CDN)
+        delete L.Icon.Default.prototype._getIconUrl;
+        L.Icon.Default.mergeOptions({
+            iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+        });
+
+        const initialPos = [36.8065, 10.1815]; // Tunis
+        
+        leafletMap = L.map('location-map').setView(initialPos, 13);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+        }).addTo(leafletMap);
+
+        leafletMarker = L.marker(initialPos, {
+            draggable: true
+        }).addTo(leafletMap);
+
+        // Click on map to move marker
+        leafletMap.on('click', (e) => {
+            updatePosition(e.latlng.lat, e.latlng.lng);
+        });
+
+        // Drag end handler
+        leafletMarker.on('dragend', () => {
+            const pos = leafletMarker.getLatLng();
+            updatePosition(pos.lat, pos.lng);
+        });
+        
+        console.log('MAP DEBUG: Leaflet map initialized successfully');
+    }
+
+    function updatePosition(lat, lng) {
+        leafletMarker.setLatLng([lat, lng]);
+        leafletMap.panTo([lat, lng]);
+
+        // Store coordinates for weather
+        selectedLat = lat;
+        selectedLng = lng;
+        
+        // Use Nominatim for reverse geocoding
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.display_name) {
+                    locationInput.value = data.display_name;
+                    locationInput.dispatchEvent(new Event('change'));
+                }
+            })
+            .catch(err => console.error('Geocoding error:', err));
+
+        // Auto-update weather when location changes on map
+        if (outdoorToggle && outdoorToggle.checked) {
+            fetchWeatherByCoords(lat, lng);
+        }
+    }
+
+    function loadLeafletScript() {
+        console.log('MAP DEBUG: loadLeafletScript called, window.L =', !!window.L);
+        if (window.L) {
+            initLeafletMap();
+            setTimeout(() => leafletMap.invalidateSize(), 100);
+            return;
+        }
+
+        // Add Leaflet CSS
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/leaflet/dist/leaflet.css';
+        document.head.appendChild(link);
+
+        // Add Leaflet JS
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/leaflet/dist/leaflet.js';
+        script.onload = () => {
+            console.log('MAP DEBUG: Leaflet script loaded, L =', !!window.L);
+            initLeafletMap();
+            setTimeout(() => leafletMap.invalidateSize(), 200);
+        };
+        script.onerror = (err) => {
+            console.error('MAP DEBUG: Failed to load Leaflet script!', err);
+        };
+        document.head.appendChild(script);
+    }
+
+    if (toggleMapBtn) {
+        console.log('MAP DEBUG: Attaching click listener to toggleMapBtn');
+        toggleMapBtn.addEventListener('click', function () {
+            console.log('MAP DEBUG: Carte button CLICKED!');
+            if (!mapPickerContainer) {
+                console.error('MAP DEBUG: mapPickerContainer is null!');
+                return;
+            }
+
+            mapPickerContainer.style.display = 'block';
+            console.log('MAP DEBUG: container shown, loading leaflet...');
+
+            loadLeafletScript();
+
+            setTimeout(() => {
+                if (leafletMap) {
+                    leafletMap.invalidateSize();
+                    console.log('MAP DEBUG: invalidateSize called');
+                }
+            }, 300);
+        });
+    } else {
+        console.error('MAP DEBUG: toggleMapBtn NOT FOUND! Button with id="toggle-map-picker" missing from DOM.');
+    }
+
+    if (closeMapBtn) {
+        closeMapBtn.addEventListener('click', function () {
+            if (!mapPickerContainer) return;
+            mapPickerContainer.style.display = 'none';
+        });
+    }
+
+    console.log('MAP DEBUG: Script fully initialized');
     updateDuration();
 });
 </script>

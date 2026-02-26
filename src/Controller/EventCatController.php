@@ -68,14 +68,12 @@ final class EventCatController extends AbstractController
         $response = new StreamedResponse(function () use ($eventCats) {
             $handle = fopen('php://output', 'w');
 
-            // Add BOM for Excel compatibility
             fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
-            // Header
             fputcsv($handle, ['ID', 'Nom', 'Description', 'Nombre d\'événements', 'Nombre de participants']);
 
             foreach ($eventCats as $cat) {
-                $eventCount = count($cat->getEvents()); // Direct access if public or use getter
+                $eventCount = count($cat->getEvents());
                 $participantCount = 0;
                 foreach ($cat->getEvents() as $event) {
                     $participantCount += count($event->getAttendances());

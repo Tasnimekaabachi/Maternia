@@ -40,13 +40,13 @@ class MailerService
         try {
             // Config SMTP (exemple Gmail)
             $mail->isSMTP();
-            $mail->Host       = 'smtp.gmail.com';
-            $mail->SMTPAuth   = true;
-            $mail->Username   = $fromEmail;
-            $mail->Password   = $fromPassword;
+            $mail->Host = 'smtp.gmail.com';
+            $mail->SMTPAuth = true;
+            $mail->Username = $fromEmail;
+            $mail->Password = $fromPassword;
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = 587;
-            $mail->CharSet    = 'UTF-8';
+            $mail->Port = 587;
+            $mail->CharSet = 'UTF-8';
 
             // Expéditeur / destinataire
             $mail->setFrom($fromEmail, 'Maternia');

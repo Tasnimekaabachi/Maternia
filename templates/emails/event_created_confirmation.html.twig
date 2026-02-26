@@ -1,0 +1,49 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block body %}
+    <h2 style="color: #111827; margin-top: 0;">Félicitations ! Votre événement est en ligne.</h2>
+    <p>Bonjour {{ user.prenom }} {{ user.nom }},</p>
+    <p>Nous sommes ravis de vous confirmer que votre événement <strong>"{{ event.title }}"</strong> a bien été créé sur Maternia. Il est désormais visible par toute la communauté !</p>
+    
+    <div class="event-card" style="border-left-color: #0ea5e9;">
+        <div class="badge" style="background-color: #e0f2fe; color: #0369a1;">{{ event.eventCat ? event.eventCat.name : 'VOTRE ÉVÉNEMENT' }}</div>
+        <h3 style="margin: 0 0 15px 0; color: #0ea5e9; font-size: 20px;">{{ event.title }}</h3>
+        
+        <div class="event-info">
+            <strong>Date :</strong>
+            <span>
+                {% if event.isWeekly %}
+                    Tous les {{ event.dayOfWeek|trans }} à {{ event.startTime|date('H:i') }}
+                {% else %}
+                    Le {{ event.startAt|date('d/m/Y') }} à {{ event.startAt|date('H:i') }}
+                {% endif %}
+            </span>
+        </div>
+        
+        <div class="event-info">
+            <strong>Lieu :</strong>
+            <span>{{ event.location }}</span>
+        </div>
+
+        {% if event.requirements is not empty %}
+            <div style="margin-top: 15px; border-top: 1px dashed #e5e7eb; padding-top: 10px;">
+                <strong style="font-size: 13px;">Prérequis listés :</strong>
+                <ul style="margin: 5px 0; padding-left: 20px; color: #6b7280; font-size: 13px;">
+                    {% for req in event.requirements %}
+                        <li>{{ req.name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+
+    <div style="text-align: center;">
+        <a href="{{ url('app_event_user_show', {id: event.id}) }}" class="btn" style="background-color: #0ea5e9;">Gérer mon événement</a>
+    </div>
+
+    <hr>
+    
+    <p style="font-size: 14px; color: #6b7280;">Vous pouvez suivre le nombre de participants et modifier les détails de votre événement à tout moment depuis votre tableau de bord.</p>
+    
+    <p>À très bientôt,<br>L'équipe Maternia</p>
+{% endblock %}
