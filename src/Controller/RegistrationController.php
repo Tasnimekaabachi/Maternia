@@ -1,52 +1,33 @@
 <?php
+// src/Controller/RegistrationController.php
 
 namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\RegistrationFormType;
-use App\Security\LoginFormAuthenticator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class RegistrationController extends AbstractController
 {
     #[Route('/register', name: 'app_register')]
-    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, Security $security, EntityManagerInterface $entityManager): Response
+    public function register(Request $request): Response
     {
+        // If already logged in, redirect to profile
+        if ($this->getUser()) {
+            return $this->redirectToRoute('app_user_profile');
+        }
+
         $user = new User();
         $user->setType('MAMAN');
         $form = $this->createForm(RegistrationFormType::class, $user);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-        /** @var User $user */
-        $user = $form->getData(); // This automatically fills nom, prenom, and email from the form
-
-            // encode the plain password
-           $user->setPassword(
-        $userPasswordHasher->hashPassword(
-            $user,
-            $form->get('plainPassword')->getData()
-        )
-    );
-    $user->setRoles(['ROLE_MAMAN']); 
-    $user->setType('MAMAN');
-
-            $entityManager->persist($user);
-            $entityManager->flush();
-
-            // do anything else you need here, like send an email
-
-            return $security->login($user, LoginFormAuthenticator::class, 'main');
-        }
         
         return $this->render('registration/register.html.twig', [
             'registrationForm' => $form,
+            'site_key' => $_ENV['RECAPTCHA_SITE_KEY'] ?? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
         ]);
     }
 }

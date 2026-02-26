@@ -1,9 +1,6 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-{# Chargement PRIORITAIRE de jQuery pour débloquer le site #}
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
 <div class="container mt-5">
     {# Affichage du message de succès après la mise à jour #}
     {% for message in app.flashes('success') %}
@@ -60,72 +57,292 @@
 
                 <div id="scan-view" style="display:none;">
                     <video id="v" width="320" height="320" autoplay muted playsinline style="border-radius: 50%; border: 6px solid #0d6efd; object-fit: cover;"></video>
-                    <h4 id="msg" class="mt-4 text-primary fw-bold">Prêt pour l'analyse...</h4>
+                    <div class="mt-4">
+                        <div class="spinner-border text-primary" role="status" id="loading-spinner" style="display:none;">
+                            <span class="visually-hidden">Chargement...</span>
+                        </div>
+                        <h4 id="msg" class="text-primary fw-bold">Prêt pour l'analyse...</h4>
+                        <button class="btn btn-outline-secondary btn-sm mt-2" id="cancel-scan">Annuler</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Load jQuery first, then Bootstrap -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-    $(document).ready(function() {
-        // Force la disparition du point rose de chargement
-        $('.spinner, #preloader, .loading').fadeOut();
+// Wait for both DOM and jQuery to be ready
+$(document).ready(function() {
+    console.log('Document ready');
+    
+    // Hide any loading spinners
+    $('.spinner, #preloader, .loading').fadeOut();
 
-        const btn = document.getElementById('start-camera');
-        if (btn) {
-            btn.onclick = async () => {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                    $('#setup-view').hide();
-                    $('#scan-view').show();
-                    document.getElementById('v').srcObject = stream;
-                    setTimeout(captureAndSend, 3000);
-                } catch (e) {
-                    alert("Caméra bloquée : " + e.message);
-                }
-            };
-        }
-    });
-
-    async function captureAndSend() {
-        const video = document.getElementById('v');
-        const msg = document.getElementById('msg');
-        const canvas = document.createElement('canvas');
-        
-        msg.innerText = "Analyse en cours...";
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0);
-
-        canvas.toBlob(blob => {
-            const fd = new FormData();
-            fd.append('photo', blob, 'face.jpg');
-
-            fetch("{{ path('app_enroll_face') }}", { method: "POST", body: fd })
-                .then(async response => {
-                    const contentType = response.headers.get("content-type");
-                    if (!response.ok || !contentType || !contentType.includes("application/json")) {
-                        const text = await response.text();
-                        console.error("Réponse serveur (Erreur 500) :", text);
-                        throw new Error("Erreur 500 : Le serveur n'a pas pu traiter l'image.");
-                    }
-                    return response.json();
-                })
-                .then(res => {
-                    if(res.success) {
-                        msg.innerHTML = "<span style='color:green'>Succès !</span>";
-                        setTimeout(() => location.reload(), 1500);
-                    } else {
-                        alert("Erreur : " + res.error);
-                        location.reload();
-                    }
-                })
-                .catch(err => {
-                    alert(err.message);
-                    location.reload();
+    const btn = document.getElementById('start-camera');
+    const cancelBtn = document.getElementById('cancel-scan');
+    
+    if (btn) {
+        btn.onclick = async () => {
+            console.log('Start camera clicked');
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        width: { ideal: 640 },
+                        height: { ideal: 640 },
+                        facingMode: 'user' 
+                    } 
                 });
-        }, 'image/jpeg');
+                
+                console.log('Camera stream obtained');
+                
+                document.getElementById('setup-view').style.display = 'none';
+                document.getElementById('scan-view').style.display = 'flex';
+                
+                const video = document.getElementById('v');
+                video.srcObject = stream;
+                
+                // Wait for video to be ready
+                video.onloadedmetadata = () => {
+                    console.log('Video metadata loaded');
+                    video.play();
+                    startCountdown();
+                };
+            } catch (e) {
+                console.error('Camera error:', e);
+                handleCameraError(e);
+            }
+        };
     }
+    
+    if (cancelBtn) {
+        cancelBtn.onclick = () => {
+            console.log('Cancel clicked');
+            resetToSetup();
+        };
+    }
+});
+
+function startCountdown() {
+    console.log('Starting countdown');
+    const msg = document.getElementById('msg');
+    let countdown = 3;
+    
+    msg.innerText = `Préparez-vous... ${countdown}`;
+    
+    const interval = setInterval(() => {
+        countdown--;
+        if (countdown > 0) {
+            msg.innerText = `Préparez-vous... ${countdown}`;
+        } else {
+            clearInterval(interval);
+            captureAndSend();
+        }
+    }, 1000);
+}
+
+// Replace your captureAndSend function with this:
+
+async function captureAndSend() {
+    console.log('Capturing and sending');
+    
+    const video = document.getElementById('v');
+    const msg = document.getElementById('msg');
+    const spinner = document.getElementById('loading-spinner');
+    
+    if (!video || !video.videoWidth) {
+        console.error('Video not available');
+        msg.innerText = "Erreur: Vidéo non disponible";
+        resetToSetup();
+        return;
+    }
+    
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    
+    // Reduce image size significantly
+    const maxSize = 480; // Smaller size
+    let width = video.videoWidth;
+    let height = video.videoHeight;
+    
+    if (width > maxSize || height > maxSize) {
+        if (width > height) {
+            height = Math.round((height / width) * maxSize);
+            width = maxSize;
+        } else {
+            width = Math.round((width / height) * maxSize);
+            height = maxSize;
+        }
+    }
+    
+    canvas.width = width;
+    canvas.height = height;
+    context.drawImage(video, 0, 0, width, height);
+
+    // Stop camera
+    const stream = video.srcObject;
+    if (stream) {
+        stream.getTracks().forEach(track => {
+            track.stop();
+            console.log('Camera track stopped');
+        });
+        video.srcObject = null;
+    }
+
+    // Show spinner
+    spinner.style.display = 'inline-block';
+    msg.innerText = "Envoi en cours...";
+
+    // Convert to JPEG with lower quality
+    canvas.toBlob(blob => {
+        console.log('Image blob created, size:', blob.size);
+        
+        const fd = new FormData();
+        fd.append('image', blob, 'face.jpg');
+
+        // Create abort controller for timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+            console.log('Request timeout');
+            controller.abort();
+        }, 15000); // 15 second timeout
+
+        fetch("{{ path('profile_enroll_face') }}", { 
+            method: "POST", 
+            body: fd,
+            signal: controller.signal
+        })
+        .then(async response => {
+            clearTimeout(timeoutId);
+            console.log('Response status:', response.status);
+            
+            const contentType = response.headers.get("content-type");
+            console.log('Content-Type:', contentType);
+            
+            if (!contentType || !contentType.includes("application/json")) {
+                const text = await response.text();
+                console.error("Non-JSON response:", text.substring(0, 200));
+                throw new Error("Erreur serveur : Réponse invalide");
+            }
+            
+            const data = await response.json();
+            console.log('Response data:', data);
+            
+            if (!response.ok) {
+                throw new Error(data.error || `Erreur serveur (${response.status})`);
+            }
+            
+            return data;
+        })
+        .then(res => {
+            spinner.style.display = 'none';
+            if(res.success) {
+                msg.innerHTML = "<span style='color:green'>✓ Succès !</span>";
+                if (res.mode === 'offline') {
+                    msg.innerHTML += "<br><small class='text-muted'>Mode hors ligne</small>";
+                }
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                throw new Error(res.error || "Erreur inconnue");
+            }
+        })
+        .catch(err => {
+            clearTimeout(timeoutId);
+            spinner.style.display = 'none';
+            
+            console.error("Erreur complète:", err);
+            
+            let errorMessage = err.message;
+            if (err.name === 'AbortError') {
+                errorMessage = "La requête a expiré. Veuillez réessayer.";
+            }
+            
+            msg.innerHTML = `<span style='color:red'>✗ Erreur</span><br><small class='text-muted'>${errorMessage}</small>`;
+            
+            // Offer retry option
+            setTimeout(() => {
+                if (confirm("Souhaitez-vous réessayer ?")) {
+                    resetToSetup();
+                    document.getElementById('start-camera').click();
+                } else {
+                    resetToSetup();
+                }
+            }, 2000);
+        });
+    }, 'image/jpeg', 0.7); // 70% quality
+}
+
+function handleCameraError(e) {
+    console.error("Camera error details:", e);
+    let message = "Erreur d'accès à la caméra : ";
+    
+    if (e.name === 'NotAllowedError') {
+        message += "Veuillez autoriser l'accès à la caméra dans les paramètres de votre navigateur.";
+    } else if (e.name === 'NotFoundError') {
+        message += "Aucune caméra n'a été trouvée sur votre appareil.";
+    } else if (e.name === 'NotReadableError') {
+        message += "La caméra est déjà utilisée par une autre application.";
+    } else if (e.name === 'OverconstrainedError') {
+        message += "Les paramètres de la caméra ne sont pas supportés.";
+    } else {
+        message += e.message;
+    }
+    
+    alert(message);
+    resetToSetup();
+}
+
+function resetToSetup() {
+    console.log('Resetting to setup view');
+    
+    // Reset UI
+    document.getElementById('scan-view').style.display = 'none';
+    document.getElementById('setup-view').style.display = 'block';
+    document.getElementById('loading-spinner').style.display = 'none';
+    
+    // Stop camera if active
+    const video = document.getElementById('v');
+    const stream = video.srcObject;
+    if (stream) {
+        stream.getTracks().forEach(track => {
+            track.stop();
+            console.log('Camera track stopped during reset');
+        });
+        video.srcObject = null;
+    }
+    
+    // Reset message
+    document.getElementById('msg').innerText = "Prêt pour l'analyse...";
+}
 </script>
+
+<style>
+#v {
+    transition: border-color 0.3s ease;
+    background: #f8f9fa;
+}
+#v.ready {
+    border-color: #28a745 !important;
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+}
+#loading-spinner {
+    margin-bottom: 10px;
+}
+#scan-view {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+</style>
 {% endblock %}

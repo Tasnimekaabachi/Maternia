@@ -52,7 +52,7 @@
 
         /* Enlarge on Hover and Focus */
         .form-control:hover, .form-control:focus {
-            transform: scale(1.03); /* This makes the field enlarge */
+            transform: scale(1.03);
             background-color: #ffffff !important;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
             z-index: 10;
@@ -63,7 +63,19 @@
             box-shadow: 0 0 0 4px rgba(240, 98, 146, 0.1) !important;
         }
 
-        /* Typography and Button remains consistent with reference */
+        /* Verification Code Input */
+        .verification-input {
+            font-size: 32px !important;
+            letter-spacing: 8px !important;
+            text-align: center;
+            font-weight: 700 !important;
+        }
+
+        .verification-input:hover, .verification-input:focus {
+            transform: scale(1.02);
+        }
+
+        /* Typography and Button */
         .welcome-title { color: #4a5568; font-weight: 700; font-size: 2rem; }
         .welcome-title span { color: #d53f8c; }
         .label-custom { font-size: 0.8rem; font-weight: 700; color: #718096; text-transform: uppercase; margin-bottom: 8px; display: block; }
@@ -85,6 +97,40 @@
             transform: scale(1.05);
             filter: brightness(1.1);
         }
+
+        .btn-outline-register {
+            background: transparent;
+            border: 2px solid #ff6b8b;
+            border-radius: 20px;
+            color: #ff6b8b;
+            font-weight: 600;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-register:hover {
+            background: #ff6b8b;
+            color: white;
+            transform: scale(1.02);
+        }
+
+        /* reCAPTCHA styling */
+        .g-recaptcha {
+            margin: 25px 0;
+            display: flex;
+            justify-content: center;
+            transform: scale(0.95);
+        }
+        
+        /* Alert styling */
+        .custom-alert {
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin: 20px 0;
+            background: linear-gradient(90deg, rgba(255,107,139,0.1) 0%, rgba(240,98,146,0.1) 100%);
+            border-left: 4px solid #ff6b8b;
+            color: #4a5568;
+        }
     </style>
 {% endblock %}
 
@@ -92,72 +138,452 @@
 <div class="register-page-wrapper">
     <div class="container d-flex justify-content-center">
         <div class="auth-card">
-            <div class="text-center mb-4">
+            <div id="step1" class="text-center mb-4">
                 <h2 class="welcome-title">Bienvenue <span>sur Maternia</span></h2>
                 <p class="text-muted small">L'aventure Maternia commence ici</p>
             </div>
 
-            {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate'}}) }}
-                {{ form_errors(registrationForm) }}
-                <div class="row g-3">
-                    <div class="col-6">
-                        <label class="label-custom">Nom</label>
-                        {{ form_widget(registrationForm.nom, {'attr': {'class': 'form-control', 'placeholder': 'Nom'}}) }}
-                        <div class="text-danger small mt-1">{{ form_errors(registrationForm.nom) }}</div>
-                    </div>
-                    <div class="col-6">
-                        <label class="label-custom">Prénom</label>
-                        {{ form_widget(registrationForm.prenom, {'attr': {'class': 'form-control', 'placeholder': 'Prénom'}}) }}
-                        <div class="text-danger small mt-1">{{ form_errors(registrationForm.prenom) }}</div>
-                    </div>
-                </div>
-
-                {# Catch-all for hidden errors (DEBUG) #}
-                {% if not registrationForm.vars.valid %}
-                    {% for child in registrationForm.children %}
-                        {% for error in child.vars.errors %}
-                            <div class="alert alert-warning py-2 px-3 small rounded-pill mb-1 border-0 shadow-sm" style="font-size: 0.75rem;">
-                                <i class="fas fa-search me-1"></i> {{ child.vars.label|default(child.vars.name) }} : {{ error.message }}
-                            </div>
-                        {% endfor %}
-                    {% endfor %}
-                {% endif %}
-
-                <div class="mt-4">
-                    <label class="label-custom">Email</label>
-                    {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'placeholder': 'Email'}}) }}
-                    <div class="text-danger small mt-1">{{ form_errors(registrationForm.email) }}</div>
-                </div>
-
-                <div class="mt-4">
-                    <label class="label-custom">Mot de passe</label>
-                    {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'placeholder': '••••••••'}}) }}
-                    <div class="text-danger small mt-1">{{ form_errors(registrationForm.plainPassword) }}</div>
-                </div>
-
-                <div class="mt-4">
-                    <div class="form-check custom-checkbox d-flex align-items-start p-0">
-                        <div class="me-3 mt-1">
-                            {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input ms-0'}}) }}
+            <!-- Step 1: Registration Form -->
+            <div id="step1-content">
+                {{ form_start(registrationForm, {'attr': {'id': 'registrationForm', 'novalidate': 'novalidate'}}) }}
+                    {{ form_errors(registrationForm) }}
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="label-custom">Nom</label>
+                            {{ form_widget(registrationForm.nom, {'attr': {'class': 'form-control', 'placeholder': 'Nom'}}) }}
+                            <div class="text-danger small mt-1">{{ form_errors(registrationForm.nom) }}</div>
                         </div>
-                        <label class="form-check-label text-muted" for="{{ registrationForm.agreeTerms.vars.id }}" style="font-size: 0.85rem; line-height: 1.4;">
-                            En m'inscrivant, j'accepte les 
-                            <a href="#" class="text-primary fw-bold text-decoration-none border-bottom border-primary border-2 pb-0">conditions d'utilisation</a> 
-                            et la <a href="#" class="text-primary fw-bold text-decoration-none border-bottom border-primary border-2 pb-0">politique de confidentialité</a> de Maternia.
-                        </label>
+                        <div class="col-6">
+                            <label class="label-custom">Prénom</label>
+                            {{ form_widget(registrationForm.prenom, {'attr': {'class': 'form-control', 'placeholder': 'Prénom'}}) }}
+                            <div class="text-danger small mt-1">{{ form_errors(registrationForm.prenom) }}</div>
+                        </div>
+                    </div>
+
+                    {# Catch-all for hidden errors #}
+                    {% if not registrationForm.vars.valid %}
+                        {% for child in registrationForm.children %}
+                            {% for error in child.vars.errors %}
+                                <div class="alert alert-warning py-2 px-3 small rounded-pill mb-1 border-0 shadow-sm" style="font-size: 0.75rem;">
+                                    <i class="fas fa-search me-1"></i> {{ child.vars.label|default(child.vars.name) }} : {{ error.message }}
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="mt-4">
+                        <label class="label-custom">Email</label>
+                        {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'placeholder': 'Email'}}) }}
+                        <div class="text-danger small mt-1">{{ form_errors(registrationForm.email) }}</div>
+                    </div>
+
+                    <div class="mt-4">
+                        <label class="label-custom">Mot de passe</label>
+                        {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'placeholder': '••••••••'}}) }}
+                        <div class="text-danger small mt-1">{{ form_errors(registrationForm.plainPassword) }}</div>
+                    </div>
+
+                    <div class="mt-4">
+                        <div class="form-check custom-checkbox d-flex align-items-start p-0">
+                            <div class="me-3 mt-1">
+                                {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input ms-0'}}) }}
+                            </div>
+                            <label class="form-check-label text-muted" for="{{ registrationForm.agreeTerms.vars.id }}" style="font-size: 0.85rem; line-height: 1.4;">
+                                En m'inscrivant, j'accepte les 
+                                <a href="#" class="text-primary fw-bold text-decoration-none border-bottom border-primary border-2 pb-0">conditions d'utilisation</a> 
+                                et la <a href="#" class="text-primary fw-bold text-decoration-none border-bottom border-primary border-2 pb-0">politique de confidentialité</a> de Maternia.
+                            </label>
+                        </div>
+                    </div>
+                    {% if registrationForm.agreeTerms.vars.errors|length > 0 %}
+                        <div class="invalid-feedback d-block small mt-1 ps-2">
+                            <i class="fas fa-exclamation-triangle me-1"></i> Veuillez accepter les conditions.
+                        </div>
+                    {% endif %}
+
+                    <!-- reCAPTCHA -->
+                    <div class="mt-4">
+                        <div class="g-recaptcha" data-sitekey="{{ site_key }}"></div>
+                    </div>
+
+                    <!-- Error containers -->
+                    <div id="recaptchaError" class="custom-alert d-none">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span></span>
+                    </div>
+                    
+                    <div id="formError" class="custom-alert d-none">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-register w-100 mt-5" id="submitBtn">
+                        CRÉER MON COMPTE <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                {{ form_end(registrationForm) }}
+            </div>
+
+            <!-- Step 2: Verification Code -->
+            <div id="step2-content" style="display: none;">
+                <div class="text-center mb-4">
+                    <h2 class="welcome-title">Vérification <span>Email</span></h2>
+                    <p class="text-muted small">Un code a été envoyé à <strong id="displayEmail" class="text-primary"></strong></p>
+                </div>
+
+                <div class="mt-5">
+                    <label class="label-custom text-center d-block mb-3">Code de vérification</label>
+                    <input type="text" class="form-control verification-input" 
+                           id="verificationCode" maxlength="6" placeholder="000000" 
+                           autocomplete="off">
+                    
+                    <div id="codeError" class="custom-alert d-none mt-3">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span></span>
+                    </div>
+
+                    <div class="mt-4">
+                        <button class="btn btn-register w-100" id="verifyBtn">
+                            VÉRIFIER <i class="fas fa-check ms-2"></i>
+                        </button>
+                    </div>
+
+                    <div class="row mt-4 g-2">
+                        <div class="col-6">
+                            <button class="btn btn-outline-register w-100" id="resendBtn">
+                                <i class="fas fa-redo me-2"></i>Renvoyer
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-register w-100" id="backBtn">
+                                <i class="fas fa-arrow-left me-2"></i>Modifier
+                            </button>
+                        </div>
                     </div>
                 </div>
-                {% if registrationForm.agreeTerms.vars.errors|length > 0 %}
-                    <div class="invalid-feedback d-block small mt-1 ps-2">
-                        <i class="fas fa-exclamation-triangle me-1"></i> Veuillez accepter les conditions.
-                    </div>
-                {% endif %}
-
-                <button type="submit" class="btn btn-register w-100 mt-5">
-                    CRÉER MON COMPTE <i class="fas fa-arrow-right ms-2"></i>
-                </button>
-            {{ form_end(registrationForm) }}
+            </div>
         </div>
     </div>
 </div>
+
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+<script>
+document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Get form values using the correct Symfony naming convention
+    // The form name is 'registration_form' by default, not 'registrationForm'
+    const nom = document.querySelector('[name="registration_form[nom]"]')?.value || '';
+    const prenom = document.querySelector('[name="registration_form[prenom]"]')?.value || '';
+    const email = document.querySelector('[name="registration_form[email]"]')?.value || '';
+    const password = document.querySelector('[name="registration_form[plainPassword]"]')?.value || '';
+    const agreeTerms = document.querySelector('[name="registration_form[agreeTerms]"]')?.checked || false;
+    const recaptcha = grecaptcha.getResponse();
+    
+    // Debug: Log values to console
+    console.log('Form values:', { nom, prenom, email, password, agreeTerms, recaptcha: recaptcha ? '✓' : '✗' });
+    
+    // Hide previous errors
+    document.getElementById('formError').classList.add('d-none');
+    document.getElementById('recaptchaError').classList.add('d-none');
+    
+    // Validate all fields are present
+    if (!nom || !prenom || !email || !password) {
+        showError('formError', 'Tous les champs sont requis.');
+        return;
+    }
+    
+    // Validate terms
+    if (!agreeTerms) {
+        showError('formError', 'Veuillez accepter les conditions d\'utilisation.');
+        return;
+    }
+    
+    // Validate password length
+    if (password.length < 6) {
+        showError('formError', 'Le mot de passe doit contenir au moins 6 caractères.');
+        return;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        showError('formError', 'Veuillez entrer un email valide.');
+        return;
+    }
+    
+    // Validate reCAPTCHA
+    if (!recaptcha) {
+        showError('recaptchaError', 'Veuillez vérifier que vous n\'êtes pas un robot.');
+        return;
+    }
+    
+    // Disable button and show loading
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'ENVOI EN COURS... <i class="fas fa-spinner fa-spin ms-2"></i>';
+    
+    try {
+        const response = await fetch('/register/send-code', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                nom, prenom, email, password,
+                recaptcha: recaptcha
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Switch to step 2
+            document.getElementById('step1-content').style.display = 'none';
+            document.getElementById('step2-content').style.display = 'block';
+            document.getElementById('displayEmail').textContent = email;
+            
+            // Store email for verification
+            window.pendingEmail = email;
+        } else {
+            showError('formError', data.error || 'Une erreur est survenue.');
+            grecaptcha.reset();
+        }
+    } catch (error) {
+        console.error('Fetch error:', error);
+        showError('formError', 'Erreur de connexion. Veuillez réessayer.');
+        grecaptcha.reset();
+    } finally {
+        // Restore button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'CRÉER MON COMPTE <i class="fas fa-arrow-right ms-2"></i>';
+    }
+});
+
+// Verification
+document.getElementById('verifyBtn').addEventListener('click', async () => {
+    const code = document.getElementById('verificationCode').value;
+    
+    if (!code || code.length !== 6 || !/^\d+$/.test(code)) {
+        showError('codeError', 'Veuillez entrer un code à 6 chiffres.');
+        return;
+    }
+    
+    const verifyBtn = document.getElementById('verifyBtn');
+    verifyBtn.disabled = true;
+    verifyBtn.innerHTML = 'VÉRIFICATION... <i class="fas fa-spinner fa-spin ms-2"></i>';
+    
+    try {
+        const response = await fetch('/register/verify-code', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                email: window.pendingEmail,
+                code: code
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            window.location.href = '/profile';
+        } else {
+            showError('codeError', data.error || 'Code invalide.');
+        }
+    } catch (error) {
+        console.error('Verify error:', error);
+        showError('codeError', 'Erreur de connexion.');
+    } finally {
+        verifyBtn.disabled = false;
+        verifyBtn.innerHTML = 'VÉRIFIER <i class="fas fa-check ms-2"></i>';
+    }
+});
+
+// Resend code
+document.getElementById('resendBtn').addEventListener('click', async () => {
+    const resendBtn = document.getElementById('resendBtn');
+    resendBtn.disabled = true;
+    resendBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>ENVOI...';
+    
+    try {
+        const response = await fetch('/register/resend-code', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                email: window.pendingEmail
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Show success message
+            const originalText = resendBtn.innerHTML;
+            resendBtn.innerHTML = '<i class="fas fa-check me-2"></i>ENVOYÉ!';
+            setTimeout(() => {
+                resendBtn.innerHTML = originalText;
+            }, 2000);
+        } else {
+            alert(data.error || 'Erreur lors de l\'envoi.');
+        }
+    } catch (error) {
+        console.error('Resend error:', error);
+        alert('Erreur de connexion.');
+    } finally {
+        resendBtn.disabled = false;
+    }
+});
+
+// Back button
+document.getElementById('backBtn').addEventListener('click', () => {
+    document.getElementById('step2-content').style.display = 'none';
+    document.getElementById('step1-content').style.display = 'block';
+    grecaptcha.reset();
+    document.getElementById('verificationCode').value = '';
+    document.getElementById('codeError').classList.add('d-none');
+});
+
+// Helper function to show errors
+function showError(elementId, message) {
+    const errorDiv = document.getElementById(elementId);
+    if (errorDiv) {
+        const span = errorDiv.querySelector('span');
+        if (span) span.textContent = message;
+        errorDiv.classList.remove('d-none');
+    } else {
+        console.error('Error element not found:', elementId);
+        alert(message);
+    }
+}
+
+// Debug: Log available form fields on page load
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Form fields found:');
+    const fields = [
+        '[name="registration_form[nom]"]',
+        '[name="registration_form[prenom]"]',
+        '[name="registration_form[email]"]',
+        '[name="registration_form[plainPassword]"]',
+        '[name="registration_form[agreeTerms]"]'
+    ];
+    fields.forEach(selector => {
+        const el = document.querySelector(selector);
+        console.log(`- ${selector}: ${el ? '✓' : '✗'}`);
+        if (el) {
+            console.log(`  Type: ${el.type}, Value: "${el.value || el.checked}"`);
+        }
+    });
+});
+</script>
+
+// Verification
+document.getElementById('verifyBtn').addEventListener('click', async () => {
+    const code = document.getElementById('verificationCode').value;
+    
+    if (!code || code.length !== 6 || !/^\d+$/.test(code)) {
+        showError('codeError', 'Veuillez entrer un code à 6 chiffres.');
+        return;
+    }
+    
+    const verifyBtn = document.getElementById('verifyBtn');
+    verifyBtn.disabled = true;
+    verifyBtn.innerHTML = 'VÉRIFICATION... <i class="fas fa-spinner fa-spin ms-2"></i>';
+    
+    try {
+        const response = await fetch('/register/verify-code', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                email: window.pendingEmail,
+                code: code
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            window.location.href = '/profile';
+        } else {
+            showError('codeError', data.error || 'Code invalide.');
+        }
+    } catch (error) {
+        console.error('Verify error:', error);
+        showError('codeError', 'Erreur de connexion.');
+    } finally {
+        verifyBtn.disabled = false;
+        verifyBtn.innerHTML = 'VÉRIFIER <i class="fas fa-check ms-2"></i>';
+    }
+});
+
+// Resend code
+document.getElementById('resendBtn').addEventListener('click', async () => {
+    const resendBtn = document.getElementById('resendBtn');
+    resendBtn.disabled = true;
+    resendBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>ENVOI...';
+    
+    try {
+        const response = await fetch('/register/resend-code', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                email: window.pendingEmail
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Show success message
+            const originalText = resendBtn.innerHTML;
+            resendBtn.innerHTML = '<i class="fas fa-check me-2"></i>ENVOYÉ!';
+            setTimeout(() => {
+                resendBtn.innerHTML = originalText;
+            }, 2000);
+        } else {
+            alert(data.error || 'Erreur lors de l\'envoi.');
+        }
+    } catch (error) {
+        console.error('Resend error:', error);
+        alert('Erreur de connexion.');
+    } finally {
+        resendBtn.disabled = false;
+    }
+});
+
+// Back button
+document.getElementById('backBtn').addEventListener('click', () => {
+    document.getElementById('step2-content').style.display = 'none';
+    document.getElementById('step1-content').style.display = 'block';
+    grecaptcha.reset();
+    document.getElementById('verificationCode').value = '';
+    document.getElementById('codeError').classList.add('d-none');
+});
+
+// Helper function to show errors
+function showError(elementId, message) {
+    const errorDiv = document.getElementById(elementId);
+    if (errorDiv) {
+        const span = errorDiv.querySelector('span');
+        if (span) span.textContent = message;
+        errorDiv.classList.remove('d-none');
+    } else {
+        console.error('Error element not found:', elementId);
+        alert(message);
+    }
+}
+
+// Debug: Log available form fields on page load
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Form fields found:');
+    const fields = [
+        '[name="registrationForm[nom]"]',
+        '[name="registrationForm[prenom]"]',
+        '[name="registrationForm[email]"]',
+        '[name="registrationForm[plainPassword]"]',
+        '[name="registrationForm[agreeTerms]"]'
+    ];
+    fields.forEach(selector => {
+        const el = document.querySelector(selector);
+        console.log(`- ${selector}: ${el ? '✓' : '✗'}`);
+    });
+});
+</script>
 {% endblock %}
