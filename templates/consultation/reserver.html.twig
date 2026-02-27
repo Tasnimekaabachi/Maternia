@@ -1001,33 +1001,123 @@ textarea.form-control {
     width: 60%; aspect-ratio: 3/4;
     position: relative;
     border-radius: 50%;
+    /* Nouveau design attirant */
+    border: 2px dashed rgba(164,93,226,0.3);
+    box-shadow: inset 0 0 30px rgba(164,93,226,0.1), 0 0 20px rgba(164,93,226,0.1);
+    animation: targetPulse 3s infinite alternate;
 }
+@keyframes targetPulse {
+    0% { border-color: rgba(164,93,226,0.2); transform: scale(0.98); }
+    100% { border-color: rgba(164,93,226,0.6); transform: scale(1.02); }
+}
+
 .face-corner {
     position: absolute;
-    width: 28px; height: 28px;
+    width: 35px; height: 35px;
     border-color: #A45DE2;
     border-style: solid;
+    filter: drop-shadow(0 0 8px rgba(164,93,226,0.8));
+    transition: all 0.4s ease;
+    z-index: 2;
 }
-.face-corner.tl { top:0; left:0; border-width:3px 0 0 3px; border-radius:6px 0 0 0; }
-.face-corner.tr { top:0; right:0; border-width:3px 3px 0 0; border-radius:0 6px 0 0; }
-.face-corner.bl { bottom:0; left:0; border-width:0 0 3px 3px; border-radius:0 0 0 6px; }
-.face-corner.br { bottom:0; right:0; border-width:0 3px 3px 0; border-radius:0 0 6px 0; }
+.face-corner.tl { top:-5px; left:-5px; border-width:4px 0 0 4px; border-radius:12px 0 0 0; }
+.face-corner.tr { top:-5px; right:-5px; border-width:4px 4px 0 0; border-radius:0 12px 0 0; }
+.face-corner.bl { bottom:-5px; left:-5px; border-width:0 0 4px 4px; border-radius:0 0 0 12px; }
+.face-corner.br { bottom:-5px; right:-5px; border-width:0 4px 4px 0; border-radius:0 0 12px 0; }
+
 .face-scan-line {
     position: absolute;
-    left: 0; right: 0; top: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #A45DE2, transparent);
-    animation: scanFace 2s ease-in-out infinite;
-    box-shadow: 0 0 10px rgba(164,93,226,0.8);
+    left: -15px; right: -15px; top: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #A45DE2, #fff, #A45DE2, transparent);
+    animation: scanFace 2.5s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+    box-shadow: 0 0 15px #A45DE2, 0 0 5px #fff;
+    border-radius: 50%;
+    z-index: 3;
 }
 @keyframes scanFace {
-    0% { top: 10%; opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% { top: 90%; opacity: 0; }
+    0% { top: -5%; opacity: 0; }
+    15% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { top: 105%; opacity: 0; }
 }
-.face-target-box.detected .face-corner { border-color: #10B981; }
-.face-target-box.detected .face-scan-line { background: linear-gradient(90deg, transparent, #10B981, transparent); }
+
+/* Lignes de repère (nouveau) */
+.face-guideline {
+    position: absolute;
+    background: rgba(164,93,226,0.3);
+    z-index: 1;
+    transition: all 0.4s ease;
+}
+.face-guideline.horizontal {
+    top: 50%; left: 10%; right: 10%; height: 1px;
+}
+.face-guideline.vertical {
+    left: 50%; top: 10%; bottom: 10%; width: 1px;
+}
+
+.face-target-box.detected { 
+    border-color: rgba(16,185,129,0.5); 
+    box-shadow: inset 0 0 40px rgba(16,185,129,0.2), 0 0 30px rgba(16,185,129,0.2);
+    animation: none;
+    transform: scale(1);
+}
+.face-target-box.detected .face-corner { 
+    border-color: #10B981; 
+    filter: drop-shadow(0 0 10px rgba(16,185,129,0.8));
+    transform: scale(1.1);
+}
+.face-target-box.detected .face-scan-line { 
+    background: linear-gradient(90deg, transparent, #10B981, #fff, #10B981, transparent); 
+    box-shadow: 0 0 15px #10B981, 0 0 5px #fff;
+}
+.face-target-box.detected .face-guideline {
+    background: rgba(16,185,129,0.3);
+}
+
+/* Central crosshair points (nouveau) */
+.face-target-box::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px; height: 6px;
+    background: #A45DE2;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #A45DE2, 0 0 0 4px rgba(164,93,226,0.3);
+    transition: all 0.4s ease;
+    z-index: 1;
+}
+.face-target-box.detected::after {
+    background: #10B981;
+    box-shadow: 0 0 10px #10B981, 0 0 0 6px rgba(16,185,129,0.2);
+}
+
+/* Grid overlay background inside the box */
+.face-target-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-image: 
+        linear-gradient(rgba(164,93,226,0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(164,93,226,0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.5;
+    animation: gridMove 10s linear infinite;
+    -webkit-mask-image: radial-gradient(circle, black 40%, transparent 70%);
+    mask-image: radial-gradient(circle, black 40%, transparent 70%);
+    z-index: 0;
+}
+.face-target-box.detected::before {
+    background-image: 
+        linear-gradient(rgba(16,185,129,0.15) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16,185,129,0.15) 1px, transparent 1px);
+}
+@keyframes gridMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 100px; }
+}
 
 .camera-status {
     position: absolute;
@@ -1086,23 +1176,99 @@ textarea.form-control {
 }
 .face-detection-status {
     display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px 18px 16px;
+    background: radial-gradient(circle at top left, rgba(34,197,94,0.20), transparent 50%),
+                radial-gradient(circle at bottom right, rgba(59,130,246,0.20), transparent 55%),
+                rgba(15,23,42,0.90);
+    border-radius: 18px;
+    border: 1px solid rgba(148,163,184,0.4);
+    box-shadow: 0 14px 35px rgba(15,23,42,0.7);
+}
+.face-detection-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+.face-status-main {
+    display: flex;
     align-items: center;
     gap: 10px;
-    padding: 12px 16px;
-    background: rgba(255,255,255,0.04);
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.08);
 }
-.face-status-dot {
-    width: 12px; height: 12px;
-    border-radius: 50%;
+.status-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
     background: #64748B;
+    box-shadow: 0 0 0 3px rgba(148,163,184,0.25);
     flex-shrink: 0;
-    transition: background 0.4s;
+    transition: background 0.4s, box-shadow 0.4s, transform 0.2s;
 }
-.face-status-dot.waiting { background: #F59E0B; animation: blink 1.2s infinite; }
-.face-status-dot.detected { background: #10B981; animation: none; }
-#faceStatusText { color: rgba(255,255,255,0.7); font-size: 0.88rem; }
+.status-dot.waiting {
+    background: #F59E0B;
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.3);
+    animation: blink 1.2s infinite;
+}
+.status-dot.detected {
+    background: #10B981;
+    box-shadow: 0 0 0 3px rgba(16,185,129,0.35);
+    transform: scale(1.05);
+    animation: none;
+}
+#faceStatusText {
+    color: #E5E7EB;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+.face-status-sub {
+    color: rgba(209,213,219,0.8);
+    font-size: 0.8rem;
+}
+.face-tips {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+}
+.face-tip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: rgba(226,232,240,0.9);
+}
+.face-tip span:first-child {
+    font-size: 0.9rem;
+}
+.btn-capture-personal {
+    background: linear-gradient(135deg, #10B981, #059669);
+    color: white;
+    border: none;
+    padding: 15px 18px;
+    border-radius: 12px;
+    font-size: 0.98rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(16,185,129,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.btn-capture-personal:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none;
+}
+.btn-capture-personal:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 40px rgba(16,185,129,0.6);
+}
 
 .btn-capture {
     background: linear-gradient(135deg, #A45DE2, #7C3AED);
@@ -1127,6 +1293,112 @@ textarea.form-control {
     transform: translateY(-2px);
     box-shadow: 0 12px 30px rgba(164,93,226,0.5);
 }
+
+    /* 🔔 Styles des options de notification tactiles */
+    .notification-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    .notif-card {
+        background: white;
+        border: 2px solid #f1f5f9;
+        border-radius: 16px;
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .notif-card:hover {
+        border-color: var(--sky-blue);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(126, 200, 227, 0.1);
+    }
+
+    .notif-card.selected {
+        border-color: var(--sky-blue);
+        background: linear-gradient(135deg, rgba(126, 200, 227, 0.05), rgba(255, 255, 255, 1));
+        box-shadow: 0 8px 20px rgba(126, 200, 227, 0.15);
+    }
+
+    .notif-check {
+        width: 22px;
+        height: 22px;
+        position: relative;
+    }
+
+    .custom-check {
+        width: 100%;
+        height: 100%;
+        border: 2px solid #cbd5e1;
+        border-radius: 6px;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .notif-card.selected .custom-check {
+        background: var(--sky-blue);
+        border-color: var(--sky-blue);
+    }
+
+    .notif-card.selected .custom-check::after {
+        content: '✓';
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .notif-icon {
+        font-size: 24px;
+    }
+
+    .notif-content {
+        flex: 1;
+    }
+
+    .notif-title {
+        font-weight: 700;
+        color: var(--deep-blue);
+        font-size: 0.95rem;
+    }
+
+    .notif-desc {
+        font-size: 0.75rem;
+        color: #64748b;
+    }
+
+    .notif-card.disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background: #f8fafc;
+    }
+
+    .notif-badge {
+        position: absolute;
+        top: -8px;
+        right: 10px;
+        background: #94a3b8;
+        color: white;
+        font-size: 10px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    @media (max-width: 768px) {
+        .notification-options {
+            grid-template-columns: 1fr;
+        }
+    }
 
 /* Step 2: AI Analysis */
 .ai-analysis-screen {
@@ -1809,6 +2081,25 @@ textarea.form-control {
         <div class="error-feedback text-danger small mt-1" style="display: none;"></div>
     </div>
 
+    <!-- 🔔 Options de Notification Tactiles -->
+    <div class="form-section mt-4">
+        <h3 class="section-title">
+            <i class="fas fa-bell me-2"></i> Préférences de notification
+        </h3>
+        <p class="text-muted small mb-3">Comment souhaitez-vous recevoir votre confirmation et vos rappels ?</p>
+        
+        <div class="notification-options">
+            <div class="form-check mb-2">
+                {{ form_widget(form.receiveEmail, {'attr': {'class': 'form-check-input'}}) }}
+                {{ form_label(form.receiveEmail, 'Recevoir une confirmation par Email', {'label_attr': {'class': 'form-check-label'}}) }}
+            </div>
+            <div class="form-check mb-2">
+                {{ form_widget(form.receiveSms, {'attr': {'class': 'form-check-input'}}) }}
+                {{ form_label(form.receiveSms, 'Recevoir un SMS de confirmation', {'label_attr': {'class': 'form-check-label'}}) }}
+            </div>
+        </div>
+    </div>
+
     <!-- 🤖 Bouton Analyser Symptômes -->
     <div class="symptom-ai-banner">
         <div class="symptom-ai-banner-left">
@@ -1856,6 +2147,236 @@ textarea.form-control {
                         <h5 class="feature-title">Pièces à préparer</h5>
                         <p class="feature-description">Ayez votre carte vitale et pièce d'identité à portée de main.</p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 🤖 Modal Analyse IA des symptômes -->
+<div class="symptom-modal-overlay" id="symptomModal">
+    <div class="symptom-modal-box">
+        <div class="symptom-modal-header">
+            <div class="symptom-modal-header-left">
+                <div class="symptom-header-icon">
+                    🤖
+                </div>
+                <div>
+                    <h3 class="symptom-modal-title">Analyse IA des symptômes</h3>
+                    <p class="symptom-modal-subtitle" id="patientTypeBadge">
+                        👤 Sélectionnez le type de patient dans le formulaire
+                    </p>
+                </div>
+            </div>
+            <button type="button" class="symptom-close-btn" id="closeSymptomModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Étape 1 : Capture caméra -->
+        <div class="symptom-step active" id="step1">
+            <div class="camera-section">
+                <div>
+                    <div class="camera-frame">
+                        <video id="symptomVideo" autoplay muted playsinline></video>
+                        <canvas id="symptomCanvas" style="display: none;"></canvas>
+                        <div class="camera-overlay-ui">
+                            <div id="faceTargetBox" class="face-target-box">
+                                <div class="face-corner tl"></div>
+                                <div class="face-corner tr"></div>
+                                <div class="face-corner bl"></div>
+                                <div class="face-corner br"></div>
+                                <div class="face-scan-line"></div>
+                                <div class="face-guideline horizontal"></div>
+                                <div class="face-guideline vertical"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="camera-status-bar" style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+                        <span class="camera-dot"></span>
+                        <span id="cameraStatusText" style="color:rgba(255,255,255,0.8);font-size:0.9rem;">
+                            Initialisation caméra...
+                        </span>
+                    </div>
+                </div>
+
+                <div class="face-detection-status">
+                    <div class="face-detection-header">
+                        <div class="face-status-main">
+                            <span id="faceStatusDot" class="status-dot"></span>
+                            <div>
+                                <div id="faceStatusText">
+                                    En attente de détection...
+                                </div>
+                                <div class="face-status-sub">
+                                    Placez votre visage au centre de l'image et regardez la caméra.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="face-tips">
+                        <div class="face-tip">
+                            <span>💡</span>
+                            <span>Restez immobile quelques secondes pour une meilleure analyse.</span>
+                        </div>
+                        <div class="face-tip">
+                            <span>✨</span>
+                            <span>La lumière douce de face améliore la détection des expressions.</span>
+                        </div>
+                    </div>
+
+                    <button type="button"
+                            id="btnCapture"
+                            class="btn-capture-personal"
+                            disabled>
+                        <i class="fas fa-camera"></i>
+                        Capturer mon visage et lancer l'analyse
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Étape 2 : Animation d'analyse IA -->
+        <div class="symptom-step" id="step2">
+            <div class="ai-analysis-screen">
+                <div class="ai-brain-animation">
+                    <div class="brain-ring r1"></div>
+                    <div class="brain-ring r2"></div>
+                    <div class="brain-ring r3"></div>
+                    <div class="brain-center">🧠</div>
+                </div>
+                <div class="ai-analysis-title">Analyse intelligente de vos signes visuels</div>
+                <div class="ai-steps-list">
+                    <div class="ai-step-item" id="aiStep1">
+                        <span class="ai-step-icon">⏳</span>
+                        <span>Stabilisation de l'image et préparation des données</span>
+                    </div>
+                    <div class="ai-step-item" id="aiStep2">
+                        <span class="ai-step-icon">⏳</span>
+                        <span>Analyse des émotions, fatigue et signes de stress</span>
+                    </div>
+                    <div class="ai-step-item" id="aiStep3">
+                        <span class="ai-step-icon">⏳</span>
+                        <span>Génération d'un bilan de santé personnalisé</span>
+                    </div>
+                    <div class="ai-step-item" id="aiStep4">
+                        <span class="ai-step-icon">⏳</span>
+                        <span>Préparation de la lecture vocale et du résumé</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Étape 3 : Bilan + robot assistant -->
+        <div class="symptom-step" id="step3">
+            <div class="bilan-container">
+                <div class="bilan-header">
+                    <div class="bilan-header-icon">📊</div>
+                    <div>
+                        <div class="bilan-title">Bilan IA de vos symptômes</div>
+                        <p class="bilan-subtitle" id="bilanDate">
+                            Généré pour votre consultation en ligne
+                        </p>
+                    </div>
+                </div>
+
+                <div class="captured-face-preview">
+                    <img id="capturedFaceImg" alt="Capture du visage" />
+                    <div class="face-emotions" id="faceEmotions"></div>
+                </div>
+
+                <div class="bilan-content" id="bilanContent">
+                    <div class="bilan-loading">
+                        <div class="mini-loader"></div>
+                        <span>Génération de votre bilan personnalisé en cours...</span>
+                    </div>
+                </div>
+
+                <!-- Robot lecteur de bilan -->
+                <div class="robot-advisor-panel">
+                    <div class="robot-figure-wrap">
+                        <div id="robotBody" class="robot-body">
+                            <div class="robot-antenna">
+                                <div class="robot-antenna-ball"></div>
+                            </div>
+                            <div class="robot-head">
+                                <div class="robot-eyes">
+                                    <div class="robot-eye">
+                                        <div class="robot-pupil"></div>
+                                    </div>
+                                    <div class="robot-eye">
+                                        <div class="robot-pupil"></div>
+                                    </div>
+                                </div>
+                                <div class="robot-mouth">
+                                    <div class="robot-mouth-bar"></div>
+                                    <div class="robot-mouth-bar"></div>
+                                    <div class="robot-mouth-bar"></div>
+                                    <div class="robot-mouth-bar"></div>
+                                    <div class="robot-mouth-bar"></div>
+                                </div>
+                            </div>
+                            <div class="robot-torso">
+                                <div class="robot-light rl1"></div>
+                                <div class="robot-light rl2"></div>
+                                <div class="robot-light rl3"></div>
+                            </div>
+                        </div>
+                        <div id="robotStatusBadge" class="robot-status-badge">
+                            🤖 Maternia AI
+                        </div>
+                    </div>
+
+                    <div class="robot-dialog-panel">
+                        <div class="robot-speech-bubble">
+                            <div id="robotSpeechText" class="speech-bubble-text">
+                                Votre bilan IA sera lu ici dès qu'il sera prêt.
+                            </div>
+                            <div id="speechWaveform" class="speech-waveform">
+                                <span></span><span></span><span></span><span></span><span></span>
+                                <span></span><span></span><span></span><span></span><span></span>
+                            </div>
+                        </div>
+
+                        <div class="robot-voice-controls">
+                            <button type="button" id="btnRobotPlay" class="robot-ctrl-btn play">
+                                <i class="fas fa-volume-up"></i>
+                                Lire le bilan
+                            </button>
+                            <button type="button" id="btnRobotPause" class="robot-ctrl-btn pause" style="display: none;">
+                                <i class="fas fa-pause"></i>
+                                Pause
+                            </button>
+                            <button type="button" id="btnRobotStop" class="robot-ctrl-btn stop" style="display: none;">
+                                <i class="fas fa-stop"></i>
+                                Arrêter
+                            </button>
+                        </div>
+
+                        <div class="robot-speed-row">
+                            <span class="robot-speed-label">Vitesse de lecture</span>
+                            <input type="range"
+                                   id="robotSpeed"
+                                   class="robot-speed-slider"
+                                   min="0.7"
+                                   max="1.3"
+                                   step="0.1"
+                                   value="0.9">
+                            <span id="robotSpeedVal">0.9×</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bilan-actions">
+                    <button type="button" id="btnInjectBilan" class="btn-inject-bilan">
+                        <i class="fas fa-file-medical"></i>
+                        Ajouter le bilan à la réservation
+                    </button>
+                    <button type="button" id="btnRetryCapture" class="btn-retry">
+                        <i class="fas fa-redo"></i>
+                        Refaire l'analyse
+                    </button>
                 </div>
             </div>
         </div>
@@ -1928,9 +2449,11 @@ textarea.form-control {
                     <li>Assurez-vous d'avoir une connexion internet stable</li>
                     <li>Ayez votre pièce d'identité à portée de main</li>
                     <li>Pour toute question, contactez-nous au 01 23 45 67 89</li>
+                    <li id="notifEmailStatus" style="display: none;"></li>
+                    <li id="notifSmsStatus" style="display: none;"></li>
                 </ul>
             </div>
-            
+
             <!-- 🎯 Actions -->
             <div class="modal-actions">
                 <button type="button" class="modal-btn primary" onclick="window.print()">
@@ -1945,192 +2468,6 @@ textarea.form-control {
                     <i class="fas fa-times"></i>
                     Fermer
                 </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- 🤖 Modal Analyse IA Symptômes -->
-<div class="symptom-modal-overlay" id="symptomModal">
-    <div class="symptom-modal-box">
-        <!-- Header -->
-        <div class="symptom-modal-header">
-            <div class="symptom-modal-header-left">
-                <div class="symptom-header-icon">🔬</div>
-                <div>
-                    <h2 class="symptom-modal-title">Analyse IA des Symptômes</h2>
-                    <p class="symptom-modal-subtitle">Détection faciale intelligente — Maternia AI</p>
-                </div>
-            </div>
-            <button type="button" class="symptom-close-btn" id="closeSymptomModal">✕</button>
-        </div>
-
-        <!-- Steps -->
-        <div class="symptom-steps" id="symptomSteps">
-            <!-- STEP 1: Caméra -->
-            <div class="symptom-step active" id="step1">
-                <div class="camera-section">
-                    <div class="camera-frame" id="cameraFrame">
-                        <video id="symptomVideo" autoplay playsinline muted></video>
-                        <canvas id="symptomCanvas" style="display:none;"></canvas>
-                        <div class="camera-overlay-ui">
-                            <div class="face-target-box" id="faceTargetBox">
-                                <div class="face-corner tl"></div>
-                                <div class="face-corner tr"></div>
-                                <div class="face-corner bl"></div>
-                                <div class="face-corner br"></div>
-                                <div class="face-scan-line" id="faceScanLine"></div>
-                            </div>
-                        </div>
-                        <div class="camera-status" id="cameraStatus">
-                            <span class="camera-dot"></span>
-                            <span id="cameraStatusText">Initialisation caméra...</span>
-                        </div>
-                    </div>
-                    <div class="camera-info-panel">
-                        <h4 class="camera-info-title">📋 Instructions</h4>
-                        <ul class="camera-instructions">
-                            <li>✅ Placez votre visage dans le cadre</li>
-                            <li>✅ Assurez-vous d'avoir un bon éclairage</li>
-                            <li>✅ Regardez directement la caméra</li>
-                            <li>✅ Restez immobile pendant la capture</li>
-                        </ul>
-                        <div class="patient-type-badge" id="patientTypeBadge">👤 Type détecté automatiquement</div>
-                        <div class="face-detection-status" id="faceStatus">
-                            <div class="face-status-dot" id="faceStatusDot"></div>
-                            <span id="faceStatusText">En attente de détection...</span>
-                        </div>
-                        <button type="button" id="btnCapture" class="btn-capture" disabled>
-                            <i class="fas fa-camera"></i> Capturer et Analyser
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- STEP 2: Analyse IA -->
-            <div class="symptom-step" id="step2">
-                <div class="ai-analysis-screen">
-                    <div class="ai-brain-animation">
-                        <div class="brain-ring r1"></div>
-                        <div class="brain-ring r2"></div>
-                        <div class="brain-ring r3"></div>
-                        <div class="brain-center">🧠</div>
-                    </div>
-                    <h3 class="ai-analysis-title">Analyse en cours...</h3>
-                    <div class="ai-steps-list" id="aiStepsList">
-                        <div class="ai-step-item" id="aiStep1"><span class="ai-step-icon">⏳</span> Analyse des traits du visage</div>
-                        <div class="ai-step-item" id="aiStep2"><span class="ai-step-icon">⏳</span> Détection des expressions</div>
-                        <div class="ai-step-item" id="aiStep3"><span class="ai-step-icon">⏳</span> Évaluation des indicateurs santé</div>
-                        <div class="ai-step-item" id="aiStep4"><span class="ai-step-icon">⏳</span> Génération du bilan médical</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- STEP 3: Bilan -->
-            <div class="symptom-step" id="step3">
-                <div class="bilan-container">
-                    <div class="bilan-header">
-                        <div class="bilan-header-icon">📊</div>
-                        <div>
-                            <h3 class="bilan-title">Bilan de Santé IA</h3>
-                            <p class="bilan-subtitle" id="bilanDate"></p>
-                        </div>
-                    </div>
-
-                    <!-- 🤖 Robot Assistant Vocal -->
-                    <div class="robot-advisor-panel" id="robotAdvisorPanel">
-                        <div class="robot-figure-wrap">
-                            <!-- Corps du robot -->
-                            <div class="robot-body" id="robotBody">
-                                <!-- Antenne -->
-                                <div class="robot-antenna">
-                                    <div class="robot-antenna-ball" id="robotAntennaBall"></div>
-                                </div>
-                                <!-- Tête -->
-                                <div class="robot-head">
-                                    <!-- Yeux -->
-                                    <div class="robot-eyes">
-                                        <div class="robot-eye" id="robotEyeL">
-                                            <div class="robot-pupil" id="robotPupilL"></div>
-                                        </div>
-                                        <div class="robot-eye" id="robotEyeR">
-                                            <div class="robot-pupil" id="robotPupilR"></div>
-                                        </div>
-                                    </div>
-                                    <!-- Bouche -->
-                                    <div class="robot-mouth" id="robotMouth">
-                                        <div class="robot-mouth-bar" id="mb1"></div>
-                                        <div class="robot-mouth-bar" id="mb2"></div>
-                                        <div class="robot-mouth-bar" id="mb3"></div>
-                                        <div class="robot-mouth-bar" id="mb4"></div>
-                                        <div class="robot-mouth-bar" id="mb5"></div>
-                                    </div>
-                                </div>
-                                <!-- Torse -->
-                                <div class="robot-torso">
-                                    <div class="robot-light rl1" id="rl1"></div>
-                                    <div class="robot-light rl2" id="rl2"></div>
-                                    <div class="robot-light rl3" id="rl3"></div>
-                                </div>
-                            </div>
-                            <!-- Badge statut -->
-                            <div class="robot-status-badge" id="robotStatusBadge">🤖 Maternia AI</div>
-                        </div>
-
-                        <!-- Panneau de dialogue -->
-                        <div class="robot-dialog-panel">
-                            <div class="robot-speech-bubble" id="robotSpeechBubble">
-                                <div class="speech-bubble-text" id="robotSpeechText">
-                                    Bonjour ! Je suis votre assistant IA Maternia. Appuyez sur <strong>"Lire le bilan"</strong> et je vous lirai vos résultats et conseils à voix haute.
-                                </div>
-                                <div class="speech-waveform" id="speechWaveform">
-                                    <span></span><span></span><span></span><span></span><span></span>
-                                    <span></span><span></span><span></span><span></span><span></span>
-                                </div>
-                            </div>
-
-                            <!-- Contrôles voix -->
-                            <div class="robot-voice-controls">
-                                <button type="button" id="btnRobotPlay" class="robot-ctrl-btn play">
-                                    <i class="fas fa-volume-up"></i> Lire le bilan
-                                </button>
-                                <button type="button" id="btnRobotPause" class="robot-ctrl-btn pause" style="display:none;">
-                                    <i class="fas fa-pause"></i> Pause
-                                </button>
-                                <button type="button" id="btnRobotStop" class="robot-ctrl-btn stop" style="display:none;">
-                                    <i class="fas fa-stop"></i> Arrêter
-                                </button>
-                            </div>
-                            <!-- Sélecteur de vitesse -->
-                            <div class="robot-speed-row">
-                                <label class="robot-speed-label">Vitesse de lecture :</label>
-                                <input type="range" id="robotSpeed" min="0.6" max="1.6" step="0.1" value="0.9" class="robot-speed-slider" />
-                                <span id="robotSpeedVal">0.9×</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="captured-face-preview">
-                        <img id="capturedFaceImg" src="" alt="Visage capturé" />
-                        <div class="face-emotions" id="faceEmotions"></div>
-                    </div>
-                    <div class="bilan-content" id="bilanContent">
-                        <div class="bilan-loading">
-                            <div class="mini-loader"></div>
-                            Génération du bilan en cours...
-                        </div>
-                    </div>
-                    <div class="bilan-actions">
-                        <button type="button" id="btnInjectBilan" class="btn-inject-bilan">
-                            <i class="fas fa-file-medical"></i>
-                            Ajouter le bilan à la réservation
-                        </button>
-                        <button type="button" id="btnRetryCapture" class="btn-retry">
-                            <i class="fas fa-redo"></i>
-                            Refaire l'analyse
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -2181,6 +2518,29 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // 🔔 Gestion des cartes de notification
+    const handleNotifCard = (cardId, checkboxId) => {
+        const card = document.getElementById(cardId);
+        const checkbox = document.getElementById(checkboxId);
+        
+        if (card && checkbox) {
+            // Initial state
+            if (checkbox.checked) card.classList.add('selected');
+            
+            card.addEventListener('click', () => {
+                checkbox.checked = !checkbox.checked;
+                if (checkbox.checked) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+        }
+    };
+
+    handleNotifCard('card_email', 'notif_email');
+    handleNotifCard('card_sms', 'notif_sms');
 
     // 🎯 Validation améliorée
     function validateForm() {
@@ -2286,6 +2646,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnCloseModal = document.getElementById('btnCloseModal');
 
     btnReserver.addEventListener('click', async function() {
+        if (!validateForm()) {
+            // Scroller vers la première erreur
+            const firstError = document.querySelector('.error-message');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return;
+        }
+
         // Reset des erreurs précédentes
         document.querySelectorAll('.error-feedback').forEach(el => {
             el.style.display = 'none';
@@ -2312,25 +2681,58 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-            const data = await response.json();
+            const contentType = response.headers.get('content-type') || '';
+            let data;
+            if (contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                const text = await response.text();
+                throw new Error(`Réponse inattendue du serveur (HTTP ${response.status}). ${text.slice(0, 250)}`);
+            }
+
+            if (!response.ok) {
+                throw new Error(data?.message || `Erreur serveur (HTTP ${response.status}).`);
+            }
 
             if (data.success) {
-                // SUCCÈS
                 loading.style.display = 'none';
                 document.getElementById('referenceNumber').textContent = data.reference;
                 document.getElementById('patientNameModal').textContent = data.patientName;
+
+                const emailLi = document.getElementById('notifEmailStatus');
+                const smsLi = document.getElementById('notifSmsStatus');
+                const email = data.notifStatus?.email;
+                const sms = data.notifStatus?.sms;
+
+                if (emailLi) {
+                    if (email && typeof email.success !== 'undefined') {
+                        emailLi.style.display = '';
+                        emailLi.textContent = (email.success ? 'Email : envoyé.' : 'Email : non envoyé.') + (email.message ? ' ' + email.message : '');
+                    } else {
+                        emailLi.style.display = 'none';
+                        emailLi.textContent = '';
+                    }
+                }
+
+                if (smsLi) {
+                    if (sms && typeof sms.success !== 'undefined') {
+                        smsLi.style.display = '';
+                        smsLi.textContent = (sms.success ? 'SMS : envoyé.' : 'SMS : non envoyé.') + (sms.message ? ' ' + sms.message : '');
+                    } else {
+                        smsLi.style.display = 'none';
+                        smsLi.textContent = '';
+                    }
+                }
+
                 overlay.style.display = 'flex';
                 createConfettiRain();
                 playSuccessSound();
             } else {
-                // ÉCHEC (Erreurs PHP)
                 loading.style.display = 'none';
                 btnReserver.disabled = false;
-                
+
                 if (data.errors) {
-                    // Affichage des erreurs PHP sous chaque champ
                     for (const [field, message] of Object.entries(data.errors)) {
-                        // Mapper les noms de champs Symfony vers les IDs du DOM
                         const fieldIdMap = {
                             'prenom': 'prenom',
                             'nom': 'nom',
@@ -2340,14 +2742,14 @@ document.addEventListener('DOMContentLoaded', function() {
                             'moisGrossesse': 'moisGrossesse',
                             'dateNaissanceBebe': 'dateNaissanceBebe'
                         };
-                        
+
                         const domId = fieldIdMap[field] || field;
                         const group = document.getElementById('group_' + domId);
-                        
+
                         if (group) {
                             const feedback = group.querySelector('.error-feedback');
                             const input = group.querySelector('.form-control');
-                            
+
                             if (feedback) {
                                 feedback.textContent = message;
                                 feedback.style.display = 'block';
@@ -2358,8 +2760,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                         }
                     }
-                    
-                    // Alerte générale
+
                     btnReserver.style.background = 'linear-gradient(135deg, #EF4444 0%, #F87171 100%)';
                     btnReserver.innerHTML = '<i class="fas fa-exclamation-circle"></i> Erreurs détectées';
                     setTimeout(() => {
@@ -2370,17 +2771,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     alert('❌ ' + (data.message || 'Erreur lors de la réservation. Veuillez réessayer.'));
                 }
             }
-
         } catch (error) {
             loading.style.display = 'none';
             btnReserver.disabled = false;
             console.error('Erreur:', error);
-            alert('⚠️ Une erreur est survenue lors de la communication avec le serveur.');
+            alert('⚠️ Une erreur est survenue lors de la communication avec le serveur.\n' + (error?.message || ''));
         }
     });
-
-    // Fermer validateForm function definition as well to avoid errors if called
-    function validateForm() { return true; }
 
     // Fermeture du modal
     btnCloseModal.addEventListener('click', function() {

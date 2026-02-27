@@ -1,0 +1,3816 @@
+﻿
+> [2026-02-25T06:40:28.89608
+2+01:00] doctrine.DEBUG: 
+Executing statement: INSERT 
+INTO reservation_client 
+(nom_client, prenom_client, 
+email_client, 
+telephone_client, 
+type_patient, 
+mois_grossesse, 
+date_naissance_bebe, 
+statut_reservation, 
+reference, 
+date_reservation, notes, 
+created_at, updated_at, 
+consultation_creneau_id) 
+VALUES (?, ?, ?, ?, ?, ?, 
+?, ?, ?, ?, ?, ?, ?, ?) 
+(parameters: array{"1":"gtr"
+,"2":"rf","3":"sboui.montaha
+@esprit.tn","4":"12345678","
+5":"MAMAN","6":4,"7":null,"8
+":"CONFIRME","9":"RDV-699E8B
+4CD4701","10":"2026-02-25 06
+:40:28","11":"fkfgjk","12":"
+2026-02-25 
+06:40:28","13":"2026-02-25 
+06:40:28","14":26}, types: a
+rray{"1":0,"2":0,"3":0,"4":0
+,"5":0,"6":0,"7":0,"8":0,"9"
+:0,"10":0,"11":0,"12":0,"13"
+:0,"14":0}) {"sql":"INSERT 
+INTO reservation_client 
+(nom_client, prenom_client, 
+email_client, 
+telephone_client, 
+type_patient, 
+mois_grossesse, 
+date_naissance_bebe, 
+statut_reservation, 
+reference, 
+date_reservation, notes, 
+created_at, updated_at, 
+consultation_creneau_id) 
+VALUES (?, ?, ?, ?, ?, ?, 
+?, ?, ?, ?, ?, ?, ?, ?)","pa
+rams":{"1":"gtr","2":"rf","3
+":"sboui.montaha@esprit.tn",
+"4":"12345678","5":"MAMAN","
+6":4,"7":null,"8":"CONFIRME"
+,"9":"RDV-699E8B4CD4701","10
+":"2026-02-25 06:40:28","11"
+:"fkfgjk","12":"2026-02-25 
+06:40:28","13":"2026-02-25 0
+6:40:28","14":26},"types":{"
+1":{"Doctrine\\DBAL\\Paramet
+erType":0},"2":{"Doctrine\\D
+BAL\\ParameterType":0},"3":{
+"Doctrine\\DBAL\\ParameterTy
+pe":0},"4":{"Doctrine\\DBAL\
+\ParameterType":0},"5":{"Doc
+trine\\DBAL\\ParameterType":
+0},"6":{"Doctrine\\DBAL\\Par
+ameterType":0},"7":{"Doctrin
+e\\DBAL\\ParameterType":0},"
+8":{"Doctrine\\DBAL\\Paramet
+erType":0},"9":{"Doctrine\\D
+BAL\\ParameterType":0},"10":
+{"Doctrine\\DBAL\\ParameterT
+ype":0},"11":{"Doctrine\\DBA
+L\\ParameterType":0},"12":{"
+Doctrine\\DBAL\\ParameterTyp
+e":0},"13":{"Doctrine\\DBAL\
+\ParameterType":0},"14":{"Do
+ctrine\\DBAL\\ParameterType"
+:0}}} []
+  [2026-02-25T06:40:28.89822
+2+01:00] doctrine.DEBUG: 
+Executing statement: UPDATE 
+consultation_creneau SET 
+statut_reservation = ? 
+WHERE id = ? (parameters: ar
+ray{"1":"RESERVE","2":26}, 
+types: array{"1":0,"2":0}) 
+{"sql":"UPDATE 
+consultation_creneau SET 
+statut_reservation = ? 
+WHERE id = ?","params":{"1":
+"RESERVE","2":26},"types":{"
+1":{"Doctrine\\DBAL\\Paramet
+erType":0},"2":{"Doctrine\\D
+BAL\\ParameterType":0}}} []
+  [2026-02-25T06:40:28.89918
+4+01:00] doctrine.DEBUG: 
+Committing transaction [] []
+  [2026-02-25T06:40:30.57876
+3+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, t0.categorie 
+AS categorie_2, 
+t0.description AS 
+description_3, t0.pour AS 
+pour_4, t0.image AS 
+image_5, t0.icon AS icon_6, 
+t0.statut AS statut_7, 
+t0.ordre_affichage AS 
+ordre_affichage_8, 
+t0.created_at AS 
+created_at_9, t0.updated_at 
+AS updated_at_10 FROM 
+consultation t0 WHERE t0.id 
+= ? (parameters: 
+array{"1":4}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.categorie AS 
+categorie_2, t0.description 
+AS description_3, t0.pour 
+AS pour_4, t0.image AS 
+image_5, t0.icon AS icon_6, 
+t0.statut AS statut_7, 
+t0.ordre_affichage AS 
+ordre_affichage_8, 
+t0.created_at AS 
+created_at_9, t0.updated_at 
+AS updated_at_10 FROM 
+consultation t0 WHERE t0.id 
+= ?","params":{"1":4},"types
+":{"1":{"Doctrine\\DBAL\\Par
+ameterType":0}}} []
+  [2026-02-25T06:40:30.71197
+4+01:00] mailer.DEBUG: 
+Email transport "Symfony\Com
+ponent\Mailer\Transport\Smtp
+\SmtpTransport" starting [] 
+[]
+  [2026-02-25T06:40:32.16460
+4+01:00] mailer.DEBUG: 
+Email transport "Symfony\Com
+ponent\Mailer\Transport\Smtp
+\SmtpTransport" started [] 
+[]
+  [2026-02-25T06:40:33.61452
+6+01:00] messenger.INFO: 
+Message Symfony\Component\Ma
+iler\Messenger\SendEmailMess
+age handled by Symfony\Compo
+nent\Mailer\Messenger\Messag
+eHandler::__invoke {"class":
+"Symfony\\Component\\Mailer\
+\Messenger\\SendEmailMessage
+","handler":"Symfony\\Compon
+ent\\Mailer\\Messenger\\Mess
+ageHandler::__invoke"} []
+> [2026-02-25T06:40:33.61508
+7+01:00] app.INFO: Email 
+confirmation envoyÃ© {"reser
+vation":"RDV-699E8B4CD4701",
+"to":"sboui.montaha@esprit.t
+n","meetLink":null} []
+  [2026-02-25T06:40:33.87932
+0+01:00] doctrine.INFO: 
+Disconnecting [] []
+  [2026-02-25T06:40:33.88136
+4+01:00] mailer.DEBUG: 
+Email transport "Symfony\Com
+ponent\Mailer\Transport\Smtp
+\SmtpTransport" stopping [] 
+[]
+  [2026-02-25T06:40:33.99814
+2+01:00] mailer.DEBUG: 
+Email transport "Symfony\Com
+ponent\Mailer\Transport\Smtp
+\SmtpTransport" stopped [] 
+[]
+  [2026-02-25T06:41:52.85056
+0+01:00] request.INFO: 
+Matched route 
+"app_medecin_creneaux". {"ro
+ute":"app_medecin_creneaux",
+"route_parameters":{"_route"
+:"app_medecin_creneaux","_co
+ntroller":"App\\Controller\\
+ConsultationController::cren
+eaux","medecin":"fr"},"reque
+st_uri":"http://127.0.0.1:80
+00/medecin/fr/creneaux","met
+hod":"GET"} []
+  [2026-02-25T06:41:53.08334
+2+01:00] doctrine.INFO: 
+Connecting with parameters a
+rray{"use_savepoints":true,"
+driver":"pdo_mysql","idle_co
+nnection_ttl":600,"host":"12
+7.0.0.1","port":3306,"user":
+"root","password":"<redacted
+>","driverOptions":[],"defau
+ltTableOptions":[],"dbname":
+"maternia","serverVersion":"
+8.0.32","charset":"utf8mb4"}
+ {"params":{"use_savepoints"
+:true,"driver":"pdo_mysql","
+idle_connection_ttl":600,"ho
+st":"127.0.0.1","port":3306,
+"user":"root","password":"<r
+edacted>","driverOptions":[]
+,"defaultTableOptions":[],"d
+bname":"maternia","serverVer
+sion":"8.0.32","charset":"ut
+f8mb4"}} []
+  [2026-02-25T06:41:53.11328
+2+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+c0_.id AS id_0, 
+c0_.nom_medecin AS 
+nom_medecin_1, 
+c0_.photo_medecin AS 
+photo_medecin_2, 
+c0_.description_medecin AS 
+description_medecin_3, 
+c0_.specialite_medecin AS 
+specialite_medecin_4, 
+c0_.date_debut AS 
+date_debut_5, c0_.date_fin 
+AS date_fin_6, c0_.jour AS 
+jour_7, c0_.heure_debut AS 
+heure_debut_8, 
+c0_.heure_fin AS 
+heure_fin_9, 
+c0_.statut_reservation AS 
+statut_reservation_10, 
+c0_.duree_minutes AS 
+duree_minutes_11, 
+c0_.nombre_places AS 
+nombre_places_12, 
+c0_.created_at AS 
+created_at_13, 
+c0_.updated_at AS 
+updated_at_14, 
+c0_.consultation_id AS 
+consultation_id_15 FROM 
+consultation_creneau c0_ 
+LEFT JOIN 
+reservation_client r1_ ON 
+c0_.id = 
+r1_.consultation_creneau_id 
+WHERE c0_.nom_medecin = ? 
+AND c0_.statut_reservation 
+= ? AND c0_.date_debut > ? 
+AND r1_.id IS NULL ORDER BY 
+c0_.date_debut ASC 
+(parameters: array{"1":"fr",
+"2":"DISPONIBLE","3":"2026-0
+2-25 06:41:53"}, types: 
+array{"1":0,"2":0,"3":0}) 
+{"sql":"SELECT c0_.id AS 
+id_0, c0_.nom_medecin AS 
+nom_medecin_1, 
+c0_.photo_medecin AS 
+photo_medecin_2, 
+c0_.description_medecin AS 
+description_medecin_3, 
+c0_.specialite_medecin AS 
+specialite_medecin_4, 
+c0_.date_debut AS 
+date_debut_5, c0_.date_fin 
+AS date_fin_6, c0_.jour AS 
+jour_7, c0_.heure_debut AS 
+heure_debut_8, 
+c0_.heure_fin AS 
+heure_fin_9, 
+c0_.statut_reservation AS 
+statut_reservation_10, 
+c0_.duree_minutes AS 
+duree_minutes_11, 
+c0_.nombre_places AS 
+nombre_places_12, 
+c0_.created_at AS 
+created_at_13, 
+c0_.updated_at AS 
+updated_at_14, 
+c0_.consultation_id AS 
+consultation_id_15 FROM 
+consultation_creneau c0_ 
+LEFT JOIN 
+reservation_client r1_ ON 
+c0_.id = 
+r1_.consultation_creneau_id 
+WHERE c0_.nom_medecin = ? 
+AND c0_.statut_reservation 
+= ? AND c0_.date_debut > ? 
+AND r1_.id IS NULL ORDER BY 
+c0_.date_debut ASC","params"
+:{"1":"fr","2":"DISPONIBLE",
+"3":"2026-02-25 06:41:53"},"
+types":{"1":{"Doctrine\\DBAL
+\\ParameterType":0},"2":{"Do
+ctrine\\DBAL\\ParameterType"
+:0},"3":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:41:53.26310
+1+01:00] doctrine.INFO: 
+Disconnecting [] []
+  [2026-02-25T06:41:54.07640
+8+01:00] request.INFO: 
+Matched route "_wdt". {"rout
+e":"_wdt","route_parameters"
+:{"_route":"_wdt","_controll
+er":"web_profiler.controller
+.profiler::toolbarAction","t
+oken":"14725e"},"request_uri
+":"http://127.0.0.1:8000/_wd
+t/14725e","method":"GET"} []
+  [2026-02-25T06:42:03.16183
+9+01:00] request.INFO: 
+Matched route "app_admin_con
+sultation_creneau_new". {"ro
+ute":"app_admin_consultation
+_creneau_new","route_paramet
+ers":{"_route":"app_admin_co
+nsultation_creneau_new","_co
+ntroller":"App\\Controller\\
+Admin\\ConsultationCreneauCr
+udController::new"},"request
+_uri":"http://127.0.0.1:8000
+/admin/consultation-creneaux
+/new","method":"GET"} []
+  [2026-02-25T06:42:03.34095
+7+01:00] doctrine.INFO: 
+Connecting with parameters a
+rray{"use_savepoints":true,"
+driver":"pdo_mysql","idle_co
+nnection_ttl":600,"host":"12
+7.0.0.1","port":3306,"user":
+"root","password":"<redacted
+>","driverOptions":[],"defau
+ltTableOptions":[],"dbname":
+"maternia","serverVersion":"
+8.0.32","charset":"utf8mb4"}
+ {"params":{"use_savepoints"
+:true,"driver":"pdo_mysql","
+idle_connection_ttl":600,"ho
+st":"127.0.0.1","port":3306,
+"user":"root","password":"<r
+edacted>","driverOptions":[]
+,"defaultTableOptions":[],"d
+bname":"maternia","serverVer
+sion":"8.0.32","charset":"ut
+f8mb4"}} []
+  [2026-02-25T06:42:03.34430
+1+01:00] doctrine.DEBUG: 
+Executing query: SELECT 
+c0_.id AS id_0, 
+c0_.categorie AS 
+categorie_1, 
+c0_.description AS 
+description_2, c0_.pour AS 
+pour_3, c0_.image AS 
+image_4, c0_.icon AS 
+icon_5, c0_.statut AS 
+statut_6, 
+c0_.ordre_affichage AS 
+ordre_affichage_7, 
+c0_.created_at AS 
+created_at_8, 
+c0_.updated_at AS 
+updated_at_9 FROM 
+consultation c0_ ORDER BY 
+c0_.ordre_affichage ASC, 
+c0_.categorie ASC 
+{"sql":"SELECT c0_.id AS 
+id_0, c0_.categorie AS 
+categorie_1, 
+c0_.description AS 
+description_2, c0_.pour AS 
+pour_3, c0_.image AS 
+image_4, c0_.icon AS 
+icon_5, c0_.statut AS 
+statut_6, 
+c0_.ordre_affichage AS 
+ordre_affichage_7, 
+c0_.created_at AS 
+created_at_8, 
+c0_.updated_at AS 
+updated_at_9 FROM 
+consultation c0_ ORDER BY 
+c0_.ordre_affichage ASC, 
+c0_.categorie ASC"} []
+  [2026-02-25T06:42:03.66184
+5+01:00] doctrine.INFO: 
+Disconnecting [] []
+  [2026-02-25T06:42:04.12703
+8+01:00] request.INFO: 
+Matched route "_wdt". {"rout
+e":"_wdt","route_parameters"
+:{"_route":"_wdt","_controll
+er":"web_profiler.controller
+.profiler::toolbarAction","t
+oken":"a527a5"},"request_uri
+":"http://127.0.0.1:8000/_wd
+t/a527a5","method":"GET"} []
+  [2026-02-25T06:42:39.11225
+3+01:00] request.INFO: 
+Matched route "app_admin_con
+sultation_creneau_new". {"ro
+ute":"app_admin_consultation
+_creneau_new","route_paramet
+ers":{"_route":"app_admin_co
+nsultation_creneau_new","_co
+ntroller":"App\\Controller\\
+Admin\\ConsultationCreneauCr
+udController::new"},"request
+_uri":"http://127.0.0.1:8000
+/admin/consultation-creneaux
+/new","method":"POST"} []
+  [2026-02-25T06:42:39.40915
+5+01:00] doctrine.INFO: 
+Connecting with parameters a
+rray{"use_savepoints":true,"
+driver":"pdo_mysql","idle_co
+nnection_ttl":600,"host":"12
+7.0.0.1","port":3306,"user":
+"root","password":"<redacted
+>","driverOptions":[],"defau
+ltTableOptions":[],"dbname":
+"maternia","serverVersion":"
+8.0.32","charset":"utf8mb4"}
+ {"params":{"use_savepoints"
+:true,"driver":"pdo_mysql","
+idle_connection_ttl":600,"ho
+st":"127.0.0.1","port":3306,
+"user":"root","password":"<r
+edacted>","driverOptions":[]
+,"defaultTableOptions":[],"d
+bname":"maternia","serverVer
+sion":"8.0.32","charset":"ut
+f8mb4"}} []
+  [2026-02-25T06:42:39.43126
+9+01:00] doctrine.DEBUG: 
+Executing query: SELECT 
+c0_.id AS id_0, 
+c0_.categorie AS 
+categorie_1, 
+c0_.description AS 
+description_2, c0_.pour AS 
+pour_3, c0_.image AS 
+image_4, c0_.icon AS 
+icon_5, c0_.statut AS 
+statut_6, 
+c0_.ordre_affichage AS 
+ordre_affichage_7, 
+c0_.created_at AS 
+created_at_8, 
+c0_.updated_at AS 
+updated_at_9 FROM 
+consultation c0_ ORDER BY 
+c0_.ordre_affichage ASC, 
+c0_.categorie ASC 
+{"sql":"SELECT c0_.id AS 
+id_0, c0_.categorie AS 
+categorie_1, 
+c0_.description AS 
+description_2, c0_.pour AS 
+pour_3, c0_.image AS 
+image_4, c0_.icon AS 
+icon_5, c0_.statut AS 
+statut_6, 
+c0_.ordre_affichage AS 
+ordre_affichage_7, 
+c0_.created_at AS 
+created_at_8, 
+c0_.updated_at AS 
+updated_at_9 FROM 
+consultation c0_ ORDER BY 
+c0_.ordre_affichage ASC, 
+c0_.categorie ASC"} []
+  [2026-02-25T06:42:39.74475
+7+01:00] doctrine.DEBUG: 
+Beginning transaction [] []
+  [2026-02-25T06:42:39.76003
+0+01:00] doctrine.DEBUG: 
+Executing statement: INSERT 
+INTO consultation_creneau 
+(nom_medecin, 
+photo_medecin, 
+description_medecin, 
+specialite_medecin, 
+date_debut, date_fin, jour, 
+heure_debut, heure_fin, 
+statut_reservation, 
+duree_minutes, 
+nombre_places, created_at, 
+updated_at, 
+consultation_id) VALUES (?, 
+?, ?, ?, ?, ?, ?, ?, ?, ?, 
+?, ?, ?, ?, ?) (parameters: 
+array{"1":"(t(","2":"Capture
+dcran2025-09-30102758_699e8b
+cfb41312.14908498.png","3":"
+fr","4":"tyyt","5":"2026-09-
+17 
+12:00:00","6":"2026-09-17 12
+:35:00","7":"2026-09-17","8"
+:"12:00:00","9":"12:35:00","
+10":"DISPONIBLE","11":30,"12
+":1,"13":"2026-02-25 
+06:42:39","14":"2026-02-25 
+06:42:39","15":4}, types: ar
+ray{"1":0,"2":0,"3":0,"4":0,
+"5":0,"6":0,"7":0,"8":0,"9":
+0,"10":0,"11":0,"12":0,"13":
+0,"14":0,"15":0}) 
+{"sql":"INSERT INTO 
+consultation_creneau 
+(nom_medecin, 
+photo_medecin, 
+description_medecin, 
+specialite_medecin, 
+date_debut, date_fin, jour, 
+heure_debut, heure_fin, 
+statut_reservation, 
+duree_minutes, 
+nombre_places, created_at, 
+updated_at, 
+consultation_id) VALUES (?, 
+?, ?, ?, ?, ?, ?, ?, ?, ?, 
+?, ?, ?, ?, ?)","params":{"1
+":"(t(","2":"Capturedcran202
+5-09-30102758_699e8bcfb41312
+.14908498.png","3":"fr","4":
+"tyyt","5":"2026-09-17 
+12:00:00","6":"2026-09-17 12
+:35:00","7":"2026-09-17","8"
+:"12:00:00","9":"12:35:00","
+10":"DISPONIBLE","11":30,"12
+":1,"13":"2026-02-25 
+06:42:39","14":"2026-02-25 0
+6:42:39","15":4},"types":{"1
+":{"Doctrine\\DBAL\\Paramete
+rType":0},"2":{"Doctrine\\DB
+AL\\ParameterType":0},"3":{"
+Doctrine\\DBAL\\ParameterTyp
+e":0},"4":{"Doctrine\\DBAL\\
+ParameterType":0},"5":{"Doct
+rine\\DBAL\\ParameterType":0
+},"6":{"Doctrine\\DBAL\\Para
+meterType":0},"7":{"Doctrine
+\\DBAL\\ParameterType":0},"8
+":{"Doctrine\\DBAL\\Paramete
+rType":0},"9":{"Doctrine\\DB
+AL\\ParameterType":0},"10":{
+"Doctrine\\DBAL\\ParameterTy
+pe":0},"11":{"Doctrine\\DBAL
+\\ParameterType":0},"12":{"D
+octrine\\DBAL\\ParameterType
+":0},"13":{"Doctrine\\DBAL\\
+ParameterType":0},"14":{"Doc
+trine\\DBAL\\ParameterType":
+0},"15":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:42:39.76101
+3+01:00] doctrine.DEBUG: 
+Committing transaction [] []
+  [2026-02-25T06:42:39.87625
+1+01:00] doctrine.INFO: 
+Disconnecting [] []
+  [2026-02-25T06:42:40.23021
+3+01:00] request.INFO: 
+Matched route "app_admin_con
+sultation_creneau_index". {"
+route":"app_admin_consultati
+on_creneau_index","route_par
+ameters":{"_route":"app_admi
+n_consultation_creneau_index
+","_controller":"App\\Contro
+ller\\Admin\\ConsultationCre
+neauCrudController::index"},
+"request_uri":"http://127.0.
+0.1:8000/admin/consultation-
+creneaux/","method":"GET"} 
+[]
+  [2026-02-25T06:42:40.38103
+3+01:00] doctrine.INFO: 
+Connecting with parameters a
+rray{"use_savepoints":true,"
+driver":"pdo_mysql","idle_co
+nnection_ttl":600,"host":"12
+7.0.0.1","port":3306,"user":
+"root","password":"<redacted
+>","driverOptions":[],"defau
+ltTableOptions":[],"dbname":
+"maternia","serverVersion":"
+8.0.32","charset":"utf8mb4"}
+ {"params":{"use_savepoints"
+:true,"driver":"pdo_mysql","
+idle_connection_ttl":600,"ho
+st":"127.0.0.1","port":3306,
+"user":"root","password":"<r
+edacted>","driverOptions":[]
+,"defaultTableOptions":[],"d
+bname":"maternia","serverVer
+sion":"8.0.32","charset":"ut
+f8mb4"}} []
+  [2026-02-25T06:42:40.40423
+5+01:00] doctrine.DEBUG: 
+Executing query: SELECT 
+c0_.id AS id_0, 
+c0_.nom_medecin AS 
+nom_medecin_1, 
+c0_.photo_medecin AS 
+photo_medecin_2, 
+c0_.description_medecin AS 
+description_medecin_3, 
+c0_.specialite_medecin AS 
+specialite_medecin_4, 
+c0_.date_debut AS 
+date_debut_5, c0_.date_fin 
+AS date_fin_6, c0_.jour AS 
+jour_7, c0_.heure_debut AS 
+heure_debut_8, 
+c0_.heure_fin AS 
+heure_fin_9, 
+c0_.statut_reservation AS 
+statut_reservation_10, 
+c0_.duree_minutes AS 
+duree_minutes_11, 
+c0_.nombre_places AS 
+nombre_places_12, 
+c0_.created_at AS 
+created_at_13, 
+c0_.updated_at AS 
+updated_at_14, 
+c0_.consultation_id AS 
+consultation_id_15 FROM 
+consultation_creneau c0_ 
+LEFT JOIN consultation c1_ 
+ON c0_.consultation_id = 
+c1_.id ORDER BY 
+c0_.date_debut DESC, 
+c1_.categorie ASC, 
+c0_.statut_reservation ASC 
+{"sql":"SELECT c0_.id AS 
+id_0, c0_.nom_medecin AS 
+nom_medecin_1, 
+c0_.photo_medecin AS 
+photo_medecin_2, 
+c0_.description_medecin AS 
+description_medecin_3, 
+c0_.specialite_medecin AS 
+specialite_medecin_4, 
+c0_.date_debut AS 
+date_debut_5, c0_.date_fin 
+AS date_fin_6, c0_.jour AS 
+jour_7, c0_.heure_debut AS 
+heure_debut_8, 
+c0_.heure_fin AS 
+heure_fin_9, 
+c0_.statut_reservation AS 
+statut_reservation_10, 
+c0_.duree_minutes AS 
+duree_minutes_11, 
+c0_.nombre_places AS 
+nombre_places_12, 
+c0_.created_at AS 
+created_at_13, 
+c0_.updated_at AS 
+updated_at_14, 
+c0_.consultation_id AS 
+consultation_id_15 FROM 
+consultation_creneau c0_ 
+LEFT JOIN consultation c1_ 
+ON c0_.consultation_id = 
+c1_.id ORDER BY 
+c0_.date_debut DESC, 
+c1_.categorie ASC, 
+c0_.statut_reservation 
+ASC"} []
+  [2026-02-25T06:42:40.48454
+2+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":13}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":13},"type
+s":{"1":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:42:40.48993
+7+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":18}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":18},"type
+s":{"1":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:42:40.49163
+1+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":25}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":25},"type
+s":{"1":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:42:40.49295
+4+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":12}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":12},"type
+s":{"1":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:42:40.49423
+3+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":27}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":27},"type
+s":{"1":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:42:40.49548
+8+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":11}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":11},"type
+s":{"1":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:42:40.49704
+2+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":19}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":19},"type
+s":{"1":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:42:40.49834
+8+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":17}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":17},"type
+s":{"1":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:42:40.49974
+0+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":20}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":20},"type
+s":{"1":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:42:40.50105
+9+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":21}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":21},"type
+s":{"1":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:42:40.50234
+7+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":22}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":22},"type
+s":{"1":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:42:40.50373
+5+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":24}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":24},"type
+s":{"1":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:42:40.50519
+3+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":23}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":23},"type
+s":{"1":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:42:40.50651
+7+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":14}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":14},"type
+s":{"1":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:42:40.50775
+7+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":16}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":16},"type
+s":{"1":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:42:40.50898
+3+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":26}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":26},"type
+s":{"1":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:42:40.51033
+1+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":10}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":10},"type
+s":{"1":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:42:40.51174
+2+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":15}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":15},"type
+s":{"1":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:42:40.51301
+0+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":9}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":9},"types
+":{"1":{"Doctrine\\DBAL\\Par
+ameterType":0}}} []
+  [2026-02-25T06:42:40.51442
+4+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":4}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":4},"types
+":{"1":{"Doctrine\\DBAL\\Par
+ameterType":0}}} []
+  [2026-02-25T06:42:40.51549
+9+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":8}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":8},"types
+":{"1":{"Doctrine\\DBAL\\Par
+ameterType":0}}} []
+  [2026-02-25T06:42:40.51663
+5+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":7}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":7},"types
+":{"1":{"Doctrine\\DBAL\\Par
+ameterType":0}}} []
+  [2026-02-25T06:42:40.51783
+2+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":6}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":6},"types
+":{"1":{"Doctrine\\DBAL\\Par
+ameterType":0}}} []
+  [2026-02-25T06:42:40.51944
+4+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":5}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":5},"types
+":{"1":{"Doctrine\\DBAL\\Par
+ameterType":0}}} []
+  [2026-02-25T06:42:40.55264
+9+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, t0.categorie 
+AS categorie_2, 
+t0.description AS 
+description_3, t0.pour AS 
+pour_4, t0.image AS 
+image_5, t0.icon AS icon_6, 
+t0.statut AS statut_7, 
+t0.ordre_affichage AS 
+ordre_affichage_8, 
+t0.created_at AS 
+created_at_9, t0.updated_at 
+AS updated_at_10 FROM 
+consultation t0 WHERE t0.id 
+= ? (parameters: 
+array{"1":7}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.categorie AS 
+categorie_2, t0.description 
+AS description_3, t0.pour 
+AS pour_4, t0.image AS 
+image_5, t0.icon AS icon_6, 
+t0.statut AS statut_7, 
+t0.ordre_affichage AS 
+ordre_affichage_8, 
+t0.created_at AS 
+created_at_9, t0.updated_at 
+AS updated_at_10 FROM 
+consultation t0 WHERE t0.id 
+= ?","params":{"1":7},"types
+":{"1":{"Doctrine\\DBAL\\Par
+ameterType":0}}} []
+  [2026-02-25T06:42:40.58560
+3+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, t0.categorie 
+AS categorie_2, 
+t0.description AS 
+description_3, t0.pour AS 
+pour_4, t0.image AS 
+image_5, t0.icon AS icon_6, 
+t0.statut AS statut_7, 
+t0.ordre_affichage AS 
+ordre_affichage_8, 
+t0.created_at AS 
+created_at_9, t0.updated_at 
+AS updated_at_10 FROM 
+consultation t0 WHERE t0.id 
+= ? (parameters: 
+array{"1":3}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.categorie AS 
+categorie_2, t0.description 
+AS description_3, t0.pour 
+AS pour_4, t0.image AS 
+image_5, t0.icon AS icon_6, 
+t0.statut AS statut_7, 
+t0.ordre_affichage AS 
+ordre_affichage_8, 
+t0.created_at AS 
+created_at_9, t0.updated_at 
+AS updated_at_10 FROM 
+consultation t0 WHERE t0.id 
+= ?","params":{"1":3},"types
+":{"1":{"Doctrine\\DBAL\\Par
+ameterType":0}}} []
+  [2026-02-25T06:42:40.58853
+4+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, t0.categorie 
+AS categorie_2, 
+t0.description AS 
+description_3, t0.pour AS 
+pour_4, t0.image AS 
+image_5, t0.icon AS icon_6, 
+t0.statut AS statut_7, 
+t0.ordre_affichage AS 
+ordre_affichage_8, 
+t0.created_at AS 
+created_at_9, t0.updated_at 
+AS updated_at_10 FROM 
+consultation t0 WHERE t0.id 
+= ? (parameters: 
+array{"1":4}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.categorie AS 
+categorie_2, t0.description 
+AS description_3, t0.pour 
+AS pour_4, t0.image AS 
+image_5, t0.icon AS icon_6, 
+t0.statut AS statut_7, 
+t0.ordre_affichage AS 
+ordre_affichage_8, 
+t0.created_at AS 
+created_at_9, t0.updated_at 
+AS updated_at_10 FROM 
+consultation t0 WHERE t0.id 
+= ?","params":{"1":4},"types
+":{"1":{"Doctrine\\DBAL\\Par
+ameterType":0}}} []
+  [2026-02-25T06:42:40.71404
+8+01:00] doctrine.INFO: 
+Disconnecting [] []
+  [2026-02-25T06:42:41.27947
+2+01:00] request.ERROR: 
+Uncaught PHP Exception Symfo
+ny\Component\HttpKernel\Exce
+ption\NotFoundHttpException:
+ "No route found for "GET ht
+tp://127.0.0.1:8000/uploads/
+medecins/images_698e231ca72d
+99.18964737.jpg" (from "http
+://127.0.0.1:8000/admin/cons
+ultation-creneaux/")" at 
+RouterListener.php line 127 
+{"exception":"[object] (Symf
+ony\\Component\\HttpKernel\\
+Exception\\NotFoundHttpExcep
+tion(code: 0): No route 
+found for \"GET http://127.0
+.0.1:8000/uploads/medecins/i
+mages_698e231ca72d99.1896473
+7.jpg\" (from \"http://127.0
+.0.1:8000/admin/consultation
+-creneaux/\") at C:/Users/Or
+diOne/Desktop/Maternia/vendo
+r/symfony/http-kernel/EventL
+istener/RouterListener.php:1
+27)\n[previous exception] 
+[object] (Symfony\\Component
+\\Routing\\Exception\\Resour
+ceNotFoundException(code: 
+0): No routes found for \"/u
+ploads/medecins/images_698e2
+31ca72d99.18964737.jpg/\". 
+at C:/Users/OrdiOne/Desktop/
+Maternia/vendor/symfony/rout
+ing/Matcher/Dumper/CompiledU
+rlMatcherTrait.php:70)"} []
+  [2026-02-25T06:42:42.03636
+1+01:00] request.ERROR: 
+Uncaught PHP Exception Symfo
+ny\Component\HttpKernel\Exce
+ption\NotFoundHttpException:
+ "No route found for "GET ht
+tp://127.0.0.1:8000/uploads/
+medecins/images1_698e2258c4e
+2c4.71094608.jpg" (from "htt
+p://127.0.0.1:8000/admin/con
+sultation-creneaux/")" at 
+RouterListener.php line 127 
+{"exception":"[object] (Symf
+ony\\Component\\HttpKernel\\
+Exception\\NotFoundHttpExcep
+tion(code: 0): No route 
+found for \"GET http://127.0
+.0.1:8000/uploads/medecins/i
+mages1_698e2258c4e2c4.710946
+08.jpg\" (from \"http://127.
+0.0.1:8000/admin/consultatio
+n-creneaux/\") at C:/Users/O
+rdiOne/Desktop/Maternia/vend
+or/symfony/http-kernel/Event
+Listener/RouterListener.php:
+127)\n[previous exception] 
+[object] (Symfony\\Component
+\\Routing\\Exception\\Resour
+ceNotFoundException(code: 
+0): No routes found for \"/u
+ploads/medecins/images1_698e
+2258c4e2c4.71094608.jpg/\". 
+at C:/Users/OrdiOne/Desktop/
+Maternia/vendor/symfony/rout
+ing/Matcher/Dumper/CompiledU
+rlMatcherTrait.php:70)"} []
+  [2026-02-25T06:42:42.76963
+5+01:00] request.ERROR: 
+Uncaught PHP Exception Symfo
+ny\Component\HttpKernel\Exce
+ption\NotFoundHttpException:
+ "No route found for "GET ht
+tp://127.0.0.1:8000/uploads/
+medecins/tom_698e40263b3299.
+36295497.jpg" (from "http://
+127.0.0.1:8000/admin/consult
+ation-creneaux/")" at 
+RouterListener.php line 127 
+{"exception":"[object] (Symf
+ony\\Component\\HttpKernel\\
+Exception\\NotFoundHttpExcep
+tion(code: 0): No route 
+found for \"GET http://127.0
+.0.1:8000/uploads/medecins/t
+om_698e40263b3299.36295497.j
+pg\" (from \"http://127.0.0.
+1:8000/admin/consultation-cr
+eneaux/\") at C:/Users/OrdiO
+ne/Desktop/Maternia/vendor/s
+ymfony/http-kernel/EventList
+ener/RouterListener.php:127)
+\n[previous exception] 
+[object] (Symfony\\Component
+\\Routing\\Exception\\Resour
+ceNotFoundException(code: 
+0): No routes found for \"/u
+ploads/medecins/tom_698e4026
+3b3299.36295497.jpg/\". at C
+:/Users/OrdiOne/Desktop/Mate
+rnia/vendor/symfony/routing/
+Matcher/Dumper/CompiledUrlMa
+tcherTrait.php:70)"} []
+  [2026-02-25T06:42:43.35171
+1+01:00] request.INFO: 
+Matched route "_wdt". {"rout
+e":"_wdt","route_parameters"
+:{"_route":"_wdt","_controll
+er":"web_profiler.controller
+.profiler::toolbarAction","t
+oken":"f4d39f"},"request_uri
+":"http://127.0.0.1:8000/_wd
+t/f4d39f","method":"GET"} []
+  [2026-02-25T06:43:05.46450
+2+01:00] request.INFO: 
+Matched route "app_consultat
+ion_medecins". {"route":"app
+_consultation_medecins","rou
+te_parameters":{"_route":"ap
+p_consultation_medecins","_c
+ontroller":"App\\Controller\
+\ConsultationController::med
+ecins","id":"4"},"request_ur
+i":"http://127.0.0.1:8000/co
+nsultation/4/medecins","meth
+od":"GET"} []
+  [2026-02-25T06:43:05.57644
+5+01:00] doctrine.INFO: 
+Connecting with parameters a
+rray{"use_savepoints":true,"
+driver":"pdo_mysql","idle_co
+nnection_ttl":600,"host":"12
+7.0.0.1","port":3306,"user":
+"root","password":"<redacted
+>","driverOptions":[],"defau
+ltTableOptions":[],"dbname":
+"maternia","serverVersion":"
+8.0.32","charset":"utf8mb4"}
+ {"params":{"use_savepoints"
+:true,"driver":"pdo_mysql","
+idle_connection_ttl":600,"ho
+st":"127.0.0.1","port":3306,
+"user":"root","password":"<r
+edacted>","driverOptions":[]
+,"defaultTableOptions":[],"d
+bname":"maternia","serverVer
+sion":"8.0.32","charset":"ut
+f8mb4"}} []
+  [2026-02-25T06:43:05.58053
+1+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, t0.categorie 
+AS categorie_2, 
+t0.description AS 
+description_3, t0.pour AS 
+pour_4, t0.image AS 
+image_5, t0.icon AS icon_6, 
+t0.statut AS statut_7, 
+t0.ordre_affichage AS 
+ordre_affichage_8, 
+t0.created_at AS 
+created_at_9, t0.updated_at 
+AS updated_at_10 FROM 
+consultation t0 WHERE t0.id 
+= ? (parameters: 
+array{"1":"4"}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.categorie AS 
+categorie_2, t0.description 
+AS description_3, t0.pour 
+AS pour_4, t0.image AS 
+image_5, t0.icon AS icon_6, 
+t0.statut AS statut_7, 
+t0.ordre_affichage AS 
+ordre_affichage_8, 
+t0.created_at AS 
+created_at_9, t0.updated_at 
+AS updated_at_10 FROM 
+consultation t0 WHERE t0.id 
+= ?","params":{"1":"4"},"typ
+es":{"1":{"Doctrine\\DBAL\\P
+arameterType":0}}} []
+  [2026-02-25T06:43:05.65443
+3+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+c0_.nom_medecin AS 
+nom_medecin_0, MAX(c0_.descr
+iption_medecin) AS sclr_1, 
+MAX(c0_.photo_medecin) AS 
+sclr_2, 
+MAX(c0_.specialite_medecin) 
+AS sclr_3 FROM 
+consultation_creneau c0_ 
+WHERE c0_.consultation_id = 
+? AND c0_.date_debut > ? 
+GROUP BY c0_.nom_medecin 
+ORDER BY c0_.nom_medecin 
+ASC (parameters: 
+array{"1":4,"2":"2026-02-25 
+06:43:05"}, types: 
+array{"1":0,"2":0}) 
+{"sql":"SELECT 
+c0_.nom_medecin AS 
+nom_medecin_0, MAX(c0_.descr
+iption_medecin) AS sclr_1, 
+MAX(c0_.photo_medecin) AS 
+sclr_2, 
+MAX(c0_.specialite_medecin) 
+AS sclr_3 FROM 
+consultation_creneau c0_ 
+WHERE c0_.consultation_id = 
+? AND c0_.date_debut > ? 
+GROUP BY c0_.nom_medecin 
+ORDER BY c0_.nom_medecin ASC
+","params":{"1":4,"2":"2026-
+02-25 06:43:05"},"types":{"1
+":{"Doctrine\\DBAL\\Paramete
+rType":0},"2":{"Doctrine\\DB
+AL\\ParameterType":0}}} []
+  [2026-02-25T06:43:05.83349
+5+01:00] doctrine.INFO: 
+Disconnecting [] []
+  [2026-02-25T06:43:06.36373
+4+01:00] request.INFO: 
+Matched route "_wdt". {"rout
+e":"_wdt","route_parameters"
+:{"_route":"_wdt","_controll
+er":"web_profiler.controller
+.profiler::toolbarAction","t
+oken":"68ed99"},"request_uri
+":"http://127.0.0.1:8000/_wd
+t/68ed99","method":"GET"} []
+  [2026-02-25T06:43:09.03440
+5+01:00] request.INFO: 
+Matched route 
+"app_medecin_creneaux". {"ro
+ute":"app_medecin_creneaux",
+"route_parameters":{"_route"
+:"app_medecin_creneaux","_co
+ntroller":"App\\Controller\\
+ConsultationController::cren
+eaux","medecin":"%28t%28"},"
+request_uri":"http://127.0.0
+.1:8000/medecin/%2528t%2528/
+creneaux","method":"GET"} []
+  [2026-02-25T06:43:09.18512
+4+01:00] doctrine.INFO: 
+Connecting with parameters a
+rray{"use_savepoints":true,"
+driver":"pdo_mysql","idle_co
+nnection_ttl":600,"host":"12
+7.0.0.1","port":3306,"user":
+"root","password":"<redacted
+>","driverOptions":[],"defau
+ltTableOptions":[],"dbname":
+"maternia","serverVersion":"
+8.0.32","charset":"utf8mb4"}
+ {"params":{"use_savepoints"
+:true,"driver":"pdo_mysql","
+idle_connection_ttl":600,"ho
+st":"127.0.0.1","port":3306,
+"user":"root","password":"<r
+edacted>","driverOptions":[]
+,"defaultTableOptions":[],"d
+bname":"maternia","serverVer
+sion":"8.0.32","charset":"ut
+f8mb4"}} []
+  [2026-02-25T06:43:09.19589
+5+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+c0_.id AS id_0, 
+c0_.nom_medecin AS 
+nom_medecin_1, 
+c0_.photo_medecin AS 
+photo_medecin_2, 
+c0_.description_medecin AS 
+description_medecin_3, 
+c0_.specialite_medecin AS 
+specialite_medecin_4, 
+c0_.date_debut AS 
+date_debut_5, c0_.date_fin 
+AS date_fin_6, c0_.jour AS 
+jour_7, c0_.heure_debut AS 
+heure_debut_8, 
+c0_.heure_fin AS 
+heure_fin_9, 
+c0_.statut_reservation AS 
+statut_reservation_10, 
+c0_.duree_minutes AS 
+duree_minutes_11, 
+c0_.nombre_places AS 
+nombre_places_12, 
+c0_.created_at AS 
+created_at_13, 
+c0_.updated_at AS 
+updated_at_14, 
+c0_.consultation_id AS 
+consultation_id_15 FROM 
+consultation_creneau c0_ 
+LEFT JOIN 
+reservation_client r1_ ON 
+c0_.id = 
+r1_.consultation_creneau_id 
+WHERE c0_.nom_medecin = ? 
+AND c0_.statut_reservation 
+= ? AND c0_.date_debut > ? 
+AND r1_.id IS NULL ORDER BY 
+c0_.date_debut ASC 
+(parameters: array{"1":"(t("
+,"2":"DISPONIBLE","3":"2026-
+02-25 06:43:09"}, types: 
+array{"1":0,"2":0,"3":0}) 
+{"sql":"SELECT c0_.id AS 
+id_0, c0_.nom_medecin AS 
+nom_medecin_1, 
+c0_.photo_medecin AS 
+photo_medecin_2, 
+c0_.description_medecin AS 
+description_medecin_3, 
+c0_.specialite_medecin AS 
+specialite_medecin_4, 
+c0_.date_debut AS 
+date_debut_5, c0_.date_fin 
+AS date_fin_6, c0_.jour AS 
+jour_7, c0_.heure_debut AS 
+heure_debut_8, 
+c0_.heure_fin AS 
+heure_fin_9, 
+c0_.statut_reservation AS 
+statut_reservation_10, 
+c0_.duree_minutes AS 
+duree_minutes_11, 
+c0_.nombre_places AS 
+nombre_places_12, 
+c0_.created_at AS 
+created_at_13, 
+c0_.updated_at AS 
+updated_at_14, 
+c0_.consultation_id AS 
+consultation_id_15 FROM 
+consultation_creneau c0_ 
+LEFT JOIN 
+reservation_client r1_ ON 
+c0_.id = 
+r1_.consultation_creneau_id 
+WHERE c0_.nom_medecin = ? 
+AND c0_.statut_reservation 
+= ? AND c0_.date_debut > ? 
+AND r1_.id IS NULL ORDER BY 
+c0_.date_debut ASC","params"
+:{"1":"(t(","2":"DISPONIBLE"
+,"3":"2026-02-25 06:43:09"},
+"types":{"1":{"Doctrine\\DBA
+L\\ParameterType":0},"2":{"D
+octrine\\DBAL\\ParameterType
+":0},"3":{"Doctrine\\DBAL\\P
+arameterType":0}}} []
+  [2026-02-25T06:43:09.21981
+7+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ? (parameters: 
+array{"1":27}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_client AS 
+nom_client_2, 
+t0.prenom_client AS 
+prenom_client_3, 
+t0.email_client AS 
+email_client_4, 
+t0.telephone_client AS 
+telephone_client_5, 
+t0.type_patient AS 
+type_patient_6, 
+t0.mois_grossesse AS 
+mois_grossesse_7, 
+t0.date_naissance_bebe AS 
+date_naissance_bebe_8, 
+t0.statut_reservation AS 
+statut_reservation_9, 
+t0.reference AS 
+reference_10, 
+t0.date_reservation AS 
+date_reservation_11, 
+t0.notes AS notes_12, 
+t0.created_at AS 
+created_at_13, 
+t0.updated_at AS 
+updated_at_14, 
+t0.consultation_creneau_id 
+AS 
+consultation_creneau_id_15 
+FROM reservation_client t0 
+WHERE 
+t0.consultation_creneau_id 
+= ?","params":{"1":27},"type
+s":{"1":{"Doctrine\\DBAL\\Pa
+rameterType":0}}} []
+  [2026-02-25T06:43:09.24733
+7+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, t0.categorie 
+AS categorie_2, 
+t0.description AS 
+description_3, t0.pour AS 
+pour_4, t0.image AS 
+image_5, t0.icon AS icon_6, 
+t0.statut AS statut_7, 
+t0.ordre_affichage AS 
+ordre_affichage_8, 
+t0.created_at AS 
+created_at_9, t0.updated_at 
+AS updated_at_10 FROM 
+consultation t0 WHERE t0.id 
+= ? (parameters: 
+array{"1":4}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.categorie AS 
+categorie_2, t0.description 
+AS description_3, t0.pour 
+AS pour_4, t0.image AS 
+image_5, t0.icon AS icon_6, 
+t0.statut AS statut_7, 
+t0.ordre_affichage AS 
+ordre_affichage_8, 
+t0.created_at AS 
+created_at_9, t0.updated_at 
+AS updated_at_10 FROM 
+consultation t0 WHERE t0.id 
+= ?","params":{"1":4},"types
+":{"1":{"Doctrine\\DBAL\\Par
+ameterType":0}}} []
+  [2026-02-25T06:43:09.37834
+6+01:00] doctrine.INFO: 
+Disconnecting [] []
+  [2026-02-25T06:43:10.00513
+1+01:00] request.INFO: 
+Matched route "_wdt". {"rout
+e":"_wdt","route_parameters"
+:{"_route":"_wdt","_controll
+er":"web_profiler.controller
+.profiler::toolbarAction","t
+oken":"019cf7"},"request_uri
+":"http://127.0.0.1:8000/_wd
+t/019cf7","method":"GET"} []
+  [2026-02-25T06:43:11.68688
+3+01:00] request.INFO: 
+Matched route 
+"app_creneau_reserver". {"ro
+ute":"app_creneau_reserver",
+"route_parameters":{"_route"
+:"app_creneau_reserver","_co
+ntroller":"App\\Controller\\
+ConsultationController::rese
+rver","id":"27"},"request_ur
+i":"http://127.0.0.1:8000/cr
+eneau/27/reserver","method":
+"GET"} []
+  [2026-02-25T06:43:11.80543
+8+01:00] doctrine.INFO: 
+Connecting with parameters a
+rray{"use_savepoints":true,"
+driver":"pdo_mysql","idle_co
+nnection_ttl":600,"host":"12
+7.0.0.1","port":3306,"user":
+"root","password":"<redacted
+>","driverOptions":[],"defau
+ltTableOptions":[],"dbname":
+"maternia","serverVersion":"
+8.0.32","charset":"utf8mb4"}
+ {"params":{"use_savepoints"
+:true,"driver":"pdo_mysql","
+idle_connection_ttl":600,"ho
+st":"127.0.0.1","port":3306,
+"user":"root","password":"<r
+edacted>","driverOptions":[]
+,"defaultTableOptions":[],"d
+bname":"maternia","serverVer
+sion":"8.0.32","charset":"ut
+f8mb4"}} []
+  [2026-02-25T06:43:11.80914
+6+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_medecin AS 
+nom_medecin_2, 
+t0.photo_medecin AS 
+photo_medecin_3, 
+t0.description_medecin AS 
+description_medecin_4, 
+t0.specialite_medecin AS 
+specialite_medecin_5, 
+t0.date_debut AS 
+date_debut_6, t0.date_fin 
+AS date_fin_7, t0.jour AS 
+jour_8, t0.heure_debut AS 
+heure_debut_9, t0.heure_fin 
+AS heure_fin_10, 
+t0.statut_reservation AS 
+statut_reservation_11, 
+t0.duree_minutes AS 
+duree_minutes_12, 
+t0.nombre_places AS 
+nombre_places_13, 
+t0.created_at AS 
+created_at_14, 
+t0.updated_at AS 
+updated_at_15, 
+t0.consultation_id AS 
+consultation_id_16, t17.id 
+AS id_18, t17.nom_client AS 
+nom_client_19, 
+t17.prenom_client AS 
+prenom_client_20, 
+t17.email_client AS 
+email_client_21, 
+t17.telephone_client AS 
+telephone_client_22, 
+t17.type_patient AS 
+type_patient_23, 
+t17.mois_grossesse AS 
+mois_grossesse_24, 
+t17.date_naissance_bebe AS 
+date_naissance_bebe_25, 
+t17.statut_reservation AS 
+statut_reservation_26, 
+t17.reference AS 
+reference_27, 
+t17.date_reservation AS 
+date_reservation_28, 
+t17.notes AS notes_29, 
+t17.created_at AS 
+created_at_30, 
+t17.updated_at AS 
+updated_at_31, 
+t17.consultation_creneau_id 
+AS 
+consultation_creneau_id_32 
+FROM consultation_creneau 
+t0 LEFT JOIN 
+reservation_client t17 ON 
+t17.consultation_creneau_id 
+= t0.id WHERE t0.id = ? 
+(parameters: 
+array{"1":"27"}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_medecin AS 
+nom_medecin_2, 
+t0.photo_medecin AS 
+photo_medecin_3, 
+t0.description_medecin AS 
+description_medecin_4, 
+t0.specialite_medecin AS 
+specialite_medecin_5, 
+t0.date_debut AS 
+date_debut_6, t0.date_fin 
+AS date_fin_7, t0.jour AS 
+jour_8, t0.heure_debut AS 
+heure_debut_9, t0.heure_fin 
+AS heure_fin_10, 
+t0.statut_reservation AS 
+statut_reservation_11, 
+t0.duree_minutes AS 
+duree_minutes_12, 
+t0.nombre_places AS 
+nombre_places_13, 
+t0.created_at AS 
+created_at_14, 
+t0.updated_at AS 
+updated_at_15, 
+t0.consultation_id AS 
+consultation_id_16, t17.id 
+AS id_18, t17.nom_client AS 
+nom_client_19, 
+t17.prenom_client AS 
+prenom_client_20, 
+t17.email_client AS 
+email_client_21, 
+t17.telephone_client AS 
+telephone_client_22, 
+t17.type_patient AS 
+type_patient_23, 
+t17.mois_grossesse AS 
+mois_grossesse_24, 
+t17.date_naissance_bebe AS 
+date_naissance_bebe_25, 
+t17.statut_reservation AS 
+statut_reservation_26, 
+t17.reference AS 
+reference_27, 
+t17.date_reservation AS 
+date_reservation_28, 
+t17.notes AS notes_29, 
+t17.created_at AS 
+created_at_30, 
+t17.updated_at AS 
+updated_at_31, 
+t17.consultation_creneau_id 
+AS 
+consultation_creneau_id_32 
+FROM consultation_creneau 
+t0 LEFT JOIN 
+reservation_client t17 ON 
+t17.consultation_creneau_id 
+= t0.id WHERE t0.id = ?","pa
+rams":{"1":"27"},"types":{"1
+":{"Doctrine\\DBAL\\Paramete
+rType":0}}} []
+  [2026-02-25T06:43:12.02371
+0+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, t0.categorie 
+AS categorie_2, 
+t0.description AS 
+description_3, t0.pour AS 
+pour_4, t0.image AS 
+image_5, t0.icon AS icon_6, 
+t0.statut AS statut_7, 
+t0.ordre_affichage AS 
+ordre_affichage_8, 
+t0.created_at AS 
+created_at_9, t0.updated_at 
+AS updated_at_10 FROM 
+consultation t0 WHERE t0.id 
+= ? (parameters: 
+array{"1":4}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.categorie AS 
+categorie_2, t0.description 
+AS description_3, t0.pour 
+AS pour_4, t0.image AS 
+image_5, t0.icon AS icon_6, 
+t0.statut AS statut_7, 
+t0.ordre_affichage AS 
+ordre_affichage_8, 
+t0.created_at AS 
+created_at_9, t0.updated_at 
+AS updated_at_10 FROM 
+consultation t0 WHERE t0.id 
+= ?","params":{"1":4},"types
+":{"1":{"Doctrine\\DBAL\\Par
+ameterType":0}}} []
+  [2026-02-25T06:43:12.17554
+4+01:00] doctrine.INFO: 
+Disconnecting [] []
+  [2026-02-25T06:43:12.79387
+4+01:00] request.INFO: 
+Matched route "_wdt". {"rout
+e":"_wdt","route_parameters"
+:{"_route":"_wdt","_controll
+er":"web_profiler.controller
+.profiler::toolbarAction","t
+oken":"0565d0"},"request_uri
+":"http://127.0.0.1:8000/_wd
+t/0565d0","method":"GET"} []
+  [2026-02-25T06:43:39.98890
+3+01:00] request.INFO: 
+Matched route 
+"app_creneau_reserver". {"ro
+ute":"app_creneau_reserver",
+"route_parameters":{"_route"
+:"app_creneau_reserver","_co
+ntroller":"App\\Controller\\
+ConsultationController::rese
+rver","id":"27"},"request_ur
+i":"http://127.0.0.1:8000/cr
+eneau/27/reserver","method":
+"POST"} []
+  [2026-02-25T06:43:40.25108
+0+01:00] doctrine.INFO: 
+Connecting with parameters a
+rray{"use_savepoints":true,"
+driver":"pdo_mysql","idle_co
+nnection_ttl":600,"host":"12
+7.0.0.1","port":3306,"user":
+"root","password":"<redacted
+>","driverOptions":[],"defau
+ltTableOptions":[],"dbname":
+"maternia","serverVersion":"
+8.0.32","charset":"utf8mb4"}
+ {"params":{"use_savepoints"
+:true,"driver":"pdo_mysql","
+idle_connection_ttl":600,"ho
+st":"127.0.0.1","port":3306,
+"user":"root","password":"<r
+edacted>","driverOptions":[]
+,"defaultTableOptions":[],"d
+bname":"maternia","serverVer
+sion":"8.0.32","charset":"ut
+f8mb4"}} []
+  [2026-02-25T06:43:40.28782
+6+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, 
+t0.nom_medecin AS 
+nom_medecin_2, 
+t0.photo_medecin AS 
+photo_medecin_3, 
+t0.description_medecin AS 
+description_medecin_4, 
+t0.specialite_medecin AS 
+specialite_medecin_5, 
+t0.date_debut AS 
+date_debut_6, t0.date_fin 
+AS date_fin_7, t0.jour AS 
+jour_8, t0.heure_debut AS 
+heure_debut_9, t0.heure_fin 
+AS heure_fin_10, 
+t0.statut_reservation AS 
+statut_reservation_11, 
+t0.duree_minutes AS 
+duree_minutes_12, 
+t0.nombre_places AS 
+nombre_places_13, 
+t0.created_at AS 
+created_at_14, 
+t0.updated_at AS 
+updated_at_15, 
+t0.consultation_id AS 
+consultation_id_16, t17.id 
+AS id_18, t17.nom_client AS 
+nom_client_19, 
+t17.prenom_client AS 
+prenom_client_20, 
+t17.email_client AS 
+email_client_21, 
+t17.telephone_client AS 
+telephone_client_22, 
+t17.type_patient AS 
+type_patient_23, 
+t17.mois_grossesse AS 
+mois_grossesse_24, 
+t17.date_naissance_bebe AS 
+date_naissance_bebe_25, 
+t17.statut_reservation AS 
+statut_reservation_26, 
+t17.reference AS 
+reference_27, 
+t17.date_reservation AS 
+date_reservation_28, 
+t17.notes AS notes_29, 
+t17.created_at AS 
+created_at_30, 
+t17.updated_at AS 
+updated_at_31, 
+t17.consultation_creneau_id 
+AS 
+consultation_creneau_id_32 
+FROM consultation_creneau 
+t0 LEFT JOIN 
+reservation_client t17 ON 
+t17.consultation_creneau_id 
+= t0.id WHERE t0.id = ? 
+(parameters: 
+array{"1":"27"}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.nom_medecin AS 
+nom_medecin_2, 
+t0.photo_medecin AS 
+photo_medecin_3, 
+t0.description_medecin AS 
+description_medecin_4, 
+t0.specialite_medecin AS 
+specialite_medecin_5, 
+t0.date_debut AS 
+date_debut_6, t0.date_fin 
+AS date_fin_7, t0.jour AS 
+jour_8, t0.heure_debut AS 
+heure_debut_9, t0.heure_fin 
+AS heure_fin_10, 
+t0.statut_reservation AS 
+statut_reservation_11, 
+t0.duree_minutes AS 
+duree_minutes_12, 
+t0.nombre_places AS 
+nombre_places_13, 
+t0.created_at AS 
+created_at_14, 
+t0.updated_at AS 
+updated_at_15, 
+t0.consultation_id AS 
+consultation_id_16, t17.id 
+AS id_18, t17.nom_client AS 
+nom_client_19, 
+t17.prenom_client AS 
+prenom_client_20, 
+t17.email_client AS 
+email_client_21, 
+t17.telephone_client AS 
+telephone_client_22, 
+t17.type_patient AS 
+type_patient_23, 
+t17.mois_grossesse AS 
+mois_grossesse_24, 
+t17.date_naissance_bebe AS 
+date_naissance_bebe_25, 
+t17.statut_reservation AS 
+statut_reservation_26, 
+t17.reference AS 
+reference_27, 
+t17.date_reservation AS 
+date_reservation_28, 
+t17.notes AS notes_29, 
+t17.created_at AS 
+created_at_30, 
+t17.updated_at AS 
+updated_at_31, 
+t17.consultation_creneau_id 
+AS 
+consultation_creneau_id_32 
+FROM consultation_creneau 
+t0 LEFT JOIN 
+reservation_client t17 ON 
+t17.consultation_creneau_id 
+= t0.id WHERE t0.id = ?","pa
+rams":{"1":"27"},"types":{"1
+":{"Doctrine\\DBAL\\Paramete
+rType":0}}} []
+  [2026-02-25T06:43:40.93495
+5+01:00] doctrine.DEBUG: 
+Beginning transaction [] []
+  [2026-02-25T06:43:40.94773
+2+01:00] doctrine.DEBUG: 
+Executing statement: INSERT 
+INTO reservation_client 
+(nom_client, prenom_client, 
+email_client, 
+telephone_client, 
+type_patient, 
+mois_grossesse, 
+date_naissance_bebe, 
+statut_reservation, 
+reference, 
+date_reservation, notes, 
+created_at, updated_at, 
+consultation_creneau_id) 
+VALUES (?, ?, ?, ?, ?, ?, 
+?, ?, ?, ?, ?, ?, ?, ?) 
+(parameters: array{"1":"rt",
+"2":"tg","3":"sboui.montaha@
+esprit.tn","4":"12345678","5
+":"MAMAN","6":5,"7":null,"8"
+:"CONFIRME","9":"RDV-699E8C0
+CE09C8","10":"2026-02-25 06:
+43:40","11":"fre","12":"2026
+-02-25 
+06:43:40","13":"2026-02-25 
+06:43:40","14":27}, types: a
+rray{"1":0,"2":0,"3":0,"4":0
+,"5":0,"6":0,"7":0,"8":0,"9"
+:0,"10":0,"11":0,"12":0,"13"
+:0,"14":0}) {"sql":"INSERT 
+INTO reservation_client 
+(nom_client, prenom_client, 
+email_client, 
+telephone_client, 
+type_patient, 
+mois_grossesse, 
+date_naissance_bebe, 
+statut_reservation, 
+reference, 
+date_reservation, notes, 
+created_at, updated_at, 
+consultation_creneau_id) 
+VALUES (?, ?, ?, ?, ?, ?, 
+?, ?, ?, ?, ?, ?, ?, ?)","pa
+rams":{"1":"rt","2":"tg","3"
+:"sboui.montaha@esprit.tn","
+4":"12345678","5":"MAMAN","6
+":5,"7":null,"8":"CONFIRME",
+"9":"RDV-699E8C0CE09C8","10"
+:"2026-02-25 06:43:40","11":
+"fre","12":"2026-02-25 
+06:43:40","13":"2026-02-25 0
+6:43:40","14":27},"types":{"
+1":{"Doctrine\\DBAL\\Paramet
+erType":0},"2":{"Doctrine\\D
+BAL\\ParameterType":0},"3":{
+"Doctrine\\DBAL\\ParameterTy
+pe":0},"4":{"Doctrine\\DBAL\
+\ParameterType":0},"5":{"Doc
+trine\\DBAL\\ParameterType":
+0},"6":{"Doctrine\\DBAL\\Par
+ameterType":0},"7":{"Doctrin
+e\\DBAL\\ParameterType":0},"
+8":{"Doctrine\\DBAL\\Paramet
+erType":0},"9":{"Doctrine\\D
+BAL\\ParameterType":0},"10":
+{"Doctrine\\DBAL\\ParameterT
+ype":0},"11":{"Doctrine\\DBA
+L\\ParameterType":0},"12":{"
+Doctrine\\DBAL\\ParameterTyp
+e":0},"13":{"Doctrine\\DBAL\
+\ParameterType":0},"14":{"Do
+ctrine\\DBAL\\ParameterType"
+:0}}} []
+  [2026-02-25T06:43:40.96794
+1+01:00] doctrine.DEBUG: 
+Executing statement: UPDATE 
+consultation_creneau SET 
+statut_reservation = ? 
+WHERE id = ? (parameters: ar
+ray{"1":"RESERVE","2":27}, 
+types: array{"1":0,"2":0}) 
+{"sql":"UPDATE 
+consultation_creneau SET 
+statut_reservation = ? 
+WHERE id = ?","params":{"1":
+"RESERVE","2":27},"types":{"
+1":{"Doctrine\\DBAL\\Paramet
+erType":0},"2":{"Doctrine\\D
+BAL\\ParameterType":0}}} []
+  [2026-02-25T06:43:40.96944
+3+01:00] doctrine.DEBUG: 
+Committing transaction [] []
+  [2026-02-25T06:43:42.84612
+9+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+t0.id AS id_1, t0.categorie 
+AS categorie_2, 
+t0.description AS 
+description_3, t0.pour AS 
+pour_4, t0.image AS 
+image_5, t0.icon AS icon_6, 
+t0.statut AS statut_7, 
+t0.ordre_affichage AS 
+ordre_affichage_8, 
+t0.created_at AS 
+created_at_9, t0.updated_at 
+AS updated_at_10 FROM 
+consultation t0 WHERE t0.id 
+= ? (parameters: 
+array{"1":4}, types: 
+array{"1":0}) 
+{"sql":"SELECT t0.id AS 
+id_1, t0.categorie AS 
+categorie_2, t0.description 
+AS description_3, t0.pour 
+AS pour_4, t0.image AS 
+image_5, t0.icon AS icon_6, 
+t0.statut AS statut_7, 
+t0.ordre_affichage AS 
+ordre_affichage_8, 
+t0.created_at AS 
+created_at_9, t0.updated_at 
+AS updated_at_10 FROM 
+consultation t0 WHERE t0.id 
+= ?","params":{"1":4},"types
+":{"1":{"Doctrine\\DBAL\\Par
+ameterType":0}}} []
+  [2026-02-25T06:43:42.98926
+5+01:00] mailer.DEBUG: 
+Email transport "Symfony\Com
+ponent\Mailer\Transport\Smtp
+\SmtpTransport" starting [] 
+[]
+  [2026-02-25T06:43:45.06352
+2+01:00] mailer.DEBUG: 
+Email transport "Symfony\Com
+ponent\Mailer\Transport\Smtp
+\SmtpTransport" started [] 
+[]
+  [2026-02-25T06:43:46.40067
+5+01:00] messenger.INFO: 
+Message Symfony\Component\Ma
+iler\Messenger\SendEmailMess
+age handled by Symfony\Compo
+nent\Mailer\Messenger\Messag
+eHandler::__invoke {"class":
+"Symfony\\Component\\Mailer\
+\Messenger\\SendEmailMessage
+","handler":"Symfony\\Compon
+ent\\Mailer\\Messenger\\Mess
+ageHandler::__invoke"} []
+  [2026-02-25T06:43:46.40207
+3+01:00] app.INFO: Email 
+confirmation envoyÃ© {"reser
+vation":"RDV-699E8C0CE09C8",
+"to":"sboui.montaha@esprit.t
+n","meetLink":null} []
+  [2026-02-25T06:43:46.69685
+8+01:00] doctrine.INFO: 
+Disconnecting [] []
+  [2026-02-25T06:43:46.69892
+4+01:00] mailer.DEBUG: 
+Email transport "Symfony\Com
+ponent\Mailer\Transport\Smtp
+\SmtpTransport" stopping [] 
+[]
+  [2026-02-25T06:43:46.80769
+6+01:00] mailer.DEBUG: 
+Email transport "Symfony\Com
+ponent\Mailer\Transport\Smtp
+\SmtpTransport" stopped [] 
+[]
+  [2026-02-25T06:49:55.46790
+8+01:00] request.INFO: 
+Matched route 
+"app_medecin_creneaux". {"ro
+ute":"app_medecin_creneaux",
+"route_parameters":{"_route"
+:"app_medecin_creneaux","_co
+ntroller":"App\\Controller\\
+ConsultationController::cren
+eaux","medecin":"%28t%28"},"
+request_uri":"http://127.0.0
+.1:8000/medecin/%2528t%2528/
+creneaux","method":"GET"} []
+  [2026-02-25T06:49:55.57491
+0+01:00] doctrine.INFO: 
+Connecting with parameters a
+rray{"use_savepoints":true,"
+driver":"pdo_mysql","idle_co
+nnection_ttl":600,"host":"12
+7.0.0.1","port":3306,"user":
+"root","password":"<redacted
+>","driverOptions":[],"defau
+ltTableOptions":[],"dbname":
+"maternia","serverVersion":"
+8.0.32","charset":"utf8mb4"}
+ {"params":{"use_savepoints"
+:true,"driver":"pdo_mysql","
+idle_connection_ttl":600,"ho
+st":"127.0.0.1","port":3306,
+"user":"root","password":"<r
+edacted>","driverOptions":[]
+,"defaultTableOptions":[],"d
+bname":"maternia","serverVer
+sion":"8.0.32","charset":"ut
+f8mb4"}} []
+  [2026-02-25T06:49:55.57876
+9+01:00] doctrine.DEBUG: 
+Executing statement: SELECT 
+c0_.id AS id_0, 
+c0_.nom_medecin AS 
+nom_medecin_1, 
+c0_.photo_medecin AS 
+photo_medecin_2, 
+c0_.description_medecin AS 
+description_medecin_3, 
+c0_.specialite_medecin AS 
+specialite_medecin_4, 
+c0_.date_debut AS 
+date_debut_5, c0_.date_fin 
+AS date_fin_6, c0_.jour AS 
+jour_7, c0_.heure_debut AS 
+heure_debut_8, 
+c0_.heure_fin AS 
+heure_fin_9, 
+c0_.statut_reservation AS 
+statut_reservation_10, 
+c0_.duree_minutes AS 
+duree_minutes_11, 
+c0_.nombre_places AS 
+nombre_places_12, 
+c0_.created_at AS 
+created_at_13, 
+c0_.updated_at AS 
+updated_at_14, 
+c0_.consultation_id AS 
+consultation_id_15 FROM 
+consultation_creneau c0_ 
+LEFT JOIN 
+reservation_client r1_ ON 
+c0_.id = 
+r1_.consultation_creneau_id 
+WHERE c0_.nom_medecin = ? 
+AND c0_.statut_reservation 
+= ? AND c0_.date_debut > ? 
+AND r1_.id IS NULL ORDER BY 
+c0_.date_debut ASC 
+(parameters: array{"1":"(t("
+,"2":"DISPONIBLE","3":"2026-
+02-25 06:49:55"}, types: 
+array{"1":0,"2":0,"3":0}) 
+{"sql":"SELECT c0_.id AS 
+id_0, c0_.nom_medecin AS 
+nom_medecin_1, 
+c0_.photo_medecin AS 
+photo_medecin_2, 
+c0_.description_medecin AS 
+description_medecin_3, 
+c0_.specialite_medecin AS 
+specialite_medecin_4, 
+c0_.date_debut AS 
+date_debut_5, c0_.date_fin 
+AS date_fin_6, c0_.jour AS 
+jour_7, c0_.heure_debut AS 
+heure_debut_8, 
+c0_.heure_fin AS 
+heure_fin_9, 
+c0_.statut_reservation AS 
+statut_reservation_10, 
+c0_.duree_minutes AS 
+duree_minutes_11, 
+c0_.nombre_places AS 
+nombre_places_12, 
+c0_.created_at AS 
+created_at_13, 
+c0_.updated_at AS 
+updated_at_14, 
+c0_.consultation_id AS 
+consultation_id_15 FROM 
+consultation_creneau c0_ 
+LEFT JOIN 
+reservation_client r1_ ON 
+c0_.id = 
+r1_.consultation_creneau_id 
+WHERE c0_.nom_medecin = ? 
+AND c0_.statut_reservation 
+= ? AND c0_.date_debut > ? 
+AND r1_.id IS NULL ORDER BY 
+c0_.date_debut ASC","params"
+:{"1":"(t(","2":"DISPONIBLE"
+,"3":"2026-02-25 06:49:55"},
+"types":{"1":{"Doctrine\\DBA
+L\\ParameterType":0},"2":{"D
+octrine\\DBAL\\ParameterType
+":0},"3":{"Doctrine\\DBAL\\P
+arameterType":0}}} []
+  [2026-02-25T06:49:55.75017
+1+01:00] doctrine.INFO: 
+Disconnecting [] []
+  [2026-02-25T06:49:56.31771
+5+01:00] request.INFO: 
+Matched route "_wdt". {"rout
+e":"_wdt","route_parameters"
+:{"_route":"_wdt","_controll
+er":"web_profiler.controller
+.profiler::toolbarAction","t
+oken":"0207bf"},"request_uri
+":"http://127.0.0.1:8000/_wd
+t/0207bf","method":"GET"} []
+  [2026-02-25T06:50:04.14063
+9+01:00] request.INFO: 
+Matched route "app_admin_con
+sultation_creneau_new". {"ro
+ute":"app_admin_consultation
+_creneau_new","route_paramet
+ers":{"_route":"app_admin_co
+nsultation_creneau_new","_co
+ntroller":"App\\Controller\\
+Admin\\ConsultationCreneauCr
+udController::new"},"request
+_uri":"http://127.0.0.1:8000
+/admin/consultation-creneaux
+/new","method":"GET"} []
+  [2026-02-25T06:50:04.28210
+6+01:00] doctrine.INFO: 
+Connecting with parameters a
+rray{"use_savepoints":true,"
+driver":"pdo_mysql","idle_co
+nnection_ttl":600,"host":"12
+7.0.0.1","port":3306,"user":
+"root","password":"<redacted
+>","driverOptions":[],"defau
+ltTableOptions":[],"dbname":
+"maternia","serverVersion":"
+8.0.32","charset":"utf8mb4"}
+ {"params":{"use_savepoints"
+:true,"driver":"pdo_mysql","
+idle_connection_ttl":600,"ho
+st":"127.0.0.1","port":3306,
+"user":"root","password":"<r
+edacted>","driverOptions":[]
+,"defaultTableOptions":[],"d
+bname":"maternia","serverVer
+sion":"8.0.32","charset":"ut
+f8mb4"}} []
+  [2026-02-25T06:50:04.30083
+0+01:00] doctrine.DEBUG: 
+Executing query: SELECT 
+c0_.id AS id_0, 
+c0_.categorie AS 
+categorie_1, 
+c0_.description AS 
+description_2, c0_.pour AS 
+pour_3, c0_.image AS 
+image_4, c0_.icon AS 
+icon_5, c0_.statut AS 
+statut_6, 
+c0_.ordre_affichage AS 
+ordre_affichage_7, 
+c0_.created_at AS 
+created_at_8, 
+c0_.updated_at AS 
+updated_at_9 FROM 
+consultation c0_ ORDER BY 
+c0_.ordre_affichage ASC, 
+c0_.categorie ASC 
+{"sql":"SELECT c0_.id AS 
+id_0, c0_.categorie AS 
+categorie_1, 
+c0_.description AS 
+description_2, c0_.pour AS 
+pour_3, c0_.image AS 
+image_4, c0_.icon AS 
+icon_5, c0_.statut AS 
+statut_6, 
+c0_.ordre_affichage AS 
+ordre_affichage_7, 
+c0_.created_at AS 
+created_at_8, 
+c0_.updated_at AS 
+updated_at_9 FROM 
+consultation c0_ ORDER BY 
+c0_.ordre_affichage ASC, 
+c0_.categorie ASC"} []
+  [2026-02-25T06:50:04.67875
+2+01:00] doctrine.INFO: 
+Disconnecting [] []
+  [2026-02-25T06:50:05.21672
+4+01:00] request.INFO: 
+Matched route "_wdt". {"rout
+e":"_wdt","route_parameters"
+:{"_route":"_wdt","_controll
+er":"web_profiler.controller
+.profiler::toolbarAction","t
+oken":"6f91b7"},"request_uri
+":"http://127.0.0.1:8000/_wd
+t/6f91b7","method":"GET"} []
+  [2026-02-25T06:50:27.80023
+4+01:00] request.INFO: 
+Matched route "app_admin_con
+sultation_creneau_new". {"ro
+ute":"app_admin_consultation
+_creneau_new","route_paramet
+ers":{"_route":"app_admin_co
+nsultation_creneau_new","_co
+ntroller":"App\\Controller\\
+Admin\\ConsultationCreneauCr
+udController::new"},"request
+_uri":"http://127.0.0.1:8000
+/admin/consultation-creneaux
+/new","method":"POST"} []
+
+

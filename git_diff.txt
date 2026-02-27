@@ -1,0 +1,2 @@
+﻿templates/consultation/reserver.html.twig
+templates/emails/reservation_confirmation.html.twig

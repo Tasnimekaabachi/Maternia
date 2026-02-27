@@ -54,22 +54,119 @@
     .input-icon-wrapper { position: relative; }
     .input-icon-wrapper i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--primary-pink); }
     .input-icon-wrapper .form-control, .input-icon-wrapper .form-select { padding-left: 2.8rem; }
+
+    /* ======================== NOTIFICATION PANEL ======================== */
+    .notif-panel {
+        background: #fff;
+        border-radius: 24px;
+        border: 1px solid #FCE4EC;
+        box-shadow: 0 15px 40px rgba(255,138,171,0.08);
+        overflow: hidden;
+        position: sticky;
+        top: 20px;
+    }
+    .notif-header {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        padding: 1.5rem 1.8rem;
+        color: white;
+    }
+    .notif-header h5 { font-weight: 800; font-size: 1rem; margin-bottom: 0.25rem; }
+    .notif-header p { font-size: 0.8rem; opacity: 0.6; margin: 0; }
+    .notif-body { padding: 1.5rem; }
+
+    .notif-option {
+        border: 2px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 1.2rem;
+        margin-bottom: 1rem;
+        cursor: pointer;
+        transition: all 0.25s;
+        background: #fafafa;
+    }
+    .notif-option:hover { border-color: var(--primary-pink); background: #fff5f7; }
+    .notif-option.selected { border-color: var(--primary-pink); background: linear-gradient(135deg, #fff5f7, #fce4ec); box-shadow: 0 4px 12px rgba(255,92,141,0.1); }
+    .notif-option-header { display: flex; align-items: center; gap: 12px; margin-bottom: 0; }
+    .notif-option-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+    .notif-option-text h6 { font-weight: 700; font-size: 0.9rem; margin: 0; color: #333; }
+    .notif-option-text p { font-size: 0.75rem; color: #999; margin: 0; }
+    .notif-option-body { margin-top: 1rem; display: none; }
+    .notif-option.selected .notif-option-body { display: block; }
+
+    .meet-input-group { position: relative; }
+    .meet-input-group .meet-prefix {
+        position: absolute; left: 0; top: 0; bottom: 0;
+        background: linear-gradient(135deg, #4285f4, #34a853);
+        color: white; font-size: 0.7rem; font-weight: 700;
+        display: flex; align-items: center; padding: 0 12px;
+        border-radius: 10px 0 0 10px; letter-spacing: 0.5px; white-space: nowrap;
+    }
+    .meet-input-group .form-control { padding-left: 90px; border-radius: 10px; }
+
+    .sms-type-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+    .sms-type-tab {
+        flex: 1; padding: 8px; border-radius: 10px; border: 2px solid #e5e7eb;
+        background: white; font-size: 0.78rem; font-weight: 700; cursor: pointer;
+        transition: all 0.2s; text-align: center; color: #666;
+    }
+    .sms-type-tab.active { border-color: var(--primary-pink); background: var(--gradient-feminine); color: white; }
+
+    .btn-send-notif {
+        width: 100%; padding: 0.9rem; border-radius: 50px;
+        font-weight: 800; font-size: 0.9rem; border: none;
+        background: linear-gradient(135deg, #FF8AAB 0%, #FF5C8D 100%);
+        color: white; transition: all 0.3s; letter-spacing: 0.3px;
+        box-shadow: 0 6px 20px rgba(255,92,141,0.25);
+        cursor: pointer;
+    }
+    .btn-send-notif:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(255,92,141,0.35); }
+    .btn-send-notif:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn-send-notif.loading { position: relative; }
+
+    .notif-result {
+        margin-top: 1rem; padding: 1rem 1.2rem; border-radius: 12px;
+        font-size: 0.82rem; font-weight: 600; display: none; line-height: 1.5;
+    }
+    .notif-result.success { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+    .notif-result.error { background: #fce4ec; color: #c62828; border: 1px solid #f8bbd0; }
+
+    .ref-chip {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: linear-gradient(135deg, #fff0f5, #fce4ec);
+        border: 1px solid #fbcfe8;
+        border-radius: 50px; padding: 6px 16px;
+        font-weight: 800; color: #d63384; font-size: 0.85rem;
+    }
+
+    .notif-disabled-msg {
+        text-align: center; padding: 2rem 1rem; color: #aaa;
+    }
+    .notif-disabled-msg i { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; opacity: 0.4; }
+
+    /* Animation spinner */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="form-container">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-10 col-xl-8">
+    <div class="container-fluid px-4">
+        <div class="row g-4 justify-content-center">
+
+            {# =========== FORMULAIRE PRINCIPAL =========== #}
+            <div class="col-lg-7 col-xl-6">
                 <div class="glass-card">
                     <div class="header-gradient d-flex align-items-center gap-4">
                         <div class="bg-white text-pink rounded-pill p-3" style="width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;">
                             <i class="fas fa-calendar-check fa-2x"></i>
                         </div>
                         <div>
-                            <h2 class="fw-bold mb-0">{{ reservation.id ? 'Modifier la réservation' : 'Nouveau rendez-vous' }}</h2>
-                            <p class="mb-0 opacity-80">Réf: #{{ reservation.reference }}</p>
+                            <h2 class="fw-bold mb-1">{{ reservation.id ? 'Modifier la réservation' : 'Nouveau rendez-vous' }}</h2>
+                            {% if reservation.reference %}
+                            <div class="ref-chip">
+                                <i class="fas fa-hashtag"></i> {{ reservation.reference }}
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
 
@@ -184,7 +281,277 @@
                     </div>
                 </div>
             </div>
+
+            {# =========== PANNEAU NOTIFICATION =========== #}
+            <div class="col-lg-5 col-xl-4">
+                <div class="notif-panel">
+                    <div class="notif-header">
+                        <h5><i class="fas fa-bell me-2"></i>Envoyer une Notification</h5>
+                        <p>Informez le patient par email ou SMS</p>
+                    </div>
+
+                    {% if reservation.id %}
+                    <div class="notif-body">
+
+                        {# Infos réservation recap #}
+                        <div class="p-3 mb-3 rounded-3" style="background: linear-gradient(135deg, #fdf8fc, #fff0f5); border: 1px solid #fce4ec;">
+                            <div class="fw-bold small text-dark mb-1">
+                                {{ reservation.prenomClient }} {{ reservation.nomClient }}
+                            </div>
+                            <div class="small text-muted">
+                                <i class="fas fa-envelope me-1" style="color: var(--primary-pink)"></i> {{ reservation.emailClient }}<br>
+                                <i class="fas fa-phone me-1" style="color: var(--primary-pink)"></i> {{ reservation.telephoneClient }}
+                            </div>
+                            <div class="mt-2">
+                                <span class="ref-chip" style="font-size: 0.75rem;">
+                                    <i class="fas fa-hashtag"></i> {{ reservation.reference }}
+                                </span>
+                            </div>
+                        </div>
+
+                        {# Option Email #}
+                        <div class="notif-option selected" id="option-email" onclick="selectOption('email')">
+                            <div class="notif-option-header">
+                                <div class="notif-option-icon" style="background: linear-gradient(135deg, #e3f2fd, #bbdefb);">📧</div>
+                                <div class="notif-option-text">
+                                    <h6>Email + Google Meet</h6>
+                                    <p>Email complet avec lien de visio</p>
+                                </div>
+                            </div>
+                            <div class="notif-option-body">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Email destinataire</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="fas fa-envelope"></i>
+                                        <input type="email" id="email-custom" name="custom_email"
+                                               class="form-control"
+                                               value="{{ reservation.emailClient }}"
+                                               placeholder="email@exemple.com">
+                                    </div>
+                                    <div class="small text-muted mt-1">Laissez tel quel ou changez pour un autre email</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Lien Google Meet <span class="text-muted fw-normal">(optionnel)</span></label>
+                                    <div class="meet-input-group">
+                                        <span class="meet-prefix">Meet</span>
+                                        <input type="url" id="email-meet" name="meet_link"
+                                               class="form-control"
+                                               placeholder="https://meet.google.com/xxx-xxxx-xxx">
+                                    </div>
+                                    <div class="small text-muted mt-1">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Créez un Meet sur <a href="https://meet.google.com" target="_blank">meet.google.com</a> et collez le lien ici
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Option SMS #}
+                        <div class="notif-option" id="option-sms" onclick="selectOption('sms')">
+                            <div class="notif-option-header">
+                                <div class="notif-option-icon" style="background: linear-gradient(135deg, #e8f5e9, #c8e6c9);">📱</div>
+                                <div class="notif-option-text">
+                                    <h6>SMS</h6>
+                                    <p>Message texte sur le téléphone</p>
+                                </div>
+                            </div>
+                            <div class="notif-option-body">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Numéro de téléphone</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="fas fa-phone"></i>
+                                        <input type="tel" id="sms-phone" name="custom_phone"
+                                               class="form-control"
+                                               value="{{ reservation.telephoneClient }}"
+                                               placeholder="12345678">
+                                    </div>
+                                    <div class="small text-muted mt-1">8 chiffres — +216 ajouté automatiquement</div>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label small fw-bold">Type de SMS</label>
+                                    <div class="sms-type-tabs">
+                                        <button type="button" class="sms-type-tab active" id="tab-normal" onclick="setSmsType('normal')">
+                                            📝 SMS Normal
+                                        </button>
+                                        <button type="button" class="sms-type-tab" id="tab-meet" onclick="setSmsType('meet')">
+                                            📹 Avec Meet
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="sms-meet-link" class="mb-2" style="display:none;">
+                                    <label class="form-label small fw-bold">Lien Google Meet</label>
+                                    <div class="meet-input-group">
+                                        <span class="meet-prefix">Meet</span>
+                                        <input type="url" id="sms-meet" name="sms_meet_link"
+                                               class="form-control"
+                                               placeholder="https://meet.google.com/xxx-xxxx-xxx">
+                                    </div>
+                                </div>
+                                <div class="p-2 rounded-2 small" style="background: #f8f9fa; color: #666; border: 1px dashed #ddd;">
+                                    <strong>Aperçu :</strong> 🌸 MATERNIA - Confirmation RDV | Réf: #{{ reservation.reference }} | {{ reservation.prenomClient }} {{ reservation.nomClient }}...
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Option WhatsApp #}
+                        <div class="notif-option" id="option-whatsapp" onclick="selectOption('whatsapp')">
+                            <div class="notif-option-header">
+                                <div class="notif-option-icon" style="background: linear-gradient(135deg, #e8f5e9, #c8e6c9);">🟢</div>
+                                <div class="notif-option-text">
+                                    <h6>WhatsApp</h6>
+                                    <p>Ouvrir WhatsApp avec un message prêt</p>
+                                </div>
+                            </div>
+                            <div class="notif-option-body">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Numéro WhatsApp</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="fab fa-whatsapp"></i>
+                                        <input type="tel" id="whatsapp-phone" name="whatsapp_phone"
+                                               class="form-control"
+                                               value="{{ reservation.telephoneClient }}"
+                                               placeholder="12345678">
+                                    </div>
+                                    <div class="small text-muted mt-1">Sera ouvert dans un nouvel onglet</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Résultat #}
+                        <div id="notif-result" class="notif-result"></div>
+
+                        {# Bouton envoyer #}
+                        <button type="button" id="btn-send-notif" class="btn-send-notif mt-2" onclick="sendNotification()">
+                            <i class="fas fa-paper-plane me-2"></i> Envoyer la notification
+                        </button>
+
+                    </div>
+                    {% else %}
+                    <div class="notif-disabled-msg">
+                        <i class="fas fa-lock"></i>
+                        <p class="small fw-bold">Enregistrez d'abord la réservation</p>
+                        <p class="small text-muted">Les notifications seront disponibles après la création du rendez-vous.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
+
+{% if reservation.id %}
+<script>
+    // =========================================================
+    // NOTIFICATION PANEL — État
+    // =========================================================
+    let selectedOption = 'email';
+    let smsType = 'normal';
+    const reservationId = {{ reservation.id }};
+    const csrfToken = '{{ csrf_token('notify_' ~ reservation.id) }}';
+    const notifUrl = '{{ path('app_admin_reservation_send_notification', {id: reservation.id}) }}';
+
+    function selectOption(type) {
+        selectedOption = type;
+        document.querySelectorAll('.notif-option').forEach(el => el.classList.remove('selected'));
+        document.getElementById('option-' + type).classList.add('selected');
+    }
+
+    function setSmsType(type) {
+        smsType = type;
+        document.querySelectorAll('.sms-type-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-' + type).classList.add('active');
+        document.getElementById('sms-meet-link').style.display = type === 'meet' ? 'block' : 'none';
+    }
+
+    async function sendNotification() {
+        const btn = document.getElementById('btn-send-notif');
+        const resultEl = document.getElementById('notif-result');
+
+        // Collecter les données selon l'option sélectionnée
+        const formData = new FormData();
+        formData.append('_token', csrfToken);
+        formData.append('type', selectedOption);
+
+        if (selectedOption === 'email') {
+            formData.append('custom_email', document.getElementById('email-custom').value.trim());
+            formData.append('meet_link', document.getElementById('email-meet').value.trim());
+        } else if (selectedOption === 'sms') {
+            formData.append('custom_phone', document.getElementById('sms-phone').value.trim());
+            formData.append('sms_type', smsType);
+            if (smsType === 'meet') {
+                formData.append('meet_link', document.getElementById('sms-meet').value.trim());
+            }
+        } else if (selectedOption === 'both') {
+            formData.append('custom_email', document.getElementById('both-email').value.trim());
+            formData.append('custom_phone', document.getElementById('both-phone').value.trim());
+            formData.append('meet_link', document.getElementById('both-meet').value.trim());
+            formData.append('sms_type', 'meet');
+        } else if (selectedOption === 'whatsapp') {
+            formData.append('custom_phone', document.getElementById('whatsapp-phone').value.trim());
+        }
+
+        // Afficher le spinner
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Envoi en cours...';
+        resultEl.style.display = 'none';
+
+        try {
+            const response = await fetch(notifUrl, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+
+            const data = await response.json();
+
+            resultEl.className = 'notif-result ' + (data.success ? 'success' : 'error');
+            resultEl.innerHTML = (data.success ? '✅ ' : '❌ ') + data.message.replace(/\n/g, '<br>');
+            resultEl.style.display = 'block';
+
+            // Scroll vers le résultat
+            resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+        } catch (e) {
+            resultEl.className = 'notif-result error';
+            resultEl.innerHTML = '❌ Erreur de connexion : ' + e.message;
+            resultEl.style.display = 'block';
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Envoyer la notification';
+            
+            // Si WhatsApp successfully generated a link
+            if (selectedOption === 'whatsapp' && typeof data !== 'undefined' && data.results && data.results.whatsapp && data.results.whatsapp.waLink) {
+                window.open(data.results.whatsapp.waLink, '_blank');
+            }
+        }
+    }
+
+    // =========================================================
+    // SYNCHRONISATION DYNAMIQUE (Indices)
+    // =========================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        const mainEmail = document.querySelector('[name*="emailClient"]');
+        const mainPhone = document.querySelector('[name*="telephoneClient"]');
+        
+        const syncFields = () => {
+            const email = mainEmail.value;
+            const phone = mainPhone.value;
+            
+            document.getElementById('email-custom').value = email;
+            document.getElementById('sms-phone').value = phone;
+            document.getElementById('whatsapp-phone').value = phone;
+            
+            // Optionnel: both fields if they exist
+            const bothEmail = document.getElementById('both-email');
+            const bothPhone = document.getElementById('both-phone');
+            if (bothEmail) bothEmail.value = email;
+            if (bothPhone) bothPhone.value = phone;
+        };
+        
+        if (mainEmail) mainEmail.addEventListener('input', syncFields);
+        if (mainPhone) mainPhone.addEventListener('input', syncFields);
+    });
+</script>
+{% endif %}
 {% endblock %}

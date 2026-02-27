@@ -1,10 +1,21 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    app.online_meet_link: '%env(default::ONLINE_MEET_LINK)%'
+    app.google_meet_credentials_path: '%env(default::GOOGLE_MEET_CREDENTIALS_PATH)%'
+    app.google_meet_calendar_id: '%env(default::GOOGLE_MEET_CALENDAR_ID)%'
 
 services:
+    # default configuration for services in *this* file
     _defaults:
-        autowire: true
-        autoconfigure: true
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
         exclude:
@@ -19,3 +30,19 @@ services:
     App\Service\ChatbotService:
         arguments:
             $apiKey: '%env(GEMINI_API_KEY)%'
+    App\Service\NotificationService:
+        arguments:
+            $fromEmail: '%env(MAILER_FROM_EMAIL)%'
+            $fromName: '%env(MAILER_FROM_NAME)%'
+            $twilioSid: '%env(default::TWILIO_SID)%'
+            $twilioToken: '%env(default::TWILIO_TOKEN)%'
+            $twilioSmsFrom: '%env(default::TWILIO_SMS_FROM)%'
+            $twilioWhatsAppFrom: '%env(default::TWILIO_WHATSAPP_FROM)%'
+
+    App\Service\GoogleMeetService:
+        arguments:
+            $credentialsPath: '%app.google_meet_credentials_path%'
+            $calendarId: '%app.google_meet_calendar_id%'
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones

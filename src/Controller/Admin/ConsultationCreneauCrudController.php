@@ -24,7 +24,7 @@ class ConsultationCreneauCrudController extends AbstractController
     {
         $searchTerm = $request->query->get('q');
         $creneaux = $creneauRepository->searchAllOrdered($searchTerm);
-
+        
         // --- STATISTIQUES "WAW" ---
         $stats = [
             'total' => count($creneaux),
@@ -35,9 +35,7 @@ class ConsultationCreneauCrudController extends AbstractController
         ];
 
         $days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
-        foreach ($days as $day) {
-            $stats['parJour'][$day] = 0;
-        }
+        foreach ($days as $day) { $stats['parJour'][$day] = 0; }
 
         foreach ($creneaux as $c) {
             // Disponibilité
@@ -72,30 +70,11 @@ class ConsultationCreneauCrudController extends AbstractController
         ]);
     }
 
-    private function getExistingPhotos(): array
-    {
-        $projectDir = $this->getParameter('kernel.project_dir');
-        $uploadDir = $projectDir . '/public/uploads/medecins';
-        $photos = [];
-        if (is_dir($uploadDir)) {
-            foreach (scandir($uploadDir) as $file) {
-                if ($file !== '.' && $file !== '..' && preg_match('/\.(jpg|jpeg|png|gif|webp|avif)$/i', $file)) {
-                    $photos[$file] = $file;
-                }
-            }
-        }
-        return $photos;
-    }
-
     private function getFrenchDayName(\DateTimeInterface $date): string
     {
         $days = [
-            'Sunday' => 'Dimanche',
-            'Monday' => 'Lundi',
-            'Tuesday' => 'Mardi',
-            'Wednesday' => 'Mercredi',
-            'Thursday' => 'Jeudi',
-            'Friday' => 'Vendredi',
+            'Sunday' => 'Dimanche', 'Monday' => 'Lundi', 'Tuesday' => 'Mardi',
+            'Wednesday' => 'Mercredi', 'Thursday' => 'Jeudi', 'Friday' => 'Vendredi',
             'Saturday' => 'Samedi'
         ];
         return $days[$date->format('l')] ?? $date->format('l');
@@ -124,7 +103,7 @@ class ConsultationCreneauCrudController extends AbstractController
 
     #[Route('/new', name: 'app_admin_consultation_creneau_new', methods: ['GET', 'POST'])]
     public function new(
-        Request $request,
+        Request $request, 
         EntityManagerInterface $entityManager,
         ConsultationRepository $consultationRepository
     ): Response {
@@ -132,29 +111,20 @@ class ConsultationCreneauCrudController extends AbstractController
         $consultationCreneau->setCreatedAt(new \DateTime());
         $consultationCreneau->setUpdatedAt(new \DateTime());
         $consultationCreneau->setStatutReservation('DISPONIBLE');
-        // Requis pour la validation (entité non persistée, utilisée comme template)
-        $consultationCreneau->setDateDebut(new \DateTime());
-        $consultationCreneau->setDateFin(new \DateTime());
-
-        $existingPhotos = $this->getExistingPhotos();
-
+        
         $form = $this->createForm(ConsultationCreneauType::class, $consultationCreneau, [
-            'consultations' => $consultationRepository->findAllOrdered(),
-            'existing_photos' => $existingPhotos,
+            'consultations' => $consultationRepository->findAllOrdered()
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Photo : upload nouveau OU sélection existante
+            // Upload photo médecin : enregistrement physique + nom en BDD
             $photoFile = $form->get('photoFile')->getData();
-            $photoExistante = $form->get('photoExistante')->getData();
             if ($photoFile) {
                 $photoFileName = $this->processPhotoUpload($photoFile);
                 if ($photoFileName) {
                     $consultationCreneau->setPhotoMedecin($photoFileName);
                 }
-            } elseif ($photoExistante) {
-                $consultationCreneau->setPhotoMedecin($photoExistante);
             }
 
             // Récupérer la collection de créneaux horaires
@@ -162,15 +132,68 @@ class ConsultationCreneauCrudController extends AbstractController
             $creneauxCrees = 0;
 
             if (!empty($creneauxHoraires)) {
-                foreach ($creneauxHoraires as $idx => $creneauData) {
+                 foreach ($creneauxHoraires as $idx => $creneauData) {
                     // Ignorer les créneaux vides/incomplets
-                    if (empty($creneauData['jour']) || empty($creneauData['heureDebut']) || empty($creneauData['heureFin'])) {
+                    if (empty($creneauData['heureDebut']) || empty($creneauData['heureFin'])) {
                         continue;
                     }
+                    
+                    $creneau = new ConsultationCreneau();
+                    
+                    // Copier toutes les informations du formulaire principal
+                    $creneau->setConsultation($consultationCreneau->getConsultation());
+                    $creneau->setNomMedecin((string)$consultationCreneau->getNomMedecin());
+                    $creneau->setPhotoMedecin($consultationCreneau->getPhotoMedecin());
+                    $creneau->setDescriptionMedecin($consultationCreneau->getDescriptionMedecin());
+                    $creneau->setSpecialiteMedecin($consultationCreneau->getSpecialiteMedecin());
+                    $creneau->setStatutReservation('DISPONIBLE'); 
+                    
+                    // Nouveaux attributs
+                    $creneau->setDureeMinutes($consultationCreneau->getDureeMinutes() ?: 30);
+                    $creneau->setNombrePlaces($consultationCreneau->getNombrePlaces() ?: 1);
 
+                    $creneau->setCreatedAt(new \DateTime());
+                    $creneau->setUpdatedAt(new \DateTime());
+                    
+                    // Dates
+                    $creneau->setJour($creneauData['jour']);
+                    $creneau->setHeureDebut($creneauData['heureDebut']);
+                    $creneau->setHeureFin($creneauData['heureFin']);
+
+                    // Sécuriser le calcul des dates complètes pour l'affichage front
+                    if ($creneauData['jour'] instanceof \DateTimeInterface && $creneauData['heureDebut'] instanceof \DateTimeInterface) {
+                        $dateDebut = (clone $creneauData['jour'])->setTime(
+                            (int) $creneauData['heureDebut']->format('H'),
+                            (int) $creneauData['heureDebut']->format('i'),
+                            (int) $creneauData['heureDebut']->format('s')
+                        );
+                        $creneau->setDateDebut($dateDebut);
+                    }
+
+                    if ($creneauData['jour'] instanceof \DateTimeInterface && $creneauData['heureFin'] instanceof \DateTimeInterface) {
+                        $dateFin = (clone $creneauData['jour'])->setTime(
+                            (int) $creneauData['heureFin']->format('H'),
+                            (int) $creneauData['heureFin']->format('i'),
+                            (int) $creneauData['heureFin']->format('s')
+                        );
+                        $creneau->setDateFin($dateFin);
+                    }
+                    
+                    $entityManager->persist($creneau);
+                    $creneauxCrees++;
+                }
+            }
+            
+            // Si aucun créneau via la collection, on tente un fallback avec les champs simples
+            if ($creneauxCrees === 0) {
+                if (
+                    $consultationCreneau->getJour() instanceof \DateTimeInterface &&
+                    $consultationCreneau->getHeureDebut() instanceof \DateTimeInterface &&
+                    $consultationCreneau->getHeureFin() instanceof \DateTimeInterface
+                ) {
                     $creneau = new ConsultationCreneau();
 
-                    // Copier toutes les informations du formulaire principal
+                    // Copier les informations principales
                     $creneau->setConsultation($consultationCreneau->getConsultation());
                     $creneau->setNomMedecin((string) $consultationCreneau->getNomMedecin());
                     $creneau->setPhotoMedecin($consultationCreneau->getPhotoMedecin());
@@ -178,33 +201,26 @@ class ConsultationCreneauCrudController extends AbstractController
                     $creneau->setSpecialiteMedecin($consultationCreneau->getSpecialiteMedecin());
                     $creneau->setStatutReservation('DISPONIBLE');
 
-                    // Nouveaux attributs
                     $creneau->setDureeMinutes($consultationCreneau->getDureeMinutes() ?: 30);
                     $creneau->setNombrePlaces($consultationCreneau->getNombrePlaces() ?: 1);
 
                     $creneau->setCreatedAt(new \DateTime());
                     $creneau->setUpdatedAt(new \DateTime());
 
-                    // Dates : jour + heures
-                    $creneau->setJour($creneauData['jour']);
-                    $creneau->setHeureDebut($creneauData['heureDebut']);
-                    $creneau->setHeureFin($creneauData['heureFin']);
-                    // S'assurer que dateDebut/dateFin sont bien remplis (requis pour l'affichage public)
-                    $creneau->setDateDebut($this->mergeDateAndTime($creneauData['jour'], $creneauData['heureDebut']));
-                    $creneau->setDateFin($this->mergeDateAndTime($creneauData['jour'], $creneauData['heureFin']));
+                    // Dates complètes
+                    $creneau->setJour($consultationCreneau->getJour());
+                    $creneau->setHeureDebut($consultationCreneau->getHeureDebut());
+                    $creneau->setHeureFin($consultationCreneau->getHeureFin());
 
                     $entityManager->persist($creneau);
-                    $creneauxCrees++;
+                    $creneauxCrees = 1;
+                } else {
+                    $this->addFlash('warning', 'Veuillez ajouter au moins un créneau horaire (via le bouton "Ajouter un créneau" ou les champs de date/heure).');
+                    return $this->render('admin/consultation_creneau/new.html.twig', [
+                        'creneau' => $consultationCreneau,
+                        'form' => $form,
+                    ]);
                 }
-            }
-
-            // Si aucun créneau via la collection
-            if ($creneauxCrees === 0) {
-                $this->addFlash('warning', 'Veuillez ajouter au moins un créneau horaire via le bouton "Ajouter un créneau".');
-                return $this->render('admin/consultation_creneau/new.html.twig', [
-                    'creneau' => $consultationCreneau,
-                    'form' => $form,
-                ]);
             }
 
             $entityManager->flush();
@@ -228,69 +244,81 @@ class ConsultationCreneauCrudController extends AbstractController
 
     #[Route('/{id}/edit', name: 'app_admin_consultation_creneau_edit', methods: ['GET', 'POST'])]
     public function edit(
-        Request $request,
-        ConsultationCreneau $consultationCreneau,
+        Request $request, 
+        ConsultationCreneau $consultationCreneau, 
         EntityManagerInterface $entityManager,
         ConsultationRepository $consultationRepository
     ): Response {
         // Mise à jour de la date de modification
         $consultationCreneau->setUpdatedAt(new \DateTime());
-
+        
         $form = $this->createForm(ConsultationCreneauType::class, $consultationCreneau, [
-            'consultations' => $consultationRepository->findAllOrdered(),
-            'existing_photos' => $this->getExistingPhotos(),
+            'consultations' => $consultationRepository->findAllOrdered()
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Photo : upload nouveau OU sélection existante
+            // Upload photo médecin si un nouveau fichier est envoyé
             $photoFile = $form->get('photoFile')->getData();
-            $photoExistante = $form->get('photoExistante')->getData();
             if ($photoFile) {
                 $photoFileName = $this->processPhotoUpload($photoFile);
                 if ($photoFileName) {
                     $consultationCreneau->setPhotoMedecin($photoFileName);
                 }
-            } elseif ($photoExistante) {
-                $consultationCreneau->setPhotoMedecin($photoExistante);
             }
 
             // Processing existing slot
             $consultationCreneau->setUpdatedAt(new \DateTime());
-
+            
             // Processing new additional slots if any
             $creneauxHoraires = $form->get('creneauxHoraires')->getData();
             $creneauxCrees = 0;
 
             if (!empty($creneauxHoraires)) {
                 foreach ($creneauxHoraires as $creneauData) {
-                    if (empty($creneauData['jour']) || empty($creneauData['heureDebut']) || empty($creneauData['heureFin'])) {
+                    if (empty($creneauData['heureDebut']) || empty($creneauData['heureFin'])) {
                         continue;
                     }
-
+                    
                     $creneau = new ConsultationCreneau();
-
+                    
                     // Copy info from the current edited slot (doctor, consultation, etc.)
                     $creneau->setConsultation($consultationCreneau->getConsultation());
-                    $creneau->setNomMedecin((string) $consultationCreneau->getNomMedecin());
+                    $creneau->setNomMedecin((string)$consultationCreneau->getNomMedecin());
                     $creneau->setPhotoMedecin($consultationCreneau->getPhotoMedecin());
                     $creneau->setDescriptionMedecin($consultationCreneau->getDescriptionMedecin());
                     $creneau->setSpecialiteMedecin($consultationCreneau->getSpecialiteMedecin());
-                    $creneau->setStatutReservation('DISPONIBLE');
-
+                    $creneau->setStatutReservation('DISPONIBLE'); 
+                    
                     $creneau->setDureeMinutes($consultationCreneau->getDureeMinutes() ?: 30);
                     $creneau->setNombrePlaces($consultationCreneau->getNombrePlaces() ?: 1);
 
                     $creneau->setCreatedAt(new \DateTime());
                     $creneau->setUpdatedAt(new \DateTime());
-
+                    
                     $creneau->setJour($creneauData['jour']);
                     $creneau->setHeureDebut($creneauData['heureDebut']);
                     $creneau->setHeureFin($creneauData['heureFin']);
-                    // S'assurer que dateDebut/dateFin sont bien remplis (affichage page publique)
-                    $creneau->setDateDebut($this->mergeDateAndTime($creneauData['jour'], $creneauData['heureDebut']));
-                    $creneau->setDateFin($this->mergeDateAndTime($creneauData['jour'], $creneauData['heureFin']));
 
+                    // Sécuriser le calcul des dates complètes pour l'affichage front
+                    if ($creneauData['jour'] instanceof \DateTimeInterface && $creneauData['heureDebut'] instanceof \DateTimeInterface) {
+                        $dateDebut = (clone $creneauData['jour'])->setTime(
+                            (int) $creneauData['heureDebut']->format('H'),
+                            (int) $creneauData['heureDebut']->format('i'),
+                            (int) $creneauData['heureDebut']->format('s')
+                        );
+                        $creneau->setDateDebut($dateDebut);
+                    }
+
+                    if ($creneauData['jour'] instanceof \DateTimeInterface && $creneauData['heureFin'] instanceof \DateTimeInterface) {
+                        $dateFin = (clone $creneauData['jour'])->setTime(
+                            (int) $creneauData['heureFin']->format('H'),
+                            (int) $creneauData['heureFin']->format('i'),
+                            (int) $creneauData['heureFin']->format('s')
+                        );
+                        $creneau->setDateFin($dateFin);
+                    }
+                    
                     $entityManager->persist($creneau);
                     $creneauxCrees++;
                 }
@@ -303,7 +331,7 @@ class ConsultationCreneauCrudController extends AbstractController
             } else {
                 $this->addFlash('success', '🌸 Modification enregistrée avec succès.');
             }
-
+            
             return $this->redirectToRoute('app_admin_consultation_creneau_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -313,58 +341,58 @@ class ConsultationCreneauCrudController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_admin_consultation_creneau_delete', methods: ['POST'])]
-    public function delete(Request $request, ConsultationCreneau $consultationCreneau, EntityManagerInterface $entityManager): Response
-    {
-        if (!$this->isCsrfTokenValid('delete' . $consultationCreneau->getId(), $request->request->get('_token'))) {
-            if ($request->isXmlHttpRequest()) {
-                return $this->json([
-                    'success' => false,
-                    'message' => 'Token CSRF invalide.'
-                ], 400);
-            }
-
-            $this->addFlash('error', 'Token CSRF invalide.');
-            return $this->redirectToRoute('app_admin_consultation_creneau_index');
+  #[Route('/{id}', name: 'app_admin_consultation_creneau_delete', methods: ['POST'])]
+public function delete(Request $request, ConsultationCreneau $consultationCreneau, EntityManagerInterface $entityManager): Response
+{
+    if (!$this->isCsrfTokenValid('delete'.$consultationCreneau->getId(), $request->request->get('_token'))) {
+        if ($request->isXmlHttpRequest()) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Token CSRF invalide.'
+            ], 400);
         }
-
-        try {
-            $entityManager->remove($consultationCreneau);
-            $entityManager->flush();
-
-            // Si c'est une requête AJAX
-            if ($request->isXmlHttpRequest()) {
-                return $this->json([
-                    'success' => true,
-                    'message' => 'Créneau supprimé avec succès.',
-                    'id' => $consultationCreneau->getId()
-                ]);
-            }
-
-            // Sinon, redirection normale
-            $this->addFlash('success', 'Créneau supprimé avec succès.');
-
-        } catch (\Exception $e) {
-            if ($request->isXmlHttpRequest()) {
-                return $this->json([
-                    'success' => false,
-                    'message' => 'Erreur lors de la suppression: ' . $e->getMessage()
-                ], 500);
-            }
-
-            $this->addFlash('error', 'Erreur lors de la suppression: ' . $e->getMessage());
-        }
-
-        return $this->redirectToRoute('app_admin_consultation_creneau_index', [], Response::HTTP_SEE_OTHER);
+        
+        $this->addFlash('error', 'Token CSRF invalide.');
+        return $this->redirectToRoute('app_admin_consultation_creneau_index');
     }
+
+    try {
+        $entityManager->remove($consultationCreneau);
+        $entityManager->flush();
+        
+        // Si c'est une requête AJAX
+        if ($request->isXmlHttpRequest()) {
+            return $this->json([
+                'success' => true,
+                'message' => 'Créneau supprimé avec succès.',
+                'id' => $consultationCreneau->getId()
+            ]);
+        }
+        
+        // Sinon, redirection normale
+        $this->addFlash('success', 'Créneau supprimé avec succès.');
+        
+    } catch (\Exception $e) {
+        if ($request->isXmlHttpRequest()) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Erreur lors de la suppression: ' . $e->getMessage()
+            ], 500);
+        }
+        
+        $this->addFlash('error', 'Erreur lors de la suppression: ' . $e->getMessage());
+    }
+
+    return $this->redirectToRoute('app_admin_consultation_creneau_index', [], Response::HTTP_SEE_OTHER);
+}
 
     #[Route('/{id}/reserve', name: 'app_admin_consultation_creneau_reserve', methods: ['POST'])]
     public function reserve(Request $request, ConsultationCreneau $creneau, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('reserve' . $creneau->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('reserve'.$creneau->getId(), $request->request->get('_token'))) {
             $creneau->setStatutReservation('RESERVE');
             $creneau->setUpdatedAt(new \DateTime());
-
+            
             $entityManager->flush();
             $this->addFlash('success', 'Créneau marqué comme réservé.');
         }
@@ -375,30 +403,21 @@ class ConsultationCreneauCrudController extends AbstractController
     #[Route('/{id}/liberer', name: 'app_admin_consultation_creneau_liberer', methods: ['POST'])]
     public function liberer(Request $request, ConsultationCreneau $creneau, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('liberer' . $creneau->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('liberer'.$creneau->getId(), $request->request->get('_token'))) {
             $creneau->setStatutReservation('DISPONIBLE');
-
+            
             // Supprimer la réservation associée si elle existe
             if ($creneau->getReservation()) {
                 $entityManager->remove($creneau->getReservation());
                 $creneau->setReservation(null);
             }
-
+            
             $creneau->setUpdatedAt(new \DateTime());
-
+            
             $entityManager->flush();
             $this->addFlash('success', 'Créneau libéré avec succès.');
         }
 
         return $this->redirectToRoute('app_admin_consultation_creneau_show', ['id' => $creneau->getId()]);
-    }
-
-    /** Fusionne une date (jour) et une heure pour produire un DateTime (pour dateDebut/dateFin). */
-    private function mergeDateAndTime(\DateTimeInterface $jour, \DateTimeInterface $heure): \DateTime
-    {
-        $dt = new \DateTime();
-        $dt->setDate((int) $jour->format('Y'), (int) $jour->format('m'), (int) $jour->format('d'));
-        $dt->setTime((int) $heure->format('H'), (int) $heure->format('i'), (int) $heure->format('s'));
-        return $dt;
     }
 }

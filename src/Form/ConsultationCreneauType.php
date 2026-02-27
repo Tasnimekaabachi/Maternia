@@ -38,7 +38,7 @@ class ConsultationCreneauType extends AbstractType
                 'attr' => ['maxlength' => 100]
             ])
             ->add('photoFile', FileType::class, [
-                'label' => 'Ou télécharger une nouvelle photo',
+                'label' => 'Photo du médecin',
                 'required' => false,
                 'mapped' => false,
                 'constraints' => [
@@ -49,14 +49,6 @@ class ConsultationCreneauType extends AbstractType
                     ]),
                 ],
                 'attr' => ['accept' => 'image/*'],
-            ])
-            ->add('photoExistante', ChoiceType::class, [
-                'label' => 'Photo du médecin',
-                'required' => false,
-                'mapped' => false,
-                'choices' => $options['existing_photos'] ?? [],
-                'placeholder' => '-- Choisir une photo existante --',
-                'attr' => ['class' => 'form-select'],
             ])
             ->add('descriptionMedecin', TextareaType::class, [
                 'label' => 'Description du médecin',
@@ -131,10 +123,8 @@ class ConsultationCreneauType extends AbstractType
         $resolver->setDefaults([
             'data_class' => ConsultationCreneau::class,
             'consultations' => [],
-            'existing_photos' => [],
         ]);
-
+        
         $resolver->setAllowedTypes('consultations', 'array');
-        $resolver->setAllowedTypes('existing_photos', 'array');
     }
 }
