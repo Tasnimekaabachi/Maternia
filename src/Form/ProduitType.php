@@ -4,6 +4,8 @@ namespace App\Form;
 
 use App\Entity\Produit;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -32,6 +34,39 @@ class ProduitType extends AbstractType
             ->add('stock', IntegerType::class, [
                 'label' => 'Stock',
                 'required' => false,
+            ])
+            ->add('ratingAverage', NumberType::class, [
+                'label' => 'Note moyenne (0–5, optionnel)',
+                'required' => false,
+                'html5' => false,
+            ])
+            ->add('categorie', ChoiceType::class, [
+                'label' => 'Catégorie',
+                'required' => false,
+                'placeholder' => '— Aucune —',
+                'choices' => [
+                    'Grossesse' => 'grossesse',
+                    'Bébé' => 'bebe',
+                    'Soins' => 'soins',
+                    'Mode' => 'mode',
+                    'Équipement' => 'equipement',
+                    'Services' => 'services',
+                ],
+            ])
+            ->add('poidsKg', NumberType::class, [
+                'label' => 'Poids (kg)',
+                'required' => false,
+                'html5' => false,
+            ])
+            ->add('sku', TextType::class, [
+                'label' => 'SKU (optionnel)',
+                'required' => false,
+            ])
+            ->add('imageFile', FileType::class, [
+                'label' => 'Image du produit',
+                'required' => false,
+                'mapped' => false,
+                'attr' => ['accept' => 'image/*'],
             ])
         ;
     }

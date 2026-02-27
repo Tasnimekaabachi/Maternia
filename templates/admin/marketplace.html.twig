@@ -68,6 +68,7 @@
                     <th>Description</th>
                     <th>Prix</th>
                     <th>Stock</th>
+                    <th>Note</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -75,10 +76,23 @@
 
                 {% for produit in produits %}
                     <tr>
-                        <td>{{ produit.nom }}</td>
+                        <td>
+                            {% if produit.imageName %}
+                                <img src="{{ asset('uploads/produits/' ~ produit.imageName) }}" alt="{{ produit.nom }}" class="rounded me-2" style="height: 40px; width: 40px; object-fit: cover;">
+                            {% endif %}
+                            {{ produit.nom }}
+                        </td>
                         <td>{{ produit.description }}</td>
                         <td>{{ produit.prix }} DT</td>
                         <td>{{ produit.stock }}</td>
+                        <td>
+                            {% if produit.ratingAverage is not null and produit.ratingCount > 0 %}
+                                {{ produit.ratingAverage|number_format(1, ',', ' ') }}/5
+                                <span class="text-muted small">({{ produit.ratingCount }})</span>
+                            {% else %}
+                                <span class="text-muted small">–</span>
+                            {% endif %}
+                        </td>
                         <td class="d-flex gap-1">
                             <a href="{{ path('admin_produit_edit', {id: produit.id}) }}" class="btn btn-sm btn-primary">
                                 <i class="fas fa-edit"></i>
@@ -93,7 +107,7 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="5" class="text-center py-4">
+                        <td colspan="6" class="text-center py-4">
                             Aucun produit ou service pour le moment.
                         </td>
                     </tr>

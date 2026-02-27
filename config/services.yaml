@@ -20,5 +20,30 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    # Livraison : injection des variables d'environnement
+    App\Service\Shipping\DistanceService:
+        arguments:
+            $apiKey: '%env(OPENROUTE_API_KEY)%'
+            $warehouseAddress: '%env(SHIPPING_WAREHOUSE_ADDRESS)%'
+
+    App\Service\Shipping\DhlQuoteClient:
+        arguments:
+            $baseUrl: '%env(DHL_API_BASE_URL)%'
+            $accountNumber: '%env(DHL_ACCOUNT_NUMBER)%'
+            $username: '%env(DHL_USERNAME)%'
+            $password: '%env(DHL_PASSWORD)%'
+
+    App\Service\Shipping\AramexQuoteClient:
+        arguments:
+            $enabled: '%env(bool:ARAMEX_ENABLED)%'
+            $accountNumber: '%env(ARAMEX_ACCOUNT_NUMBER)%'
+            $username: '%env(ARAMEX_USERNAME)%'
+            $password: '%env(ARAMEX_PASSWORD)%'
+            $rateUrl: '%env(ARAMEX_RATE_URL)%'
+
+    App\Service\NotificationService:
+        arguments:
+            $mailerFrom: '%env(MAILER_FROM)%'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

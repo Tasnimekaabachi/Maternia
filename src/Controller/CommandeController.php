@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/commande')]
+#[Route('/admin/commande')]
 final class CommandeController extends AbstractController
 {
     #[Route(name: 'app_commande_index', methods: ['GET'])]
@@ -177,7 +177,7 @@ final class CommandeController extends AbstractController
     #[Route('/{id}', name: 'app_commande_delete', methods: ['POST'])]
     public function delete(Request $request, Commande $commande, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$commande->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$commande->getId(), (string) $request->request->get('_token'))) {
             // Annulation de commande : on restitue 1 unité de stock par produit
             foreach ($commande->getProduits() as $produit) {
                 $stockActuel = $produit->getStock();

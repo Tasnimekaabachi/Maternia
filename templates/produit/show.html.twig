@@ -21,7 +21,7 @@
             </tr>
             <tr>
                 <th>Prix</th>
-                <td>{{ produit.prix }}</td>
+                <td>{{ produit.prix }} TND</td>
             </tr>
             <tr>
                 <th>Stock</th>
@@ -29,6 +29,44 @@
             </tr>
         </tbody>
     </table>
+
+    <hr>
+
+    <h2>Note du produit</h2>
+    {% set avg = produit.ratingAverage ?? 0 %}
+    {% set count = produit.ratingCount ?? 0 %}
+
+    {% if count > 0 %}
+        <p>Note moyenne : {{ avg|number_format(1, ',', ' ') }}/5 ({{ count }} avis)</p>
+        <div class="mb-3 text-warning">
+            {% for i in 1..5 %}
+                {% if avg >= i %}
+                    <i class="fas fa-star"></i>
+                {% elseif avg >= i - 0.5 %}
+                    <i class="fas fa-star-half-alt"></i>
+                {% else %}
+                    <i class="far fa-star"></i>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Aucune note pour le moment.</p>
+    {% endif %}
+
+    <h3>Donner votre avis</h3>
+    <form method="post" action="{{ path('app_produit_rate', { id: produit.id }) }}">
+        <div class="mb-3">
+            <label for="rating" class="form-label">Votre note</label>
+            <select id="rating" name="rating" class="form-select" required>
+                {% for i in 1..5 %}
+                    <option value="{{ i }}">{{ i }} / 5</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Envoyer mon avis</button>
+    </form>
+
+    <hr>
 
     <a href="{{ path('app_produit_index') }}">back to list</a>
 

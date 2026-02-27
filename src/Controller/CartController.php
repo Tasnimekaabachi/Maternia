@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Commande;
 use App\Repository\ProduitRepository;
+use App\Service\NotificationService;
+use App\Service\Shipping\ShippingQuoteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -15,7 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class CartController extends AbstractController
 {
     #[Route('', name: 'app_cart_show', methods: ['GET'])]
-    public function show(Request $request, ProduitRepository $produitRepository): Response
+    public function show(Request $request, ProduitRepository $produitRepository, ShippingQuoteService $shippingQuoteService): Response
     {
         $session = $request->getSession();
         /** @var int[] $cart */
@@ -23,17 +25,22 @@ final class CartController extends AbstractController
 
         $produits = [];
         $total = 0;
+        $shippingQuote = null;
 
         if (!empty($cart)) {
             $produits = $produitRepository->findBy(['id' => $cart]);
             foreach ($produits as $produit) {
                 $total += $produit->getPrix() ?? 0;
             }
+            if (!empty($produits)) {
+                $shippingQuote = $shippingQuoteService->quote($produits, 'TN', 'POSTE');
+            }
         }
 
         return $this->render('pages/cart.html.twig', [
             'produits' => $produits,
             'total' => $total,
+            'shippingQuote' => $shippingQuote,
         ]);
     }
 
@@ -112,7 +119,9 @@ final class CartController extends AbstractController
     public function checkout(
         Request $request,
         ProduitRepository $produitRepository,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        ShippingQuoteService $shippingQuoteService,
+        NotificationService $notificationService
     ): RedirectResponse {
         $session = $request->getSession();
         /** @var int[] $cart */
@@ -131,25 +140,63 @@ final class CartController extends AbstractController
         }
 
         $commande = new Commande();
-        $total = 0;
 
+        $email = trim((string) $request->request->get('email'));
+        $telephone = trim((string) $request->request->get('telephone'));
+        $address = trim((string) $request->request->get('address'));
+        $city = trim((string) $request->request->get('city'));
+        $postalCode = trim((string) $request->request->get('postal_code'));
+        $country = strtoupper(trim((string) $request->request->get('country', 'TN')));
+        $carrier = strtoupper(trim((string) $request->request->get('carrier', 'POSTE')));
+
+        $subtotal = 0.0;
         foreach ($produits as $produit) {
             $commande->addProduit($produit);
-            $total += $produit->getPrix() ?? 0;
+            $subtotal += $produit->getPrix() ?? 0;
         }
 
-        $commande->setTotal($total);
+        $destination = [
+            'country' => $country,
+            'postalCode' => $postalCode,
+            'city' => $city,
+            'address' => $address,
+        ];
+        $quote = $shippingQuoteService->quote($produits, $country ?: 'TN', $carrier ?: 'POSTE', $destination);
+
+        $commande->setEmail($email ?: null);
+        $commande->setTelephone($telephone ?: null);
+        $commande->setShippingAddress($address ?: null);
+        $commande->setShippingCity($city ?: null);
+        $commande->setShippingPostalCode($postalCode ?: null);
+        $commande->setShippingCountry($country ?: null);
+        $commande->setShippingCarrier($quote->carrier);
+        $commande->setShippingEtaDays($quote->etaDays);
+        $commande->setShippingCost($quote->cost);
+        $commande->setPaymentStatus('pending_offline');
+        $commande->setTotal((float) ($subtotal + $quote->cost));
 
         $entityManager->persist($commande);
         $entityManager->flush();
+
+        // Envoi de l'email de confirmation (et SMS optionnel) si les informations sont renseignées
+        $notificationService->sendOrderPaid($commande);
 
         // Vider le panier
         $session->remove('cart');
 
         $this->addFlash('success', 'Votre commande a été créée avec succès.');
 
-        // Rester sur la page panier après la validation
-        return $this->redirectToRoute('app_cart_show');
+        return $this->redirectToRoute('app_checkout_success', [
+            'id' => $commande->getId(),
+        ]);
+    }
+
+    #[Route('/checkout/success/{id}', name: 'app_checkout_success', methods: ['GET'])]
+    public function checkoutSuccess(Commande $commande): Response
+    {
+        return $this->render('pages/checkout_success.html.twig', [
+            'commande' => $commande,
+        ]);
     }
 }
 
