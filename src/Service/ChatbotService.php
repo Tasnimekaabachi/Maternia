@@ -1,55 +1,114 @@
 <?php
+
 namespace App\Service;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ChatbotService
 {
-    public function __construct(
-        private HttpClientInterface $client,
-        private string $apiKey
-    ) {}
+    private HttpClientInterface $client;
+    private string $apiKey;
+
+    public function __construct(HttpClientInterface $client, string $apiKey)
+    {
+        $this->client = $client;
+        $this->apiKey = $apiKey;
+    }
 
     public function ask(string $question, array $mamanContext = []): string
     {
-        // Contexte médical personnalisé
-        $context = "Tu es un assistant médical spécialisé en grossesse pour l'application Maternia. 
-        Réponds toujours en français, de manière bienveillante et professionnelle.
-        Ne remplace jamais un médecin — rappelle-le si nécessaire.";
+        // Construction du profil médical intelligent
+        $profil = "";
 
-        if (!empty($mamanContext)) {
-            $context .= "\n\nInformations sur la maman :";
-            if (isset($mamanContext['trimestre'])) $context .= "\n- Trimestre : " . $mamanContext['trimestre'];
-            if (isset($mamanContext['semaine'])) $context .= "\n- Semaine : " . $mamanContext['semaine'];
-            if (isset($mamanContext['groupeSanguin'])) $context .= "\n- Groupe sanguin : " . $mamanContext['groupeSanguin'];
-            if (isset($mamanContext['maladies'])) $context .= "\n- Maladies chroniques : " . $mamanContext['maladies'];
-            if (isset($mamanContext['allergies'])) $context .= "\n- Allergies : " . $mamanContext['allergies'];
+        if (!empty($mamanContext['groupeSanguin'])) {
+            $profil .= "Groupe sanguin : " . $mamanContext['groupeSanguin'] . ". ";
+        }
+        if (!empty($mamanContext['maladies'])) {
+            $profil .= "Maladies chroniques : " . $mamanContext['maladies'] . ". ";
+        }
+        if (!empty($mamanContext['allergies'])) {
+            $profil .= "Allergies : " . $mamanContext['allergies'] . ". ";
+        }
+        if (!empty($mamanContext['semaine'])) {
+            $profil .= "Semaine de grossesse : " . $mamanContext['semaine'] . ". ";
+        }
+        if (!empty($mamanContext['trimestre'])) {
+            $profil .= "Trimestre : " . $mamanContext['trimestre'] . ". ";
         }
 
+        // PROMPT ULTRA HUMAIN (spécial Maternia)
+        $prompt = "
+Tu es Maternia AI 🤱, une assistante médicale virtuelle spécialisée en suivi de grossesse.
+
+PERSONNALITÉ :
+- Douce, rassurante et humaine
+- Comme une sage-femme bienveillante
+- Empathique et chaleureuse
+- Professionnelle mais simple à comprendre
+
+RÈGLES DE RÉPONSE :
+- Réponds en français naturel
+- 2 à 3 phrases maximum
+- Pas de listes longues
+- Pas de ton robotique
+- Adapte les conseils selon le trimestre de grossesse
+- Reste rassurante (jamais alarmiste)
+- Rappelle doucement que tu ne remplaces pas un médecin si nécessaire
+- Si la question évoque douleur intense, saignement, fièvre élevée ou urgence,
+  conseille immédiatement de consulter un professionnel de santé.
+
+CONTEXTE MÉDICAL DE LA MAMAN :
+$profil
+
+QUESTION DE LA MAMAN :
+$question
+";
+
         try {
-            $response = $this->client->request('POST',
-                'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . $this->apiKey,
+            $response = $this->client->request(
+                'POST',
+                'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' . $this->apiKey,
                 [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                    ],
+                    'timeout' => 30,
                     'json' => [
                         'contents' => [
                             [
+                                'role' => 'user',
                                 'parts' => [
-                                    ['text' => $context . "\n\nQuestion : " . $question]
+                                    ['text' => $prompt]
                                 ]
                             ]
+                        ],
+                        'generationConfig' => [
+                            'temperature' => 0.9, // + humain
+                            'maxOutputTokens' => 1028, // idéal pour 2-3 phrases
+                            'topP' => 0.95
                         ]
                     ]
                 ]
             );
 
-            $data = $response->toArray();
-            return $data['candidates'][0]['content']['parts'][0]['text'] ?? 'Désolée, je n\'ai pas pu répondre.';
+            $data = $response->toArray(false);
 
-} catch (\Exception $e) {
-    if (str_contains($e->getMessage(), '429')) {
-        return 'Je suis un peu occupée en ce moment 💕 Veuillez réessayer dans quelques secondes.';
+            // Vérification réponse API
+            if (!isset($data['candidates'][0]['content']['parts'][0]['text'])) {
+                return "Je suis là pour vous aider 💕 Pouvez-vous reformuler votre question ?";
+            }
+
+            $text = $data['candidates'][0]['content']['parts'][0]['text'];
+
+            // Nettoyage affichage (chat UI)
+            $text = trim($text);
+            $text = str_replace(["\n\n", "\n"], " ", $text);
+
+            return $text;
+
+        } catch (\Exception $e) {
+            // Réponse humaine même en cas d’erreur API (SUPER important pour la démo)
+            return "Je rencontre un petit souci technique 💕 mais je suis toujours là pour vous accompagner. Réessayez dans quelques secondes.";
+        }
     }
-    return 'Service temporairement indisponible. Veuillez réessayer.';
-}
-}
 }

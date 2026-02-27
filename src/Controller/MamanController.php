@@ -170,7 +170,6 @@ $evaluationTaille = 'normal';
 'poids_actuel_g'   => $grossesse ? $grossesse->getPoidsActuel() ?? null : null,
 'prise_poids'      => $prisePoids ?? null,
 'evaluation_prise' => $evaluationPrise ?? null,
-'gemini_api_key' => $_ENV['GEMINI_API_KEY'] ?? '',
         ]);
     }
 
@@ -214,9 +213,13 @@ $evaluationTaille = 'normal';
      *
      * @return string[]
      */
-    #[Route('/suivi_grossesse/{id}/chatbot', name: 'app_chatbot_ask', methods: ['POST'])]
-public function chatbotAsk(Request $request, Maman $maman, ChatbotService $chatbotService): JsonResponse
-{
+#[Route('/suivi_grossesse/{id}/chatbot', name: 'app_chatbot_ask', methods: ['POST'])]
+public function chatbotAsk(
+    Request $request,
+    Maman $maman,
+    ChatbotService $chatbotService,
+    GrosesseRepository $grosesseRepository
+): JsonResponse {
     $data = json_decode($request->getContent(), true);
     $question = $data['question'] ?? '';
 
@@ -224,10 +227,17 @@ public function chatbotAsk(Request $request, Maman $maman, ChatbotService $chatb
         return new JsonResponse(['error' => 'Question vide'], 400);
     }
 
+    $grossesse = $grosesseRepository->findOneBy(
+        ['maman' => $maman],
+        ['dateCreation' => 'DESC']
+    );
+
     $context = [
         'groupeSanguin' => $maman->getGroupeSanguin(),
         'maladies'      => $maman->getMaladiesChroniques(),
         'allergies'     => $maman->getAllergies(),
+        'semaine'       => $grossesse?->getSemaineActuelle(),
+        'trimestre'     => $grossesse?->getTrimestreActuel(),
     ];
 
     $reponse = $chatbotService->ask($question, $context);

@@ -39,7 +39,7 @@ final class GrosesseController extends AbstractController
         $poidsActuelG     = null;
         $prisePoids       = null;
         $evaluationPrise  = null;
-        $alerteSemaine    = null; // ← NOUVEAU
+        $alerteSemaine    = null; 
 
         $semaine = $grosesse->getSemaineActuelle();
         $statut  = $grosesse->getStatutGrossesse();
@@ -63,7 +63,7 @@ final class GrosesseController extends AbstractController
                 else                       $evaluationPrise = 'excessif';
             }
 
-            // ← NOUVEAU : Alerte selon semaine
+            //Alerte selon semaine
             if ($semaine >= 40) {
                 $alerteSemaine = [
                     'niveau'  => 'danger',
@@ -117,7 +117,7 @@ final class GrosesseController extends AbstractController
             'poids_actuel_g'    => $poidsActuelG,
             'prise_poids'       => $prisePoids,
             'evaluation_prise'  => $evaluationPrise,
-            'alerte_semaine'    => $alerteSemaine, // ← NOUVEAU
+            'alerte_semaine'    => $alerteSemaine, 
         ]);
     }
 
