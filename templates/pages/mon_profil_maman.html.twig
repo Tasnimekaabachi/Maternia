@@ -600,25 +600,25 @@ function sendMessage() {
     {% endif %}
     prompt += "Question : " + question;
 
-    fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={{ gemini_api_key }}', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-    })
-    .then(r => {
-        if (!r.ok) return r.json().then(e => { throw new Error(JSON.stringify(e)); });
-        return r.json();
-    })
-    .then(data => {
-        removeTyping();
-        var reponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Desole, une erreur est survenue.';
-        reponse = reponse.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-        appendMessage(reponse, 'bot');
-    })
-    .catch(err => {
-        removeTyping();
-        appendMessage('Service momentanement indisponible. Reessayez dans quelques secondes.', 'bot');
-    });
+fetch('/suivi_grossesse/{{ maman.id }}/chatbot', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+body: JSON.stringify({
+    question: prompt
+})
+})
+.then(r => r.json())
+.then(data => {
+    removeTyping();
+    var reponse = data.reponse || "Une erreur est survenue.";
+    appendMessage(reponse, 'bot');
+})
+.catch(err => {
+    removeTyping();
+    appendMessage("Service momentanément indisponible.", 'bot');
+});
 }
 
 function askSuggestion(text) {
@@ -761,7 +761,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function loadHospitals(userLat, userLng) {
-       fetch(`https://api.geoapify.com/v2/places?categories=healthcare.hospital,healthcare.clinic_or_praxis,healthcare.pharmacy&filter=circle:${userLng},${userLat},7000&limit=15&apiKey=1175ae2fbe7c4881803c31dae105044d`)
+       fetch(https://api.geoapify.com/v2/places?categories=healthcare.hospital,healthcare.clinic_or_praxis,healthcare.pharmacy&filter=circle:${userLng},${userLat},7000&limit=15&apiKey=1175ae2fbe7c4881803c31dae105044d)
             .then(r => r.json())
             .then(data => {
                 var results = [];
@@ -775,7 +775,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     var cats     = f.properties.categories || [];
                     var type     = getType(cats);
                     var label    = getTypeLabel(type);
-                    var mapsUrl  = `https://www.google.com/maps/dir/?api=1&destination=${fLat},${fLon}`;
+                    var mapsUrl  = https://www.google.com/maps/dir/?api=1&destination=${fLat},${fLon};
 
                     // Marqueur sur la carte
                     L.marker([fLat, fLon], {icon: icons[type]})
@@ -1206,29 +1206,30 @@ function renderList(count) {
         <div class="col-12">
             <label class="form-label fw-semibold small">🌿 Allergies connues</label>
             <div class="mic-wrapper">
-                {{ form_widget(form.allergies, {'attr': {'id': 'voice_field_allergies', 'class': 'form-control', 'rows': 2, 'placeholder': 'Ex. pénicilline, arachides, latex...', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);resize:none;'}}) }}
-                <button type="button" class="mic-btn" data-voice-target="voice_field_allergies" title="Dicter par voix">🎤</button>
+                {{ form_widget(form.allergies, {'attr': {'class': 'form-control', 'rows': 2, 'placeholder': 'Ex. pénicilline, arachides, latex...', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);resize:none;'}}) }}
+                <button type="button" class="mic-btn" onclick="startVoice('maman_allergies', this)" title="Dicter par voix">🎤</button>
             </div>
         </div>
         <div class="col-12">
             <label class="form-label fw-semibold small">🏥 Antécédents médicaux</label>
             <div class="mic-wrapper">
-                {{ form_widget(form.antecedentsMedicaux, {'attr': {'id': 'voice_field_antecedents', 'class': 'form-control', 'rows': 2, 'placeholder': 'Ex. diabète gestationnel, hypertension...', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);resize:none;'}}) }}
-                <button type="button" class="mic-btn" data-voice-target="voice_field_antecedents" title="Dicter par voix">🎤</button>
+                {{ form_widget(form.antecedentsMedicaux, {'attr': {'class': 'form-control', 'rows': 2, 'placeholder': 'Ex. fausse couche, césarienne, diabète gestationnel, 
+prééclampsie, grossesse extra-utérine...', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);resize:none;'}}) }}
+                <button type="button" class="mic-btn" onclick="startVoice('maman_antecedentsMedicaux', this)" title="Dicter par voix">🎤</button>
             </div>
         </div>
         <div class="col-12">
             <label class="form-label fw-semibold small">💊 Maladies chroniques</label>
             <div class="mic-wrapper">
-                {{ form_widget(form.maladiesChroniques, {'attr': {'id': 'voice_field_maladies', 'class': 'form-control', 'rows': 2, 'placeholder': 'Ex. diabète de type 2, asthme...', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);resize:none;'}}) }}
-                <button type="button" class="mic-btn" data-voice-target="voice_field_maladies" title="Dicter par voix">🎤</button>
+                {{ form_widget(form.maladiesChroniques, {'attr': {'class': 'form-control', 'rows': 2, 'placeholder': 'Ex. diabète de type 2, asthme...', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);resize:none;'}}) }}
+                <button type="button" class="mic-btn" onclick="startVoice('maman_maladiesChroniques', this)" title="Dicter par voix">🎤</button>
             </div>
         </div>
         <div class="col-12">
             <label class="form-label fw-semibold small">💉 Médicaments actuels</label>
             <div class="mic-wrapper">
-                {{ form_widget(form.medicamentsActuels, {'attr': {'id': 'voice_field_medicaments', 'class': 'form-control', 'rows': 2, 'placeholder': 'Ex. acide folique, fer, vitamine D...', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);resize:none;'}}) }}
-                <button type="button" class="mic-btn" data-voice-target="voice_field_medicaments" title="Dicter par voix">🎤</button>
+                {{ form_widget(form.medicamentsActuels, {'attr': {'class': 'form-control', 'rows': 2, 'placeholder': 'Ex. acide folique, fer, vitamine D...', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);resize:none;'}}) }}
+                <button type="button" class="mic-btn" onclick="startVoice('maman_medicamentsActuels', this)" title="Dicter par voix">🎤</button>
             </div>
         </div>
     </div>
@@ -1247,8 +1248,8 @@ function renderList(count) {
         <div class="col-12">
             <label class="form-label fw-semibold small">🥗 Habitudes alimentaires</label>
             <div class="mic-wrapper">
-                {{ form_widget(form.habitudesAlimentaires, {'attr': {'id': 'voice_field_habitudes', 'class': 'form-control', 'placeholder': 'Ex. végétarienne, sans gluten, méditerranéenne...', 'style': 'border-radius:12px;border:2px solid rgba(76,175,80,0.3);'}}) }}
-                <button type="button" class="mic-btn" data-voice-target="voice_field_habitudes" title="Dicter par voix">🎤</button>
+                {{ form_widget(form.habitudesAlimentaires, {'attr': {'class': 'form-control', 'placeholder': 'Ex. végétarienne, sans gluten, méditerranéenne...', 'style': 'border-radius:12px;border:2px solid rgba(76,175,80,0.3);'}}) }}
+                <button type="button" class="mic-btn" onclick="startVoice('maman_habitudesAlimentaires', this)" title="Dicter par voix">🎤</button>
             </div>
         </div>
     </div>
@@ -1268,171 +1269,102 @@ function renderList(count) {
     </div>
 </section>
     {% endif %}
-    <script>
-(function() {
-    var currentRecognition = null;
-    var currentBtn = null;
-    var currentField = null;
-    var baseValue = '';
-    var finalTranscript = '';
-    var listeningSpan = null;
+   <script>
+// Overlay enregistrement
+function showRecordingOverlay(btn) {
+    var overlay = document.createElement('div');
+    overlay.id = 'mic-overlay';
+    overlay.className = 'mic-recording-overlay';
+    overlay.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:42px;height:42px;background:#e91e8c;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;animation:mic-pulse 1s infinite;">🎤</div>
+            <div>
+                <div style="font-weight:700;color:#333;font-size:14px;">Enregistrement en cours...</div>
+                <div style="font-size:12px;color:#aaa;" id="mic-timer">0:00</div>
+            </div>
+        </div>
+        <div class="mic-wave">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <button onclick="stopRecording()" style="background:#e91e8c;border:none;color:white;width:48px;height:48px;border-radius:50%;font-size:20px;cursor:pointer;box-shadow:0 2px 10px rgba(233,30,140,0.4);">⏹️</button>
+    `;
+    document.body.appendChild(overlay);
 
-    function getField(btn) {
-        var id = btn.getAttribute('data-voice-target');
-        if (id) {
-            var el = document.getElementById(id);
-            if (el && (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT')) return el;
-        }
-        var prev = btn.previousElementSibling;
-        if (prev && (prev.tagName === 'TEXTAREA' || (prev.tagName === 'INPUT' && (prev.type === 'text' || !prev.type)))) return prev;
-        return null;
+    // Timer
+    var seconds = 0;
+    window.micTimerInterval = setInterval(function() {
+        seconds++;
+        var min = Math.floor(seconds / 60);
+        var sec = seconds % 60;
+        var el = document.getElementById('mic-timer');
+        if (el) el.textContent = min + ':' + (sec < 10 ? '0' : '') + sec;
+    }, 1000);
+}
+
+function hideRecordingOverlay() {
+    var overlay = document.getElementById('mic-overlay');
+    if (overlay) overlay.remove();
+    if (window.micTimerInterval) clearInterval(window.micTimerInterval);
+}
+
+window.currentRecognition = null;
+
+function stopRecording() {
+    if (window.currentRecognition) {
+        window.currentRecognition.stop();
+    }
+    hideRecordingOverlay();
+    if (window.currentMicBtn) {
+        window.currentMicBtn.classList.remove('recording');
+        window.currentMicBtn.innerHTML = '🎤';
+    }
+}
+
+function startVoice(fieldId, btn) {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert('Votre navigateur ne supporte pas la reconnaissance vocale. Utilisez Chrome ou Edge.');
+        return;
     }
 
-    function setListeningUI(btn, listening) {
-        if (!btn) return;
-        btn.classList.toggle('recording', listening);
-        btn.innerHTML = listening ? '⏹' : '🎤';
-        btn.title = listening ? 'Cliquer pour arrêter' : 'Dicter par voix';
-        if (listeningSpan) {
-            listeningSpan.textContent = listening ? ' Parlez…' : '';
-            listeningSpan.style.color = listening ? '#28a745' : '';
-        }
+    if (btn.classList.contains('recording')) {
+        stopRecording();
+        return;
     }
 
-    function stopListening(btn) {
-        if (currentRecognition) {
-            try { currentRecognition.abort(); } catch (e) {}
-            currentRecognition = null;
+    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    var recognition = new SpeechRecognition();
+    recognition.lang = 'fr-FR';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    window.currentRecognition = recognition;
+    window.currentMicBtn = btn;
+
+    btn.classList.add('recording');
+    btn.innerHTML = '⏹️';
+    showRecordingOverlay(btn);
+    recognition.start();
+
+    recognition.onresult = function(event) {
+        var transcript = event.results[0][0].transcript;
+        var field = document.getElementById(fieldId);
+        if (field) {
+            field.value = field.value.trim() !== '' ? field.value + ', ' + transcript : transcript;
+            field.style.borderColor = '#4caf50';
+            setTimeout(() => { field.style.borderColor = ''; }, 2000);
         }
-        currentBtn = null;
-        currentField = null;
-        setListeningUI(btn, false);
-        if (listeningSpan) listeningSpan.textContent = '';
-    }
+    };
 
-    function startRecognitionAfterPermission(btn, field, Recognition) {
-        baseValue = (field.value || '').trim();
-        finalTranscript = '';
-        var recognition = new Recognition();
-        recognition.lang = 'fr-FR';
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.maxAlternatives = 1;
-
-        recognition.onresult = function(event) {
-            var interim = '';
-            var i, result, transcript;
-            for (i = 0; i < event.results.length; i++) {
-                result = event.results[i];
-                transcript = result[0] ? result[0].transcript : '';
-                if (result.isFinal && transcript) {
-                    finalTranscript += (finalTranscript ? ' ' : '') + transcript;
-                } else {
-                    interim += transcript;
-                }
-            }
-            if (currentField) {
-                currentField.value = (baseValue ? baseValue + ' ' : '') + finalTranscript + interim;
-                currentField.style.borderColor = '#28a745';
-            }
-        };
-
-        recognition.onerror = function(event) {
-            if (event.error === 'not-allowed' || event.error === 'permission-denied') {
-                alert('Accès au micro refusé. Cliquez sur l’icône cadenas (ou « i ») dans la barre d’adresse et autorisez le micro pour ce site.');
-            } else if (event.error === 'no-speech') {
-                alert('Aucune parole détectée. Parlez clairement après avoir cliqué sur le micro (en français).');
-            } else if (event.error !== 'aborted') {
-                alert('Erreur reconnaissance vocale : ' + event.error);
-            }
-            stopListening(btn);
-        };
-
-        recognition.onend = function() {
-            if (currentField && finalTranscript) {
-                currentField.value = (baseValue ? baseValue + ' ' : '') + finalTranscript;
-                currentField.style.boxShadow = '0 0 0 2px rgba(40,167,69,0.3)';
-                setTimeout(function() {
-                    if (currentField) {
-                        currentField.style.borderColor = '';
-                        currentField.style.boxShadow = '';
-                    }
-                }, 1500);
-            }
-            currentRecognition = null;
-            currentBtn = null;
-            currentField = null;
-            setListeningUI(btn, false);
-            if (listeningSpan) listeningSpan.textContent = '';
-        };
-
-        currentRecognition = recognition;
-        currentBtn = btn;
-        currentField = field;
-        setListeningUI(btn, true);
-        if (listeningSpan) listeningSpan.textContent = ' Parlez…';
-
-        try {
-            recognition.start();
-        } catch (err) {
-            alert('Impossible de démarrer l’écoute : ' + (err.message || err));
-            stopListening(btn);
+    recognition.onerror = function(event) {
+        if (event.error === 'not-allowed') {
+            alert('Accès au microphone refusé. Autorisez le microphone dans votre navigateur.');
         }
-    }
+        stopRecording();
+    };
 
-    function startVoice(btn) {
-        var field = getField(btn);
-        if (!field) {
-            alert('Champ introuvable.');
-            return;
-        }
-
-        if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
-            alert('Reconnaissance vocale non supportée. Utilisez Chrome ou Edge (navigateur à jour).');
-            return;
-        }
-
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            alert('Votre navigateur ou cette page ne permet pas d’accéder au micro. Utilisez HTTPS ou localhost.');
-            return;
-        }
-
-        var Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-        if (btn.classList.contains('recording') && currentRecognition) {
-            try { currentRecognition.abort(); } catch (e) {}
-            currentRecognition = null;
-            currentBtn = null;
-            setListeningUI(btn, false);
-            if (listeningSpan) listeningSpan.textContent = '';
-            return;
-        }
-
-        if (!listeningSpan && btn.parentNode) {
-            listeningSpan = document.createElement('span');
-            listeningSpan.setAttribute('aria-live', 'polite');
-            listeningSpan.style.fontSize = '0.85rem';
-            listeningSpan.style.marginLeft = '4px';
-            btn.parentNode.appendChild(listeningSpan);
-        }
-
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(function(stream) {
-                stream.getTracks().forEach(function(t) { t.stop(); });
-                startRecognitionAfterPermission(btn, field, Recognition);
-            })
-            .catch(function(err) {
-                alert('Impossible d’accéder au micro. Autorisez-le dans les paramètres du navigateur (cadenas dans la barre d’adresse). Détail : ' + (err.message || err.name || 'refusé'));
-                setListeningUI(btn, false);
-                if (listeningSpan) listeningSpan.textContent = '';
-            });
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.mic-btn[data-voice-target]').forEach(function(btn) {
-            btn.addEventListener('click', function(ev) { ev.preventDefault(); startVoice(btn); });
-        });
-    });
-})();
+    recognition.onend = function() {
+        stopRecording();
+    };
+}
 </script>
 {% endblock %}
