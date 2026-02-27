@@ -1,0 +1,74 @@
+﻿composer : 
+./composer.json has 
+been updated
+At line:1 char:1
++ composer require 
+symfony/google-mailer 
+-W > 
+composer_error.txt 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (./composer.js   
+ on has been update    
+d:String) [], Remo    
+teException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+Running composer 
+update 
+symfony/google-mailer 
+--with-all-dependencies
+Loading composer 
+repositories with 
+package information
+Restricting packages 
+listed in 
+"symfony/symfony" to 
+"6.4.*"
+Updating dependencies
+Your requirements 
+could not be resolved 
+to an installable set 
+of packages.
+
+  Problem 1
+    - Root 
+composer.json requires 
+google/apiclient 2.15 
+-> satisfiable by googl
+e/apiclient[v2.15.0].
+    - google/apiclient 
+v2.15.0 requires 
+firebase/php-jwt ~6.0 
+-> found firebase/php-j
+wt[v6.0.0, ..., 
+v6.11.1] but these 
+were not loaded, 
+because they are 
+affected by security 
+advisories ("PKSA-y2cr-
+5h3j-g3ys"). Go to http
+s://packagist.org/secur
+ity-advisories/ to 
+find advisory details. 
+To ignore the 
+advisories, add them 
+to the audit "ignore" 
+config. To turn the 
+feature off entirely, 
+you can set 
+"block-insecure" to 
+false in your "audit" 
+config.
+
+
+Installation failed, 
+reverting 
+./composer.json and 
+./composer.lock to 
+their original content.
