@@ -23,6 +23,9 @@ final class NotificationService
     {
         $to = $commande->getEmail();
         if ($to) {
+            $to = trim($to);
+        }
+        if ($to) {
             $html = $this->twig->render('emails/commande_payee.html.twig', [
                 'commande' => $commande,
             ]);

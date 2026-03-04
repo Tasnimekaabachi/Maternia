@@ -4,6 +4,8 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    stripe_publishable_key: '%env(default::STRIPE_PUBLISHABLE_KEY)%'
+    stripe_currency_default: 'eur'
 
 services:
     # default configuration for services in *this* file
@@ -44,6 +46,13 @@ services:
     App\Service\NotificationService:
         arguments:
             $mailerFrom: '%env(MAILER_FROM)%'
+
+    App\Service\PaymentService:
+        arguments:
+            $secretKey: '%env(default::STRIPE_SECRET_KEY)%'
+            $webhookSecret: '%env(default::STRIPE_WEBHOOK_SECRET)%'
+            $currency: '%env(default:stripe_currency_default:STRIPE_CURRENCY)%'
+            $tndToEurRate: '%env(float:STRIPE_TND_TO_EUR)%'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

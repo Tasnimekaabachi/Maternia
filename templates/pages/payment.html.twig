@@ -1,0 +1,112 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paiement - Commande #{{ commande.id }} - Maternia{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        #payment-element { margin: 1rem 0; }
+        #payment-message { color: #df1b41; margin-top: 0.5rem; }
+        .spinner { display: none; }
+        .spinner.visible { display: inline-block; }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Paiement sécurisé - Commande #{{ commande.id }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">
+                            Montant à régler : <strong class="text-primary">{{ commande.total|number_format(2, '.', ' ') }} TND</strong>
+                            <small>(converti en EUR pour le paiement par carte)</small>
+                        </p>
+
+                        <form id="payment-form">
+                            <div id="payment-element"></div>
+                            <div id="payment-message" class="text-danger"></div>
+                            <button type="submit" id="submit" class="btn btn-primary btn-lg w-100 mt-3">
+                                <span id="button-text">Payer maintenant</span>
+                                <span id="spinner" class="spinner-border spinner-border-sm ms-2 spinner" role="status"></span>
+                            </button>
+                        </form>
+
+                        <p class="small text-muted mt-3 mb-0">
+                            <i class="fas fa-lock me-1"></i> Paiement sécurisé par Stripe. Vos données bancaires ne transitent pas sur nos serveurs.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const stripePublishableKey = "{{ stripePublishableKey|e('js') }}";
+            if (!stripePublishableKey) {
+                document.getElementById('payment-message').textContent = 'Clé Stripe non configurée.';
+                return;
+            }
+
+            const stripe = Stripe(stripePublishableKey);
+            const options = { layout: 'tabs' };
+
+            let elementsInstance = null;
+            const paymentForm = document.getElementById('payment-form');
+            const submitButton = document.getElementById('submit');
+            const buttonText = document.getElementById('button-text');
+            const spinner = document.getElementById('spinner');
+            const messageEl = document.getElementById('payment-message');
+
+            async function initPaymentElement() {
+                const response = await fetch("{{ path('api_payment_create_intent', { id: commande.id }) }}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                const data = await response.json();
+                if (data.error) {
+                    messageEl.textContent = data.error;
+                    return;
+                }
+                elementsInstance = stripe.elements({ clientSecret: data.clientSecret });
+                const paymentElement = elementsInstance.create('payment', options);
+                paymentElement.mount('#payment-element');
+                paymentElement.on('ready', () => {
+                    submitButton.disabled = false;
+                });
+            }
+
+            paymentForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!elementsInstance) return;
+                submitButton.disabled = true;
+                buttonText.textContent = 'Traitement...';
+                spinner.classList.add('visible');
+                messageEl.textContent = '';
+
+                const confirmParams = { return_url: "{{ url('app_checkout_success', { id: commande.id }) }}" };
+                {% if commande.email %}
+                confirmParams.receipt_email = "{{ commande.email|e('js') }}";
+                {% endif %}
+                const { error } = await stripe.confirmPayment({
+                    elements: elementsInstance,
+                    confirmParams
+                });
+
+                if (error) {
+                    messageEl.textContent = error.message || 'Une erreur est survenue.';
+                    submitButton.disabled = false;
+                }
+                buttonText.textContent = 'Payer maintenant';
+                spinner.classList.remove('visible');
+            });
+
+            initPaymentElement();
+        });
+    </script>
+{% endblock %}

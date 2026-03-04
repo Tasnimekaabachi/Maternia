@@ -6,12 +6,28 @@
     <div class="container py-5">
         <div class="row g-4">
             <div class="col-12">
+                {% if commande.paymentStatus == 'pending_stripe' and app.request.query.get('payment_intent_client_secret') %}
+                <div class="alert alert-info">
+                    <h4 class="alert-heading mb-2">Paiement en cours de traitement</h4>
+                    <p class="mb-0">
+                        Votre paiement par carte est en cours. Vous recevrez une confirmation par email sous peu.
+                    </p>
+                </div>
+                {% elseif commande.paymentStatus == 'paid' %}
+                <div class="alert alert-success">
+                    <h4 class="alert-heading mb-2"><i class="fas fa-check-circle me-2"></i>Paiement confirmé</h4>
+                    <p class="mb-0">
+                        Merci ! Votre commande est payée. Un récapitulatif vous a été envoyé par email.
+                    </p>
+                </div>
+                {% else %}
                 <div class="alert alert-success">
                     <h4 class="alert-heading mb-2">Merci, votre commande est bien enregistrée</h4>
                     <p class="mb-0">
                         Un récapitulatif vous sera envoyé par email si vous avez renseigné votre adresse.
                     </p>
                 </div>
+                {% endif %}
             </div>
 
             <div class="col-lg-8">

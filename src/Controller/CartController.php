@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Commande;
 use App\Repository\ProduitRepository;
+use App\Repository\PromoCodeRepository;
 use App\Service\NotificationService;
+use App\Service\PaymentService;
 use App\Service\Shipping\ShippingQuoteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,7 +19,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class CartController extends AbstractController
 {
     #[Route('', name: 'app_cart_show', methods: ['GET'])]
-    public function show(Request $request, ProduitRepository $produitRepository, ShippingQuoteService $shippingQuoteService): Response
+    public function show(Request $request, ProduitRepository $produitRepository, ShippingQuoteService $shippingQuoteService, PaymentService $paymentService): Response
     {
         $session = $request->getSession();
         /** @var int[] $cart */
@@ -41,6 +43,7 @@ final class CartController extends AbstractController
             'produits' => $produits,
             'total' => $total,
             'shippingQuote' => $shippingQuote,
+            'stripeAvailable' => $paymentService->isConfigured(),
         ]);
     }
 
@@ -121,7 +124,9 @@ final class CartController extends AbstractController
         ProduitRepository $produitRepository,
         EntityManagerInterface $entityManager,
         ShippingQuoteService $shippingQuoteService,
-        NotificationService $notificationService
+        NotificationService $notificationService,
+        PromoCodeRepository $promoCodeRepository,
+        PaymentService $paymentService
     ): RedirectResponse {
         $session = $request->getSession();
         /** @var int[] $cart */
@@ -148,6 +153,7 @@ final class CartController extends AbstractController
         $postalCode = trim((string) $request->request->get('postal_code'));
         $country = strtoupper(trim((string) $request->request->get('country', 'TN')));
         $carrier = strtoupper(trim((string) $request->request->get('carrier', 'POSTE')));
+        $promoCodeInput = strtoupper(trim((string) $request->request->get('promo_code')));
 
         $subtotal = 0.0;
         foreach ($produits as $produit) {
@@ -163,6 +169,20 @@ final class CartController extends AbstractController
         ];
         $quote = $shippingQuoteService->quote($produits, $country ?: 'TN', $carrier ?: 'POSTE', $destination);
 
+        $total = $subtotal + $quote->cost;
+
+        // Application éventuelle du code promo
+        if ($promoCodeInput !== '') {
+            $promo = $promoCodeRepository->findActiveForEmail($promoCodeInput, $email);
+            if ($promo) {
+                $discount = max(0, min(100, $promo->getDiscountPercent()));
+                $total = $total * (1 - $discount / 100);
+                $promo->markUsed();
+            } else {
+                $this->addFlash('warning', 'Code promo invalide ou déjà utilisé.');
+            }
+        }
+
         $commande->setEmail($email ?: null);
         $commande->setTelephone($telephone ?: null);
         $commande->setShippingAddress($address ?: null);
@@ -172,28 +192,71 @@ final class CartController extends AbstractController
         $commande->setShippingCarrier($quote->carrier);
         $commande->setShippingEtaDays($quote->etaDays);
         $commande->setShippingCost($quote->cost);
-        $commande->setPaymentStatus('pending_offline');
-        $commande->setTotal((float) ($subtotal + $quote->cost));
+        $commande->setTotal((float) $total);
+
+        $paymentMethod = strtolower(trim((string) $request->request->get('payment_method', 'offline')));
+        $useStripe = $paymentMethod === 'stripe' && $paymentService->isConfigured();
+
+        if ($useStripe) {
+            $commande->setPaymentStatus('pending_stripe');
+        } else {
+            $commande->setPaymentStatus('pending_offline');
+        }
 
         $entityManager->persist($commande);
         $entityManager->flush();
 
-        // Envoi de l'email de confirmation (et SMS optionnel) si les informations sont renseignées
+        if ($useStripe) {
+            $session->remove('cart');
+            return $this->redirectToRoute('app_cart_payment', ['id' => $commande->getId()]);
+        }
+
         $notificationService->sendOrderPaid($commande);
-
-        // Vider le panier
         $session->remove('cart');
-
         $this->addFlash('success', 'Votre commande a été créée avec succès.');
+        return $this->redirectToRoute('app_checkout_success', ['id' => $commande->getId()]);
+    }
 
-        return $this->redirectToRoute('app_checkout_success', [
-            'id' => $commande->getId(),
+    #[Route('/payment/{id}', name: 'app_cart_payment', methods: ['GET'])]
+    public function payment(Commande $commande, PaymentService $paymentService): Response
+    {
+        if ($commande->getPaymentStatus() === 'paid') {
+            $this->addFlash('success', 'Cette commande est déjà payée.');
+            return $this->redirectToRoute('app_checkout_success', ['id' => $commande->getId()]);
+        }
+        if ($commande->getPaymentStatus() !== 'pending_stripe') {
+            $this->addFlash('warning', 'Cette commande n\'est pas en attente de paiement par carte.');
+            return $this->redirectToRoute('app_checkout_success', ['id' => $commande->getId()]);
+        }
+        if (!$paymentService->isConfigured()) {
+            $this->addFlash('danger', 'Le paiement en ligne n\'est pas disponible.');
+            return $this->redirectToRoute('app_checkout_success', ['id' => $commande->getId()]);
+        }
+
+        return $this->render('pages/payment.html.twig', [
+            'commande' => $commande,
+            'stripePublishableKey' => $this->getParameter('stripe_publishable_key'),
         ]);
     }
 
     #[Route('/checkout/success/{id}', name: 'app_checkout_success', methods: ['GET'])]
-    public function checkoutSuccess(Commande $commande): Response
+    public function checkoutSuccess(Commande $commande, PaymentService $paymentService, Request $request): Response
     {
+        // Fallback : si retour depuis Stripe, confirmer et envoyer l'email
+        $paymentIntentId = $request->query->get('payment_intent');
+        if (!$paymentIntentId && $paymentService->isConfigured()) {
+            $clientSecret = $request->query->get('payment_intent_client_secret');
+            if ($clientSecret && preg_match('/^(pi_[a-zA-Z0-9]+)_secret_/', (string) $clientSecret, $m)) {
+                $paymentIntentId = $m[1];
+            }
+        }
+        if ($paymentIntentId && $commande->getPaymentStatus() === 'pending_stripe') {
+            $confirmed = $paymentService->confirmFromRedirect($commande, (string) $paymentIntentId);
+            if ($confirmed && !$commande->getEmail()) {
+                $this->addFlash('warning', 'Merci de renseigner votre email au checkout pour recevoir la facture par email.');
+            }
+        }
+
         return $this->render('pages/checkout_success.html.twig', [
             'commande' => $commande,
         ]);

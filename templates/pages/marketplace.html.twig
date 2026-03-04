@@ -13,10 +13,16 @@
                     <p class="lead text-white mb-4">Une sélection soignée pour la grossesse, la naissance et les premiers mois.</p>
                 </div>
                 <div class="col-lg-5 col-md-12 text-lg-end text-md-start">
-                    <a href="{{ path('app_cart_show') }}" class="btn btn-light btn-lg btn-border-radius d-inline-flex align-items-center">
-                        <i class="fas fa-shopping-cart text-primary me-2"></i>
-                        <span>Voir mon panier</span>
-                    </a>
+                    <div class="d-flex flex-lg-row flex-column gap-2 justify-content-lg-end">
+                        <a href="{{ path('app_cart_show') }}" class="btn btn-light btn-lg btn-border-radius d-inline-flex align-items-center">
+                            <i class="fas fa-shopping-cart text-primary me-2"></i>
+                            <span>Voir mon panier</span>
+                        </a>
+                        <a href="{{ path('app_wheel') }}" class="btn btn-outline-light btn-lg btn-border-radius d-inline-flex align-items-center">
+                            <i class="fas fa-gift text-primary me-2"></i>
+                            <span>Roue des réductions</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
