@@ -43,6 +43,10 @@ services:
         arguments:
             $credentialsPath: '%app.google_meet_credentials_path%'
             $calendarId: '%app.google_meet_calendar_id%'
+    
+    App\Service\CartService:
+        arguments:
+            $produitRepository: '@App\Repository\ProduitRepository'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

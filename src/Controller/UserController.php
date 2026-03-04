@@ -14,6 +14,11 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Repository\AttendanceRepository;
 use App\Repository\GrosesseRepository;
 use App\Entity\Maman;
+use App\Repository\CommandeRepository;
+use App\Service\CartService;
+use App\Repository\DemandeBabySitterRepository;
+use App\Repository\OffreBabySitterRepository;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 class UserController extends AbstractController
 {
     private string $compreFaceUrl;
@@ -314,12 +319,16 @@ class UserController extends AbstractController
 
         return new JsonResponse($results);
     }
-    #[Route('/user/dashboard', name: 'app_user_dashboard')]
+#[Route('/user/dashboard', name: 'app_user_dashboard')]
 #[IsGranted('ROLE_USER')]
 public function userDashboard(
     EntityManagerInterface $em,
     AttendanceRepository $attendanceRepository,
-    GrosesseRepository $grosesseRepository
+    GrosesseRepository $grosesseRepository,
+    CommandeRepository $commandeRepository,
+    CartService $cartService,
+    DemandeBabySitterRepository $demandeBabySitterRepository, // Add this
+    OffreBabySitterRepository $offreBabySitterRepository // Add this
 ): Response {
     $user = $this->getUser();
     
@@ -356,12 +365,41 @@ public function userDashboard(
         );
     }
     
+    // Get user's orders
+    $orders = $commandeRepository->findBy([], ['dateCommande' => 'DESC']);
+    
+    // Get cart data
+    $cartData = $cartService->getCartDetails();
+    
+    // Get babysitter requests made by this user (using email)
+    $babysitterRequests = $demandeBabySitterRepository->createQueryBuilder('d')
+        ->select('d', 'o')
+        ->join('d.offre', 'o')
+        ->where('d.emailParent = :email')
+        ->setParameter('email', $user->getEmail())
+        ->orderBy('d.dateDemande', 'DESC')
+        ->getQuery()
+        ->getResult();
+    
+    // Get available babysitters (limit to 3 for display)
+    $availableBabysitters = $offreBabySitterRepository->createQueryBuilder('o')
+        ->where('o.disponibilite = :disponible')
+        ->setParameter('disponible', true)
+        ->orderBy('o.nomBabysitter', 'ASC')
+        ->setMaxResults(3)
+        ->getQuery()
+        ->getResult();
+    
     return $this->render('user/dashboard.html.twig', [
         'user' => $user,
         'events' => $events,
         'appointments' => $appointments,
         'maman' => $maman,
-        'grossesse' => $grossesse
+        'grossesse' => $grossesse,
+        'orders' => $orders,
+        'cart' => $cartData,
+        'babysitter_requests' => $babysitterRequests,
+        'available_babysitters' => $availableBabysitters
     ]);
 }
 }
