@@ -39,14 +39,16 @@
             </h5>
         </div>
         <div class="admin-card-body p-4">
+            {# Include the form - it has form_start/form_end with ID 'admin-event-form' #}
             {{ include('admin/event/_form.html.twig') }}
         </div>
+        {# FOOTER SECTION WITH BUTTONS - ADDED BACK #}
         <div class="admin-card-footer p-4 border-top bg-light">
             <div class="d-flex justify-content-between align-items-center">
                 <a href="{{ path('app_event_index') }}" class="btn btn-outline-secondary">
                     <i class="fas fa-times me-1"></i> Annuler
                 </a>
-                <button type="submit" form="event-form" class="btn btn-primary admin-btn-primary">
+                <button type="submit" form="admin-event-form" class="btn btn-primary admin-btn-primary">
                     <i class="fas fa-check me-1"></i> Créer l'événement
                 </button>
             </div>
