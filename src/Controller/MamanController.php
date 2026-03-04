@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
 final class MamanController extends AbstractController
 {
     /**
@@ -21,11 +23,13 @@ final class MamanController extends AbstractController
      * URL unifiée : /suivi_grossesse (création) et /suivi_grossesse/{id} (voir une maman).
      */
     #[Route('/suivi_grossesse', name: 'app_suivi_grossesse_creer', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_USER')]
     public function suiviGrossesseCreer(Request $request, EntityManagerInterface $entityManager, MailerService $mailerService): Response
     {
         $maman = new Maman();
         $form = $this->createForm(MamanType::class, $maman);
         $form->handleRequest($request);
+        
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($maman);
             $entityManager->flush();
@@ -46,6 +50,7 @@ final class MamanController extends AbstractController
             'maman' => $maman,
             'form' => $form,
             'mode' => 'create',
+            'current_route' => 'app_suivi_grossesse_creer', // ADD THIS
         ]);
     }
 
@@ -72,7 +77,9 @@ final class MamanController extends AbstractController
      * /suivi_grossesse/{id}
      */
     #[Route('/suivi_grossesse/{id}', name: 'app_suivi_grossesse_show', requirements: ['id' => '\d+'], methods: ['GET'])]
-public function suiviGrossesseShow(Maman $maman, GrosesseRepository $grosesseRepository, ConseilsSuiviService $conseilsSuiviService): Response    {
+    #[IsGranted('ROLE_USER')]
+    public function suiviGrossesseShow(Maman $maman, GrosesseRepository $grosesseRepository, ConseilsSuiviService $conseilsSuiviService): Response    
+    {
         $imc = $maman->getImc();
         $imcCategorie = $maman->getImcCategorie();
         $imcAlerte = $maman->isImcAlerte();
@@ -103,54 +110,55 @@ public function suiviGrossesseShow(Maman $maman, GrosesseRepository $grosesseRep
                     $grossesseAlertes[] = 'IMC à risque : surveillez la prise de poids avec un professionnel de santé.';
                 }
                 // Graphique prise de poids
-$poidsAvant  = $maman->getPoids();
-$poidsActuel = $grossesse->getPoidsActuel();
-$prisePoids  = ($poidsAvant && $poidsActuel)
-               ? round($poidsActuel - $poidsAvant, 1)
-               : null;
+                $poidsAvant  = $maman->getPoids();
+                $poidsActuel = $grossesse->getPoidsActuel();
+                $prisePoids  = ($poidsAvant && $poidsActuel)
+                               ? round($poidsActuel - $poidsAvant, 1)
+                               : null;
 
-$evaluationPrise = null;
-if ($prisePoids !== null) {
-    if ($prisePoids < 0)       $evaluationPrise = 'perte';
-    elseif ($prisePoids <= 8)   $evaluationPrise = 'insuffisant';
-    elseif ($prisePoids <= 16) $evaluationPrise = 'normal';
-    elseif ($prisePoids <= 20) $evaluationPrise = 'attention';
-    else                       $evaluationPrise = 'excessif';
-}
-           } elseif ($statut === 'terminee') {
-    $bebeAgeMois = $conseilsSuiviService->getAgeBebeEnMois($grossesse);
-    if ($bebeAgeMois !== null) {
-        $bebeConseil = $conseilsSuiviService->conseilsBebe($bebeAgeMois);
-    }
+                $evaluationPrise = null;
+                if ($prisePoids !== null) {
+                    if ($prisePoids < 0)       $evaluationPrise = 'perte';
+                    elseif ($prisePoids <= 8)   $evaluationPrise = 'insuffisant';
+                    elseif ($prisePoids <= 16) $evaluationPrise = 'normal';
+                    elseif ($prisePoids <= 20) $evaluationPrise = 'attention';
+                    else                       $evaluationPrise = 'excessif';
+                }
+            } elseif ($statut === 'terminee') {
+                $bebeAgeMois = $conseilsSuiviService->getAgeBebeEnMois($grossesse);
+                if ($bebeAgeMois !== null) {
+                    $bebeConseil = $conseilsSuiviService->conseilsBebe($bebeAgeMois);
+                }
 
-    // Données courbe bébé
-    $sexe = $grossesse->getSexeBebe(); // 'M' ou 'F'
+                // Données courbe bébé
+                $sexe = $grossesse->getSexeBebe(); // 'M' ou 'F'
 
-    // Normes OMS à la naissance
-    $normes = [
-        'M' => ['poids_min' => 2.9, 'poids_max' => 4.0, 'taille_min' => 48.0, 'taille_max' => 52.0],
-        'F' => ['poids_min' => 2.8, 'poids_max' => 3.8, 'taille_min' => 47.0, 'taille_max' => 51.0],
-    ];
+                // Normes OMS à la naissance
+                $normes = [
+                    'M' => ['poids_min' => 2.9, 'poids_max' => 4.0, 'taille_min' => 48.0, 'taille_max' => 52.0],
+                    'F' => ['poids_min' => 2.8, 'poids_max' => 3.8, 'taille_min' => 47.0, 'taille_max' => 51.0],
+                ];
 
-    $normesBebe = $normes[$sexe] ?? $normes['M'];
-    $poidsBebe  = $grossesse->getPoidsNaissance();
-    $tailleBebe = $grossesse->getTailleNaissance();
+                $normesBebe = $normes[$sexe] ?? $normes['M'];
+                $poidsBebe  = $grossesse->getPoidsNaissance();
+                $tailleBebe = $grossesse->getTailleNaissance();
 
-    // Évaluation poids
-    $evaluationPoids = 'normal';
-    if ($poidsBebe !== null) {
-        if ($poidsBebe < $normesBebe['poids_min']) $evaluationPoids = 'faible';
-        elseif ($poidsBebe > $normesBebe['poids_max']) $evaluationPoids = 'eleve';
-    }
+                // Évaluation poids
+                $evaluationPoids = 'normal';
+                if ($poidsBebe !== null) {
+                    if ($poidsBebe < $normesBebe['poids_min']) $evaluationPoids = 'faible';
+                    elseif ($poidsBebe > $normesBebe['poids_max']) $evaluationPoids = 'eleve';
+                }
 
-    // Évaluation taille
-$evaluationTaille = 'normal';
-    if ($tailleBebe !== null) {
-        if ($tailleBebe < $normesBebe['taille_min']) $evaluationTaille = 'faible';
-        elseif ($tailleBebe > $normesBebe['taille_max']) $evaluationTaille = 'eleve';
-    }
+                // Évaluation taille
+                $evaluationTaille = 'normal';
+                if ($tailleBebe !== null) {
+                    if ($tailleBebe < $normesBebe['taille_min']) $evaluationTaille = 'faible';
+                    elseif ($tailleBebe > $normesBebe['taille_max']) $evaluationTaille = 'eleve';
+                }
+            }
         }
-        }
+        
         return $this->render('pages/mon_profil_maman.html.twig', [
             'maman' => $maman,
             'mode' => 'show',
@@ -164,12 +172,13 @@ $evaluationTaille = 'normal';
             'bebe_age_mois' => $bebeAgeMois,
             'bebe_conseil' => $bebeConseil,
             'normes_bebe'       => $normesBebe ?? null,
-'evaluation_poids'  => $evaluationPoids ?? null,
-'evaluation_taille' => $evaluationTaille ?? null,
-'poids_avant'      => $maman->getPoids() ?? null,
-'poids_actuel_g'   => $grossesse ? $grossesse->getPoidsActuel() ?? null : null,
-'prise_poids'      => $prisePoids ?? null,
-'evaluation_prise' => $evaluationPrise ?? null,
+            'evaluation_poids'  => $evaluationPoids ?? null,
+            'evaluation_taille' => $evaluationTaille ?? null,
+            'poids_avant'      => $maman->getPoids() ?? null,
+            'poids_actuel_g'   => $grossesse ? $grossesse->getPoidsActuel() ?? null : null,
+            'prise_poids'      => $prisePoids ?? null,
+            'evaluation_prise' => $evaluationPrise ?? null,
+            'current_route' => 'app_suivi_grossesse_show', // ADD THIS
         ]);
     }
 
@@ -177,13 +186,14 @@ $evaluationTaille = 'normal';
      * Édition du profil par la maman. /suivi_grossesse/{id}/edit
      */
     #[Route('/suivi_grossesse/{id}/edit', name: 'app_suivi_grossesse_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_USER')]
     public function suiviGrossesseEdit(Request $request, Maman $maman, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(MamanType::class, $maman);
         $form->handleRequest($request);
+        
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-
             return $this->redirectToRoute('app_suivi_grossesse_show', ['id' => $maman->getId()], Response::HTTP_SEE_OTHER);
         }
 
@@ -191,6 +201,7 @@ $evaluationTaille = 'normal';
             'maman' => $maman,
             'form' => $form,
             'mode' => 'edit',
+            'current_route' => 'app_suivi_grossesse_edit', // ADD THIS
         ]);
     }
 
@@ -198,6 +209,7 @@ $evaluationTaille = 'normal';
      * Suppression du profil par la maman. /suivi_grossesse/{id}/supprimer
      */
     #[Route('/suivi_grossesse/{id}/supprimer', name: 'app_suivi_grossesse_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
     public function suiviGrossesseDelete(Request $request, Maman $maman, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete' . $maman->getId(), $request->request->getString('_token'))) {
@@ -213,37 +225,39 @@ $evaluationTaille = 'normal';
      *
      * @return string[]
      */
-#[Route('/suivi_grossesse/{id}/chatbot', name: 'app_chatbot_ask', methods: ['POST'])]
-public function chatbotAsk(
-    Request $request,
-    Maman $maman,
-    ChatbotService $chatbotService,
-    GrosesseRepository $grosesseRepository
-): JsonResponse {
-    $data = json_decode($request->getContent(), true);
-    $question = $data['question'] ?? '';
+    #[Route('/suivi_grossesse/{id}/chatbot', name: 'app_chatbot_ask', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function chatbotAsk(
+        Request $request,
+        Maman $maman,
+        ChatbotService $chatbotService,
+        GrosesseRepository $grosesseRepository
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+        $question = $data['question'] ?? '';
 
-    if (empty($question)) {
-        return new JsonResponse(['error' => 'Question vide'], 400);
+        if (empty($question)) {
+            return new JsonResponse(['error' => 'Question vide'], 400);
+        }
+
+        $grossesse = $grosesseRepository->findOneBy(
+            ['maman' => $maman],
+            ['dateCreation' => 'DESC']
+        );
+
+        $context = [
+            'groupeSanguin' => $maman->getGroupeSanguin(),
+            'maladies'      => $maman->getMaladiesChroniques(),
+            'allergies'     => $maman->getAllergies(),
+            'semaine'       => $grossesse?->getSemaineActuelle(),
+            'trimestre'     => $grossesse?->getTrimestreActuel(),
+        ];
+
+        $reponse = $chatbotService->ask($question, $context);
+
+        return new JsonResponse(['reponse' => $reponse]);
     }
-
-    $grossesse = $grosesseRepository->findOneBy(
-        ['maman' => $maman],
-        ['dateCreation' => 'DESC']
-    );
-
-    $context = [
-        'groupeSanguin' => $maman->getGroupeSanguin(),
-        'maladies'      => $maman->getMaladiesChroniques(),
-        'allergies'     => $maman->getAllergies(),
-        'semaine'       => $grossesse?->getSemaineActuelle(),
-        'trimestre'     => $grossesse?->getTrimestreActuel(),
-    ];
-
-    $reponse = $chatbotService->ask($question, $context);
-
-    return new JsonResponse(['reponse' => $reponse]);
-}
+    
     private function getConseilsSante(Maman $maman): array
     {
         $conseils = [];

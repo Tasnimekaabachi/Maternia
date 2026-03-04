@@ -29,9 +29,10 @@ security:
                 lifetime: 604800
                 path: /
             
-            # Add this line to use custom access denied handler
+            # custom access denied handler
             access_denied_handler: App\Security\AccessDeniedHandler
 
     # Easy way to control access for large sections of your site
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
+        #- { path: ^/suivi_grossesse, roles: ROLE_USER }

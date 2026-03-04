@@ -476,7 +476,8 @@
 </head>
 
 <body>
-
+{% include 'includes/login_modal.html.twig' %}
+<body data-route="{{ app.request.get('_route') }}">
     <!-- Spinner Start -->
     <div id="spinner" class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50  d-flex align-items-center justify-content-center">
         <div class="spinner-grow text-primary" role="status"></div>
@@ -521,10 +522,15 @@
                             <span>Services</span>
                         </a>
 
-                        <a href="{{ path('app_suivi_grossesse_creer') }}"
-                           class="nav-link-modern{% if app.request.attributes.get('_route') starts with 'app_suivi_grossesse' %} active{% endif %}">
-                            <span>Mon suivi</span>
-                        </a>
+                        {% if app.user %}
+    <a href="{{ path('app_suivi_grossesse_creer') }}" class="nav-link-modern">
+        <span>Mon suivi</span>
+    </a>
+{% else %}
+    <a href="#" class="nav-link-modern" data-bs-toggle="modal" data-bs-target="#loginRequiredModal">
+        <span>Mon suivi</span>
+    </a>
+{% endif %}
 
                         <a href="{{ path('app_marketplace') }}"
                            class="nav-link-modern{% if app.request.attributes.get('_route') == 'app_marketplace' %} active{% endif %}">
@@ -578,7 +584,6 @@
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
-                    <button class="btn-search btn btn-primary btn-md-square rounded-circle" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fas fa-search text-white"></i></button>
                 </div>
             </nav>
         </div>
@@ -1185,6 +1190,35 @@
             }
         })();
     </script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Only run if user is not logged in
+    {% if not app.user %}
+        // Define which routes are protected
+        const protectedRoutes = [
+            'app_suivi_grossesse_creer',
+            'app_suivi_grossesse_show', 
+            'app_suivi_grossesse_edit',
+            'app_user_profile',
+            'profile_enroll_face'
+        ];
+        
+        // Get current route from data attribute on body
+        const currentRoute = document.body.dataset.route || '';
+        
+        if (protectedRoutes.includes(currentRoute)) {
+            // Show login modal
+            setTimeout(function() {
+                const modalElement = document.getElementById('loginRequiredModal');
+                if (modalElement) {
+                    const loginModal = new bootstrap.Modal(modalElement);
+                    loginModal.show();
+                }
+            }, 500);
+        }
+    {% endif %}
+});
+</script>
     {% endblock %}
 </body>
 
