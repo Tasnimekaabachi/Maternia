@@ -11,7 +11,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-
+use App\Repository\AttendanceRepository;
+use App\Repository\GrosesseRepository;
+use App\Entity\Maman;
 class UserController extends AbstractController
 {
     private string $compreFaceUrl;
@@ -312,4 +314,54 @@ class UserController extends AbstractController
 
         return new JsonResponse($results);
     }
+    #[Route('/user/dashboard', name: 'app_user_dashboard')]
+#[IsGranted('ROLE_USER')]
+public function userDashboard(
+    EntityManagerInterface $em,
+    AttendanceRepository $attendanceRepository,
+    GrosesseRepository $grosesseRepository
+): Response {
+    $user = $this->getUser();
+    
+    // Get events the user is attending
+    $attendances = $attendanceRepository->findBy(
+        ['user' => $user],
+        ['createdAt' => 'DESC']
+    );
+    
+    $events = [];
+    foreach ($attendances as $attendance) {
+        $events[] = $attendance->getEvent();
+    }
+    
+    // Get user's appointments from reservation_client table
+    $conn = $em->getConnection();
+    $sql = "SELECT rc.*, cc.nom_medecin, cc.specialite_medecin, cc.date_debut, cc.date_fin, c.categorie 
+            FROM reservation_client rc
+            JOIN consultation_creneau cc ON rc.consultation_creneau_id = cc.id
+            JOIN consultation c ON cc.consultation_id = c.id
+            WHERE rc.email_client = :email
+            ORDER BY rc.date_reservation DESC";
+    
+    $appointments = $conn->fetchAllAssociative($sql, ['email' => $user->getEmail()]);
+    
+    // Get user's suivi (Maman profile)
+    $maman = $em->getRepository(Maman::class)->findOneBy(['email' => $user->getEmail()]);
+    
+    $grossesse = null;
+    if ($maman) {
+        $grossesse = $grosesseRepository->findOneBy(
+            ['maman' => $maman],
+            ['dateCreation' => 'DESC']
+        );
+    }
+    
+    return $this->render('user/dashboard.html.twig', [
+        'user' => $user,
+        'events' => $events,
+        'appointments' => $appointments,
+        'maman' => $maman,
+        'grossesse' => $grossesse
+    ]);
+}
 }

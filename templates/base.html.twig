@@ -564,6 +564,7 @@
                                         <span class="profile-name d-none d-md-inline">{{ app.user.prenom }} {{ app.user.nom }}</span>
                                     </a>
                                    <ul class="dropdown-menu dropdown-menu-end profile-dropdown animate-in">
+    <li><a class="dropdown-item" href="{{ path('app_user_dashboard') }}"><i class="fas fa-columns me-2"></i>Tableau de bord</a></li>
     <li><a class="dropdown-item" href="{{ path('app_user_profile') }}"><i class="fas fa-id-card me-2"></i>Mon Profil</a></li>
     
     {% if is_granted('ROLE_ADMIN') %}

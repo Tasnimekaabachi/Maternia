@@ -1,0 +1,387 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Tableau de bord - Maternia{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .dashboard-header {
+            background: linear-gradient(135deg, #ec4899, #be185d);
+            padding: 60px 0;
+            color: white;
+            margin-bottom: 40px;
+            border-radius: 0 0 50px 50px;
+            box-shadow: 0 10px 30px rgba(236, 72, 153, 0.3);
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            padding: 25px;
+            margin-bottom: 30px;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(236, 72, 153, 0.1);
+            height: 100%;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(236, 72, 153, 0.1);
+        }
+        
+        .card-title {
+            color: #be185d;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #fce7f3;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title i {
+            font-size: 1.5rem;
+            margin-right: 10px;
+            color: #ec4899;
+            background: #fce7f3;
+            padding: 10px;
+            border-radius: 12px;
+        }
+        
+        .event-item, .appointment-item {
+            padding: 15px;
+            border-radius: 12px;
+            background: #f8f9fa;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .event-item:hover, .appointment-item:hover {
+            background: #fce7f3;
+            border-left-color: #ec4899;
+        }
+        
+        .event-date, .appointment-date {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        
+        .event-title, .appointment-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+        
+        .event-location, .appointment-doctor {
+            font-size: 0.9rem;
+            color: #4b5563;
+        }
+        
+        .badge-event {
+            background: #ec4899;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            display: inline-block;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #d1d5db;
+        }
+        
+        .suivi-card {
+            background: linear-gradient(135deg, #fff5f5, #ffffff);
+        }
+        
+        .suivi-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #be185d;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .action-btn {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            text-decoration: none;
+            color: #4b5563;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(236, 72, 153, 0.1);
+        }
+        
+        .action-btn:hover {
+            background: linear-gradient(135deg, #ec4899, #be185d);
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(236, 72, 153, 0.3);
+        }
+        
+        .action-btn i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #ec4899;
+        }
+        
+        .action-btn:hover i {
+            color: white;
+        }
+        
+        .action-btn span {
+            display: block;
+            font-weight: 600;
+        }
+        
+        .welcome-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .welcome-text h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .welcome-text p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .profile-quick-link {
+            background: rgba(255,255,255,0.2);
+            padding: 12px 25px;
+            border-radius: 50px;
+            color: white;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .profile-quick-link:hover {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard-header">
+    <div class="container">
+        <div class="welcome-section">
+            <div class="welcome-text">
+                <h1>Bonjour, {{ app.user.prenom }} !</h1>
+                <p><i class="fas fa-map-marker-alt me-2"></i>Bienvenue sur votre tableau de bord personnel</p>
+            </div>
+            <a href="{{ path('app_user_profile') }}" class="profile-quick-link">
+                <i class="fas fa-user-circle me-2"></i>Modifier mon profil
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <a href="{{ path('app_suivi_grossesse_creer') }}" class="action-btn">
+            <i class="fas fa-heart"></i>
+            <span>Mon suivi</span>
+        </a>
+        <a href="{{ path('app_consultations') }}" class="action-btn">
+            <i class="fas fa-stethoscope"></i>
+            <span>Rendez-vous</span>
+        </a>
+        <a href="{{ path('app_events') }}" class="action-btn">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Événements</span>
+        </a>
+        <a href="{{ path('app_user_profile') }}" class="action-btn">
+            <i class="fas fa-user-edit"></i>
+            <span>Mon profil</span>
+        </a>
+    </div>
+
+    <div class="row mt-4">
+        <!-- Suivi Grossesse Card -->
+        <div class="col-md-6">
+            <div class="dashboard-card suivi-card">
+                <h3 class="card-title">
+                    <i class="fas fa-heart"></i> Mon Suivi de Grossesse
+                </h3>
+                
+                {% if maman %}
+                    <div class="suivi-stats">
+                        {% if grossesse %}
+                            <div class="stat-item">
+                                <div class="stat-value">{{ grossesse.semaineActuelle ?? 'N/A' }}</div>
+                                <div class="stat-label">Semaine</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">{{ grossesse.typeGrossesse|capitalize }}</div>
+                                <div class="stat-label">Type</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">{{ maman.poids }} kg</div>
+                                <div class="stat-label">Poids</div>
+                            </div>
+                        {% else %}
+                            <div class="col-12 text-center py-4">
+                                <p>Aucune grossesse enregistrée</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{{ path('app_suivi_grossesse_show', {'id': maman.id}) }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-eye me-2"></i>Voir mon suivi complet
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <p class="mt-3">Vous n'avez pas encore créé de suivi de grossesse</p>
+                        <a href="{{ path('app_suivi_grossesse_creer') }}" class="btn btn-primary mt-3">
+                            <i class="fas fa-plus-circle me-2"></i>Créer mon suivi
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Rendez-vous Card -->
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <h3 class="card-title">
+                    <i class="fas fa-calendar-check"></i> Mes Rendez-vous
+                </h3>
+                
+                {% if appointments|length > 0 %}
+                    {% for appointment in appointments|slice(0, 3) %}
+                        <div class="appointment-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="appointment-date">
+                                        <i class="far fa-calendar-alt me-1"></i> {{ appointment.date_debut|date('d/m/Y H:i') }}
+                                    </div>
+                                    <div class="appointment-title">{{ appointment.categorie }}</div>
+                                    <div class="appointment-doctor">
+                                        <i class="fas fa-user-md me-1"></i> Dr. {{ appointment.nom_medecin }}
+                                    </div>
+                                    <div class="appointment-doctor mt-1">
+                                        <i class="fas fa-hashtag me-1"></i> {{ appointment.reference }}
+                                    </div>
+                                </div>
+                                <span class="badge-event">{{ appointment.statut_reservation }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    
+                    {% if appointments|length > 3 %}
+                        <div class="text-center mt-3">
+                            <a href="#" class="text-primary">Voir tous les rendez-vous ({{ appointments|length }})</a>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-times"></i>
+                        <p class="mt-3">Aucun rendez-vous planifié</p>
+                        <a href="{{ path('app_consultations') }}" class="btn btn-primary mt-3">
+                            <i class="fas fa-calendar-plus me-2"></i>Prendre rendez-vous
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Événements Card -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <h3 class="card-title">
+                    <i class="fas fa-calendar-alt"></i> Mes Événements
+                </h3>
+                
+                {% if events|length > 0 %}
+                    <div class="row">
+                        {% for event in events %}
+                            <div class="col-md-4">
+                                <div class="event-item">
+                                    <div class="event-date">
+                                        <i class="far fa-calendar me-1"></i> 
+                                        {% if event.isWeekly %}
+                                            Tous les {{ event.dayOfWeek }}
+                                        {% else %}
+                                            {{ event.startAt|date('d/m/Y H:i') }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="event-title">{{ event.title }}</div>
+                                    <div class="event-location">
+                                        <i class="fas fa-map-marker-alt me-1"></i> {{ event.location|slice(0, 30) }}{% if event.location|length > 30 %}...{% endif %}
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <span class="badge-event">{{ event.eventCat.name }}</span>
+                                        <a href="{{ path('app_event_user_show', {'id': event.id}) }}" class="btn btn-sm btn-outline-primary">
+                                            Voir
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-alt"></i>
+                        <p class="mt-3">Vous ne participez à aucun événement</p>
+                        <a href="{{ path('app_events') }}" class="btn btn-primary mt-3">
+                            <i class="fas fa-search me-2"></i>Découvrir les événements
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
