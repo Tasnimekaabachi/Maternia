@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Maman;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -12,6 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
 class MamanType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -29,14 +31,12 @@ class MamanType extends AbstractType
                 ],
                 'help' => '8 chiffres, commençant par 2, 4, 5 ou 9 (ex. 9 12 34 56 78)',
             ])
-            // Champ email en TextType pour éviter la validation HTML5.
             ->add('email', TextType::class, [
                 'label' => 'Adresse email',
                 'required' => false,
                 'attr' => [
                     'class' => 'form-control',
                 ],
-                // validation faite uniquement dans l'entité Maman (Assert\Email) pour éviter le doublon de messages
                 'help' => 'Un email de confirmation sera envoyé à cette adresse.',
             ])
             ->add('groupeSanguin', ChoiceType::class, [
@@ -80,6 +80,15 @@ class MamanType extends AbstractType
                     'step' => 0.1,
                 ],
                 'help' => 'Entre 30 et 140 kg',
+            ])
+            ->add('dateNaissance', DateType::class, [
+                'label'    => 'Date de naissance',
+                'widget'   => 'single_text',
+                'required' => false,
+                'attr'     => [
+                    'class' => 'form-control',
+                ],
+                'help' => 'Utilisée pour calculer vos besoins nutritionnels',
             ])
             ->add('allergies', TextareaType::class, [
                 'label' => 'Allergies connues',

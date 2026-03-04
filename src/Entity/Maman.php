@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 
 #[ORM\Entity(repositoryClass: MamanRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -68,6 +69,14 @@ class Maman
 
     #[ORM\Column(length: 100)]
     private ?string $habitudesAlimentaires = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+#[Assert\NotNull(message: 'La date de naissance est obligatoire.')]
+#[Assert\LessThan(
+    value: 'today',
+    message: 'La date de naissance doit être dans le passé.'
+)]
+private ?\DateTimeInterface $dateNaissance = null;
 
     public function getId(): ?int
     {
@@ -235,6 +244,17 @@ class Maman
 
         return $this;
     }
+
+    public function getDateNaissance(): ?\DateTimeInterface
+{
+    return $this->dateNaissance;
+}
+
+public function setDateNaissance(?\DateTimeInterface $dateNaissance): static
+{
+    $this->dateNaissance = $dateNaissance;
+    return $this;
+}
 #[ORM\Column(type: 'datetime')]
 private ?\DateTimeInterface $dateCreation = null;
 
@@ -353,5 +373,15 @@ public function removeGrosess(Grosesse $grosess): static
     }
 
     return $this;
+}
+/**
+ * Calcule l'âge en années depuis dateNaissance.
+ */
+public function getAge(): int
+{
+    if ($this->dateNaissance === null) {
+        return 28; // défaut si non renseigné
+    }
+    return $this->dateNaissance->diff(new \DateTime())->y;
 }
 }

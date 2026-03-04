@@ -1,0 +1,241 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Checklist valise maternité — Maternia{% endblock %}
+
+{% block body %}
+
+{% set categories = {
+    'bebe': {
+        'label': 'Pour bébé',
+        'emoji': '👶',
+        'couleur': '#e91e8c',
+        'items': {
+            'bebe_1':  '3 bodys taille naissance',
+            'bebe_2':  '3 bodys taille 1 mois',
+            'bebe_3':  '2 pyjamas',
+            'bebe_4':  'Couches nouveau-né (1 paquet)',
+            'bebe_5':  'Gigoteuse',
+            'bebe_6':  'Bonnet nouveau-né',
+            'bebe_7':  'Chaussettes',
+            'bebe_8':  'Lange / carré de coton',
+            'bebe_9':  'Siège auto (installé avant)',
+            'bebe_10': 'Crème change'
+        }
+    },
+    'maman': {
+        'label': 'Pour maman',
+        'emoji': '👩',
+        'couleur': '#9c27b0',
+        'items': {
+            'maman_1':  'Nuisette d\'allaitement (x2)',
+            'maman_2':  'Coussin de maternité',
+            'maman_3':  'Soutien-gorge d\'allaitement',
+            'maman_4':  'Chaussettes et pantoufles',
+            'maman_5':  'Trousse de toilette',
+            'maman_6':  'Serviettes hygiéniques post-partum',
+            'maman_7':  'Vêtements de retour (larges)',
+            'maman_8':  'Snacks et boissons',
+            'maman_9':  'Chargeur téléphone',
+            'maman_10': 'Coussin d\'allaitement'
+        }
+    },
+    'documents': {
+        'label': 'Documents',
+        'emoji': '🏥',
+        'couleur': '#2196f3',
+        'items': {
+            'doc_1': 'Carte vitale',
+            'doc_2': 'Pièce d\'identité',
+            'doc_3': 'Carnet de maternité',
+            'doc_4': 'Carte de groupe sanguin',
+            'doc_5': 'Ordonnances en cours',
+            'doc_6': 'Plan de naissance',
+            'doc_7': 'Numéros utiles notés',
+            'doc_8': 'Carte de mutuelle'
+        }
+    },
+    'confort': {
+        'label': 'Confort & divertissement',
+        'emoji': '🎧',
+        'couleur': '#ff9800',
+        'items': {
+            'conf_1': 'Casque / écouteurs',
+            'conf_2': 'Livre ou magazine',
+            'conf_3': 'Playlist musique préparée',
+            'conf_4': 'Spray eau minérale',
+            'conf_5': 'Baume à lèvres',
+            'conf_6': 'Appareil photo chargé'
+        }
+    }
+} %}
+
+{% set totalItems = 0 %}
+{% set totalChecked = 0 %}
+{% for cat in categories %}
+    {% set totalItems = totalItems + cat.items|length %}
+    {% for itemId, label in cat.items %}
+        {% if itemId in checked %}
+            {% set totalChecked = totalChecked + 1 %}
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+{% set progression = totalItems > 0 ? ((totalChecked / totalItems) * 100)|round : 0 %}
+
+{# Header #}
+<div class="container-fluid py-5 hero-header wow fadeIn" data-wow-delay="0.1s">
+    <div class="container py-5">
+        <div class="row g-5">
+            <div class="col-lg-8 col-md-12">
+                <h1 class="mb-3 text-primary">Checklist valise maternité</h1>
+                <h2 class="mb-4 display-6 text-white">Préparez votre départ à la maternité 🏥</h2>
+                <p class="lead text-white mb-0">Cochez chaque item au fur et à mesure de votre préparation.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="py-5">
+    <div class="container py-5">
+
+        {# Breadcrumb #}
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Accueil</a></li>
+                <li class="breadcrumb-item"><a href="{{ path('app_suivi_grossesse_show', {id: maman.id}) }}">Mon suivi</a></li>
+                <li class="breadcrumb-item active">Checklist valise</li>
+            </ol>
+        </nav>
+
+        {# Carte progression #}
+        <div class="border rounded-3 p-4 mb-5 shadow-sm" style="background:linear-gradient(135deg,#fce4ec,#f3e5f5);border-color:#e91e8c !important;">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div style="width:56px;height:56px;background:linear-gradient(135deg,#e91e8c,#ff6bb3);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;">🧳</div>
+                    <div>
+                        <h4 class="mb-0 text-primary fw-bold">Ma valise maternité</h4>
+                        <small class="text-muted">{{ totalChecked }} / {{ totalItems }} items cochés</small>
+                    </div>
+                </div>
+                <div style="font-size:42px;font-weight:800;color:#e91e8c;">{{ progression }}%</div>
+            </div>
+            <div style="background:rgba(0,0,0,0.1);border-radius:20px;height:14px;overflow:hidden;">
+                <div id="progress-bar" style="background:linear-gradient(135deg,#e91e8c,#ff6bb3);height:100%;border-radius:20px;width:{{ progression }}%;transition:width 0.5s ease;">
+                </div>
+            </div>
+            {% if progression == 100 %}
+                <div class="text-center mt-3">
+                    <span style="background:linear-gradient(135deg,#4caf50,#81c784);color:white;padding:8px 20px;border-radius:20px;font-weight:600;">
+                        🎉 Valise prête ! Bonne chance pour l'accouchement 💕
+                    </span>
+                </div>
+            {% endif %}
+            <div class="text-end mt-2">
+                <button onclick="resetChecklist()" style="background:none;border:none;color:#aaa;font-size:12px;cursor:pointer;">🗑️ Tout réinitialiser</button>
+            </div>
+        </div>
+
+        {# Catégories #}
+        <div class="row g-4">
+            {% for catId, cat in categories %}
+                <div class="col-lg-6">
+                    <div class="border rounded-3 p-4 shadow-sm h-100" style="border-color:{{ cat.couleur }}40 !important;background:white;">
+                        <h5 class="fw-bold mb-4" style="color:{{ cat.couleur }};">
+                            {{ cat.emoji }} {{ cat.label }}
+                        </h5>
+                        <div class="d-flex flex-column gap-2">
+                            {% for itemId, label in cat.items %}
+                                {% set isCoche = itemId in checked %}
+                                <div class="checklist-item d-flex align-items-center gap-3 p-3 rounded-3"
+                                     id="item-{{ itemId }}"
+                                     onclick="toggleItem('{{ itemId }}')"
+                                     style="cursor:pointer;background:{{ isCoche ? cat.couleur ~ '12' : '#f9f9f9' }};border:2px solid {{ isCoche ? cat.couleur : 'transparent' }};transition:all 0.2s;">
+                                    <div class="check-circle flex-shrink-0"
+                                         style="width:28px;height:28px;border-radius:50%;border:2px solid {{ cat.couleur }};background:{{ isCoche ? cat.couleur : 'white' }};display:flex;align-items:center;justify-content:center;transition:all 0.2s;">
+                                        {% if isCoche %}
+                                            <span style="color:white;font-size:14px;">✓</span>
+                                        {% endif %}
+                                    </div>
+                                    <span style="font-size:14px;color:#333;{{ isCoche ? 'text-decoration:line-through;color:#aaa;' : '' }}">
+                                        {{ label }}
+                                    </span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {# Bouton retour #}
+        <div class="text-center mt-5">
+            <a href="{{ path('app_suivi_grossesse_show', {id: maman.id}) }}"
+               class="btn px-5 py-3"
+               style="background:linear-gradient(135deg,#e91e8c,#ff6bb3);border:none;color:white;border-radius:14px;font-weight:600;">
+                ← Retour à mon dashboard
+            </a>
+        </div>
+
+    </div>
+</section>
+
+<script>
+const MAMAN_ID = {{ maman.id }};
+const COULEURS = {
+    {% for catId, cat in categories %}
+    {% for itemId, label in cat.items %}
+    '{{ itemId }}': '{{ cat.couleur }}',
+    {% endfor %}
+    {% endfor %}
+};
+
+function toggleItem(itemId) {
+    fetch(`/suivi_grossesse/${MAMAN_ID}/checklist/toggle`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ item: itemId })
+    })
+    .then(r => r.json())
+    .then(data => {
+        var checked = data.checked;
+        var el = document.getElementById('item-' + itemId);
+        var circle = el.querySelector('.check-circle');
+        var text = el.querySelector('span:last-child');
+        var couleur = COULEURS[itemId];
+        var isCoche = checked.includes(itemId);
+
+        if (isCoche) {
+            el.style.background = couleur + '12';
+            el.style.border = '2px solid ' + couleur;
+            circle.style.background = couleur;
+            circle.innerHTML = '<span style="color:white;font-size:14px;">✓</span>';
+            text.style.textDecoration = 'line-through';
+            text.style.color = '#aaa';
+        } else {
+            el.style.background = '#f9f9f9';
+            el.style.border = '2px solid transparent';
+            circle.style.background = 'white';
+            circle.innerHTML = '';
+            text.style.textDecoration = 'none';
+            text.style.color = '#333';
+        }
+
+        // Mettre à jour la progression
+        var total = Object.keys(COULEURS).length;
+        var done = checked.length;
+        var pct = Math.round((done / total) * 100);
+        document.getElementById('progress-bar').style.width = pct + '%';
+        document.querySelector('.text-muted').textContent = done + ' / ' + total + ' items cochés';
+        document.querySelector('[style*="font-size:42px"]').textContent = pct + '%';
+    });
+}
+
+function resetChecklist() {
+    if (!confirm('Tout réinitialiser ? 🗑️')) return;
+    fetch(`/suivi_grossesse/${MAMAN_ID}/checklist/reset`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    }).then(() => location.reload());
+}
+</script>
+
+{% endblock %}

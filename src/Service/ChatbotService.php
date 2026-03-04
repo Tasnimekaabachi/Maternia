@@ -15,11 +15,28 @@ class ChatbotService
         $this->apiKey = $apiKey;
     }
 
-    public function ask(string $question, array $mamanContext = []): string
+    public function ask(string $question, array $mamanContext = [], array $conversationHistory = []): string
     {
-        // Construction du profil médical intelligent
-        $profil = "";
+        // ⚠️ DÉTECTION URGENCE MÉDICALE (avant même d'appeler l'API)
+        $urgenceKeywords = [
+            'saignement', 'saigne', 'hémorragie',
+            'douleur intense', 'douleur forte', 'très mal',
+            'fièvre élevée', 'fièvre forte', '39', '40 degrés',
+            'je tombe', 'je perds connaissance', 'vertige fort',
+            'bébé ne bouge plus', 'bébé bouge pas',
+            'contractions', 'perte de liquide', 'poche des eaux',
+            'urgence', 'je saigne', 'sang',
+        ];
 
+        $questionLower = mb_strtolower($question);
+        foreach ($urgenceKeywords as $keyword) {
+            if (str_contains($questionLower, $keyword)) {
+                return "🚨 Ce que vous décrivez nécessite une attention médicale immédiate. Appelez le 15 (SAMU) ou rendez-vous aux urgences sans attendre. Votre santé et celle de votre bébé passent avant tout 💕";
+            }
+        }
+
+        // Construction du profil médical
+        $profil = "";
         if (!empty($mamanContext['groupeSanguin'])) {
             $profil .= "Groupe sanguin : " . $mamanContext['groupeSanguin'] . ". ";
         }
@@ -36,33 +53,46 @@ class ChatbotService
             $profil .= "Trimestre : " . $mamanContext['trimestre'] . ". ";
         }
 
-        // PROMPT ULTRA HUMAIN (spécial Maternia)
-        $prompt = "
+        // PROMPT SYSTÈME
+        $systemPrompt = "
 Tu es Maternia AI 🤱, une assistante médicale virtuelle spécialisée en suivi de grossesse.
 
 PERSONNALITÉ :
-- Douce, rassurante et humaine
-- Comme une sage-femme bienveillante
-- Empathique et chaleureuse
-- Professionnelle mais simple à comprendre
+- Douce, rassurante et très humaine
+- Comme une sage-femme bienveillante et chaleureuse
+- Utilise des emojis doux (💕 🤱 🌸 ✨ 👶 🌿) naturellement dans tes réponses
+- Appelle toujours la maman \"chère future maman\" ou \"ma belle\" ou \"chère maman\"
 
 RÈGLES DE RÉPONSE :
-- Réponds en français naturel
+- Réponds en français naturel et chaleureux
 - 2 à 3 phrases maximum
 - Pas de listes longues
 - Pas de ton robotique
 - Adapte les conseils selon le trimestre de grossesse
-- Reste rassurante (jamais alarmiste)
+- Reste toujours rassurante et positive
 - Rappelle doucement que tu ne remplaces pas un médecin si nécessaire
-- Si la question évoque douleur intense, saignement, fièvre élevée ou urgence,
-  conseille immédiatement de consulter un professionnel de santé.
+- Termine parfois par une phrase d'encouragement
 
 CONTEXTE MÉDICAL DE LA MAMAN :
 $profil
-
-QUESTION DE LA MAMAN :
-$question
 ";
+
+        // Construction des messages avec historique (mémoire)
+        $messages = [];
+
+        foreach ($conversationHistory as $entry) {
+            if (!empty($entry['role']) && !empty($entry['content'])) {
+                $messages[] = [
+                    'role' => $entry['role'],
+                    'parts' => [['text' => $entry['content']]]
+                ];
+            }
+        }
+
+        $messages[] = [
+            'role' => 'user',
+            'parts' => [['text' => $question]]
+        ];
 
         try {
             $response = $this->client->request(
@@ -74,18 +104,20 @@ $question
                     ],
                     'timeout' => 30,
                     'json' => [
-                        'contents' => [
-                            [
-                                'role' => 'user',
-                                'parts' => [
-                                    ['text' => $prompt]
-                                ]
-                            ]
+                        'system_instruction' => [
+                            'parts' => [['text' => $systemPrompt]]
                         ],
+                        'contents' => $messages,
                         'generationConfig' => [
-                            'temperature' => 0.9, // + humain
-                            'maxOutputTokens' => 1028, // idéal pour 2-3 phrases
+                            'temperature' => 0.9,
+                            'maxOutputTokens' => 1024,
                             'topP' => 0.95
+                        ],
+                        'safetySettings' => [
+                            ['category' => 'HARM_CATEGORY_DANGEROUS_CONTENT', 'threshold' => 'BLOCK_ONLY_HIGH'],
+                            ['category' => 'HARM_CATEGORY_HARASSMENT', 'threshold' => 'BLOCK_ONLY_HIGH'],
+                            ['category' => 'HARM_CATEGORY_HATE_SPEECH', 'threshold' => 'BLOCK_ONLY_HIGH'],
+                            ['category' => 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'threshold' => 'BLOCK_ONLY_HIGH'],
                         ]
                     ]
                 ]
@@ -93,21 +125,17 @@ $question
 
             $data = $response->toArray(false);
 
-            // Vérification réponse API
             if (!isset($data['candidates'][0]['content']['parts'][0]['text'])) {
                 return "Je suis là pour vous aider 💕 Pouvez-vous reformuler votre question ?";
             }
 
             $text = $data['candidates'][0]['content']['parts'][0]['text'];
-
-            // Nettoyage affichage (chat UI)
             $text = trim($text);
             $text = str_replace(["\n\n", "\n"], " ", $text);
 
             return $text;
 
         } catch (\Exception $e) {
-            // Réponse humaine même en cas d’erreur API (SUPER important pour la démo)
             return "Je rencontre un petit souci technique 💕 mais je suis toujours là pour vous accompagner. Réessayez dans quelques secondes.";
         }
     }
