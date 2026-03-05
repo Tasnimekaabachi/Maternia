@@ -63,6 +63,15 @@
                                 {% endif %}
                             </dd>
 
+                            {% if commande.shippingTracking %}
+                            <dt class="col-sm-5">Suivi</dt>
+                            <dd class="col-sm-7">
+                                <a href="{{ path('app_tracking') }}?tracking={{ commande.shippingTracking }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-truck me-1"></i> Suivre mon colis ({{ commande.shippingTracking }})
+                                </a>
+                            </dd>
+                            {% endif %}
+
                             <dt class="col-sm-5">Total à payer</dt>
                             <dd class="col-sm-7 fw-bold text-primary">
                                 {{ commande.total|number_format(2, '.', ' ') }} TND

@@ -7,6 +7,7 @@ use App\Repository\ProduitRepository;
 use App\Repository\PromoCodeRepository;
 use App\Service\NotificationService;
 use App\Service\PaymentService;
+use App\Service\Shipping\DhlShipmentClient;
 use App\Service\Shipping\ShippingQuoteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -124,6 +125,7 @@ final class CartController extends AbstractController
         ProduitRepository $produitRepository,
         EntityManagerInterface $entityManager,
         ShippingQuoteService $shippingQuoteService,
+        DhlShipmentClient $dhlShipmentClient,
         NotificationService $notificationService,
         PromoCodeRepository $promoCodeRepository,
         PaymentService $paymentService
@@ -160,6 +162,13 @@ final class CartController extends AbstractController
             $commande->addProduit($produit);
             $subtotal += $produit->getPrix() ?? 0;
         }
+
+        // Poids total du colis (utilisé pour DHL Shipment)
+        $weightKg = 0.0;
+        foreach ($produits as $produit) {
+            $weightKg += $produit->getPoidsKg() ?? 0.30;
+        }
+        $weightKg = max(0.1, $weightKg);
 
         $destination = [
             'country' => $country,
@@ -205,6 +214,46 @@ final class CartController extends AbstractController
 
         $entityManager->persist($commande);
         $entityManager->flush();
+
+        // 1) Tenter de créer un envoi réel DHL (si transporteur DHL + API configurée)
+        if (
+            !$useStripe
+            && strtoupper($quote->carrier) === 'DHL'
+            && $dhlShipmentClient->isConfigured()
+            && $commande->getShippingTracking() === null
+        ) {
+            $shipment = $dhlShipmentClient->createShipment(
+                $weightKg,
+                [
+                    'recipientName' => $email !== '' ? $email : 'Client Maternia',
+                    'address' => $address,
+                    'city' => $city,
+                    'postalCode' => $postalCode,
+                    'country' => $country,
+                    'phone' => $telephone,
+                    'email' => $email,
+                ],
+                $quote->productCode ?? 'N',
+                sprintf('CMD-%d', $commande->getId())
+            );
+
+            if ($shipment !== null) {
+                $commande->setShippingTracking($shipment['trackingNumber']);
+                $entityManager->flush();
+            }
+        }
+
+        // 2) Si aucun tracking n'a pu être créé (POSTE, ARAMEX, DHL non configuré...),
+        // on génère un numéro de suivi interne Maternia pour toutes les commandes.
+        if ($commande->getShippingTracking() === null) {
+            $internalTracking = sprintf(
+                'MTR-%s-%04d',
+                (new \DateTimeImmutable())->format('Ymd'),
+                $commande->getId()
+            );
+            $commande->setShippingTracking($internalTracking);
+            $entityManager->flush();
+        }
 
         if ($useStripe) {
             $session->remove('cart');

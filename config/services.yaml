@@ -35,6 +35,19 @@ services:
             $username: '%env(DHL_USERNAME)%'
             $password: '%env(DHL_PASSWORD)%'
 
+    App\Service\Shipping\DhlShipmentClient:
+        arguments:
+            $baseUrl: '%env(DHL_API_BASE_URL)%'
+            $accountNumber: '%env(DHL_ACCOUNT_NUMBER)%'
+            $username: '%env(DHL_USERNAME)%'
+            $password: '%env(DHL_PASSWORD)%'
+            $shipperName: 'Maternia'
+            $shipperAddress: '%env(SHIPPING_WAREHOUSE_ADDRESS)%'
+
+    App\Service\Shipping\DhlTrackingClient:
+        arguments:
+            $apiKey: '%env(default::DHL_TRACKING_API_KEY)%'
+
     App\Service\Shipping\AramexQuoteClient:
         arguments:
             $enabled: '%env(bool:ARAMEX_ENABLED)%'
