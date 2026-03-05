@@ -52,7 +52,9 @@ final class MamanGrossesseController extends AbstractController
             ];
 
             $result = $this->riskService->predict($symptomes);
-            $grossesse->setRiskLevel($result['risk']);
+            // ✅ is_string() → niveau 9 compatible
+            $riskLevel = isset($result['risk']) && is_string($result['risk']) ? $result['risk'] : null;
+            $grossesse->setRiskLevel($riskLevel);
 
             if ($isNew) {
                 $entityManager->persist($grossesse);
@@ -64,10 +66,10 @@ final class MamanGrossesseController extends AbstractController
         }
 
         return $this->render('maman/grossesse.html.twig', [
-            'maman'    => $maman,
+            'maman'     => $maman,
             'grossesse' => $grossesse,
-            'form'     => $form->createView(),
-            'is_new'   => $isNew,
+            'form'      => $form->createView(),
+            'is_new'    => $isNew,
         ]);
     }
 }
