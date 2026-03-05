@@ -8,6 +8,7 @@ class NutritionService
      * Calcule les besoins nutritionnels complets d'une maman enceinte.
      * Formule Mifflin-St Jeor + ajustements OMS grossesse.
      */
+    /** @return array<mixed> */
     public function calculerBesoins(
         float $poids,
         float $taille,
@@ -69,7 +70,7 @@ class NutritionService
             'trimestre'         => $trimestre,
         ];
     }
-
+    /** @return array<mixed> */
     private function getMicronutriments(int $trimestre): array
     {
         return [
@@ -129,7 +130,7 @@ class NutritionService
             ],
         ];
     }
-
+/** @return array<mixed> */
     private function getAlimentsTop(int $trimestre): array
     {
         return match($trimestre) {
@@ -157,7 +158,7 @@ class NutritionService
             default => [],
         };
     }
-
+/** @return array<mixed> */
     private function getEvaluation(?float $imc, int $trimestre): array
     {
         if ($imc === null) {

@@ -19,3 +19,7 @@ services:
     App\Service\ChatbotService:
         arguments:
             $apiKey: '%env(GEMINI_API_KEY)%'
+
+    App\Service\BebeSemaineService:
+        arguments:
+            $publicDir: '%kernel.project_dir%/public'

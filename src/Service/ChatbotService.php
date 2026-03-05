@@ -15,9 +15,13 @@ class ChatbotService
         $this->apiKey = $apiKey;
     }
 
+    /**
+     * @param array<mixed> $mamanContext
+     * @param array<mixed> $conversationHistory
+     */
     public function ask(string $question, array $mamanContext = [], array $conversationHistory = []): string
     {
-        // ⚠️ DÉTECTION URGENCE MÉDICALE (avant même d'appeler l'API)
+        // ⚠️ DÉTECTION URGENCE MÉDICALE
         $urgenceKeywords = [
             'saignement', 'saigne', 'hémorragie',
             'douleur intense', 'douleur forte', 'très mal',
@@ -35,25 +39,33 @@ class ChatbotService
             }
         }
 
-        // Construction du profil médical
-        $profil = "";
-        if (!empty($mamanContext['groupeSanguin'])) {
-            $profil .= "Groupe sanguin : " . $mamanContext['groupeSanguin'] . ". ";
+        // ── Construction du profil médical ────────────────────────
+        $profil = '';
+
+        // ✅ is_string() garantit le type → pas de mixed
+        $groupeSanguin = $mamanContext['groupeSanguin'] ?? null;
+        $maladies      = $mamanContext['maladies']      ?? null;
+        $allergies     = $mamanContext['allergies']     ?? null;
+        $semaine       = $mamanContext['semaine']       ?? null;
+        $trimestre     = $mamanContext['trimestre']     ?? null;
+
+        if (is_string($groupeSanguin) && $groupeSanguin !== '') {
+            $profil .= 'Groupe sanguin : ' . $groupeSanguin . '. ';
         }
-        if (!empty($mamanContext['maladies'])) {
-            $profil .= "Maladies chroniques : " . $mamanContext['maladies'] . ". ";
+        if (is_string($maladies) && $maladies !== '') {
+            $profil .= 'Maladies chroniques : ' . $maladies . '. ';
         }
-        if (!empty($mamanContext['allergies'])) {
-            $profil .= "Allergies : " . $mamanContext['allergies'] . ". ";
+        if (is_string($allergies) && $allergies !== '') {
+            $profil .= 'Allergies : ' . $allergies . '. ';
         }
-        if (!empty($mamanContext['semaine'])) {
-            $profil .= "Semaine de grossesse : " . $mamanContext['semaine'] . ". ";
+        if ($semaine !== null) {
+            $profil .= 'Semaine de grossesse : ' . (string) $semaine . '. ';
         }
-        if (!empty($mamanContext['trimestre'])) {
-            $profil .= "Trimestre : " . $mamanContext['trimestre'] . ". ";
+        if ($trimestre !== null) {
+            $profil .= 'Trimestre : ' . (string) $trimestre . '. ';
         }
 
-        // PROMPT SYSTÈME
+        // ── Prompt système ────────────────────────────────────────
         $systemPrompt = "
 Tu es Maternia AI 🤱, une assistante médicale virtuelle spécialisée en suivi de grossesse.
 
@@ -77,61 +89,73 @@ CONTEXTE MÉDICAL DE LA MAMAN :
 $profil
 ";
 
-        // Construction des messages avec historique (mémoire)
+        // ── Construction des messages avec historique ─────────────
         $messages = [];
 
         foreach ($conversationHistory as $entry) {
-            if (!empty($entry['role']) && !empty($entry['content'])) {
-                $messages[] = [
-                    'role' => $entry['role'],
-                    'parts' => [['text' => $entry['content']]]
-                ];
+            // ✅ Vérification explicite que $entry est un array
+            if (!is_array($entry)) {
+                continue;
             }
+
+            $role    = $entry['role']    ?? null;
+            $content = $entry['content'] ?? null;
+
+            // ✅ is_string() au lieu de cast → niveau 9
+            if (!is_string($role) || !is_string($content) || $role === '' || $content === '') {
+                continue;
+            }
+
+            $messages[] = [
+                'role'  => $role,
+                'parts' => [['text' => $content]],
+            ];
         }
 
         $messages[] = [
-            'role' => 'user',
-            'parts' => [['text' => $question]]
+            'role'  => 'user',
+            'parts' => [['text' => $question]],
         ];
 
+        // ── Appel API Gemini ──────────────────────────────────────
         try {
             $response = $this->client->request(
                 'POST',
                 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' . $this->apiKey,
                 [
-                    'headers' => [
-                        'Content-Type' => 'application/json',
-                    ],
+                    'headers' => ['Content-Type' => 'application/json'],
                     'timeout' => 30,
-                    'json' => [
+                    'json'    => [
                         'system_instruction' => [
-                            'parts' => [['text' => $systemPrompt]]
+                            'parts' => [['text' => $systemPrompt]],
                         ],
-                        'contents' => $messages,
+                        'contents'         => $messages,
                         'generationConfig' => [
-                            'temperature' => 0.9,
+                            'temperature'     => 0.9,
                             'maxOutputTokens' => 1024,
-                            'topP' => 0.95
+                            'topP'            => 0.95,
                         ],
                         'safetySettings' => [
                             ['category' => 'HARM_CATEGORY_DANGEROUS_CONTENT', 'threshold' => 'BLOCK_ONLY_HIGH'],
-                            ['category' => 'HARM_CATEGORY_HARASSMENT', 'threshold' => 'BLOCK_ONLY_HIGH'],
-                            ['category' => 'HARM_CATEGORY_HATE_SPEECH', 'threshold' => 'BLOCK_ONLY_HIGH'],
+                            ['category' => 'HARM_CATEGORY_HARASSMENT',        'threshold' => 'BLOCK_ONLY_HIGH'],
+                            ['category' => 'HARM_CATEGORY_HATE_SPEECH',       'threshold' => 'BLOCK_ONLY_HIGH'],
                             ['category' => 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'threshold' => 'BLOCK_ONLY_HIGH'],
-                        ]
-                    ]
+                        ],
+                    ],
                 ]
             );
 
             $data = $response->toArray(false);
 
-            if (!isset($data['candidates'][0]['content']['parts'][0]['text'])) {
+            // ✅ is_string() sur la réponse API → niveau 9
+            $rawText = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
+
+            if (!is_string($rawText) || $rawText === '') {
                 return "Je suis là pour vous aider 💕 Pouvez-vous reformuler votre question ?";
             }
 
-            $text = $data['candidates'][0]['content']['parts'][0]['text'];
-            $text = trim($text);
-            $text = str_replace(["\n\n", "\n"], " ", $text);
+            $text = trim($rawText);
+            $text = str_replace(["\n\n", "\n"], ' ', $text);
 
             return $text;
 

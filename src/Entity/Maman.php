@@ -8,17 +8,15 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 
 #[ORM\Entity(repositoryClass: MamanRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 class Maman
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-    
+#[ORM\Id]
+#[ORM\GeneratedValue]
+#[ORM\Column]
+private ?int $id = null; // @phpstan-ignore property.unusedType
     #[ORM\Column(length: 30)]
     #[Assert\NotBlank(message: 'Le numéro d\'urgence est obligatoire.')]
     #[Assert\Regex(
@@ -88,19 +86,26 @@ private ?\DateTimeInterface $dateNaissance = null;
         return $this->numeroUrgence;
     }
 
-    public function setNumeroUrgence(string $numeroUrgence): static
-    {
-        $digits = preg_replace('/\D/', '', $numeroUrgence);
-        if (strlen($digits) >= 8) {
-            if (str_starts_with($digits, '216') && strlen($digits) >= 11) {
-                $digits = substr($digits, 3, 8);
-            } else {
-                $digits = substr($digits, -8);
-            }
+public function setNumeroUrgence(string $numeroUrgence): static
+{
+    // ✅ $numeroUrgence est déjà typé string → pas de null possible
+    $digits = preg_replace('/\D/', '', $numeroUrgence);
+
+    // ✅ preg_replace peut retourner null → on cast en string
+    $digits = $digits ?? '';
+
+    if (strlen($digits) >= 8) {
+        if (str_starts_with($digits, '216') && strlen($digits) >= 11) {
+            $digits = substr($digits, 3, 8);
+        } else {
+            $digits = substr($digits, -8);
         }
-        $this->numeroUrgence = $digits !== '' ? $digits : $numeroUrgence;
-        return $this;
     }
+
+    $this->numeroUrgence = $digits !== '' ? $digits : $numeroUrgence;
+
+    return $this;
+}
 
     public function getEmail(): ?string
     {

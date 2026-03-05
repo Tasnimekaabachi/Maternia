@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Maman;
 use App\Form\MamanType;
 use App\Repository\GrosesseRepository;
+use App\Service\BebeSemaineService;
 use App\Service\ConseilsSuiviService;
 use App\Service\MailerService;
 use App\Service\ChatbotService;
@@ -19,21 +20,17 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 final class MamanController extends AbstractController
 {
-    /**
-     * Page publique : la maman remplit son profil pour le suivi de grossesse.
-     * URL unifiée : /suivi_grossesse (création) et /suivi_grossesse/{id} (voir une maman).
-     */
     #[Route('/suivi_grossesse', name: 'app_suivi_grossesse_creer', methods: ['GET', 'POST'])]
     public function suiviGrossesseCreer(Request $request, EntityManagerInterface $entityManager, MailerService $mailerService): Response
     {
         $maman = new Maman();
-        $form = $this->createForm(MamanType::class, $maman);
+        $form  = $this->createForm(MamanType::class, $maman);
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($maman);
             $entityManager->flush();
 
-            // Envoi de l'email de bienvenue si une adresse est fournie
             $emailSent = $mailerService->sendWelcomeEmail($maman);
             if ($emailSent) {
                 $this->addFlash('success', 'Votre profil a été créé et un email de confirmation a été envoyé.');
@@ -41,59 +38,55 @@ final class MamanController extends AbstractController
                 $this->addFlash('success', 'Votre profil a été créé. Ajoutez une adresse email valide pour recevoir une confirmation.');
             }
 
-            // Étape 2 : enchaîner directement sur le formulaire grossesse
             return $this->redirectToRoute('app_maman_grossesse_edit', ['id' => $maman->getId()], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('pages/mon_profil_maman.html.twig', [
             'maman' => $maman,
-            'form' => $form,
-            'mode' => 'create',
+            'form'  => $form,
+            'mode'  => 'create',
         ]);
     }
 
-    /**
-     * Ancienne URL : GET /mon-suivi-grossesse redirige vers /suivi_grossesse.
-     */
     #[Route('/mon-suivi-grossesse', name: 'app_suivi_grossesse_creer_alias', methods: ['GET'])]
     public function suiviGrossesseCreerAlias(Request $request): Response
     {
         return $this->redirectToRoute('app_suivi_grossesse_creer', $request->query->all(), Response::HTTP_MOVED_PERMANENTLY);
     }
 
-    /**
-     * Ancienne URL : /mon-suivi-grossesse/{id} redirige vers /suivi_grossesse/{id}.
-     */
     #[Route('/mon-suivi-grossesse/{id}', name: 'app_suivi_grossesse_show_alias', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function suiviGrossesseShowAlias(Maman $maman): Response
     {
         return $this->redirectToRoute('app_suivi_grossesse_show', ['id' => $maman->getId()], Response::HTTP_MOVED_PERMANENTLY);
     }
 
-    /**
-     * Vue personnelle : la maman consulte et gère ses infos (dashboard santé).
-     * /suivi_grossesse/{id}
-     */
     #[Route('/suivi_grossesse/{id}', name: 'app_suivi_grossesse_show', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function suiviGrossesseShow(Maman $maman, GrosesseRepository $grosesseRepository, ConseilsSuiviService $conseilsSuiviService,
-    NutritionService $nutritionService): Response
-    {
-        $imc = $maman->getImc();
+    public function suiviGrossesseShow(
+        Maman $maman,
+        GrosesseRepository $grosesseRepository,
+        ConseilsSuiviService $conseilsSuiviService,
+        NutritionService $nutritionService,
+        BebeSemaineService $bebeSemaineService
+    ): Response {
+        $imc          = $maman->getImc();
         $imcCategorie = $maman->getImcCategorie();
-        $imcAlerte = $maman->isImcAlerte();
+        $imcAlerte    = $maman->isImcAlerte();
+        $conseils     = $this->getConseilsSante($maman);
 
-        $conseils = $this->getConseilsSante($maman);
-
-        $grossesse = $grosesseRepository->findOneBy(['maman' => $maman], ['dateCreation' => 'DESC']);
-
+        $grossesse        = $grosesseRepository->findOneBy(['maman' => $maman], ['dateCreation' => 'DESC']);
         $grossesseConseil = null;
         $grossesseAlertes = [];
-        $bebeAgeMois = null;
-        $bebeConseil = null;
+        $bebeAgeMois      = null;
+        $bebeConseil      = null;
+        $normesBebe       = null;
+        $evaluationPoids  = null;
+        $evaluationTaille = null;
+        $prisePoids       = null;
+        $evaluationPrise  = null;
 
         if ($grossesse) {
             $semaine = $grossesse->getSemaineActuelle();
-            $statut = $grossesse->getStatutGrossesse();
+            $statut  = $grossesse->getStatutGrossesse();
 
             if ($statut !== 'terminee' && $semaine !== null) {
                 $grossesseConseil = $conseilsSuiviService->conseilsGrossesse($semaine);
@@ -108,10 +101,9 @@ final class MamanController extends AbstractController
                 $poidsAvant  = $maman->getPoids();
                 $poidsActuel = $grossesse->getPoidsActuel();
                 $prisePoids  = ($poidsAvant && $poidsActuel)
-                               ? round($poidsActuel - $poidsAvant, 1)
-                               : null;
+                    ? round($poidsActuel - $poidsAvant, 1)
+                    : null;
 
-                $evaluationPrise = null;
                 if ($prisePoids !== null) {
                     if ($prisePoids < 0)       $evaluationPrise = 'perte';
                     elseif ($prisePoids < 8)   $evaluationPrise = 'insuffisant';
@@ -119,62 +111,75 @@ final class MamanController extends AbstractController
                     elseif ($prisePoids <= 20) $evaluationPrise = 'attention';
                     else                       $evaluationPrise = 'excessif';
                 }
+
             } elseif ($statut === 'terminee') {
                 $bebeAgeMois = $conseilsSuiviService->getAgeBebeEnMois($grossesse);
                 if ($bebeAgeMois !== null) {
                     $bebeConseil = $conseilsSuiviService->conseilsBebe($bebeAgeMois);
                 }
 
-                $sexe = $grossesse->getSexeBebe();
-
+                $sexe   = $grossesse->getSexeBebe();
                 $normes = [
                     'M' => ['poids_min' => 2.9, 'poids_max' => 4.0, 'taille_min' => 48.0, 'taille_max' => 52.0],
                     'F' => ['poids_min' => 2.8, 'poids_max' => 3.8, 'taille_min' => 47.0, 'taille_max' => 51.0],
                 ];
-
                 $normesBebe = $normes[$sexe] ?? $normes['M'];
+
                 $poidsBebe  = $grossesse->getPoidsNaissance();
                 $tailleBebe = $grossesse->getTailleNaissance();
 
                 $evaluationPoids = 'normal';
                 if ($poidsBebe !== null) {
-                    if ($poidsBebe < $normesBebe['poids_min']) $evaluationPoids = 'faible';
+                    if ($poidsBebe < $normesBebe['poids_min'])     $evaluationPoids = 'faible';
                     elseif ($poidsBebe > $normesBebe['poids_max']) $evaluationPoids = 'eleve';
                 }
 
                 $evaluationTaille = 'normal';
                 if ($tailleBebe !== null) {
-                    if ($tailleBebe < $normesBebe['taille_min']) $evaluationTaille = 'faible';
+                    if ($tailleBebe < $normesBebe['taille_min'])     $evaluationTaille = 'faible';
                     elseif ($tailleBebe > $normesBebe['taille_max']) $evaluationTaille = 'eleve';
                 }
             }
         }
-        // ── Calculateur nutritionnel ──────────────────────────────
-$nutrition = null;
-if ($maman->getPoids() && $maman->getTaille()) {
-    $nutrition = $nutritionService->calculerBesoins(
-        $maman->getPoids(),
-        $maman->getTaille(),
-        $imc,
-        $grossesse?->getTrimestreActuel() ?? 1,
-        $maman->getAge()  // utilise dateNaissance ou 28 par défaut
-    );
-}
-// ── Compte à rebours accouchement ────────────────────────
-$compteARebours = null;
-if ($grossesse && $grossesse->getDateAccouchementPrevue()) {
-    $dateAccouchement = \DateTime::createFromImmutable($grossesse->getDateAccouchementPrevue());
-    $maintenant = new \DateTime();
-    $diff = $maintenant->diff($dateAccouchement);
-    $joursRestants = (int) $diff->days;
 
-    if (!$diff->invert && $joursRestants <= 7) {
-        $compteARebours = [
-            'date'  => $dateAccouchement->format('Y-m-d'),
-            'jours' => $joursRestants,
-        ];
-    }
-}
+        // ── Calculateur nutritionnel ──────────────────────────────
+        $nutrition = null;
+        if ($maman->getPoids() && $maman->getTaille()) {
+            $nutrition = $nutritionService->calculerBesoins(
+                $maman->getPoids(),
+                $maman->getTaille(),
+                $imc,
+                $grossesse?->getTrimestreActuel() ?? 1,
+                $maman->getAge()
+            );
+        }
+
+        // ── Compte à rebours accouchement ────────────────────────
+        $compteARebours = null;
+        if ($grossesse && $grossesse->getDateAccouchementPrevue()) {
+            $dateAccouchement = \DateTime::createFromImmutable($grossesse->getDateAccouchementPrevue());
+            $maintenant       = new \DateTime();
+            $diff             = $maintenant->diff($dateAccouchement);
+            $joursRestants    = (int) $diff->days;
+
+            if (!$diff->invert && $joursRestants <= 7) {
+                $compteARebours = [
+                    'date'  => $dateAccouchement->format('Y-m-d'),
+                    'jours' => $joursRestants,
+                ];
+            }
+        }
+
+        // ── Données bébé selon la semaine (image par mois) ───────
+        $bebeSemaine = null;
+        if ($grossesse
+            && $grossesse->getStatutGrossesse() !== 'terminee'
+            && $grossesse->getSemaineActuelle() !== null
+        ) {
+            $bebeSemaine = $bebeSemaineService->getSemaine(
+                $grossesse->getSemaineActuelle()
+            );
+        }
 
         return $this->render('pages/mon_profil_maman.html.twig', [
             'maman'             => $maman,
@@ -188,29 +193,27 @@ if ($grossesse && $grossesse->getDateAccouchementPrevue()) {
             'grossesse_alertes' => $grossesseAlertes,
             'bebe_age_mois'     => $bebeAgeMois,
             'bebe_conseil'      => $bebeConseil,
-            'normes_bebe'       => $normesBebe ?? null,
-            'evaluation_poids'  => $evaluationPoids ?? null,
-            'evaluation_taille' => $evaluationTaille ?? null,
+            'normes_bebe'       => $normesBebe,
+            'evaluation_poids'  => $evaluationPoids,
+            'evaluation_taille' => $evaluationTaille,
             'poids_avant'       => $maman->getPoids() ?? null,
-            'poids_actuel_g'    => $grossesse ? $grossesse->getPoidsActuel() ?? null : null,
-            'prise_poids'       => $prisePoids ?? null,
-            'evaluation_prise'  => $evaluationPrise ?? null,
+            'poids_actuel_g'    => $grossesse?->getPoidsActuel() ?? null,
+            'prise_poids'       => $prisePoids,
+            'evaluation_prise'  => $evaluationPrise,
             'nutrition'         => $nutrition,
-            'compte_a_rebours' => $compteARebours,
+            'compte_a_rebours'  => $compteARebours,
+            'bebe_semaine'      => $bebeSemaine,
         ]);
     }
 
-    /**
-     * Édition du profil par la maman. /suivi_grossesse/{id}/edit
-     */
     #[Route('/suivi_grossesse/{id}/edit', name: 'app_suivi_grossesse_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
     public function suiviGrossesseEdit(Request $request, Maman $maman, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(MamanType::class, $maman);
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-
             return $this->redirectToRoute('app_suivi_grossesse_show', ['id' => $maman->getId()], Response::HTTP_SEE_OTHER);
         }
 
@@ -221,9 +224,6 @@ if ($grossesse && $grossesse->getDateAccouchementPrevue()) {
         ]);
     }
 
-    /**
-     * Suppression du profil par la maman. /suivi_grossesse/{id}/supprimer
-     */
     #[Route('/suivi_grossesse/{id}/supprimer', name: 'app_suivi_grossesse_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function suiviGrossesseDelete(Request $request, Maman $maman, EntityManagerInterface $entityManager): Response
     {
@@ -231,13 +231,9 @@ if ($grossesse && $grossesse->getDateAccouchementPrevue()) {
             $entityManager->remove($maman);
             $entityManager->flush();
         }
-
         return $this->redirectToRoute('app_suivi_grossesse_creer', [], Response::HTTP_SEE_OTHER);
     }
 
-    /**
-     * Chatbot Maternia AI avec mémoire de conversation.
-     */
     #[Route('/suivi_grossesse/{id}/chatbot', name: 'app_chatbot_ask', methods: ['POST'])]
     public function chatbotAsk(
         Request $request,
@@ -246,17 +242,18 @@ if ($grossesse && $grossesse->getDateAccouchementPrevue()) {
         GrosesseRepository $grosesseRepository,
         SessionInterface $session
     ): JsonResponse {
-        $data = json_decode($request->getContent(), true);
-        $question = $data['question'] ?? '';
+        $decoded  = json_decode($request->getContent(), true);
+        $data     = is_array($decoded) ? $decoded : [];
+
+        // ✅ is_string() au lieu de isset() + cast → niveau 9
+        $rawQuestion = $data['question'] ?? null;
+        $question    = is_string($rawQuestion) ? $rawQuestion : '';
 
         if (empty($question)) {
             return new JsonResponse(['error' => 'Question vide'], 400);
         }
 
-        $grossesse = $grosesseRepository->findOneBy(
-            ['maman' => $maman],
-            ['dateCreation' => 'DESC']
-        );
+        $grossesse = $grosesseRepository->findOneBy(['maman' => $maman], ['dateCreation' => 'DESC']);
 
         $context = [
             'groupeSanguin' => $maman->getGroupeSanguin(),
@@ -266,19 +263,15 @@ if ($grossesse && $grossesse->getDateAccouchementPrevue()) {
             'trimestre'     => $grossesse?->getTrimestreActuel(),
         ];
 
-        // Récupérer l'historique de cette maman depuis la session
         $sessionKey = 'chat_history_maman_' . $maman->getId();
-        $history = $session->get($sessionKey, []);
+        $history    = $session->get($sessionKey, []);
+        $history    = is_array($history) ? $history : [];
 
-        // Limiter l'historique aux 10 derniers échanges (20 messages) pour ne pas surcharger l'API
         if (count($history) > 20) {
             $history = array_slice($history, -20);
         }
 
-        // Appeler le chatbot avec l'historique
-        $reponse = $chatbotService->ask($question, $context, $history);
-
-        // Sauvegarder le nouvel échange dans la session
+        $reponse   = $chatbotService->ask($question, $context, $history);
         $history[] = ['role' => 'user',  'content' => $question];
         $history[] = ['role' => 'model', 'content' => $reponse];
         $session->set($sessionKey, $history);
@@ -286,29 +279,114 @@ if ($grossesse && $grossesse->getDateAccouchementPrevue()) {
         return new JsonResponse(['reponse' => $reponse]);
     }
 
-    /**
-     * Effacer l'historique du chatbot (optionnel - bouton "Nouvelle conversation").
-     */
     #[Route('/suivi_grossesse/{id}/chatbot/reset', name: 'app_chatbot_reset', methods: ['POST'])]
-    public function chatbotReset(
-        Maman $maman,
-        SessionInterface $session
-    ): JsonResponse {
-        $sessionKey = 'chat_history_maman_' . $maman->getId();
-        $session->remove($sessionKey);
-
+    public function chatbotReset(Maman $maman, SessionInterface $session): JsonResponse
+    {
+        $session->remove('chat_history_maman_' . $maman->getId());
         return new JsonResponse(['status' => 'ok', 'message' => 'Conversation réinitialisée 💕']);
     }
 
-    /**
-     * Conseils santé personnalisés selon IMC et mode de vie.
-     *
-     * @return string[]
-     */
+    #[Route('/suivi_grossesse/{id}/checklist', name: 'app_checklist', methods: ['GET'])]
+    public function checklist(Maman $maman, SessionInterface $session): Response
+    {
+        $sessionKey = 'checklist_maman_' . $maman->getId();
+        $checked    = $session->get($sessionKey, []);
+        $checked    = is_array($checked) ? $checked : [];
+
+        return $this->render('pages/checklist.html.twig', [
+            'maman'   => $maman,
+            'checked' => $checked,
+        ]);
+    }
+
+    #[Route('/suivi_grossesse/{id}/checklist/toggle', name: 'app_checklist_toggle', methods: ['POST'])]
+    public function checklistToggle(Request $request, Maman $maman, SessionInterface $session): JsonResponse
+    {
+        $decoded = json_decode($request->getContent(), true);
+        $data    = is_array($decoded) ? $decoded : [];
+
+        // ✅ is_string() → niveau 9
+        $rawItem = $data['item'] ?? null;
+        $itemId  = is_string($rawItem) ? $rawItem : null;
+
+        if ($itemId === null || $itemId === '') {
+            return new JsonResponse(['error' => 'Item manquant'], 400);
+        }
+
+        $sessionKey = 'checklist_maman_' . $maman->getId();
+        $checked    = $session->get($sessionKey, []);
+        $checked    = is_array($checked) ? $checked : [];
+
+        if (in_array($itemId, $checked, true)) {
+            $checked = array_values(array_filter($checked, fn($i) => $i !== $itemId));
+        } else {
+            $checked[] = $itemId;
+        }
+
+        $session->set($sessionKey, $checked);
+        return new JsonResponse(['checked' => $checked]);
+    }
+
+    #[Route('/suivi_grossesse/{id}/checklist/reset', name: 'app_checklist_reset', methods: ['POST'])]
+    public function checklistReset(Maman $maman, SessionInterface $session): JsonResponse
+    {
+        $session->remove('checklist_maman_' . $maman->getId());
+        return new JsonResponse(['status' => 'ok']);
+    }
+
+    #[Route('/suivi_grossesse/{id}/prenom', name: 'app_prenom_calculateur', methods: ['POST'])]
+    public function prenomCalculateur(
+        Request $request,
+        Maman $maman,
+        ChatbotService $chatbotService
+    ): JsonResponse {
+        $decoded = json_decode($request->getContent(), true);
+        $data    = is_array($decoded) ? $decoded : [];
+
+        // ✅ is_string() → niveau 9
+        $rawPrenom     = $data['prenom']     ?? null;
+        $rawNomFamille = $data['nomFamille'] ?? null;
+        $prenom        = is_string($rawPrenom)     ? trim($rawPrenom)     : '';
+        $nomFamille    = is_string($rawNomFamille) ? trim($rawNomFamille) : '';
+
+        if ($prenom === '') {
+            return new JsonResponse(['error' => 'Prénom manquant'], 400);
+        }
+
+        $question = "
+Analyse le prénom \"$prenom\"" . ($nomFamille !== '' ? " avec le nom de famille \"$nomFamille\"" : "") . ".
+
+Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) avec cette structure exacte :
+{
+  \"prenom\": \"$prenom\",
+  \"genre\": \"masculin ou féminin ou mixte\",
+  \"origine\": \"origine du prénom\",
+  \"signification\": \"signification détaillée\",
+  \"popularite\": \"description de la popularité en France et Tunisie\",
+  \"rang\": \"rang approximatif (ex: Top 10, Top 50, Rare...)\",
+  \"similaires\": [\"prénom1\", \"prénom2\", \"prénom3\", \"prénom4\", \"prénom5\"],
+  \"compatibilite\": \"" . ($nomFamille !== '' ? "analyse de compatibilité avec $nomFamille" : "non demandée") . "\",
+  \"score_compatibilite\": " . ($nomFamille !== '' ? "score de 1 à 10" : "0") . ",
+  \"anecdote\": \"une anecdote ou fait intéressant sur ce prénom\"
+}
+";
+
+        $reponse = $chatbotService->ask($question);
+        $reponse = trim((string) preg_replace('/```json|```/', '', $reponse));
+
+        $decodedResult = json_decode($reponse, true);
+        if (!is_array($decodedResult)) {
+            return new JsonResponse(['error' => 'Erreur analyse'], 500);
+        }
+
+        return new JsonResponse($decodedResult);
+    }
+
+    /** @return array<string> */
     private function getConseilsSante(Maman $maman): array
     {
         $conseils = [];
-        $imc = $maman->getImc();
+        $imc      = $maman->getImc();
 
         if ($imc !== null) {
             if ($imc < 18.5) {
@@ -339,111 +417,4 @@ if ($grossesse && $grossesse->getDateAccouchementPrevue()) {
 
         return $conseils;
     }
-
-    /**
- * Page checklist valise maternité
- */
-#[Route('/suivi_grossesse/{id}/checklist', name: 'app_checklist', methods: ['GET'])]
-public function checklist(
-    Maman $maman,
-    SessionInterface $session
-): Response {
-    $sessionKey = 'checklist_maman_' . $maman->getId();
-    $checked = $session->get($sessionKey, []);
-
-    return $this->render('pages/checklist.html.twig', [
-        'maman'   => $maman,
-        'checked' => $checked,
-    ]);
-}
-
-/**
- * Cocher/décocher un item
- */
-#[Route('/suivi_grossesse/{id}/checklist/toggle', name: 'app_checklist_toggle', methods: ['POST'])]
-public function checklistToggle(
-    Request $request,
-    Maman $maman,
-    SessionInterface $session
-): JsonResponse {
-    $data = json_decode($request->getContent(), true);
-    $itemId = $data['item'] ?? null;
-
-    if (!$itemId) {
-        return new JsonResponse(['error' => 'Item manquant'], 400);
-    }
-
-    $sessionKey = 'checklist_maman_' . $maman->getId();
-    $checked = $session->get($sessionKey, []);
-
-    if (in_array($itemId, $checked)) {
-        $checked = array_values(array_filter($checked, fn($i) => $i !== $itemId));
-    } else {
-        $checked[] = $itemId;
-    }
-
-    $session->set($sessionKey, $checked);
-
-    return new JsonResponse(['checked' => $checked]);
-}
-
-/**
- * Reset checklist
- */
-#[Route('/suivi_grossesse/{id}/checklist/reset', name: 'app_checklist_reset', methods: ['POST'])]
-public function checklistReset(
-    Maman $maman,
-    SessionInterface $session
-): JsonResponse {
-    $session->remove('checklist_maman_' . $maman->getId());
-    return new JsonResponse(['status' => 'ok']);
-}
-/**
- * Calculateur prénom via Gemini AI
- */
-#[Route('/suivi_grossesse/{id}/prenom', name: 'app_prenom_calculateur', methods: ['POST'])]
-public function prenomCalculateur(
-    Request $request,
-    Maman $maman,
-    ChatbotService $chatbotService
-): JsonResponse {
-    $data = json_decode($request->getContent(), true);
-    $prenom = trim($data['prenom'] ?? '');
-    $nomFamille = trim($data['nomFamille'] ?? '');
-
-    if (empty($prenom)) {
-        return new JsonResponse(['error' => 'Prénom manquant'], 400);
-    }
-
-    $question = "
-Analyse le prénom \"$prenom\"" . (!empty($nomFamille) ? " avec le nom de famille \"$nomFamille\"" : "") . ".
-
-Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) avec cette structure exacte :
-{
-  \"prenom\": \"$prenom\",
-  \"genre\": \"masculin ou féminin ou mixte\",
-  \"origine\": \"origine du prénom\",
-  \"signification\": \"signification détaillée\",
-  \"popularite\": \"description de la popularité en France et Tunisie\",
-  \"rang\": \"rang approximatif (ex: Top 10, Top 50, Rare...)\",
-  \"similaires\": [\"prénom1\", \"prénom2\", \"prénom3\", \"prénom4\", \"prénom5\"],
-  \"compatibilite\": \"" . (!empty($nomFamille) ? "analyse de compatibilité avec $nomFamille" : "non demandée") . "\",
-  \"score_compatibilite\": " . (!empty($nomFamille) ? "score de 1 à 10" : "0") . ",
-  \"anecdote\": \"une anecdote ou fait intéressant sur ce prénom\"
-}
-";
-
-    $reponse = $chatbotService->ask($question);
-
-    // Nettoyer la réponse JSON
-    $reponse = preg_replace('/```json|```/', '', $reponse);
-    $reponse = trim($reponse);
-
-    $decoded = json_decode($reponse, true);
-    if (!$decoded) {
-        return new JsonResponse(['error' => 'Erreur analyse'], 500);
-    }
-
-    return new JsonResponse($decoded);
-}
 }

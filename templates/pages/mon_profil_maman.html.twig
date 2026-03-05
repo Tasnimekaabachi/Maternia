@@ -383,6 +383,60 @@
                     {% endif %}
                 </div>
                 {# ===== FIN CARTE SUIVI GROSSESSE ===== #}
+                                {# ===== FIN CARTE SUIVI GROSSESSE ===== #}
+
+                {# ===== BLOC BÉBÉ SEMAINE ===== #}
+                {% if grossesse and grossesse.statutGrossesse != 'terminee' and bebe_semaine is defined and bebe_semaine %}
+                <div class="border border-primary rounded-3 bg-light p-4 mb-4 shadow-sm">
+                    <h5 class="text-primary mb-3">
+                        👶 Semaine {{ bebe_semaine.semaine }} — Mois {{ bebe_semaine.mois }}
+                    </h5>
+                    <div class="row align-items-center g-4">
+
+                        {# Image selon le mois #}
+                        <div class="col-md-5 text-center">
+                            <img
+                                src="{{ bebe_semaine.image_echographie }}"
+                                alt="Échographie mois {{ bebe_semaine.mois }}"
+                                class="img-fluid rounded-3 shadow"
+                                style="max-height:220px; object-fit:cover; border:3px solid #e91e8c;"
+                                onerror="this.src='/images/echographie/default.jpg'"
+                            >
+                            <p class="small text-muted mt-2">
+                                📷 Mois {{ bebe_semaine.mois }} de grossesse (semaine {{ bebe_semaine.semaine }})
+                            </p>
+                        </div>
+
+                        {# Infos bébé #}
+                        <div class="col-md-7">
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <div class="p-3 rounded-3" style="background:rgba(233,30,140,0.08);">
+                                        <div class="fw-bold text-primary">📏 {{ bebe_semaine.taille }} cm</div>
+                                        <small class="text-muted">Taille approximative</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-3 rounded-3" style="background:rgba(74,144,217,0.08);">
+                                        <div class="fw-bold text-primary">⚖️ {{ bebe_semaine.poids }} g</div>
+                                        <small class="text-muted">Poids approximatif</small>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="p-3 rounded-3" style="background:rgba(76,175,80,0.08);">
+                                        <p class="mb-0 small">{{ bebe_semaine.dev }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                {% endif %}
+                {# ===== FIN BLOC BÉBÉ SEMAINE ===== #}
+
+                {# ===== BOUTONS D'ACTION ===== #}
+                <div class="row g-4 mb-4 mt-2">
 
                 {# ===== BOUTONS D'ACTION ===== #}
                 <div class="row g-4 mb-4 mt-2">

@@ -7,7 +7,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class RiskPredictionService
 {
     public function __construct(private HttpClientInterface $client) {}
-
+/** @param array<mixed> $symptomes
+ *  @return array<mixed> */
     public function predict(array $symptomes): array
     {
         try {
