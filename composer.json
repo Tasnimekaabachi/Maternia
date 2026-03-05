@@ -105,6 +105,8 @@
         "symfony/maker-bundle": "^1.0",
         "symfony/phpunit-bridge": "^8.0",
         "symfony/stopwatch": "6.4.*",
-        "symfony/web-profiler-bundle": "6.4.*"
+        "symfony/web-profiler-bundle": "6.4.*",
+        "phpstan/phpstan": "^1.11",
+        "phpstan/phpstan-symfony": "^1.4"
     }
 }
