@@ -13,10 +13,16 @@
                     <p class="lead text-white mb-4">Une sélection soignée pour la grossesse, la naissance et les premiers mois.</p>
                 </div>
                 <div class="col-lg-5 col-md-12 text-lg-end text-md-start">
-                    <a href="{{ path('app_cart_show') }}" class="btn btn-light btn-lg btn-border-radius d-inline-flex align-items-center">
-                        <i class="fas fa-shopping-cart text-primary me-2"></i>
-                        <span>Voir mon panier</span>
-                    </a>
+                    <div class="d-flex flex-lg-row flex-column gap-2 justify-content-lg-end">
+                        <a href="{{ path('app_cart_show') }}" class="btn btn-light btn-lg btn-border-radius d-inline-flex align-items-center">
+                            <i class="fas fa-shopping-cart text-primary me-2"></i>
+                            <span>Voir mon panier</span>
+                        </a>
+                        <a href="{{ path('app_wheel') }}" class="btn btn-outline-light btn-lg btn-border-radius d-inline-flex align-items-center">
+                            <i class="fas fa-gift text-primary me-2"></i>
+                            <span>Roue des réductions</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -31,42 +37,47 @@
             </div>
             <div class="row g-4 justify-content-center">
                 <div class="col-6 col-md-4 col-lg-2 wow fadeIn" data-wow-delay="0.1s">
-                    <a href="#produits" class="text-decoration-none marketplace-cat border border-primary rounded-3 bg-white d-flex flex-column align-items-center justify-content-center p-4 h-100 transition-cat">
+                    <a href="{{ path('app_marketplace', { categorie: 'grossesse' }) }}#produits" class="text-decoration-none marketplace-cat border rounded-3 d-flex flex-column align-items-center justify-content-center p-4 h-100 transition-cat {{ categorieActive == 'grossesse' ? 'border-primary bg-primary bg-opacity-10' : 'border-primary bg-white' }}">
                         <i class="fas fa-heart fa-2x text-primary mb-2"></i>
-                        <span class="text-dark fw-semibold small text-center">Grossesse</span>
+                        <span class="fw-semibold small text-center {{ categorieActive == 'grossesse' ? 'text-primary' : 'text-dark' }}">Grossesse</span>
                     </a>
                 </div>
                 <div class="col-6 col-md-4 col-lg-2 wow fadeIn" data-wow-delay="0.2s">
-                    <a href="#produits" class="text-decoration-none marketplace-cat border border-primary rounded-3 bg-white d-flex flex-column align-items-center justify-content-center p-4 h-100 transition-cat">
+                    <a href="{{ path('app_marketplace', { categorie: 'bebe' }) }}#produits" class="text-decoration-none marketplace-cat border rounded-3 d-flex flex-column align-items-center justify-content-center p-4 h-100 transition-cat {{ categorieActive == 'bebe' ? 'border-primary bg-primary bg-opacity-10' : 'border-primary bg-white' }}">
                         <i class="fas fa-baby fa-2x text-primary mb-2"></i>
-                        <span class="text-dark fw-semibold small text-center">Bébé</span>
+                        <span class="fw-semibold small text-center {{ categorieActive == 'bebe' ? 'text-primary' : 'text-dark' }}">Bébé</span>
                     </a>
                 </div>
                 <div class="col-6 col-md-4 col-lg-2 wow fadeIn" data-wow-delay="0.3s">
-                    <a href="#produits" class="text-decoration-none marketplace-cat border border-primary rounded-3 bg-white d-flex flex-column align-items-center justify-content-center p-4 h-100 transition-cat">
+                    <a href="{{ path('app_marketplace', { categorie: 'soins' }) }}#produits" class="text-decoration-none marketplace-cat border rounded-3 d-flex flex-column align-items-center justify-content-center p-4 h-100 transition-cat {{ categorieActive == 'soins' ? 'border-primary bg-primary bg-opacity-10' : 'border-primary bg-white' }}">
                         <i class="fas fa-spa fa-2x text-primary mb-2"></i>
-                        <span class="text-dark fw-semibold small text-center">Soins</span>
+                        <span class="fw-semibold small text-center {{ categorieActive == 'soins' ? 'text-primary' : 'text-dark' }}">Soins</span>
                     </a>
                 </div>
                 <div class="col-6 col-md-4 col-lg-2 wow fadeIn" data-wow-delay="0.4s">
-                    <a href="#produits" class="text-decoration-none marketplace-cat border border-primary rounded-3 bg-white d-flex flex-column align-items-center justify-content-center p-4 h-100 transition-cat">
+                    <a href="{{ path('app_marketplace', { categorie: 'mode' }) }}#produits" class="text-decoration-none marketplace-cat border rounded-3 d-flex flex-column align-items-center justify-content-center p-4 h-100 transition-cat {{ categorieActive == 'mode' ? 'border-primary bg-primary bg-opacity-10' : 'border-primary bg-white' }}">
                         <i class="fas fa-tshirt fa-2x text-primary mb-2"></i>
-                        <span class="text-dark fw-semibold small text-center">Mode</span>
+                        <span class="fw-semibold small text-center {{ categorieActive == 'mode' ? 'text-primary' : 'text-dark' }}">Mode</span>
                     </a>
                 </div>
                 <div class="col-6 col-md-4 col-lg-2 wow fadeIn" data-wow-delay="0.5s">
-                    <a href="#produits" class="text-decoration-none marketplace-cat border border-primary rounded-3 bg-white d-flex flex-column align-items-center justify-content-center p-4 h-100 transition-cat">
+                    <a href="{{ path('app_marketplace', { categorie: 'equipement' }) }}#produits" class="text-decoration-none marketplace-cat border rounded-3 d-flex flex-column align-items-center justify-content-center p-4 h-100 transition-cat {{ categorieActive == 'equipement' ? 'border-primary bg-primary bg-opacity-10' : 'border-primary bg-white' }}">
                         <i class="fas fa-couch fa-2x text-primary mb-2"></i>
-                        <span class="text-dark fw-semibold small text-center">Équipement</span>
+                        <span class="fw-semibold small text-center {{ categorieActive == 'equipement' ? 'text-primary' : 'text-dark' }}">Équipement</span>
                     </a>
                 </div>
                 <div class="col-6 col-md-4 col-lg-2 wow fadeIn" data-wow-delay="0.6s">
-                    <a href="#produits" class="text-decoration-none marketplace-cat border border-primary rounded-3 bg-white d-flex flex-column align-items-center justify-content-center p-4 h-100 transition-cat">
+                    <a href="{{ path('app_marketplace', { categorie: 'services' }) }}#produits" class="text-decoration-none marketplace-cat border rounded-3 d-flex flex-column align-items-center justify-content-center p-4 h-100 transition-cat {{ categorieActive == 'services' ? 'border-primary bg-primary bg-opacity-10' : 'border-primary bg-white' }}">
                         <i class="fas fa-hands-helping fa-2x text-primary mb-2"></i>
-                        <span class="text-dark fw-semibold small text-center">Services</span>
+                        <span class="fw-semibold small text-center {{ categorieActive == 'services' ? 'text-primary' : 'text-dark' }}">Services</span>
                     </a>
                 </div>
             </div>
+            {% if categorieActive %}
+            <div class="text-center mt-3">
+                <a href="{{ path('app_marketplace') }}" class="btn btn-outline-primary btn-sm">Toutes les catégories</a>
+            </div>
+            {% endif %}
         </div>
     </section>
 
@@ -79,9 +90,23 @@
                 <p class="text-muted small">Recherchez un produit par son nom.</p>
             </div>
 
+            {% if weather is defined and weather %}
+            <div class="row justify-content-center mb-3">
+                <div class="col-auto">
+                    <div class="border border-primary rounded-3 bg-white p-3 d-inline-block">
+                        <span class="text-primary fw-semibold"><i class="fas fa-cloud-sun me-1"></i> Météo du jour (API Open-Meteo)</span>
+                        <span class="ms-2">{{ weather.temperature ?? '–' }} °C — {{ weather.label }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             <div class="row justify-content-center mb-4">
                 <div class="col-md-8">
                     <form method="get" action="{{ path('app_marketplace') }}" class="input-group">
+                        {% if categorieActive %}
+                        <input type="hidden" name="categorie" value="{{ categorieActive }}">
+                        {% endif %}
                         <input
                             type="text"
                             name="q"
@@ -101,22 +126,41 @@
                     <div class="col-sm-6 col-lg-4 col-xl-3 wow fadeIn" data-wow-delay="0.1s">
                         <div class="marketplace-card border border-primary bg-white rounded-3 overflow-hidden h-100 d-flex flex-column">
                             <div class="marketplace-card-img position-relative overflow-hidden">
-                                <img src="{{ asset('img/blog-1.jpg') }}" class="img-fluid w-100" alt="{{ produit.nom }}" style="height: 200px; object-fit: cover;">
+                                <img src="{{ produit.imageName ? asset('uploads/produits/' ~ produit.imageName) : asset('img/blog-1.jpg') }}" class="img-fluid w-100" alt="{{ produit.nom }}" style="height: 200px; object-fit: cover;">
                             </div>
                             <div class="p-3 flex-grow-1 d-flex flex-column">
                                 <h6 class="text-primary mb-2">{{ produit.nom }}</h6>
                                 <p class="text-muted small mb-2 flex-grow-1">
                                     {{ produit.description|length > 80 ? produit.description|slice(0, 80) ~ '...' : produit.description }}
                                 </p>
+                                {% if produit.ratingAverage is not null and produit.ratingCount > 0 %}
+                                    <div class="mb-2 small text-warning">
+                                        {% for i in 1..5 %}
+                                            {% if produit.ratingAverage >= i %}
+                                                <i class="fas fa-star"></i>
+                                            {% elseif produit.ratingAverage >= i - 0.5 %}
+                                                <i class="fas fa-star-half-alt"></i>
+                                            {% else %}
+                                                <i class="far fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <span class="text-muted ms-1">({{ produit.ratingCount }})</span>
+                                    </div>
+                                {% endif %}
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="fw-bold text-primary">{{ produit.prix }} TND</span>
                                     <span class="badge bg-secondary">Stock : {{ produit.stock }}</span>
                                 </div>
                                 <div class="mt-3 text-end">
                                     {% if produit.stock > 0 %}
-                                        <a href="{{ path('app_cart_add', { id: produit.id }) }}" class="btn btn-primary btn-sm btn-border-radius">
-                                            Ajouter au panier
-                                        </a>
+                                        <div class="btn-group">
+                                            <a href="{{ path('app_produit_show', { id: produit.id }) }}" class="btn btn-outline-primary btn-sm btn-border-radius">
+                                                Détails
+                                            </a>
+                                            <a href="{{ path('app_cart_add', { id: produit.id }) }}" class="btn btn-primary btn-sm btn-border-radius">
+                                                Ajouter au panier
+                                            </a>
+                                        </div>
                                     {% else %}
                                         <button class="btn btn-secondary btn-sm btn-border-radius" disabled>
                                             Rupture de stock
@@ -132,6 +176,11 @@
                     </div>
                 {% endfor %}
             </div>
+            {% if pagination is defined and pagination.pageCount > 1 %}
+            <div class="d-flex justify-content-center mt-4">
+                {{ knp_pagination_render(pagination) }}
+            </div>
+            {% endif %}
         </div>
     </section>
 
@@ -190,7 +239,7 @@
                         col.innerHTML = `
                             <div class="marketplace-card border border-primary bg-white rounded-3 overflow-hidden h-100 d-flex flex-column">
                                 <div class="marketplace-card-img position-relative overflow-hidden">
-                                    <img src="{{ asset('img/blog-2.jpg') }}" class="img-fluid w-100" alt="${produit.nom}" style="height: 200px; object-fit: cover;">
+                                    <img src="${produit.imageName ? '{{ asset('uploads/produits/') }}' + produit.imageName : '{{ asset('img/blog-2.jpg') }}'}" class="img-fluid w-100" alt="${produit.nom}" style="height: 200px; object-fit: cover;">
                                 </div>
                                 <div class="p-3 flex-grow-1 d-flex flex-column">
                                     <h6 class="text-primary mb-2">${produit.nom}</h6>

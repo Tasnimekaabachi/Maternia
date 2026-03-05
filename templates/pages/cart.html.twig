@@ -59,18 +59,99 @@
                         </tbody>
                         <tfoot>
                         <tr>
-                            <th colspan="2" class="text-end">Total</th>
-                            <th colspan="2">{{ total }} TND</th>
+                            <td colspan="2" class="text-end">Sous-total produits</td>
+                            <td colspan="2">{{ total|number_format(2, '.', ' ') }} TND</td>
                         </tr>
+                        {% if shippingQuote is not null %}
+                        <tr>
+                            <td colspan="2" class="text-end">Frais de livraison <small class="text-muted">(estimation POSTE, TN)</small></td>
+                            <td colspan="2">{{ shippingQuote.cost|number_format(2, '.', ' ') }} TND</td>
+                        </tr>
+                        <tr class="table-light">
+                            <th colspan="2" class="text-end">Total estimé</th>
+                            <th colspan="2">{{ (total + shippingQuote.cost)|number_format(2, '.', ' ') }} TND</th>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <th colspan="2" class="text-end">Total</th>
+                            <th colspan="2">{{ total|number_format(2, '.', ' ') }} TND</th>
+                        </tr>
+                        {% endif %}
                         </tfoot>
                     </table>
                 </div>
 
-                <div class="text-end mt-4">
-                    <form method="post" action="{{ path('app_cart_checkout') }}">
-                        <button type="submit" class="btn btn-primary px-5 py-3 btn-border-radius">
-                            Valider la commande
-                        </button>
+                <div class="mt-4 bg-white rounded-3 shadow-sm p-4">
+                    <h5 class="mb-3">Livraison & validation de la commande</h5>
+                    <form method="post" action="{{ path('app_cart_checkout') }}" class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Email (pour recevoir la facture) <span class="text-danger">*</span></label>
+                            <input type="email" name="email" class="form-control" placeholder="ex: client@mail.com" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Téléphone (SMS optionnel)</label>
+                            <input type="text" name="telephone" class="form-control" placeholder="+216...">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Adresse</label>
+                            <input type="text" name="address" class="form-control" placeholder="Rue, numéro...">
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Ville</label>
+                            <input type="text" name="city" class="form-control" placeholder="Tunis">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Code postal</label>
+                            <input type="text" name="postal_code" class="form-control" placeholder="1000">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Pays</label>
+                            <input type="text" name="country" class="form-control" value="TN">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Transporteur</label>
+                            <select name="carrier" class="form-select">
+                                <option value="POSTE" selected>POSTE</option>
+                                <option value="ARAMEX">ARAMEX</option>
+                                <option value="DHL">DHL</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Code promo (optionnel)</label>
+                            <input type="text" name="promo_code" class="form-control" placeholder="Code gagné avec la roue">
+                            <small class="text-muted">
+                                Vous pouvez tenter votre chance sur la
+                                <a href="{{ path('app_wheel') }}">roue des réductions</a>.
+                            </small>
+                        </div>
+
+                        {% if stripeAvailable|default(false) %}
+                        <div class="col-12">
+                            <label class="form-label">Mode de paiement</label>
+                            <div class="d-flex gap-3 flex-wrap">
+                                <div class="form-check">
+                                    <input type="radio" name="payment_method" id="payment_offline" value="offline" class="form-check-input" checked>
+                                    <label for="payment_offline" class="form-check-label">Paiement à la livraison</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="radio" name="payment_method" id="payment_stripe" value="stripe" class="form-check-input">
+                                    <label for="payment_stripe" class="form-check-label"><i class="fab fa-cc-visa me-1"></i><i class="fab fa-cc-mastercard me-1"></i>Paiement par carte bancaire (sécurisé)</label>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="col-12 d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary px-5 py-3 btn-border-radius">
+                                Valider ma commande
+                            </button>
+                        </div>
+                        <div class="col-12">
+                            <small class="text-muted">
+                                Les frais définitifs sont calculés à la validation selon le poids du panier, le pays et le transporteur choisi (POSTE, Aramex, DHL). Ils seront affichés sur la page de confirmation.
+                            </small>
+                        </div>
                     </form>
                 </div>
             {% endif %}

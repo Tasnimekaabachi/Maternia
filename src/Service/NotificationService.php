@@ -3,11 +3,13 @@
 namespace App\Service;
 
 use App\Entity\ReservationClient;
+use App\Entity\Commande;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Address;
 use Twig\Environment;
-use Psr\Log\LoggerInterface;
+use Twilio\Rest\Client as TwilioClient;
 
 class NotificationService
 {
@@ -17,6 +19,7 @@ class NotificationService
     private ?string $twilioToken;
     private ?string $twilioSmsFrom;
     private ?string $twilioWhatsAppFrom;
+    private readonly string $mailerFrom;
 
     public function __construct(
         private readonly MailerInterface $mailer,
@@ -28,6 +31,7 @@ class NotificationService
         ?string $twilioToken = null,
         ?string $twilioSmsFrom = null,
         ?string $twilioWhatsAppFrom = null,
+        string $mailerFrom = ''
     ) {
         $this->fromEmail = $fromEmail ?: 'noreply@maternia.tn';
         $this->fromName = $fromName ?: 'Maternia Clinique';
@@ -35,6 +39,7 @@ class NotificationService
         $this->twilioToken = $twilioToken;
         $this->twilioSmsFrom = $twilioSmsFrom;
         $this->twilioWhatsAppFrom = $twilioWhatsAppFrom;
+        $this->mailerFrom = $mailerFrom ?: $fromEmail;
     }
 
     /**
@@ -99,6 +104,40 @@ class NotificationService
                 'message' => 'Erreur lors de l\'envoi de l\'email : ' . $e->getMessage(),
             ];
         }
+    }
+
+    /**
+     * Envoyer la confirmation de commande (marketplace)
+     */
+    public function sendOrderPaid(Commande $commande): void
+    {
+        $to = $commande->getEmail();
+        if ($to) {
+            $to = trim($to);
+        }
+        if ($to) {
+            $html = $this->twig->render('emails/commande_payee.html.twig', [
+                'commande' => $commande,
+            ]);
+
+            $email = (new Email())
+                ->from($this->mailerFrom)
+                ->to($to)
+                ->subject('Votre facture Maternia – Commande #' . $commande->getId())
+                ->html($html);
+
+            try {
+                $this->mailer->send($email);
+            } catch (\Throwable $e) {
+                $this->logger->error('Envoi email commande échoué', [
+                    'commande_id' => $commande->getId(),
+                    'to' => $to,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        $this->sendSmsIfConfigured($commande);
     }
 
     /**
@@ -189,6 +228,31 @@ class NotificationService
             'to' => $digits,
             'simulated' => true,
         ];
+    }
+
+    /**
+     * Envoyer un SMS pour une commande (marketplace)
+     */
+    private function sendSmsIfConfigured(Commande $commande): void
+    {
+        $sid = (string) getenv('TWILIO_ACCOUNT_SID');
+        $token = (string) getenv('TWILIO_AUTH_TOKEN');
+        $from = (string) getenv('TWILIO_FROM_NUMBER');
+
+        $to = $commande->getTelephone();
+        if ($sid === '' || $token === '' || $from === '' || !$to) {
+            return;
+        }
+
+        try {
+            $client = new TwilioClient($sid, $token);
+            $client->messages->create($to, [
+                'from' => $from,
+                'body' => sprintf('Maternia: commande #%d payée. Total: %.2f TND.', $commande->getId(), (float) $commande->getTotal()),
+            ]);
+        } catch (\Throwable) {
+            // Ne pas bloquer le checkout si SMS échoue
+        }
     }
 
     /**

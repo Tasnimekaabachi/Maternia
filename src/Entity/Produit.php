@@ -38,6 +38,38 @@ class Produit
     #[Assert\Type(type: 'integer', message: "Le stock doit être un entier")]
     private ?int $stock = null;
 
+    /** Slug de catégorie : grossesse, bebe, soins, mode, equipement, services */
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $categorie = null;
+
+    /** Nom du fichier image (stocké dans public/uploads/produits/) */
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $imageName = null;
+
+    /** Poids du produit en kg (utilisé pour le calcul livraison) */
+    #[ORM\Column(nullable: true)]
+    #[Assert\PositiveOrZero(message: "Le poids doit être positif ou zéro")]
+    #[Assert\Type(type: 'float', message: "Le poids doit être un nombre")]
+    private ?float $poidsKg = null;
+
+    /** Identifiant fournisseur / SKU (utilisé pour synchronisation) */
+    #[ORM\Column(length: 64, nullable: true)]
+    #[Assert\Length(max: 64)]
+    private ?string $sku = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Assert\PositiveOrZero(message: "La note moyenne doit être positive ou zéro")]
+    #[Assert\Range(
+        min: 0,
+        max: 5,
+        notInRangeMessage: "La note moyenne doit être comprise entre 0 et 5"
+    )]
+    private ?float $ratingAverage = null;
+
+    #[ORM\Column(options: ['default' => 0])]
+    #[Assert\PositiveOrZero(message: "Le nombre de notes doit être positif ou zéro")]
+    private int $ratingCount = 0;
+
     #[ORM\ManyToMany(targetEntity: Commande::class, mappedBy: 'produits')]
     private Collection $commandes;
 
@@ -121,6 +153,78 @@ class Produit
     public function setStock(int $stock): static
     {
         $this->stock = $stock;
+
+        return $this;
+    }
+
+    public function getCategorie(): ?string
+    {
+        return $this->categorie;
+    }
+
+    public function setCategorie(?string $categorie): static
+    {
+        $this->categorie = $categorie;
+
+        return $this;
+    }
+
+    public function getImageName(): ?string
+    {
+        return $this->imageName;
+    }
+
+    public function setImageName(?string $imageName): static
+    {
+        $this->imageName = $imageName;
+
+        return $this;
+    }
+
+    public function getPoidsKg(): ?float
+    {
+        return $this->poidsKg;
+    }
+
+    public function setPoidsKg(?float $poidsKg): static
+    {
+        $this->poidsKg = $poidsKg;
+
+        return $this;
+    }
+
+    public function getSku(): ?string
+    {
+        return $this->sku;
+    }
+
+    public function setSku(?string $sku): static
+    {
+        $this->sku = $sku;
+
+        return $this;
+    }
+
+    public function getRatingAverage(): ?float
+    {
+        return $this->ratingAverage;
+    }
+
+    public function setRatingAverage(?float $ratingAverage): static
+    {
+        $this->ratingAverage = $ratingAverage;
+
+        return $this;
+    }
+
+    public function getRatingCount(): int
+    {
+        return $this->ratingCount;
+    }
+
+    public function setRatingCount(int $ratingCount): static
+    {
+        $this->ratingCount = $ratingCount;
 
         return $this;
     }

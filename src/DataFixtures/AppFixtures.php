@@ -18,6 +18,7 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+        // Create admin user
         $user = new User();
         $user->setEmail('admin@gmail.com');
         $user->setNom('Admin');
@@ -30,6 +31,11 @@ class AppFixtures extends Fixture
         $user->setPassword($hashedPassword);
 
         $manager->persist($user);
+        
+        // You can add more fixtures here for marketplace products, etc.
+        // $product = new Product();
+        // $manager->persist($product);
+
         $manager->flush();
     }
 }

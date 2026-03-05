@@ -1,0 +1,142 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Suivi de colis - Maternia{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <h4 class="text-primary mb-4 border-bottom border-primary border-2 d-inline-block p-2 title-border-radius">Livraison</h4>
+                <h1 class="display-5 mb-3">Suivi de votre colis</h1>
+                <p class="text-muted">Entrez votre numéro de suivi pour connaître le statut de votre livraison.</p>
+            </div>
+
+            <div class="card shadow-sm border-primary">
+                <div class="card-body p-4">
+                    <form id="tracking-form" class="row g-3">
+                        <div class="col-12">
+                            <label for="tracking-number" class="form-label">Numéro de suivi</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text"><i class="fas fa-barcode"></i></span>
+                                <input type="text" id="tracking-number" name="trackingNumber" class="form-control"
+                                       placeholder="Ex : 1234567890" required>
+                                <button type="submit" class="btn btn-primary" id="btn-track">
+                                    <i class="fas fa-search me-1"></i> Suivre
+                                </button>
+                            </div>
+                            <small class="text-muted">Vous trouverez ce numéro sur votre email de confirmation ou votre étiquette.</small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="tracking-result" class="mt-4 d-none">
+                <div class="card shadow-sm border-primary">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-truck me-2"></i>Statut du colis</h5>
+                        <span id="result-status-badge" class="badge bg-light text-dark"></span>
+                    </div>
+                    <div class="card-body">
+                        <p id="result-description" class="mb-3"></p>
+                        <p id="result-delivery-date" class="text-muted small mb-0 d-none"></p>
+                        <p id="result-service" class="text-muted small mb-3 d-none"></p>
+                        <h6 class="mt-4 mb-2">Historique</h6>
+                        <ul id="result-events" class="list-group list-group-flush"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tracking-error" class="alert alert-danger mt-4 d-none" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span id="error-message"></span>
+            </div>
+
+            <div id="tracking-loading" class="text-center py-5 d-none">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 text-muted">Recherche en cours...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+var urlParams = new URLSearchParams(window.location.search);
+var trackingFromUrl = urlParams.get('tracking');
+if (trackingFromUrl) {
+    document.getElementById('tracking-number').value = trackingFromUrl;
+}
+})();
+
+document.getElementById('tracking-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var input = document.getElementById('tracking-number');
+    var number = input.value.trim();
+    if (!number) return;
+
+    var btn = document.getElementById('btn-track');
+    var resultDiv = document.getElementById('tracking-result');
+    var errorDiv = document.getElementById('tracking-error');
+    var loadingDiv = document.getElementById('tracking-loading');
+
+    resultDiv.classList.add('d-none');
+    errorDiv.classList.add('d-none');
+    loadingDiv.classList.remove('d-none');
+    btn.disabled = true;
+
+    fetch('{{ path('api_dhl_track') }}?trackingNumber=' + encodeURIComponent(number) + '&service=express')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            loadingDiv.classList.add('d-none');
+            btn.disabled = false;
+
+            if (data.error) {
+                errorDiv.classList.remove('d-none');
+                document.getElementById('error-message').textContent = data.error;
+                return;
+            }
+
+            resultDiv.classList.remove('d-none');
+            document.getElementById('result-status-badge').textContent = data.status || '—';
+            document.getElementById('result-description').textContent = data.description || 'Pas de description.';
+
+            var deliveryEl = document.getElementById('result-delivery-date');
+            if (deliveryEl) {
+                if (data.deliveryDate) {
+                    deliveryEl.textContent = 'Livraison prévue : ' + data.deliveryDate;
+                    deliveryEl.classList.remove('d-none');
+                } else deliveryEl.classList.add('d-none');
+            }
+
+            var serviceEl = document.getElementById('result-service');
+            if (serviceEl) {
+                if (data.service) {
+                    serviceEl.textContent = 'Service : ' + data.service;
+                    serviceEl.classList.remove('d-none');
+                } else serviceEl.classList.add('d-none');
+            }
+
+            var eventsList = document.getElementById('result-events');
+            eventsList.innerHTML = '';
+            (data.events || []).forEach(function(evt) {
+                var li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between';
+                li.innerHTML = '<div><strong>' + (evt.description || '—') + '</strong>' +
+                    (evt.location ? '<br><small class="text-muted"><i class="fas fa-map-marker-alt me-1"></i>' + evt.location + '</small>' : '') +
+                    '</div><small>' + (evt.date || '') + ' ' + (evt.time || '') + '</small>';
+                eventsList.appendChild(li);
+            });
+            if ((data.events || []).length === 0) {
+                eventsList.innerHTML = '<li class="list-group-item text-muted">Aucun événement disponible.</li>';
+            }
+        })
+        .catch(function() {
+            loadingDiv.classList.add('d-none');
+            btn.disabled = false;
+            errorDiv.classList.remove('d-none');
+            document.getElementById('error-message').textContent = 'Erreur de connexion. Réessayez.';
+        });
+});
+</script>
+{% endblock %}

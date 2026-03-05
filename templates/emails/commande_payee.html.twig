@@ -1,0 +1,23 @@
+<div style="font-family: Arial, sans-serif; color:#222; line-height:1.5">
+    <h2 style="margin:0 0 8px">Facture – Maternia</h2>
+    <p style="margin:0 0 10px">
+        Merci pour votre achat. Votre commande <strong>#{{ commande.id }}</strong> est payée.
+    </p>
+
+    <h3 style="margin:16px 0 6px">Détails de la commande</h3>
+    <ul style="margin:0 0 10px; padding-left:18px">
+        {% for p in commande.produits %}
+            <li>{{ p.nom }} — {{ p.prix }} TND</li>
+        {% endfor %}
+    </ul>
+
+    <p style="margin:0 0 6px"><strong>Livraison</strong> : {{ commande.shippingCarrier ?? '—' }}{% if commande.shippingEtaDays %} ({{ commande.shippingEtaDays }} jours){% endif %}</p>
+    <p style="margin:0 0 6px"><strong>Frais de livraison</strong> : {{ commande.shippingCost ?? 0 }} TND</p>
+    <p style="margin:0 0 6px"><strong>Total</strong> : {{ commande.total }} TND</p>
+
+    <hr style="margin:16px 0; border:none; border-top:1px solid #ddd">
+    <p style="margin:0; font-size:12px; color:#666">
+        Maternia — Ceci est un email automatique.
+    </p>
+</div>
+

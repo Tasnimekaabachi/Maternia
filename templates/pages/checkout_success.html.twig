@@ -1,0 +1,108 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Commande confirmée - Maternia{% endblock %}
+
+{% block body %}
+    <div class="container py-5">
+        <div class="row g-4">
+            <div class="col-12">
+                {% if commande.paymentStatus == 'pending_stripe' and app.request.query.get('payment_intent_client_secret') %}
+                <div class="alert alert-info">
+                    <h4 class="alert-heading mb-2">Paiement en cours de traitement</h4>
+                    <p class="mb-0">
+                        Votre paiement par carte est en cours. Vous recevrez une confirmation par email sous peu.
+                    </p>
+                </div>
+                {% elseif commande.paymentStatus == 'paid' %}
+                <div class="alert alert-success">
+                    <h4 class="alert-heading mb-2"><i class="fas fa-check-circle me-2"></i>Paiement confirmé</h4>
+                    <p class="mb-0">
+                        Merci ! Votre commande est payée. Un récapitulatif vous a été envoyé par email.
+                    </p>
+                </div>
+                {% else %}
+                <div class="alert alert-success">
+                    <h4 class="alert-heading mb-2">Merci, votre commande est bien enregistrée</h4>
+                    <p class="mb-0">
+                        Un récapitulatif vous sera envoyé par email si vous avez renseigné votre adresse.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Récapitulatif de la commande #{{ commande.id }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5">Total produits (TND)</dt>
+                            <dd class="col-sm-7">
+                                {# total produits = total - frais de livraison #}
+                                {% set totalProduits = (commande.total ?? 0) - (commande.shippingCost ?? 0) %}
+                                {{ totalProduits|number_format(2, '.', ' ') }} TND
+                            </dd>
+
+                            <dt class="col-sm-5">Frais de livraison</dt>
+                            <dd class="col-sm-7">
+                                {{ commande.shippingCost is not null
+                                    ? (commande.shippingCost|number_format(2, '.', ' ') ~ ' TND')
+                                    : 'À calculer' }}
+                                {% if commande.shippingCarrier %}
+                                    <span class="badge bg-secondary ms-2">{{ commande.shippingCarrier }}</span>
+                                {% endif %}
+                            </dd>
+
+                            <dt class="col-sm-5">Délai estimé</dt>
+                            <dd class="col-sm-7">
+                                {% if commande.shippingEtaDays is not null %}
+                                    {{ commande.shippingEtaDays }} jour(s) ouvrable(s)
+                                {% else %}
+                                    Non renseigné
+                                {% endif %}
+                            </dd>
+
+                            {% if commande.shippingTracking %}
+                            <dt class="col-sm-5">Suivi</dt>
+                            <dd class="col-sm-7">
+                                <a href="{{ path('app_tracking') }}?tracking={{ commande.shippingTracking }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-truck me-1"></i> Suivre mon colis ({{ commande.shippingTracking }})
+                                </a>
+                            </dd>
+                            {% endif %}
+
+                            <dt class="col-sm-5">Total à payer</dt>
+                            <dd class="col-sm-7 fw-bold text-primary">
+                                {{ commande.total|number_format(2, '.', ' ') }} TND
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">Coordonnées de livraison</h6>
+                    </div>
+                    <div class="card-body small">
+                        {% if commande.shippingAddress or commande.shippingCity or commande.shippingPostalCode or commande.shippingCountry %}
+                            <p class="mb-1">{{ commande.shippingAddress }}</p>
+                            <p class="mb-1">
+                                {{ commande.shippingPostalCode }} {{ commande.shippingCity }}
+                            </p>
+                            <p class="mb-0">{{ commande.shippingCountry }}</p>
+                        {% else %}
+                            <p class="mb-0 text-muted">Aucune adresse renseignée.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <a class="btn btn-primary w-100" href="{{ path('app_marketplace') }}">
+                    Retour à la marketplace
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

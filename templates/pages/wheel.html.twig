@@ -1,0 +1,172 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Roue des réductions - Maternia{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 text-center">
+            <h1 class="mb-3">Roue des réductions</h1>
+            <p class="text-muted mb-4">
+                Tentez votre chance pour gagner <strong>-10%</strong>, <strong>-5%</strong> ou rien.
+            </p>
+
+            <div class="mb-3">
+                <label class="form-label">Votre email (pour associer le code à votre wallet)</label>
+                <input type="email" id="wheel-email" class="form-control text-center" placeholder="ex : client@mail.com" required>
+            </div>
+
+            <div class="wheel-wrapper my-4">
+                <div class="wheel" id="wheel">
+                    <div class="segment segment-10">-10%</div>
+                    <div class="segment segment-5">-5%</div>
+                    <div class="segment segment-none">Rien</div>
+                    <div class="center-circle">GO</div>
+                </div>
+                <div class="wheel-pointer"></div>
+            </div>
+
+            <button id="wheel-spin-btn" class="btn btn-primary btn-border-radius px-5">
+                Tourner la roue
+            </button>
+
+            <div id="wheel-result" class="mt-4"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .wheel-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+    .wheel {
+        position: relative;
+        width: 260px;
+        height: 260px;
+        border-radius: 50%;
+        border: 8px solid #f38fb0;
+        overflow: hidden;
+        margin: 0 auto;
+        transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
+        background: #fff;
+    }
+    .wheel-pointer {
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 12px solid transparent;
+        border-right: 12px solid transparent;
+        border-bottom: 18px solid #f38fb0;
+        z-index: 10;
+    }
+    .wheel .segment {
+        position: absolute;
+        width: 50%;
+        height: 50%;
+        left: 50%;
+        top: 50%;
+        transform-origin: 0% 0%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+    /* 3 segments de 120° chacun */
+    .segment-10  { background:#f38fb0; transform: rotate(0deg)    skewY(-30deg); }
+    .segment-5   { background:#ffb347; transform: rotate(120deg)  skewY(-30deg); }
+    .segment-none{ background:#95a5a6; transform: rotate(240deg)  skewY(-30deg); }
+
+    .center-circle {
+        position:absolute;
+        width:90px;
+        height:90px;
+        border-radius:50%;
+        background:#fff;
+        border:3px solid #f38fb0;
+        top:50%;
+        left:50%;
+        transform:translate(-50%, -50%);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-weight:700;
+        color:#f38fb0;
+        pointer-events:none;
+    }
+</style>
+
+<script>
+    (function () {
+        const btn = document.getElementById('wheel-spin-btn');
+        const wheel = document.getElementById('wheel');
+        const result = document.getElementById('wheel-result');
+        const emailInput = document.getElementById('wheel-email');
+        let spinning = false;
+
+        btn?.addEventListener('click', function () {
+            if (spinning) {
+                return;
+            }
+            spinning = true;
+            result.innerHTML = '';
+
+            const turns = 4 + Math.random() * 2;
+            const finalRotation = 360 * turns;
+            wheel.style.transform = 'rotate(' + finalRotation + 'deg)';
+
+            setTimeout(function () {
+                const formData = new FormData();
+                formData.append('email', emailInput.value || '');
+
+                fetch('{{ path('app_wheel_spin') }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.result === 'email_required') {
+                            result.innerHTML =
+                                '<div class="alert alert-warning mt-3">' +
+                                (data.message || 'Merci de saisir votre email avant de jouer.') +
+                                '</div>';
+                        } else if (data.result === 'limit') {
+                            result.innerHTML =
+                                '<div class="alert alert-warning mt-3">' +
+                                (data.message || 'Vous avez déjà atteint le nombre maximal de codes pour ce mois.') +
+                                '</div>';
+                        } else if (data.result === 'win') {
+                            result.innerHTML =
+                                '<div class="alert alert-success mt-3">' +
+                                'Bravo ! Vous avez gagné <strong>-' + data.percent + '%</strong><br>' +
+                                'Votre code promo : <code>' + data.code + '</code><br>' +
+                                '<small>Conservez ce code et saisissez-le lors du paiement.</small>' +
+                                '</div>';
+                        } else {
+                            result.innerHTML =
+                                '<div class="alert alert-secondary mt-3">' +
+                                'Pas de réduction cette fois-ci… Réessayez plus tard !' +
+                                '</div>';
+                        }
+                    })
+                    .catch(() => {
+                        result.innerHTML =
+                            '<div class="alert alert-danger mt-3">' +
+                            'Une erreur est survenue pendant le tirage.' +
+                            '</div>';
+                    })
+                    .finally(() => {
+                        spinning = false;
+                    });
+            }, 3200);
+        });
+    })();
+</script>
+{% endblock %}
+

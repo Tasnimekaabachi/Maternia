@@ -8,6 +8,8 @@ use App\Form\AppointmentType;
 use App\Form\Model\AppointmentData;
 use App\Repository\ProduitRepository;
 use App\Repository\OffreBabySitterRepository;
+use App\Service\WeatherApiService;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,6 +17,8 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class HomeController extends AbstractController
 {
+    private const MARKETPLACE_PER_PAGE = 8;
+
     public function __construct(
         private ConsultationRepository $consultationRepository,
         private ConsultationCreneauRepository $creneauRepository
@@ -30,19 +34,29 @@ final class HomeController extends AbstractController
     }
 
     #[Route('/marketplace', name: 'app_marketplace')]
-    public function marketplace(Request $request, ProduitRepository $produitRepository): Response
+    public function marketplace(Request $request, ProduitRepository $produitRepository, PaginatorInterface $paginator, WeatherApiService $weatherApiService): Response
     {
         $term = $request->query->get('q', '');
+        $categorie = $request->query->get('categorie', '');
+        $page = max(1, (int) $request->query->get('page', 1));
 
-        if ($term) {
-            $produits = $produitRepository->search($term);
-        } else {
-            $produits = $produitRepository->findAll();
-        }
+        $qb = $produitRepository->getQbByCategorieAndSearch(
+            $categorie !== '' ? $categorie : null,
+            $term
+        );
+
+        $pagination = $paginator->paginate($qb, $page, self::MARKETPLACE_PER_PAGE, [
+            'distinct' => true,
+        ]);
+
+        $weather = $weatherApiService->getCurrentWeather();
 
         return $this->render('pages/marketplace.html.twig', [
-            'produits' => $produits,
+            'produits' => $pagination,
+            'pagination' => $pagination,
             'searchTerm' => $term,
+            'categorieActive' => $categorie,
+            'weather' => $weather,
         ]);
     }
 

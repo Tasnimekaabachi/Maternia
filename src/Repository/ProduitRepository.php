@@ -24,6 +24,38 @@ public function search(string $term)
         ->getResult();
 }
 
+/**
+ * QueryBuilder pour catégorie + recherche (pour pagination KnpPaginator).
+ */
+public function getQbByCategorieAndSearch(?string $categorie, string $searchTerm = ''): \Doctrine\ORM\QueryBuilder
+{
+    $qb = $this->createQueryBuilder('p')
+        ->orderBy('p.id', 'ASC');
+    if ($categorie !== null && $categorie !== '') {
+        $qb->andWhere('p.categorie = :cat')
+           ->setParameter('cat', $categorie);
+    }
+    if ($searchTerm !== '') {
+        $qb->andWhere('p.nom LIKE :t')
+           ->setParameter('t', '%'.$searchTerm.'%');
+    }
+    return $qb;
+}
+
+/**
+ * Trouve les produits par catégorie (slug), avec recherche optionnelle.
+ *
+ * @param string|null $categorie Slug : grossesse, bebe, soins, mode, equipement, services
+ * @param string      $searchTerm Terme de recherche optionnel
+ * @return Produit[]
+ */
+public function findByCategorieAndSearch(?string $categorie, string $searchTerm = ''): array
+{
+    return $this->getQbByCategorieAndSearch($categorie, $searchTerm)
+        ->getQuery()
+        ->getResult();
+}
+
     //    /**
     //     * @return Produit[] Returns an array of Produit objects
     //     */

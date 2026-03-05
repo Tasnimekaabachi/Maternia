@@ -4,9 +4,14 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    # Events module parameters
     app.online_meet_link: '%env(default::ONLINE_MEET_LINK)%'
     app.google_meet_credentials_path: '%env(default::GOOGLE_MEET_CREDENTIALS_PATH)%'
     app.google_meet_calendar_id: '%env(default::GOOGLE_MEET_CALENDAR_ID)%'
+    
+    # Marketplace module parameters
+    stripe_publishable_key: '%env(default::STRIPE_PUBLISHABLE_KEY)%'
+    stripe_currency_default: 'eur'
 
 services:
     # default configuration for services in *this* file
@@ -23,6 +28,7 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    # Events module services
     App\Service\HospitalmapService:
         arguments:
             $apiKey: '%env(GEOAPIFY_API_KEY)%'
@@ -30,14 +36,6 @@ services:
     App\Service\ChatbotService:
         arguments:
             $apiKey: '%env(GEMINI_API_KEY)%'
-    App\Service\NotificationService:
-        arguments:
-            $fromEmail: '%env(MAILER_FROM_EMAIL)%'
-            $fromName: '%env(MAILER_FROM_NAME)%'
-            $twilioSid: '%env(default::TWILIO_SID)%'
-            $twilioToken: '%env(default::TWILIO_TOKEN)%'
-            $twilioSmsFrom: '%env(default::TWILIO_SMS_FROM)%'
-            $twilioWhatsAppFrom: '%env(default::TWILIO_WHATSAPP_FROM)%'
 
     App\Service\GoogleMeetService:
         arguments:
@@ -47,6 +45,59 @@ services:
     App\Service\CartService:
         arguments:
             $produitRepository: '@App\Repository\ProduitRepository'
+
+    # Marketplace shipping services
+    App\Service\Shipping\DistanceService:
+        arguments:
+            $apiKey: '%env(OPENROUTE_API_KEY)%'
+            $warehouseAddress: '%env(SHIPPING_WAREHOUSE_ADDRESS)%'
+
+    App\Service\Shipping\DhlQuoteClient:
+        arguments:
+            $baseUrl: '%env(DHL_API_BASE_URL)%'
+            $accountNumber: '%env(DHL_ACCOUNT_NUMBER)%'
+            $username: '%env(DHL_USERNAME)%'
+            $password: '%env(DHL_PASSWORD)%'
+
+    App\Service\Shipping\DhlShipmentClient:
+        arguments:
+            $baseUrl: '%env(DHL_API_BASE_URL)%'
+            $accountNumber: '%env(DHL_ACCOUNT_NUMBER)%'
+            $username: '%env(DHL_USERNAME)%'
+            $password: '%env(DHL_PASSWORD)%'
+            $shipperName: 'Maternia'
+            $shipperAddress: '%env(SHIPPING_WAREHOUSE_ADDRESS)%'
+
+    App\Service\Shipping\DhlTrackingClient:
+        arguments:
+            $apiKey: '%env(default::DHL_TRACKING_API_KEY)%'
+
+    App\Service\Shipping\AramexQuoteClient:
+        arguments:
+            $enabled: '%env(bool:ARAMEX_ENABLED)%'
+            $accountNumber: '%env(ARAMEX_ACCOUNT_NUMBER)%'
+            $username: '%env(ARAMEX_USERNAME)%'
+            $password: '%env(ARAMEX_PASSWORD)%'
+            $rateUrl: '%env(ARAMEX_RATE_URL)%'
+
+    # Notification service - merged from both branches
+    App\Service\NotificationService:
+        arguments:
+            $fromEmail: '%env(MAILER_FROM_EMAIL)%'
+            $fromName: '%env(MAILER_FROM_NAME)%'
+            $mailerFrom: '%env(MAILER_FROM)%'
+            $twilioSid: '%env(default::TWILIO_ACCOUNT_SID)%'
+            $twilioToken: '%env(default::TWILIO_AUTH_TOKEN)%'
+            $twilioSmsFrom: '%env(default::TWILIO_FROM_NUMBER)%'
+            $twilioWhatsAppFrom: '%env(default::TWILIO_WHATSAPP_FROM)%'
+
+    # Payment service
+    App\Service\PaymentService:
+        arguments:
+            $secretKey: '%env(default::STRIPE_SECRET_KEY)%'
+            $webhookSecret: '%env(default::STRIPE_WEBHOOK_SECRET)%'
+            $currency: '%env(default:stripe_currency_default:STRIPE_CURRENCY)%'
+            $tndToEurRate: '%env(float:STRIPE_TND_TO_EUR)%'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

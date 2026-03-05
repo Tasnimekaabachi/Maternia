@@ -17,12 +17,21 @@
     <div class="admin-card">
         <div class="admin-card-header">Formulaire produit</div>
         <div class="admin-card-body">
-            {{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
+            {{ form_start(form, { attr: { novalidate: 'novalidate', enctype: 'multipart/form-data' } }) }}
                 {{ form_errors(form) }}
                 {{ form_row(form.nom) }}
                 {{ form_row(form.description) }}
                 {{ form_row(form.prix) }}
                 {{ form_row(form.stock) }}
+                {{ form_row(form.ratingAverage) }}
+                {{ form_row(form.categorie) }}
+                {{ form_row(form.imageFile) }}
+                {% if produit.imageName %}
+                <div class="mb-3">
+                    <label class="form-label">Image actuelle</label>
+                    <div><img src="{{ asset('uploads/produits/' ~ produit.imageName) }}" alt="{{ produit.nom }}" class="img-thumbnail" style="max-height: 150px;"></div>
+                </div>
+                {% endif %}
 
                 <button class="btn btn-primary mt-3">Enregistrer</button>
             {{ form_end(form) }}

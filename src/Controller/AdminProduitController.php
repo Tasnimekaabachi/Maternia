@@ -7,6 +7,8 @@ use App\Form\ProduitType;
 use App\Repository\ProduitRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,12 +53,10 @@ class AdminProduitController extends AbstractController
         $qb = $repo->createQueryBuilder('p');
 
         if ($term) {
-            $qb
-                ->andWhere('p.nom LIKE :t OR p.description LIKE :t')
-                ->setParameter('t', '%'.$term.'%');
+            $qb->andWhere('p.nom LIKE :t OR p.description LIKE :t')
+               ->setParameter('t', '%'.$term.'%');
         }
 
-        // Tri
         if ($sort === 'price_asc') {
             $qb->orderBy('p.prix', 'ASC');
         } elseif ($sort === 'price_desc') {
@@ -81,7 +81,8 @@ class AdminProduitController extends AbstractController
     #[Route('/produit/add', name: 'admin_produit_add')]
     public function add(
         Request $request,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        SluggerInterface $slugger
     ): Response {
         $produit = new Produit();
 
@@ -89,6 +90,7 @@ class AdminProduitController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->handleImageUpload($form, $produit, $slugger);
             $em->persist($produit);
             $em->flush();
 
@@ -102,12 +104,13 @@ class AdminProduitController extends AbstractController
     }
 
     #[Route('/produit/{id}/edit', name: 'admin_produit_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Produit $produit, EntityManagerInterface $em): Response
+    public function edit(Request $request, Produit $produit, EntityManagerInterface $em, SluggerInterface $slugger): Response
     {
         $form = $this->createForm(ProduitType::class, $produit);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->handleImageUpload($form, $produit, $slugger);
             $em->flush();
             $this->addFlash('success', 'Le produit a bien été modifié.');
 
@@ -120,10 +123,34 @@ class AdminProduitController extends AbstractController
         ]);
     }
 
+    private function handleImageUpload($form, Produit $produit, SluggerInterface $slugger): void
+    {
+        $imageFile = $form->get('imageFile')->getData();
+        if (!$imageFile) {
+            return;
+        }
+
+        $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+        $safeFilename = $slugger->slug($originalFilename);
+        $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+
+        $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/produits';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        try {
+            $imageFile->move($uploadDir, $newFilename);
+            $produit->setImageName($newFilename);
+        } catch (FileException $e) {
+            // En cas d'erreur, on garde l'ancienne image si édition
+        }
+    }
+
     #[Route('/produit/{id}/delete', name: 'admin_produit_delete', methods: ['POST'])]
     public function delete(Request $request, Produit $produit, EntityManagerInterface $em): RedirectResponse
     {
-        if ($this->isCsrfTokenValid('delete_admin_produit'.$produit->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete_admin_produit'.$produit->getId(), (string) $request->request->get('_token'))) {
             $em->remove($produit);
             $em->flush();
             $this->addFlash('success', 'Le produit a bien été supprimé.');
