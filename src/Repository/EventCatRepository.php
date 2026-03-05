@@ -6,13 +6,19 @@ use App\Entity\EventCat;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-
+/**
+ * @extends ServiceEntityRepository<EventCat>
+ */
 class EventCatRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, EventCat::class);
     }
+
+    /**
+     * @return EventCat[]
+     */
     public function findWithSearchAndSort(
         ?string $searchTerm,
         string $sortBy = 'name',

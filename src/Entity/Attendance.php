@@ -13,7 +13,7 @@ class Attendance
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private ?int $id = null; // @phpstan-ignore property.unusedType
 
     #[ORM\ManyToOne(inversedBy: 'attendances')]
     #[ORM\JoinColumn(nullable: false)]

@@ -20,9 +20,9 @@ final class EventCatController extends AbstractController
     #[Route(name: 'app_event_cat_index', methods: ['GET'])]
     public function index(Request $request, EventCatRepository $eventCatRepository): Response
     {
-        $searchTerm = $request->query->get('search', '');
-        $sortBy = $request->query->get('sort_by', 'name');
-        $sortOrder = $request->query->get('sort_order', 'ASC');
+        $searchTerm = (string) $request->query->get('search', '');
+        $sortBy = (string) $request->query->get('sort_by', 'name');
+        $sortOrder = (string) $request->query->get('sort_order', 'ASC');
         $event_cats = $eventCatRepository->findWithSearchAndSort($searchTerm, $sortBy, $sortOrder);
 
         return $this->render('event_cat/index.html.twig', [
@@ -67,15 +67,21 @@ final class EventCatController extends AbstractController
 
         $response = new StreamedResponse(function () use ($eventCats) {
             $handle = fopen('php://output', 'w');
+            if ($handle === false) {
+                return;
+            }
 
             fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
             fputcsv($handle, ['ID', 'Nom', 'Description', 'Nombre d\'événements', 'Nombre de participants']);
 
+            /** @var EventCat $cat */
             foreach ($eventCats as $cat) {
-                $eventCount = count($cat->getEvents());
+                $events = $cat->getEvents();
+                $eventCount = count($events);
                 $participantCount = 0;
-                foreach ($cat->getEvents() as $event) {
+                /** @var \App\Entity\Event $event */
+                foreach ($events as $event) {
                     $participantCount += count($event->getAttendances());
                 }
 
@@ -83,7 +89,7 @@ final class EventCatController extends AbstractController
                     $cat->getId(),
                     $cat->getName(),
                     $cat->getDescription(),
-                    count($cat->getEvents()),
+                    $eventCount,
                     $participantCount
                 ]);
             }

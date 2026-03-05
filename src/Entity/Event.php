@@ -17,7 +17,7 @@ class Event
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private ?int $id = null; // @phpstan-ignore property.unusedType
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Le titre est obligatoire")]
@@ -74,17 +74,21 @@ class Event
     #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $endTime = null;
 
+    /**
+     * @var Collection<int, Requirement>
+     */
     #[ORM\ManyToMany(targetEntity: Requirement::class, inversedBy: 'events')]
     #[ORM\JoinTable(name: 'event_requirement')]
     private Collection $requirements;
 
     #[ORM\Column(options: ["default" => false])]
-    private ?bool $isOutdoor = false;
+    private bool $isOutdoor = false; // Kept non-nullable with default from old
 
     public function __construct()
     {
         $this->requirements = new ArrayCollection();
         $this->attendances = new ArrayCollection();
+        $this->isOutdoor = false; // Ensure default value
     }
 
     public function getImage(): ?string
@@ -302,7 +306,7 @@ class Event
         return $this;
     }
 
-    public function isOutdoor(): ?bool
+    public function isOutdoor(): bool
     {
         return $this->isOutdoor;
     }
@@ -313,7 +317,7 @@ class Event
         return $this;
     }
 
-    public function validateTiming(ExecutionContextInterface $context, $payload): void
+    public function validateTiming(ExecutionContextInterface $context, mixed $payload): void // Kept mixed type from new
     {
         if ($this->isWeekly === true) {
             if (!$this->dayOfWeek) {

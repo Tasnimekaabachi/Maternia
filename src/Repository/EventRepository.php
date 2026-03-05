@@ -6,7 +6,9 @@ use App\Entity\Event;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-
+/**
+ * @extends ServiceEntityRepository<Event>
+ */
 class EventRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -14,6 +16,9 @@ class EventRepository extends ServiceEntityRepository
         parent::__construct($registry, Event::class);
     }
 
+    /**
+     * @return Event[]
+     */
     public function findWithSearchAndSort(
         ?string $searchTerm,
         string $sortBy = 'startAt',
@@ -68,7 +73,8 @@ class EventRepository extends ServiceEntityRepository
             }
         }
 
-        $allowedSortFields = ['title', 'startAt', 'endAt', 'location'];
+        // Fixed: Added 'category' to allowed sort fields
+        $allowedSortFields = ['title', 'startAt', 'endAt', 'location', 'category'];
         $allowedSortOrders = ['ASC', 'DESC'];
 
         $sortBy = in_array($sortBy, $allowedSortFields) ? $sortBy : 'startAt';
@@ -82,6 +88,10 @@ class EventRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    /**
+     * @return Event[]
+     */
     public function findUpcomingEvents(?int $limit = null): array
     {
         $qb = $this->createQueryBuilder('e')
@@ -94,6 +104,9 @@ class EventRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @return Event[]
+     */
     public function findRecents(int $limit = 5): array
     {
         return $this->createQueryBuilder('e')

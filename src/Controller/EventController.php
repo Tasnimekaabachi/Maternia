@@ -55,6 +55,9 @@ class EventController extends AbstractController
 
         $response = new StreamedResponse(function () use ($events) {
             $handle = fopen('php://output', 'w');
+            if ($handle === false) {
+                return;
+            }
 
             fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
@@ -137,13 +140,13 @@ class EventController extends AbstractController
     #[Route('/admin/event/', name: 'app_event_index', methods: ['GET'])]
     public function index(Request $request, EventRepository $eventRepository, \App\Repository\EventCatRepository $eventCatRepository): Response
     {
-        $searchTerm = $request->query->get('search', '');
-        $sortBy = $request->query->get('sort_by', 'startAt');
-        $sortOrder = $request->query->get('sort_order', 'DESC');
+        $searchTerm = (string) $request->query->get('search', '');
+        $sortBy = (string) $request->query->get('sort_by', 'startAt');
+        $sortOrder = (string) $request->query->get('sort_order', 'DESC');
 
         $categoryId = $request->query->get('category_id');
-        $status = $request->query->get('status');
-        $organizer = $request->query->get('organizer');
+        $status = (string) $request->query->get('status', '');
+        $organizer = (string) $request->query->get('organizer', '');
 
         $events = $eventRepository->findWithSearchAndSort(
             $searchTerm,
@@ -194,8 +197,9 @@ class EventController extends AbstractController
                     $event->setImage($selectedImage);
                 }
 
-                if ($this->getUser()) {
-                    $event->setCreator($this->getUser());
+                $user = $this->getUser();
+                if ($user instanceof \App\Entity\User) {
+                    $event->setCreator($user);
                 }
 
                 $entityManager->persist($event);
@@ -241,8 +245,9 @@ class EventController extends AbstractController
                     $event->setImage($selectedImage);
                 }
 
-                if ($this->getUser()) {
-                    $event->setCreator($this->getUser());
+                $user = $this->getUser();
+                if ($user instanceof \App\Entity\User) {
+                    $event->setCreator($user);
                 }
 
                 $entityManager->persist($event);
@@ -383,7 +388,8 @@ class EventController extends AbstractController
     #[Route('/admin/event/{id}', name: 'admin_event_delete', methods: ['POST'])]
     public function delete(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete' . $event->getId(), $request->request->get('_token'))) {
+        $token = $request->request->get('_token');
+        if ($this->isCsrfTokenValid('delete' . $event->getId(), is_string($token) ? $token : null)) {
             $entityManager->remove($event);
             $entityManager->flush();
 
@@ -401,7 +407,8 @@ class EventController extends AbstractController
             return $this->redirectToRoute('app_events');
         }
 
-        if ($this->isCsrfTokenValid('delete' . $event->getId(), $request->request->get('_token'))) {
+        $token = $request->request->get('_token');
+        if ($this->isCsrfTokenValid('delete' . $event->getId(), is_string($token) ? $token : null)) {
             $entityManager->remove($event);
             $entityManager->flush();
             $this->addFlash('success', 'Votre événement a été supprimé.');
@@ -436,7 +443,9 @@ class EventController extends AbstractController
         }
 
         $attendance = new Attendance();
-        $attendance->setUser($user);
+        if ($user instanceof \App\Entity\User) {
+            $attendance->setUser($user);
+        }
         $attendance->setEvent($event);
 
         $entityManager->persist($attendance);
@@ -525,7 +534,7 @@ class EventController extends AbstractController
 
         $eventId = $attendance->getEvent()->getId();
 
-        if ($this->isCsrfTokenValid('remove' . $attendance->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('remove' . $attendance->getId(), (string) $request->request->get('_token'))) {
             $entityManager->remove($attendance);
             $entityManager->flush();
 
@@ -544,10 +553,18 @@ class EventController extends AbstractController
             'limit' => $limit
         ]);
     }
+
+    /**
+     * @return string[]
+     */
     private function getExistingImages(): array
     {
         $images = [];
-        $imgDir = $this->getParameter('kernel.project_dir') . '/public/img/events/';
+        $projectDir = $this->getParameter('kernel.project_dir');
+        if (!is_string($projectDir)) {
+            throw new \RuntimeException('Project directory must be a string');
+        }
+        $imgDir = $projectDir . '/public/img/events/';
 
         if (file_exists($imgDir)) {
             $finder = new Finder();
