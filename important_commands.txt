@@ -50,4 +50,6 @@ php bin/console debug:autowiring
 composer install
 > Download requiered dependencies for the project
 
+php bin/console doctrine:schema:update --force
+
 =========================================================
