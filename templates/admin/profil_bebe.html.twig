@@ -75,6 +75,16 @@
                                             {% endif %}
                                         </td>
                                         <td class="text-end">
+                                            <a href="{{ path('admin_messagerie') }}?offre_id={{ offre.id }}"
+                                               class="btn btn-sm btn-outline-primary"
+                                               title="Contacter via messagerie">
+                                                <i class="fas fa-comments"></i>
+                                            </a>
+                                            <a href="{{ path('admin_calendrier_reservations') }}?offre_id={{ offre.id }}"
+                                               class="btn btn-sm btn-outline-success"
+                                               title="Réservations / Calendrier">
+                                                <i class="fas fa-calendar-check"></i>
+                                            </a>
                                             <a href="{{ path('app_offre_baby_sitter_show', {'id': offre.id}) }}" class="btn btn-sm btn-outline-info">
                                                 <i class="fas fa-eye"></i>
                                             </a>

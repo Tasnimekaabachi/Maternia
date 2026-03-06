@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Repository\OffreBabySitterRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -10,9 +11,19 @@ use Symfony\Component\Routing\Attribute\Route;
 final class DashboardController extends AbstractController
 {
     #[Route('', name: 'dashboard', methods: ['GET'])]
-    public function dashboard(): Response
+    public function dashboard(OffreBabySitterRepository $offreBabySitterRepository): Response
     {
-        return $this->render('admin/dashboard.html.twig');
+        return $this->render('admin/dashboard.html.twig', [
+            'offres_babysitter' => $offreBabySitterRepository->findAll(),
+        ]);
+    }
+
+    #[Route('/analyse-pleurs', name: 'analyse_pleurs', methods: ['GET'])]
+    public function analysePleurs(OffreBabySitterRepository $offreBabySitterRepository): Response
+    {
+        return $this->render('admin/analyse_pleurs.html.twig', [
+            'offres_babysitter' => $offreBabySitterRepository->findAll(),
+        ]);
     }
 
     #[Route('/suivi-grossesse', name: 'suivi_grossesse', methods: ['GET'])]

@@ -3,11 +3,13 @@
 namespace App\Form;
 
 use App\Entity\OffreBabySitter;
+use App\Service\VillesTunisie;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -20,35 +22,11 @@ class OffreBabySitterType extends AbstractType
         $builder
             ->add('nomBabysitter', TextType::class)
             ->add('telephone', TextType::class)
+            ->add('email', EmailType::class, ['required' => false, 'label' => 'Email (pour alertes)'])
             ->add('experience', IntegerType::class)
             ->add('ville', ChoiceType::class, [
                 'placeholder' => 'Choisir une ville',
-                'choices' => [
-                    'Tunis' => 'Tunis',
-                    'Ariana' => 'Ariana',
-                    'Ben Arous' => 'Ben Arous',
-                    'La Manouba' => 'Manouba',
-                    'Nabeul' => 'Nabeul',
-                    'Zaghouan' => 'Zaghouan',
-                    'Bizerte' => 'Bizerte',
-                    'Béja' => 'Beja',
-                    'Jendouba' => 'Jendouba',
-                    'Le Kef' => 'Kef',
-                    'Siliana' => 'Siliana',
-                    'Kairouan' => 'Kairouan',
-                    'Kasserine' => 'Kasserine',
-                    'Sidi Bouzid' => 'Sidi Bouzid',
-                    'Sousse' => 'Sousse',
-                    'Monastir' => 'Monastir',
-                    'Mahdia' => 'Mahdia',
-                    'Sfax' => 'Sfax',
-                    'Gafsa' => 'Gafsa',
-                    'Tozeur' => 'Tozeur',
-                    'Kébili' => 'Kebili',
-                    'Gabès' => 'Gabes',
-                    'Médenine' => 'Medenine',
-                    'Tataouine' => 'Tataouine',
-                ],
+                'choices' => VillesTunisie::getChoicesForm(),
             ])
             ->add('tarif', NumberType::class, [
                 'scale' => 2,

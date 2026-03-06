@@ -35,6 +35,10 @@ class OffreBabySitter
     )]
     private ?string $telephone = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Email(message: 'L\'adresse email n\'est pas valide.')]
+    private ?string $email = null;
+
     #[ORM\Column]
     #[Assert\NotNull(message: 'L\'expérience est obligatoire.')]
     #[Assert\PositiveOrZero(message: 'L\'expérience doit être un nombre positif.')]
@@ -71,9 +75,19 @@ class OffreBabySitter
     #[ORM\OneToMany(mappedBy: 'offre', targetEntity: DemandeBabySitter::class, cascade: ['persist', 'remove'])]
     private Collection $demandes;
 
+    /** @var Collection<int, Conversation> */
+    #[ORM\OneToMany(mappedBy: 'offre', targetEntity: Conversation::class, cascade: ['persist', 'remove'])]
+    private Collection $conversations;
+
+    /** @var Collection<int, Reservation> */
+    #[ORM\OneToMany(mappedBy: 'offre', targetEntity: Reservation::class, cascade: ['persist', 'remove'])]
+    private Collection $reservations;
+
     public function __construct()
     {
         $this->demandes = new ArrayCollection();
+        $this->conversations = new ArrayCollection();
+        $this->reservations = new ArrayCollection();
     }
 
     // ---------------- GETTERS & SETTERS ----------------
@@ -102,6 +116,17 @@ class OffreBabySitter
     public function setTelephone(string $telephone): self
     {
         $this->telephone = $telephone;
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
         return $this;
     }
 
@@ -183,6 +208,40 @@ class OffreBabySitter
             if ($demande->getOffre() === $this) {
                 $demande->setOffre(null);
             }
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Conversation>
+     */
+    public function getConversations(): Collection
+    {
+        return $this->conversations;
+    }
+
+    public function addConversation(Conversation $conversation): self
+    {
+        if (!$this->conversations->contains($conversation)) {
+            $this->conversations->add($conversation);
+            $conversation->setOffre($this);
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Reservation>
+     */
+    public function getReservations(): Collection
+    {
+        return $this->reservations;
+    }
+
+    public function addReservation(Reservation $reservation): self
+    {
+        if (!$this->reservations->contains($reservation)) {
+            $this->reservations->add($reservation);
+            $reservation->setOffre($this);
         }
         return $this;
     }
