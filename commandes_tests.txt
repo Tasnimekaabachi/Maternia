@@ -1,0 +1,25 @@
+================================================
+   MATERNIA - Commandes de tests
+================================================
+
+--- SETUP (première fois seulement) ---
+
+php bin/console doctrine:database:create --env=test
+php bin/console doctrine:schema:create --env=test
+
+
+--- 1. TESTS UNITAIRES (PHPUnit) ---
+
+php bin/phpunit tests/Entity tests/Controller/MamanControllerTest.php tests/Controller/GrosesseControllerTest.php tests/Controller/MamanGrossesseControllerTest.php --testdox
+
+
+--- 2. TESTS STATIQUES (PhpStan niveau 6) ---
+
+php vendor/bin/phpstan analyse src/Service/BebeSemaineService.php src/Service/ChatbotService.php src/Service/NutritionService.php src/Service/RiskPredictionService.php src/Service/HospitalmapService.php src/Service/ConseilsSuiviService.php src/Service/MailerService.php src/Entity/Maman.php src/Entity/Grosesse.php src/Controller/MamanController.php src/Controller/GrosesseController.php src/Controller/MamanGrossesseController.php --level=6
+
+
+--- 3. DOCTRINE DOCTOR ---
+
+php bin/console doctrine:schema:validate
+php bin/console doctrine:mapping:info
+php bin/console doctrine:migrations:status
