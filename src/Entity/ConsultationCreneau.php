@@ -142,8 +142,10 @@ class ConsultationCreneau
     {
         $this->dateDebut = $dateDebut;
         if ($dateDebut) {
-            $this->jour = \DateTime::createFromFormat('Y-m-d', $dateDebut->format('Y-m-d'));
-            $this->heureDebut = \DateTime::createFromFormat('H:i:s', $dateDebut->format('H:i:s'));
+            $jour = \DateTime::createFromFormat('Y-m-d', $dateDebut->format('Y-m-d'));
+            $this->jour = $jour ?: null;
+            $heureDebut = \DateTime::createFromFormat('H:i:s', $dateDebut->format('H:i:s'));
+            $this->heureDebut = $heureDebut ?: null;
         }
         return $this;
     }
@@ -157,7 +159,8 @@ class ConsultationCreneau
     {
         $this->dateFin = $dateFin;
         if ($dateFin) {
-            $this->heureFin = \DateTime::createFromFormat('H:i:s', $dateFin->format('H:i:s'));
+            $heureFin = \DateTime::createFromFormat('H:i:s', $dateFin->format('H:i:s'));
+            $this->heureFin = $heureFin ?: null;
         }
         return $this;
     }
@@ -197,31 +200,29 @@ class ConsultationCreneau
         $this->syncDates();
         return $this;
     }
-
-    private function syncDates(): void
-    {
-        if ($this->jour) {
-            if ($this->heureDebut) {
-                $dtDebut = clone $this->jour;
-                $dtDebut = $dtDebut->setTime(
-                    (int) $this->heureDebut->format('H'),
-                    (int) $this->heureDebut->format('i'),
-                    (int) $this->heureDebut->format('s')
-                );
-                $this->dateDebut = $dtDebut;
-            }
-            if ($this->heureFin) {
-                $dtFin = clone $this->jour;
-                $dtFin = $dtFin->setTime(
-                    (int) $this->heureFin->format('H'),
-                    (int) $this->heureFin->format('i'),
-                    (int) $this->heureFin->format('s')
-                );
-                $this->dateFin = $dtFin;
-            }
+private function syncDates(): void
+{
+    if ($this->jour) {
+        if ($this->heureDebut) {
+            $dtDebut = \DateTime::createFromInterface($this->jour);
+            $dtDebut->setTime(
+                (int) $this->heureDebut->format('H'),
+                (int) $this->heureDebut->format('i'),
+                (int) $this->heureDebut->format('s')
+            );
+            $this->dateDebut = $dtDebut;
+        }
+        if ($this->heureFin) {
+            $dtFin = \DateTime::createFromInterface($this->jour);
+            $dtFin->setTime(
+                (int) $this->heureFin->format('H'),
+                (int) $this->heureFin->format('i'),
+                (int) $this->heureFin->format('s')
+            );
+            $this->dateFin = $dtFin;
         }
     }
-
+}
     public function getReservation(): ?ReservationClient
     {
         return $this->reservation;
