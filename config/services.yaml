@@ -104,5 +104,11 @@ services:
         arguments:
             $publicDir: '%kernel.project_dir%/public'
 
+    # Babysitter module services
+    App\Controller\CryAnalysisController:
+        arguments:
+            $mailerDsn: '%env(MAILER_DSN)%'
+            $twilioDsn: '%env(TWILIO_DSN)%'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

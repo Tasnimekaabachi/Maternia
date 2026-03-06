@@ -1,0 +1,101 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Analyse pleur bébé{% endblock %}
+{% block page_title %}Analyse pleur bébé{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
+        <span>/</span>
+        <span>Analyse pleur bébé</span>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="admin-card" data-controller="audio-analyzer">
+        <div class="admin-card-header">Analyse des pleurs (audio)</div>
+        <div class="admin-card-body">
+            <p class="mb-3">
+                Autorisez l’accès au micro pour capturer les pleurs, analyser le spectre sonore
+                (fréquences / intensité) et envoyer le flux vers le modèle de classification.
+            </p>
+
+            <div class="mb-3 row g-2 align-items-end">
+                <div class="col-12 col-md-4">
+                    <label class="form-label"><strong>Bébé</strong></label>
+                    <input type="text"
+                           class="form-control"
+                           placeholder="Ex: Adam"
+                           data-audio-analyzer-target="babyName" />
+                </div>
+                <div class="col-12 col-md-8">
+                    <label class="form-label"><strong>Babysitter à alerter</strong></label>
+                    <select class="form-select" data-audio-analyzer-target="offreId">
+                        <option value="">— Choisir une babysitter —</option>
+                        {% for offre in offres_babysitter|default([]) %}
+                            <option value="{{ offre.id }}">
+                                {{ offre.nomBabysitter }} ({{ offre.ville }}) — {{ offre.telephone }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <small class="text-muted">L’alerte sera enregistrée et la babysitter + le parent prévenus par SMS/email (retour du bébé à la maison).</small>
+                </div>
+            </div>
+            <div class="mb-3 row g-2 align-items-end">
+                <div class="col-12 col-md-4">
+                    <label class="form-label"><strong>Nom du parent</strong></label>
+                    <input type="text"
+                           class="form-control"
+                           placeholder="Ex: Marie Dupont"
+                           data-audio-analyzer-target="parentName" />
+                </div>
+                <div class="col-12 col-md-4">
+                    <label class="form-label"><strong>Email du parent</strong></label>
+                    <input type="email"
+                           class="form-control"
+                           placeholder="parent@exemple.com"
+                           data-audio-analyzer-target="parentEmail" />
+                </div>
+                <div class="col-12 col-md-4">
+                    <small class="text-muted">Pour recevoir l’email « récupérez votre bébé » à la maison.</small>
+                </div>
+            </div>
+
+            <div class="mb-3 d-flex gap-2 flex-wrap">
+                <button type="button"
+                        class="btn btn-primary"
+                        data-action="click->audio-analyzer#start">
+                    Démarrer la capture
+                </button>
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        data-action="click->audio-analyzer#stop">
+                    Arrêter
+                </button>
+                <button type="button"
+                        class="btn btn-outline-primary"
+                        data-action="click->audio-analyzer#sendMailOnly"
+                        data-audio-analyzer-target="mailOnlyButton">
+                    Mailing seulement
+                </button>
+            </div>
+
+            <div class="mb-3">
+                <strong>Statut :</strong>
+                <span data-audio-analyzer-target="status">En attente…</span>
+            </div>
+
+            <div class="mb-3">
+                <strong>Dernière classification :</strong>
+                <span data-audio-analyzer-target="classification">—</span>
+            </div>
+
+            <div>
+                <strong>Spectre fréquentiel :</strong>
+                <canvas data-audio-analyzer-target="canvas"
+                        style="width: 100%; max-width: 600px; height: 200px; border-radius: 8px; background: #0b0c1f;"></canvas>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

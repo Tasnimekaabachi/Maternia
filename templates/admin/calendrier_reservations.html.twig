@@ -1,0 +1,273 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Calendrier & Réservations{% endblock %}
+{% block page_title %}Calendrier & Réservations{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
+        <span>/</span>
+        <span>Calendrier & Réservations</span>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <i class="fas fa-calendar-check me-2"></i>
+            Calendrier et réservations babysitter
+        </div>
+        <div class="admin-card-body">
+            <p class="mb-3 text-muted">
+                Filtrer par babysitter, consulter les réservations et accepter ou refuser les demandes.
+            </p>
+
+            <form method="get" class="row g-2 mb-4">
+                <div class="col-12 col-md-4">
+                    <label class="form-label">Babysitter</label>
+                    <select name="offre_id" class="form-select">
+                        <option value="">Toutes</option>
+                        {% for o in offres_babysitter|default([]) %}
+                            <option value="{{ o.id }}" {{ (offre_id_selected|default('')) == o.id ? 'selected' : '' }}>{{ o.nomBabysitter }} ({{ o.ville }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">Filtrer</button>
+                </div>
+            </form>
+
+            <h6 class="mb-2">Créer une réservation</h6>
+            <div class="admin-card mb-4" style="border: 1px solid #e0e0e0;">
+                <div class="admin-card-body">
+                    <div class="row g-3" id="form-reservation">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Babysitter</label>
+                            <select class="form-select" id="new-res-offre">
+                                <option value="">— Choisir —</option>
+                                {% for o in offres_babysitter|default([]) %}
+                                    <option value="{{ o.id }}" {{ (offre_id_selected|default('')) == o.id ? 'selected' : '' }}>{{ o.nomBabysitter }} ({{ o.ville }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Nom du parent</label>
+                            <input type="text" class="form-control" id="new-res-name" placeholder="Prénom Nom">
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Email du parent</label>
+                            <input type="email" class="form-control" id="new-res-email" placeholder="parent@exemple.com">
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Date &amp; heure début</label>
+                            <input type="datetime-local" class="form-control" id="new-res-debut">
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Date &amp; heure fin</label>
+                            <input type="datetime-local" class="form-control" id="new-res-fin">
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Message (optionnel)</label>
+                            <input type="text" class="form-control" id="new-res-message" placeholder="Informations complémentaires…">
+                        </div>
+                        <div class="col-12">
+                            <button type="button" class="btn btn-success" id="btn-create-reservation">
+                                <i class="fas fa-plus me-1"></i> Créer la réservation
+                            </button>
+                            <span id="res-feedback" class="ms-3 small"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h6 class="mb-2">Calendrier visuel</h6>
+            <div id="reservation-calendar" class="mb-4" style="min-height: 420px; background:#fff; border:1px solid #e0e0e0; border-radius:6px; padding:12px;"></div>
+
+            <h6 class="mb-2">Réservations</h6>
+            <div class="table-responsive mb-4">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Babysitter</th>
+                            <th>Parent</th>
+                            <th>Début</th>
+                            <th>Fin</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in reservations|default([]) %}
+                            <tr data-reservation-id="{{ r.id }}">
+                                <td>{{ r.offre.nomBabysitter }}</td>
+                                <td>{{ r.parentName }} ({{ r.parentEmail }})</td>
+                                <td>{{ r.dateDebut|date('d/m/Y H:i') }}</td>
+                                <td>{{ r.dateFin|date('d/m/Y H:i') }}</td>
+                                <td>
+                                    {% if r.statut == 'demande' %}
+                                        <span class="badge bg-warning text-dark">Demande</span>
+                                    {% elseif r.statut == 'acceptee' %}
+                                        <span class="badge bg-success">Acceptée</span>
+                                    {% elseif r.statut == 'refusee' %}
+                                        <span class="badge bg-danger">Refusée</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ r.statut }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if r.statut == 'demande' %}
+                                        <button type="button" class="btn btn-sm btn-success btn-reservation-accept" data-id="{{ r.id }}">Accepter</button>
+                                        <button type="button" class="btn btn-sm btn-danger btn-reservation-refuse" data-id="{{ r.id }}">Refuser</button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-muted">Aucune réservation.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% block javascripts %}
+        {{ parent() }}
+        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+        <script>
+(function () {
+    /* ---- Reservation création ---- */
+    const apiBase = '{{ path('api_reservations_list')|e('js') }}'.replace(/\/$/, '');
+
+    // Auto-select offre from URL
+    (function () {
+        const params = new URLSearchParams(window.location.search);
+        const preId = params.get('offre_id');
+        if (preId) {
+            const sel = document.getElementById('new-res-offre');
+            if (sel) sel.value = preId;
+        }
+    })();
+
+    document.getElementById('btn-create-reservation').addEventListener('click', function () {
+        const offreId  = document.getElementById('new-res-offre').value;
+        const name     = document.getElementById('new-res-name').value.trim();
+        const email    = document.getElementById('new-res-email').value.trim();
+        const debut    = document.getElementById('new-res-debut').value;
+        const fin      = document.getElementById('new-res-fin').value;
+        const message  = document.getElementById('new-res-message').value.trim();
+        const feedback = document.getElementById('res-feedback');
+
+        if (!offreId || !name || !email || !debut || !fin) {
+            feedback.className = 'ms-3 small text-danger';
+            feedback.textContent = 'Merci de remplir tous les champs obligatoires.';
+            return;
+        }
+        if (new Date(fin) <= new Date(debut)) {
+            feedback.className = 'ms-3 small text-danger';
+            feedback.textContent = 'La date de fin doit être après la date de début.';
+            return;
+        }
+        feedback.className = 'ms-3 small text-muted';
+        feedback.textContent = 'Envoi en cours…';
+
+        fetch(apiBase, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                offre_id: parseInt(offreId, 10),
+                parent_name: name,
+                parent_email: email,
+                date_debut: debut,
+                date_fin: fin,
+                message: message || null
+            })
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (data.error) {
+                feedback.className = 'ms-3 small text-danger';
+                feedback.textContent = data.error;
+                return;
+            }
+            feedback.className = 'ms-3 small text-success';
+            feedback.textContent = 'Réservation créée ! Rechargement…';
+            setTimeout(function () { window.location.reload(); }, 1200);
+        })
+        .catch(function () {
+            feedback.className = 'ms-3 small text-danger';
+            feedback.textContent = 'Erreur réseau.';
+        });
+    });
+
+    /* ---- FullCalendar ---- */
+    const calEl = document.getElementById('reservation-calendar');
+    const reservationEvents = [
+        {% for r in reservations|default([]) %}
+        {
+            id: '{{ r.id }}',
+            title: '{{ r.offre.nomBabysitter|e('js') }} – {{ r.parentName|e('js') }}',
+            start: '{{ r.dateDebut|date('Y-m-d\\TH:i:s') }}',
+            end:   '{{ r.dateFin|date('Y-m-d\\TH:i:s') }}',
+            color: {% if r.statut == 'acceptee' %}'#28a745'{% elseif r.statut == 'refusee' %}'#dc3545'{% elseif r.statut == 'annulee' %}'#6c757d'{% else %}'#fd7e14'{% endif %},
+            extendedProps: { statut: '{{ r.statut }}', parentEmail: '{{ r.parentEmail|e('js') }}' }
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    const calendar = new FullCalendar.Calendar(calEl, {
+        initialView: 'dayGridMonth',
+        locale: 'fr',
+        headerToolbar: {
+            left:   'prev,next today',
+            center: 'title',
+            right:  'dayGridMonth,timeGridWeek,listWeek'
+        },
+        events: reservationEvents,
+        eventClick: function (info) {
+            const p = info.event.extendedProps;
+            alert(
+                'Réservation #' + info.event.id + '\n' +
+                info.event.title + '\n' +
+                'Statut : ' + p.statut + '\n' +
+                'Email : ' + p.parentEmail
+            );
+        },
+        height: 420
+    });
+    calendar.render();
+
+    /* ---- Accept / Refuse ---- */
+    document.querySelectorAll('.btn-reservation-accept').forEach(function (btn) {
+        btn.addEventListener('click', function () { updateStatut(parseInt(btn.dataset.id, 10), 'acceptee', btn); });
+    });
+    document.querySelectorAll('.btn-reservation-refuse').forEach(function (btn) {
+        btn.addEventListener('click', function () { updateStatut(parseInt(btn.dataset.id, 10), 'refusee', btn); });
+    });
+    function updateStatut(id, statut, btn) {
+        fetch(apiBase + '/' + id, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ statut: statut })
+        })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                var row = btn.closest('tr');
+                var statutCell = row.querySelector('td:nth-child(5)');
+                var actionsCell = row.querySelector('td:nth-child(6)');
+                statutCell.innerHTML = statut === 'acceptee'
+                    ? '<span class="badge bg-success">Acceptée</span>'
+                    : '<span class="badge bg-danger">Refusée</span>';
+                actionsCell.innerHTML = '';
+            })
+            .catch(function () { alert('Erreur'); });
+    }
+})();
+        </script>
+    {% endblock %}
+{% endblock %}

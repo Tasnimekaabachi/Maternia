@@ -1,0 +1,178 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Distance & temps vers babysitter{% endblock %}
+{% block page_title %}Distance & temps vers babysitter{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
+        <span>/</span>
+        <span>Distance & temps vers babysitter</span>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <i class="fas fa-route me-2"></i>
+            Calculer la distance et le temps pour rejoindre une babysitter
+        </div>
+        <div class="admin-card-body">
+            <p class="mb-4 text-muted">
+                Saisissez votre adresse (ou utilisez votre position) et choisissez une babysitter pour obtenir la distance à parcourir en voiture et le temps de trajet estimé à travers la ville.
+            </p>
+
+            <div class="mb-3 row g-2 align-items-end">
+                <div class="col-12 col-md-6">
+                    <label class="form-label"><strong>Mon emplacement (adresse ou ville)</strong></label>
+                    <div class="input-group">
+                        <input type="text"
+                               id="origin"
+                               class="form-control"
+                               placeholder="Ex: Tunis, Avenue Habib Bourguiba, Sfax…"
+                               autocomplete="off" />
+                        <button type="button" class="btn btn-outline-primary" id="btn-geoloc" title="Utiliser ma position">
+                            <i class="fas fa-location-arrow"></i>
+                        </button>
+                    </div>
+                    <small class="text-muted">Ou cliquez sur <i class="fas fa-location-arrow"></i> pour utiliser votre position actuelle.</small>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label"><strong>Babysitter (destination)</strong></label>
+                    <select class="form-select" id="destination">
+                        <option value="">— Choisir une babysitter —</option>
+                        {% for offre in offres_babysitter|default([]) %}
+                            <option value="{{ offre.ville|e('html_attr') }}">
+                                {{ offre.nomBabysitter }} — {{ offre.ville }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <button type="button" class="btn btn-primary" id="btn-calculate">
+                    <i class="fas fa-calculator me-1"></i>
+                    Calculer distance et temps
+                </button>
+            </div>
+
+            <div id="result" class="d-none">
+                <hr>
+                <h6 class="mb-3"><strong>Résultat</strong></h6>
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <div class="p-3 rounded border bg-light">
+                            <div class="text-muted small">Distance (en voiture)</div>
+                            <div class="fs-4 fw-bold" id="result-distance">—</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="p-3 rounded border bg-light">
+                            <div class="text-muted small">Temps de trajet estimé</div>
+                            <div class="fs-4 fw-bold" id="result-duration">—</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="error" class="d-none alert alert-danger mt-3" role="alert"></div>
+            <div id="loading" class="d-none text-muted mt-2">
+                <i class="fas fa-spinner fa-spin me-1"></i> Calcul en cours…
+            </div>
+        </div>
+    </div>
+
+    {% block javascripts %}
+        {{ parent() }}
+        <script>
+(function () {
+    const originEl = document.getElementById('origin');
+    const destinationEl = document.getElementById('destination');
+    const btnGeoloc = document.getElementById('btn-geoloc');
+    const btnCalculate = document.getElementById('btn-calculate');
+    const resultBlock = document.getElementById('result');
+    const resultDistance = document.getElementById('result-distance');
+    const resultDuration = document.getElementById('result-duration');
+    const errorBlock = document.getElementById('error');
+    const loadingEl = document.getElementById('loading');
+    const calculateUrl = '{{ path('admin_distance_babysitter_calculate')|e('js') }}';
+
+    function hideMessages() {
+        resultBlock.classList.add('d-none');
+        errorBlock.classList.add('d-none');
+        loadingEl.classList.add('d-none');
+    }
+
+    function showResult(distanceText, durationText) {
+        errorBlock.classList.add('d-none');
+        resultDistance.textContent = distanceText;
+        resultDuration.textContent = durationText;
+        resultBlock.classList.remove('d-none');
+    }
+
+    function showError(msg) {
+        resultBlock.classList.add('d-none');
+        errorBlock.textContent = msg;
+        errorBlock.classList.remove('d-none');
+    }
+
+    btnGeoloc.addEventListener('click', function () {
+        if (!navigator.geolocation) {
+            showError('La géolocalisation n\'est pas supportée par votre navigateur.');
+            return;
+        }
+        btnGeoloc.disabled = true;
+        btnGeoloc.querySelector('i').className = 'fas fa-spinner fa-spin';
+        navigator.geolocation.getCurrentPosition(
+            function (pos) {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                originEl.value = lat + ',' + lon;
+                originEl.placeholder = 'Position actuelle (' + lat.toFixed(5) + ', ' + lon.toFixed(5) + ')';
+                btnGeoloc.disabled = false;
+                btnGeoloc.querySelector('i').className = 'fas fa-location-arrow';
+            },
+            function () {
+                showError('Impossible d\'obtenir votre position. Vérifiez les autorisations ou saisissez une adresse.');
+                btnGeoloc.disabled = false;
+                btnGeoloc.querySelector('i').className = 'fas fa-location-arrow';
+            }
+        );
+    });
+
+    btnCalculate.addEventListener('click', function () {
+        const origin = (originEl.value || '').trim();
+        const destination = (destinationEl.value || '').trim();
+        hideMessages();
+        if (!origin) {
+            showError('Veuillez saisir votre adresse ou utiliser votre position.');
+            return;
+        }
+        if (!destination) {
+            showError('Veuillez choisir une babysitter.');
+            return;
+        }
+        loadingEl.classList.remove('d-none');
+        fetch(calculateUrl + '?origin=' + encodeURIComponent(origin) + '&destination=' + encodeURIComponent(destination), {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' }
+        })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                loadingEl.classList.add('d-none');
+                if (data.error) {
+                    showError(data.error);
+                    return;
+                }
+                showResult(data.distance_text || (data.distance_km + ' km'), data.duration_text || (data.duration_minutes + ' min'));
+            })
+            .catch(function () {
+                loadingEl.classList.add('d-none');
+                showError('Erreur lors du calcul. Réessayez.');
+            });
+    });
+})();
+        </script>
+    {% endblock %}
+{% endblock %}

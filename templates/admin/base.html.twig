@@ -73,6 +73,23 @@
                     <div class="nav-icon-box"><i class="fas fa-user-nurse"></i></div>
                     <span>Profil babysitting</span>
                 </a>
+                </a>
+                <a href="{{ path('admin_analyse_pleurs') }}" class="nav-link {{ app.request.attributes.get('_route') == 'admin_analyse_pleurs' ? 'active' : '' }}">
+                    <i class="fas fa-wave-square"></i>
+                    Analyse pleur bébé
+                </a>
+                <a href="{{ path('admin_distance_babysitter') }}" class="nav-link {{ app.request.attributes.get('_route') == 'admin_distance_babysitter' ? 'active' : '' }}">
+                    <i class="fas fa-route"></i>
+                    Distance & temps babysitter
+                </a>
+                <a href="{{ path('admin_messagerie') }}" class="nav-link {{ app.request.attributes.get('_route') == 'admin_messagerie' ? 'active' : '' }}">
+                    <i class="fas fa-comments"></i>
+                    Messagerie
+                </a>
+                <a href="{{ path('admin_calendrier_reservations') }}" class="nav-link {{ app.request.attributes.get('_route') == 'admin_calendrier_reservations' ? 'active' : '' }}">
+                    <i class="fas fa-calendar-check"></i>
+                    Calendrier & Réservations
+                </a>
             </nav>
 
             <div class="admin-sidebar-footer">
@@ -131,6 +148,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
         // Sidebar toggle
         const toggle = document.getElementById('sidebarToggle');
@@ -148,6 +166,9 @@
             });
         }
     </script>
+
+    {{ importmap('app') }}
+
     {% block javascripts %}{% endblock %}
 </body>
 </html>

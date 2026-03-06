@@ -1,0 +1,324 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Messagerie Parent – Babysitter{% endblock %}
+{% block page_title %}Messagerie Parent – Babysitter{% endblock %}
+
+{% block breadcrumb %}
+    <div class="admin-breadcrumb">
+        <a href="{{ path('admin_dashboard') }}">Backoffice</a>
+        <span>/</span>
+        <span>Messagerie</span>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <i class="fas fa-comments me-2"></i>
+            Messagerie entre parents et babysitters
+        </div>
+        <div class="admin-card-body">
+            <p class="mb-4 text-muted">
+                Consulter les conversations par email (parent) ou par babysitter (offre), envoyer et recevoir des messages.
+            </p>
+
+            <div class="row mb-4">
+                <div class="col-12 col-md-4">
+                    <label class="form-label"><strong>Vue</strong></label>
+                    <select class="form-select" id="vue">
+                        <option value="babysitter">Babysitter (par offre)</option>
+                        <option value="parent">Parent (par email)</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-4" id="wrap-offre">
+                    <label class="form-label"><strong>Babysitter</strong></label>
+                    <select class="form-select" id="offre_id">
+                        <option value="">— Choisir —</option>
+                        {% for o in offres_babysitter|default([]) %}
+                            <option value="{{ o.id }}">{{ o.nomBabysitter }} ({{ o.ville }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-4 d-none" id="wrap-email">
+                    <label class="form-label"><strong>Email du parent</strong></label>
+                    <input type="email" class="form-control" id="parent_email" placeholder="parent@exemple.com">
+                </div>
+                <div class="col-12 col-md-4 align-self-end d-flex gap-2">
+                    <button type="button" class="btn btn-primary" id="btn-load-conversations">
+                        <i class="fas fa-search me-1"></i> Charger
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" id="btn-new-conversation" title="Créer une conversation avec un parent">
+                        <i class="fas fa-plus me-1"></i> Nouvelle conversation
+                    </button>
+                </div>
+            </div>
+            <div class="row mb-3 d-none" id="wrap-new-conversation">
+                <div class="col-12 col-md-3">
+                    <input type="email" class="form-control form-control-sm" id="new-parent-email" placeholder="Email du parent">
+                </div>
+                <div class="col-12 col-md-3">
+                    <input type="text" class="form-control form-control-sm" id="new-parent-name" placeholder="Nom du parent">
+                </div>
+                <div class="col-12 col-md-2">
+                    <button type="button" class="btn btn-sm btn-success" id="btn-create-conversation">Créer</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-cancel-new">Annuler</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 col-md-4 border-end" style="min-height: 320px;">
+                    <h6 class="mb-2">Conversations</h6>
+                    {# status line OUTSIDE the list so innerHTML clears don't remove it #}
+                    <div id="conversation-status" class="text-muted small mb-1">Choisir une vue et charger.</div>
+                    <div id="conversation-list" class="list-group list-group-flush"></div>
+                </div>
+                <div class="col-12 col-md-8">
+                    <div id="chat-area" class="d-none">
+                        <h6 class="mb-2"><span id="chat-title">—</span></h6>
+                        <div class="border rounded p-3 mb-2 bg-light" style="height: 280px; overflow-y: auto;" id="messages-container"></div>
+                        <div class="d-flex gap-2">
+                            <input type="text" class="form-control" id="message-contenu" placeholder="Votre message…">
+                            <select class="form-select w-auto" id="message-envoye-par">
+                                <option value="babysitter">En tant que babysitter</option>
+                                <option value="parent">En tant que parent</option>
+                            </select>
+                            <button type="button" class="btn btn-primary" id="btn-send-message">Envoyer</button>
+                        </div>
+                    </div>
+                    <div id="chat-placeholder" class="text-muted">Sélectionnez une conversation.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% block javascripts %}
+        {{ parent() }}
+        <script>
+(function () {
+    const apiBase = '{{ path('api_messagerie_conversations')|e('js') }}'.replace('/conversations', '');
+
+    const vueEl          = document.getElementById('vue');
+    const wrapOffre      = document.getElementById('wrap-offre');
+    const wrapEmail      = document.getElementById('wrap-email');
+    const offreIdEl      = document.getElementById('offre_id');
+    const parentEmailEl  = document.getElementById('parent_email');
+    const btnLoad        = document.getElementById('btn-load-conversations');
+    const statusEl       = document.getElementById('conversation-status');
+    const convList       = document.getElementById('conversation-list');
+    const chatArea       = document.getElementById('chat-area');
+    const chatPlaceholder= document.getElementById('chat-placeholder');
+    const chatTitle      = document.getElementById('chat-title');
+    const msgContainer   = document.getElementById('messages-container');
+    const msgInput       = document.getElementById('message-contenu');
+    const msgSender      = document.getElementById('message-envoye-par');
+    const btnSend        = document.getElementById('btn-send-message');
+    const wrapNewConv    = document.getElementById('wrap-new-conversation');
+    const btnNewConv     = document.getElementById('btn-new-conversation');
+    const newEmail       = document.getElementById('new-parent-email');
+    const newName        = document.getElementById('new-parent-name');
+    const btnCreateConv  = document.getElementById('btn-create-conversation');
+    const btnCancelNew   = document.getElementById('btn-cancel-new');
+
+    let currentConvId    = null;
+    let pollInterval     = null;
+
+    /* ── helpers ─────────────────────────────────────── */
+    function setStatus(msg, type) {
+        statusEl.textContent = msg;
+        statusEl.className = 'small mb-1 ' + (type === 'danger' ? 'text-danger' : type === 'success' ? 'text-success' : 'text-muted');
+    }
+
+    function escapeHtml(s) {
+        const d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+    }
+
+    function stopPoll() {
+        if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+    }
+
+    /* ── vue switch ───────────────────────────────────── */
+    vueEl.addEventListener('change', function () {
+        const isParent = vueEl.value === 'parent';
+        wrapOffre.classList.toggle('d-none', isParent);
+        wrapEmail.classList.toggle('d-none', !isParent);
+        btnNewConv.classList.toggle('d-none', isParent);
+        wrapNewConv.classList.add('d-none');
+        convList.innerHTML = '';
+        setStatus('Choisir une vue et charger.');
+        chatArea.classList.add('d-none');
+        chatPlaceholder.classList.remove('d-none');
+        stopPoll();
+        currentConvId = null;
+    });
+
+    /* ── auto-select offre from URL param ─────────────── */
+    (function () {
+        const p = new URLSearchParams(window.location.search);
+        const id = p.get('offre_id');
+        if (id) {
+            offreIdEl.value = id;
+            setTimeout(function () { btnLoad.click(); }, 150);
+        }
+    })();
+
+    /* ── nouvelle conversation ────────────────────────── */
+    btnNewConv.addEventListener('click', function () { wrapNewConv.classList.toggle('d-none'); });
+    btnCancelNew.addEventListener('click', function () { wrapNewConv.classList.add('d-none'); });
+
+    btnCreateConv.addEventListener('click', function () {
+        const offreId = offreIdEl.value;
+        const email   = newEmail.value.trim();
+        const name    = newName.value.trim();
+        if (!offreId || !email || !name) {
+            alert('Veuillez choisir une babysitter, saisir l\'email et le nom du parent.');
+            return;
+        }
+        btnCreateConv.disabled = true;
+        fetch(apiBase + '/conversations', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ offre_id: parseInt(offreId, 10), parent_email: email, parent_name: name })
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            btnCreateConv.disabled = false;
+            if (data.error) { alert(data.error); return; }
+            wrapNewConv.classList.add('d-none');
+            newEmail.value = ''; newName.value = '';
+            loadConversations();
+        })
+        .catch(function () { btnCreateConv.disabled = false; alert('Erreur réseau.'); });
+    });
+
+    /* ── charger conversations ────────────────────────── */
+    function loadConversations() {
+        const isParent = vueEl.value === 'parent';
+        if (isParent && !parentEmailEl.value.trim()) {
+            setStatus('Saisir un email parent.', 'danger'); return;
+        }
+        if (!isParent && !offreIdEl.value) {
+            setStatus('Choisir une babysitter.', 'danger'); return;
+        }
+        const url = isParent
+            ? apiBase + '/conversations?email=' + encodeURIComponent(parentEmailEl.value.trim())
+            : apiBase + '/conversations?offre_id=' + encodeURIComponent(offreIdEl.value);
+
+        setStatus('Chargement…');
+        convList.innerHTML = '';
+
+        fetch(url, { headers: { 'Accept': 'application/json' } })
+        .then(function (r) {
+            if (!r.ok) return r.json().then(function (e) { throw new Error(e.error || 'Erreur ' + r.status); });
+            return r.json();
+        })
+        .then(function (data) {
+            if (!Array.isArray(data) || data.length === 0) {
+                setStatus('Aucune conversation trouvée.');
+                return;
+            }
+            setStatus(data.length + ' conversation(s).');
+            convList.innerHTML = data.map(function (c) {
+                const preview = c.last_message
+                    ? escapeHtml(c.last_message.contenu.substring(0, 45)) + (c.last_message.contenu.length > 45 ? '…' : '')
+                    : '<em>Pas encore de message</em>';
+                const label = isParent
+                    ? (c.offre_nom || 'Babysitter #' + c.offre_id)
+                    : (escapeHtml(c.parent_name) + ' <small class="text-muted">(' + escapeHtml(c.parent_email) + ')</small>');
+                return '<a href="#" class="list-group-item list-group-item-action conv-item py-2 px-3" data-id="' + c.id + '">' +
+                    '<div class="fw-semibold">' + label + '</div>' +
+                    '<div class="small text-muted">' + preview + '</div>' +
+                    '</a>';
+            }).join('');
+            convList.querySelectorAll('.conv-item').forEach(function (a) {
+                a.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    convList.querySelectorAll('.conv-item').forEach(function (x) { x.classList.remove('active'); });
+                    a.classList.add('active');
+                    openConversation(parseInt(a.dataset.id, 10), a.querySelector('.fw-semibold').textContent);
+                });
+            });
+        })
+        .catch(function (err) { setStatus(err.message || 'Erreur de chargement.', 'danger'); });
+    }
+
+    btnLoad.addEventListener('click', loadConversations);
+
+    /* ── ouvrir conversation ──────────────────────────── */
+    function openConversation(id, label) {
+        currentConvId = id;
+        chatTitle.textContent = label;
+        chatArea.classList.remove('d-none');
+        chatPlaceholder.classList.add('d-none');
+        stopPoll();
+        loadMessages(id);
+        pollInterval = setInterval(function () { if (currentConvId === id) loadMessages(id); }, 4000);
+    }
+
+    /* ── charger messages ─────────────────────────────── */
+    function loadMessages(convId) {
+        fetch(apiBase + '/conversations/' + convId + '/messages', { headers: { 'Accept': 'application/json' } })
+        .then(function (r) {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        })
+        .then(function (data) {
+            if (!Array.isArray(data)) return;
+            const wasAtBottom = msgContainer.scrollHeight - msgContainer.scrollTop <= msgContainer.clientHeight + 50;
+            msgContainer.innerHTML = data.length === 0
+                ? '<p class="text-muted text-center small mt-3">Aucun message — commencez la conversation.</p>'
+                : data.map(function (m) {
+                    const isParentMsg = m.envoye_par === 'parent';
+                    const side = isParentMsg ? 'start' : 'end';
+                    const bubble = isParentMsg
+                        ? 'bg-white border text-dark'
+                        : 'bg-primary text-white';
+                    const sender = isParentMsg ? 'Parent' : 'Babysitter';
+                    const time = m.created_at ? new Date(m.created_at).toLocaleString('fr-FR', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' }) : '';
+                    return '<div class="d-flex justify-content-' + side + ' mb-2">' +
+                        '<div class="rounded p-2 shadow-sm ' + bubble + '" style="max-width:80%;">' +
+                        '<div class="small fw-semibold mb-1">' + escapeHtml(sender) + '</div>' +
+                        '<div>' + escapeHtml(m.contenu) + '</div>' +
+                        '<div class="text-end" style="font-size:.7rem;opacity:.65;">' + time + '</div>' +
+                        '</div></div>';
+                }).join('');
+            if (wasAtBottom) msgContainer.scrollTop = msgContainer.scrollHeight;
+        })
+        .catch(function () { /* silently ignore poll errors */ });
+    }
+
+    /* ── envoyer message ──────────────────────────────── */
+    function sendMessage() {
+        if (!currentConvId || !msgInput.value.trim()) return;
+        const contenu = msgInput.value.trim();
+        const envoyePar = msgSender.value;
+        btnSend.disabled = true;
+        fetch(apiBase + '/conversations/' + currentConvId + '/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ contenu: contenu, envoye_par: envoyePar })
+        })
+        .then(function (r) {
+            if (!r.ok) return r.json().then(function (e) { throw new Error(e.error || 'Erreur ' + r.status); });
+            return r.json();
+        })
+        .then(function () {
+            msgInput.value = '';
+            btnSend.disabled = false;
+            loadMessages(currentConvId);
+        })
+        .catch(function (err) {
+            btnSend.disabled = false;
+            alert('Erreur envoi : ' + err.message);
+        });
+    }
+
+    btnSend.addEventListener('click', sendMessage);
+    msgInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+})();
+        </script>
+    {% endblock %}
+{% endblock %}

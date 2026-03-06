@@ -13,8 +13,8 @@ use App\Repository\GrosesseRepository;
 use App\Repository\OffreBabySitterRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/admin', name: 'admin_')]
 final class DashboardController extends AbstractController
@@ -57,7 +57,7 @@ final class DashboardController extends AbstractController
             ($statsStatut['enCours'] ?? 0) +
             ($statsStatut['aRisque'] ?? 0);
 
-        // ===== BABYSITTING STATS - SANS createdAt =====
+        // ===== BABYSITTING STATS =====
         // Total babysitters
         $totalBabysitters = $offreBabySitterRepository->count([]);
 
@@ -296,7 +296,7 @@ final class DashboardController extends AbstractController
             'total_grossesses' => $totalGrossesses,
             'suivis_grossesse_actifs' => $suivisActifs,
 
-            // BABYSITTING STATS - Sans createdAt
+            // BABYSITTING STATS
             'total_babysitters' => $totalBabysitters,
             'babysitters_disponibles' => $babysittersDisponibles,
             'offres_babysitting' => $offresBabysitting,
@@ -312,6 +312,14 @@ final class DashboardController extends AbstractController
             // Existing dashboard data
             'creneaux_ce_mois' => $this->consultationCreneauRepository->countCeMois(),
             'recent_activity' => $activity,
+        ]);
+    }
+
+    #[Route('/analyse-pleurs', name: 'analyse_pleurs', methods: ['GET'])]
+    public function analysePleurs(OffreBabySitterRepository $offreBabySitterRepository): Response
+    {
+        return $this->render('admin/analyse_pleurs.html.twig', [
+            'offres_babysitter' => $offreBabySitterRepository->findAll(),
         ]);
     }
 
