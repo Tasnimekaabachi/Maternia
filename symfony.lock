@@ -59,8 +59,8 @@
     "knplabs/knp-paginator-bundle": {
         "version": "v6.10.0"
     },
-    "phpstan/phpstan": {
-        "version": "1.12",
+        "phpstan/phpstan": {
+        "version": "2.1",
         "recipe": {
             "repo": "github.com/symfony/recipes-contrib",
             "branch": "main",
@@ -72,17 +72,17 @@
         ]
     },
     "phpunit/phpunit": {
-        "version": "9.6",
+        "version": "9.5",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
             "version": "9.6",
-            "ref": "6a9341aa97d441627f8bd424ae85dc04c944f8b4"
+            "ref": "fb9df8575f2dcef8ebd08b975e4637ba047d2173"
         },
         "files": [
-            "./.env.test",
-            "./phpunit.xml.dist",
-            "./tests/bootstrap.php"
+            ".env.test",
+            "phpunit.xml.dist",
+            "tests/bootstrap.php"
         ]
     },
     "symfony/asset-mapper": {

@@ -8,7 +8,7 @@ class HospitalmapService{
         private HttpClientInterface $client,
         private string $apiKey
     ) {}
-
+    /** @return array<mixed> */
     public function getHospitalsNear(float $lat, float $lon, int $radius = 5000): array
     {
         try {

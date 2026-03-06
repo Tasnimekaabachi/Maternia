@@ -99,5 +99,10 @@ services:
             $currency: '%env(default:stripe_currency_default:STRIPE_CURRENCY)%'
             $tndToEurRate: '%env(float:STRIPE_TND_TO_EUR)%'
 
+    # Grossesse module services
+    App\Service\BebeSemaineService:
+        arguments:
+            $publicDir: '%kernel.project_dir%/public'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

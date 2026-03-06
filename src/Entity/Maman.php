@@ -13,11 +13,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\HasLifecycleCallbacks]
 class Maman
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-    
+#[ORM\Id]
+#[ORM\GeneratedValue]
+#[ORM\Column]
+private ?int $id = null; // @phpstan-ignore property.unusedType
     #[ORM\Column(length: 30)]
     #[Assert\NotBlank(message: 'Le numéro d\'urgence est obligatoire.')]
     #[Assert\Regex(
@@ -69,6 +68,14 @@ class Maman
     #[ORM\Column(length: 100)]
     private ?string $habitudesAlimentaires = null;
 
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+#[Assert\NotNull(message: 'La date de naissance est obligatoire.')]
+#[Assert\LessThan(
+    value: 'today',
+    message: 'La date de naissance doit être dans le passé.'
+)]
+private ?\DateTimeInterface $dateNaissance = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -79,19 +86,26 @@ class Maman
         return $this->numeroUrgence;
     }
 
-    public function setNumeroUrgence(string $numeroUrgence): static
-    {
-        $digits = preg_replace('/\D/', '', $numeroUrgence);
-        if (strlen($digits) >= 8) {
-            if (str_starts_with($digits, '216') && strlen($digits) >= 11) {
-                $digits = substr($digits, 3, 8);
-            } else {
-                $digits = substr($digits, -8);
-            }
+public function setNumeroUrgence(string $numeroUrgence): static
+{
+    // ✅ $numeroUrgence est déjà typé string → pas de null possible
+    $digits = preg_replace('/\D/', '', $numeroUrgence);
+
+    // ✅ preg_replace peut retourner null → on cast en string
+    $digits = $digits ?? '';
+
+    if (strlen($digits) >= 8) {
+        if (str_starts_with($digits, '216') && strlen($digits) >= 11) {
+            $digits = substr($digits, 3, 8);
+        } else {
+            $digits = substr($digits, -8);
         }
-        $this->numeroUrgence = $digits !== '' ? $digits : $numeroUrgence;
-        return $this;
     }
+
+    $this->numeroUrgence = $digits !== '' ? $digits : $numeroUrgence;
+
+    return $this;
+}
 
     public function getEmail(): ?string
     {
@@ -235,6 +249,17 @@ class Maman
 
         return $this;
     }
+
+    public function getDateNaissance(): ?\DateTimeInterface
+{
+    return $this->dateNaissance;
+}
+
+public function setDateNaissance(?\DateTimeInterface $dateNaissance): static
+{
+    $this->dateNaissance = $dateNaissance;
+    return $this;
+}
 #[ORM\Column(type: 'datetime')]
 private ?\DateTimeInterface $dateCreation = null;
 
@@ -353,5 +378,15 @@ public function removeGrosess(Grosesse $grosess): static
     }
 
     return $this;
+}
+/**
+ * Calcule l'âge en années depuis dateNaissance.
+ */
+public function getAge(): int
+{
+    if ($this->dateNaissance === null) {
+        return 28; // défaut si non renseigné
+    }
+    return $this->dateNaissance->diff(new \DateTime())->y;
 }
 }

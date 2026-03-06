@@ -12,11 +12,10 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 #[ORM\HasLifecycleCallbacks]
 class Grosesse
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
+#[ORM\Id]
+#[ORM\GeneratedValue]
+#[ORM\Column]
+private ?int $id = null; // @phpstan-ignore property.unusedType
     #[ORM\Column(options: ['default' => false])]
     private bool $connaitDDR = false;
 
@@ -114,7 +113,7 @@ private ?string $riskLevel = null;
     private ?string $bebes = null;
 
     #[ORM\ManyToOne(inversedBy: 'grosesses')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Maman $maman = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -437,7 +436,7 @@ private ?string $riskLevel = null;
         $this->commentaireGeneral = $commentaireGeneral;
         return $this;
     }
-
+    /** @return array<mixed> */
     public function getBebes(): array
     {
         if ($this->bebes === null || $this->bebes === '') {
@@ -448,6 +447,7 @@ private ?string $riskLevel = null;
         return is_array($decoded) ? $decoded : [];
     }
 
+    /** @param array<mixed>|null $bebes */
     public function setBebes(?array $bebes): static
     {
         if ($bebes === null || $bebes === []) {
@@ -497,7 +497,7 @@ private ?string $riskLevel = null;
             return null;
         }
         $today = new \DateTimeImmutable('today');
-        $days = $base->diff($today)->days ?? 0;
+        $days = $base->diff($today)->days ?: 0;
         return max(1, (int) floor($days / 7) + 1);
     }
 

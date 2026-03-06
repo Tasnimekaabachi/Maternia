@@ -52,6 +52,8 @@
 
         <section class="py-5 wow fadeIn" data-wow-delay="0.1s">
             <div class="container py-5">
+
+                {# Breadcrumb #}
                 <nav aria-label="breadcrumb" class="mb-4">
                     <ol class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Accueil</a></li>
@@ -60,6 +62,7 @@
                     </ol>
                 </nav>
 
+                {# Alerte IMC #}
                 {% if imc_alerte|default(false) %}
                     <div class="alert alert-danger border-2 d-flex align-items-start mb-4" role="alert">
                         <i class="fas fa-exclamation-triangle fa-2x me-3 mt-1"></i>
@@ -71,6 +74,7 @@
                     </div>
                 {% endif %}
 
+                {# ===== CARTE SUIVI GROSSESSE ===== #}
                 <div class="border border-primary rounded-3 bg-light p-4 mb-4 shadow-sm">
                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
                         <h4 class="text-primary mb-0"><i class="fas fa-baby-carriage me-2"></i> Suivi de grossesse</h4>
@@ -97,9 +101,7 @@
                                 <strong>
                                     {% if grossesse.dateAccouchementPrevue %}
                                         {{ grossesse.dateAccouchementPrevue|date('d/m/Y') }}
-                                    {% else %}
-                                        —
-                                    {% endif %}
+                                    {% else %}—{% endif %}
                                 </strong>
                             </div>
                             <div class="col-md-6">
@@ -114,66 +116,134 @@
                                 <span class="text-muted small d-block">Symptômes</span>
                                 <span>{{ grossesse.symptomesList|length > 0 ? grossesse.symptomesList|join(', ') : '—' }}</span>
                             </div>
-                            {% if grossesse.riskLevel %}
-    <div class="col-12 mt-2">
-        {% if grossesse.riskLevel == 'High' %}
-            {% set color = 'danger' %}
-            {% set icon = '🚨' %}
-            {% set titre = 'Votre grossesse nécessite un suivi rapproché' %}
-            {% set message = 'Notre analyse indique certains facteurs de risque importants. Nous vous recommandons fortement de consulter votre médecin ou sage-femme dans les plus brefs délais.' %}
-        {% elseif grossesse.riskLevel == 'Mid' %}
-            {% set color = 'warning' %}
-            {% set icon = '⚠️' %}
-            {% set titre = 'Quelques points importants à surveiller' %}
-            {% set message = 'Notre analyse détecte quelques facteurs à surveiller. Une consultation prochaine avec votre médecin est recommandée pour un suivi adapté.' %}
-        {% else %}
-            {% set color = 'success' %}
-            {% set icon = '✅' %}
-            {% set titre = 'Votre grossesse se déroule bien' %}
-            {% set message = 'Notre analyse ne détecte aucun facteur de risque particulier. Continuez vos consultations régulières et prenez soin de vous 💕' %}
-        {% endif %}
-        <div class="alert alert-{{ color }} border-2 d-flex align-items-start mb-0" role="alert">
-            <span class="fs-4 me-3">{{ icon }}</span>
-            <div>
-                <h6 class="alert-heading mb-1">{{ titre }}</h6>
-                <p class="mb-0 small">{{ message }}</p>
-            </div>
-        </div>
-    </div>
-{% endif %}
-                        <hr class="my-3">
 
-                        {% set trimestre = grossesse.trimestreActuel ?? null %}
-                        {% if trimestre and grossesse.statutGrossesse != 'terminee' %}
-                            <div class="mb-3">
-                                {% if trimestre == 1 %}
-                                    <div class="alert alert-success border-success border-2 mb-0">
-                                        <strong>🟢 Vous êtes dans le 1er trimestre de grossesse.</strong><br>
-                                        <span class="small text-muted">Cette phase correspond au début du développement du bébé.</span>
+                            {# Niveau de risque #}
+                            {% if grossesse.riskLevel %}
+                                <div class="col-12 mt-2">
+                                    {% if grossesse.riskLevel == 'High' %}
+                                        {% set color = 'danger' %}{% set icon = '🚨' %}
+                                        {% set titre = 'Votre grossesse nécessite un suivi rapproché' %}
+                                        {% set message = 'Notre analyse indique certains facteurs de risque importants. Nous vous recommandons fortement de consulter votre médecin ou sage-femme dans les plus brefs délais.' %}
+                                    {% elseif grossesse.riskLevel == 'Mid' %}
+                                        {% set color = 'warning' %}{% set icon = '⚠️' %}
+                                        {% set titre = 'Quelques points importants à surveiller' %}
+                                        {% set message = 'Notre analyse détecte quelques facteurs à surveiller. Une consultation prochaine avec votre médecin est recommandée pour un suivi adapté.' %}
+                                    {% else %}
+                                        {% set color = 'success' %}{% set icon = '✅' %}
+                                        {% set titre = 'Votre grossesse se déroule bien' %}
+                                        {% set message = 'Notre analyse ne détecte aucun facteur de risque particulier. Continuez vos consultations régulières et prenez soin de vous 💕' %}
+                                    {% endif %}
+                                    <div class="alert alert-{{ color }} border-2 d-flex align-items-start mb-0" role="alert">
+                                        <span class="fs-4 me-3">{{ icon }}</span>
+                                        <div>
+                                            <h6 class="alert-heading mb-1">{{ titre }}</h6>
+                                            <p class="mb-0 small">{{ message }}</p>
+                                        </div>
                                     </div>
-                                {% elseif trimestre == 2 %}
-                                    <div class="alert alert-warning border-warning border-2 mb-0">
-                                        <strong>🟠 Début du 2ème trimestre.</strong><br>
-                                        <span class="small text-muted">La grossesse évolue positivement. Pensez à planifier votre consultation de suivi.</span>
+                                </div>
+                            {% endif %}
+
+                            {# ===== COMPTE À REBOURS ===== #}
+                            {% if compte_a_rebours is defined and compte_a_rebours %}
+                            <div class="col-12">
+                                <div class="border border-danger rounded-3 p-4 shadow-sm" style="background:linear-gradient(135deg,#fff5f5,#ffe8e8);">
+                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                        <div style="width:48px;height:48px;background:linear-gradient(135deg,#f44336,#e91e8c);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;">🤱</div>
+                                        <div>
+                                            <h5 class="text-danger mb-0 fw-bold">Votre accouchement approche !</h5>
+                                            <small class="text-muted">Prévu le {{ compte_a_rebours.date|date('d/m/Y') }}</small>
+                                        </div>
                                     </div>
-                                {% else %}
-                                    <div class="alert alert-danger border-danger border-2 mb-0">
-                                        <strong>🔴 Bienvenue au 3ème trimestre.</strong><br>
-                                        <span class="small text-muted">Préparez votre suivi final et les examens avant l'accouchement.</span>
+                                    <div class="d-flex justify-content-center gap-3 mb-3">
+                                        <div style="background:white;border-radius:16px;padding:16px 20px;text-align:center;box-shadow:0 4px 15px rgba(244,67,54,0.15);min-width:80px;">
+                                            <div id="chrono-jours" style="font-size:36px;font-weight:800;color:#f44336;line-height:1;">00</div>
+                                            <div style="font-size:11px;color:#888;margin-top:4px;">JOURS</div>
+                                        </div>
+                                        <div style="display:flex;align-items:center;font-size:28px;font-weight:800;color:#f44336;">:</div>
+                                        <div style="background:white;border-radius:16px;padding:16px 20px;text-align:center;box-shadow:0 4px 15px rgba(244,67,54,0.15);min-width:80px;">
+                                            <div id="chrono-heures" style="font-size:36px;font-weight:800;color:#e91e8c;line-height:1;">00</div>
+                                            <div style="font-size:11px;color:#888;margin-top:4px;">HEURES</div>
+                                        </div>
+                                        <div style="display:flex;align-items:center;font-size:28px;font-weight:800;color:#f44336;">:</div>
+                                        <div style="background:white;border-radius:16px;padding:16px 20px;text-align:center;box-shadow:0 4px 15px rgba(244,67,54,0.15);min-width:80px;">
+                                            <div id="chrono-minutes" style="font-size:36px;font-weight:800;color:#e91e8c;line-height:1;">00</div>
+                                            <div style="font-size:11px;color:#888;margin-top:4px;">MINUTES</div>
+                                        </div>
+                                        <div style="display:flex;align-items:center;font-size:28px;font-weight:800;color:#f44336;">:</div>
+                                        <div style="background:white;border-radius:16px;padding:16px 20px;text-align:center;box-shadow:0 4px 15px rgba(244,67,54,0.15);min-width:80px;">
+                                            <div id="chrono-secondes" style="font-size:36px;font-weight:800;color:#e91e8c;line-height:1;">00</div>
+                                            <div style="font-size:11px;color:#888;margin-top:4px;">SECONDES</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-center">
+                                        <span class="badge" style="background:linear-gradient(135deg,#f44336,#e91e8c);padding:8px 16px;border-radius:20px;font-size:13px;">
+                                            💕 Plus que {{ compte_a_rebours.jours }} jour{{ compte_a_rebours.jours > 1 ? 's' : '' }} avant de rencontrer votre bébé
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <script>
+                            (function() {
+                                var dateAccouchement = new Date('{{ compte_a_rebours.date }}T00:00:00');
+                                function updateChrono() {
+                                    var maintenant = new Date();
+                                    var diff = dateAccouchement - maintenant;
+                                    if (diff <= 0) {
+                                        ['chrono-jours','chrono-heures','chrono-minutes','chrono-secondes'].forEach(id => document.getElementById(id).textContent = '00');
+                                        return;
+                                    }
+                                    document.getElementById('chrono-jours').textContent    = String(Math.floor(diff / (1000*60*60*24))).padStart(2,'0');
+                                    document.getElementById('chrono-heures').textContent   = String(Math.floor((diff % (1000*60*60*24)) / (1000*60*60))).padStart(2,'0');
+                                    document.getElementById('chrono-minutes').textContent  = String(Math.floor((diff % (1000*60*60)) / (1000*60))).padStart(2,'0');
+                                    document.getElementById('chrono-secondes').textContent = String(Math.floor((diff % (1000*60)) / 1000)).padStart(2,'0');
+                                }
+                                updateChrono();
+                                setInterval(updateChrono, 1000);
+                            })();
+                            </script>
+                            {% endif %}
+                            {# ===== FIN COMPTE À REBOURS ===== #}
+
+                            <div class="col-12"><hr class="my-2"></div>
+
+                            {# Alerte trimestre (2 premières semaines seulement) #}
+                            {% set trimestre = grossesse.trimestreActuel ?? null %}
+                            {% if trimestre and grossesse.statutGrossesse != 'terminee' %}
+                                {% set semaine = grossesse.semaineActuelle %}
+                                {% set debutT1 = (trimestre == 1 and semaine <= 2) %}
+                                {% set debutT2 = (trimestre == 2 and semaine <= 14) %}
+                                {% set debutT3 = (trimestre == 3 and semaine <= 29) %}
+                                {% if debutT1 %}
+                                    <div class="col-12">
+                                        <div class="alert alert-success border-success border-2 mb-0">
+                                            <strong>🟢 Vous êtes dans le 1er trimestre de grossesse.</strong><br>
+                                            <span class="small text-muted">Cette phase correspond au début du développement du bébé.</span>
+                                        </div>
+                                    </div>
+                                {% elseif debutT2 %}
+                                    <div class="col-12">
+                                        <div class="alert alert-warning border-warning border-2 mb-0">
+                                            <strong>🟠 Début du 2ème trimestre.</strong><br>
+                                            <span class="small text-muted">La grossesse évolue positivement. Pensez à planifier votre consultation de suivi.</span>
+                                        </div>
+                                    </div>
+                                {% elseif debutT3 %}
+                                    <div class="col-12">
+                                        <div class="alert alert-danger border-danger border-2 mb-0">
+                                            <strong>🔴 Bienvenue au 3ème trimestre.</strong><br>
+                                            <span class="small text-muted">Préparez votre suivi final et les examens avant l'accouchement.</span>
+                                        </div>
                                     </div>
                                 {% endif %}
-                            </div>
-                        {% endif %}
+                            {% endif %}
 
-                        {% if grossesse.statutGrossesse != 'terminee' %}
-                            <div class="row g-3">
+                            {# Alertes & conseils grossesse #}
+                            {% if grossesse.statutGrossesse != 'terminee' %}
                                 {% if grossesse_alertes is defined and grossesse_alertes|length > 0 %}
                                     <div class="col-md-6">
                                         <h6 class="text-danger mb-2"><i class="fas fa-exclamation-triangle me-1"></i> Alertes maman</h6>
                                         <ul class="small mb-0 ps-3">
-                                            {% for alerte in grossesse_alertes %}
-                                                <li>{{ alerte }}</li>
-                                            {% endfor %}
+                                            {% for alerte in grossesse_alertes %}<li>{{ alerte }}</li>{% endfor %}
                                         </ul>
                                     </div>
                                 {% endif %}
@@ -183,131 +253,70 @@
                                         <p class="small mb-0">{{ grossesse_conseil }}</p>
                                     </div>
                                 {% endif %}
+
                                 {# ===== GRAPHIQUE PRISE DE POIDS ===== #}
-{% if prise_poids is defined and prise_poids is not null %}
-    <div class="col-12 mt-3">
-        <div class="border border-primary rounded-3 bg-white p-3 shadow-sm">
-            <h6 class="text-primary mb-3">
-                <i class="fas fa-weight me-2"></i> Suivi de prise de poids — Normes OMS
-            </h6>
+                                {% if prise_poids is defined and prise_poids is not null %}
+                                    <div class="col-12 mt-3">
+                                        <div class="border border-primary rounded-3 bg-white p-3 shadow-sm">
+                                            <h6 class="text-primary mb-3"><i class="fas fa-weight me-2"></i> Suivi de prise de poids — Normes OMS</h6>
+                                            {% if evaluation_prise == 'normal' %}
+                                                <div class="alert alert-success border-2 py-2 mb-3">✅ Prise de poids normale selon les normes OMS.</div>
+                                            {% elseif evaluation_prise == 'insuffisant' %}
+                                                <div class="alert alert-info border-2 py-2 mb-3">ℹ️ Prise de poids insuffisante. Consultez votre médecin.</div>
+                                            {% elseif evaluation_prise == 'attention' %}
+                                                <div class="alert alert-warning border-2 py-2 mb-3">⚠️ Prise de poids élevée. Surveillance recommandée.</div>
+                                            {% elseif evaluation_prise == 'excessif' %}
+                                                <div class="alert alert-danger border-2 py-2 mb-3">🚨 Prise de poids excessive. Consultez un médecin.</div>
+                                            {% elseif evaluation_prise == 'perte' %}
+                                                <div class="alert alert-danger border-2 py-2 mb-3">🚨 Perte de poids détectée. Consultez un médecin.</div>
+                                            {% endif %}
+                                            <div class="row g-2 mb-3 text-center">
+                                                <div class="col-4">
+                                                    <div class="p-2 rounded-3" style="background:rgba(74,144,217,0.1);">
+                                                        <div class="fw-bold text-primary">{{ poids_avant }} kg</div>
+                                                        <small class="text-muted">Avant grossesse</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-4">
+                                                    <div class="p-2 rounded-3" style="background:rgba(233,30,140,0.1);">
+                                                        <div class="fw-bold" style="color:#e91e8c;">{{ poids_actuel_g }} kg</div>
+                                                        <small class="text-muted">Poids actuel</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-4">
+                                                    <div class="p-2 rounded-3" style="background:rgba(76,175,80,0.1);">
+                                                        <div class="fw-bold text-success">+{{ prise_poids }} kg</div>
+                                                        <small class="text-muted">Prise de poids</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <canvas id="chartPrisePoids" height="120"></canvas>
+                                            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                                            <script>
+                                            new Chart(document.getElementById('chartPrisePoids'), {
+                                                type: 'line',
+                                                data: {
+                                                    labels: ['Avant grossesse','Zone insuffisante','Zone normale OMS','Zone attention','Zone excessive'],
+                                                    datasets: [
+                                                        { label:'Zones OMS', data:[{{ poids_avant }},{{ poids_avant+8 }},{{ poids_avant+16 }},{{ poids_avant+20 }},{{ poids_avant+25 }}], borderColor:'rgba(200,200,200,0.5)', backgroundColor:'rgba(200,200,200,0.1)', borderDash:[5,5], pointRadius:0, fill:false, tension:0.3 },
+                                                        { label:'Votre poids', data:[{{ poids_avant }},null,{{ poids_actuel_g }},null,null], borderColor:'#e91e8c', backgroundColor:'rgba(233,30,140,0.1)', borderWidth:3, pointBackgroundColor:['#4a90d9',null,'{{ evaluation_prise=="normal"?"#4caf50":(evaluation_prise=="attention" or evaluation_prise=="excessif")?"#f44336":"#ff9800" }}',null,null], pointRadius:[8,0,12,0,0], pointBorderColor:'white', pointBorderWidth:3, fill:true, tension:0.4, spanGaps:true }
+                                                    ]
+                                                },
+                                                options: { responsive:true, plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>ctx.parsed.y?ctx.parsed.y+' kg':null}} }, scales:{ y:{ ticks:{callback:val=>val+' kg'}, min:{{ poids_avant-5 }}, max:{{ poids_avant+30 }} } } }
+                                            });
+                                            </script>
+                                            <div class="d-flex flex-wrap gap-2 mt-3 small">
+                                                <span class="badge" style="background:rgba(74,144,217,0.2);color:#4a90d9;">⬤ Insuffisant : 0–8 kg</span>
+                                                <span class="badge" style="background:rgba(76,175,80,0.2);color:#4caf50;">⬤ Normal OMS : 8–16 kg</span>
+                                                <span class="badge" style="background:rgba(255,152,0,0.2);color:#ff9800;">⬤ Attention : 16–20 kg</span>
+                                                <span class="badge" style="background:rgba(244,67,54,0.2);color:#f44336;">⬤ Excessif : +20 kg</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {# ===== FIN GRAPHIQUE PRISE DE POIDS ===== #}
 
-            {# Évaluation #}
-            {% if evaluation_prise == 'normal' %}
-                <div class="alert alert-success border-2 py-2 mb-3">✅ Prise de poids normale selon les normes OMS.</div>
-            {% elseif evaluation_prise == 'insuffisant' %}
-                <div class="alert alert-info border-2 py-2 mb-3">ℹ️ Prise de poids insuffisante. Consultez votre médecin.</div>
-            {% elseif evaluation_prise == 'attention' %}
-                <div class="alert alert-warning border-2 py-2 mb-3">⚠️ Prise de poids élevée. Surveillance recommandée.</div>
-            {% elseif evaluation_prise == 'excessif' %}
-                <div class="alert alert-danger border-2 py-2 mb-3">🚨 Prise de poids excessive. Consultez un médecin.</div>
-            {% elseif evaluation_prise == 'perte' %}
-                <div class="alert alert-danger border-2 py-2 mb-3">🚨 Perte de poids détectée. Consultez un médecin.</div>
-            {% endif %}
-
-            {# Infos chiffres #}
-            <div class="row g-2 mb-3 text-center">
-                <div class="col-4">
-                    <div class="p-2 rounded-3" style="background:rgba(74,144,217,0.1);">
-                        <div class="fw-bold text-primary">{{ poids_avant }} kg</div>
-                        <small class="text-muted">Avant grossesse</small>
-                    </div>
-                </div>
-                <div class="col-4">
-                    <div class="p-2 rounded-3" style="background:rgba(233,30,140,0.1);">
-                        <div class="fw-bold" style="color:#e91e8c;">{{ poids_actuel_g }} kg</div>
-                        <small class="text-muted">Poids actuel</small>
-                    </div>
-                </div>
-                <div class="col-4">
-                    <div class="p-2 rounded-3" style="background:rgba(76,175,80,0.1);">
-                        <div class="fw-bold text-success">+{{ prise_poids }} kg</div>
-                        <small class="text-muted">Prise de poids</small>
-                    </div>
-                </div>
-            </div>
-
-            {# Graphique #}
-            <canvas id="chartPrisePoids" height="120"></canvas>
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-            <script>
-            new Chart(document.getElementById('chartPrisePoids'), {
-                type: 'line',
-                data: {
-                    labels: ['Avant grossesse', 'Zone insuffisante', 'Zone normale OMS', 'Zone attention', 'Zone excessive'],
-                    datasets: [
-                        {
-                            label: 'Zones OMS',
-                            data: [
-                                {{ poids_avant }},
-                                {{ poids_avant + 8 }},
-                                {{ poids_avant + 16 }},
-                                {{ poids_avant + 20 }},
-                                {{ poids_avant + 25 }}
-                            ],
-                            borderColor: 'rgba(200,200,200,0.5)',
-                            backgroundColor: 'rgba(200,200,200,0.1)',
-                            borderDash: [5,5],
-                            pointRadius: 0,
-                            fill: false,
-                            tension: 0.3,
-                        },
-                        {
-                            label: 'Votre poids',
-                            data: [
-                                {{ poids_avant }},
-                                null,
-                                {{ poids_actuel_g }},
-                                null,
-                                null
-                            ],
-                            borderColor: '#e91e8c',
-                            backgroundColor: 'rgba(233,30,140,0.1)',
-                            borderWidth: 3,
-                            pointBackgroundColor: ['#4a90d9', null, '{{ evaluation_prise == "normal" ? "#4caf50" : (evaluation_prise == "attention" or evaluation_prise == "excessif") ? "#f44336" : "#ff9800" }}', null, null],
-                            pointRadius: [8, 0, 12, 0, 0],
-                            pointBorderColor: 'white',
-                            pointBorderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
-                            spanGaps: true,
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: ctx => ctx.parsed.y ? ctx.parsed.y + ' kg' : null
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            ticks: { callback: val => val + ' kg' },
-                            min: {{ poids_avant - 5 }},
-                            max: {{ poids_avant + 30 }}
-                        }
-                    }
-                }
-            });
-            </script>
-
-            {# Légende OMS #}
-            <div class="d-flex flex-wrap gap-2 mt-3 small">
-                <span class="badge" style="background:rgba(74,144,217,0.2);color:#4a90d9;">⬤ Insuffisant : 0–8 kg</span>
-                <span class="badge" style="background:rgba(76,175,80,0.2);color:#4caf50;">⬤ Normal OMS : 8–16 kg</span>
-                <span class="badge" style="background:rgba(255,152,0,0.2);color:#ff9800;">⬤ Attention : 16–20 kg</span>
-                <span class="badge" style="background:rgba(244,67,54,0.2);color:#f44336;">⬤ Excessif : +20 kg</span>
-            </div>
-        </div>
-    </div>
-{% endif %}
-{# ===== FIN GRAPHIQUE PRISE DE POIDS ===== #}
-                            </div>
-                        {% elseif bebe_age_mois is defined and bebe_age_mois is not null %}
-                            <div class="row g-3">
+                            {% elseif bebe_age_mois is defined and bebe_age_mois is not null %}
                                 <div class="col-md-4">
                                     <span class="text-muted small d-block">Âge du bébé</span>
                                     {% if bebe_age_mois == 0 and grossesse.dateAccouchementReelle %}
@@ -327,141 +336,143 @@
                                         <p class="small mb-0">{{ bebe_conseil }}</p>
                                     </div>
                                 {% endif %}
-                            </div>
 
-                            {# ===== COURBE BÉBÉ ===== #}
-                            {% if normes_bebe is defined and normes_bebe is not null and grossesse.poidsNaissance is not null %}
-                                <div class="mt-4">
-                                    <h5 class="text-primary mb-3">
-                                        <i class="fas fa-chart-bar me-2"></i>
-                                        Courbe de croissance — Normes OMS
-                                    </h5>
-                                    {% if evaluation_poids == 'normal' and evaluation_taille == 'normal' %}
-                                        <div class="alert alert-success border-2 mb-3">
-                                            ✅ <strong>Votre bébé est dans les normes OMS</strong> pour le poids et la taille.
-                                        </div>
-                                    {% else %}
-                                        <div class="alert alert-warning border-2 mb-3">
-                                            ⚠️ <strong>Attention :</strong> Certaines mesures sont en dehors des normes OMS. Consultez votre pédiatre.
-                                        </div>
-                                    {% endif %}
-                                    <div class="row g-4">
-                                        <div class="col-md-6">
-                                            <div class="border border-primary rounded-3 bg-white p-3 shadow-sm">
-                                                <h6 class="text-primary mb-1 text-center">⚖️ Poids à la naissance</h6>
-                                                <p class="text-center small text-muted mb-2">
-                                                    Norme OMS : {{ normes_bebe.poids_min }} — {{ normes_bebe.poids_max }} kg
-                                                </p>
-                                                <canvas id="chartPoids" height="200"></canvas>
-                                                <p class="text-center mt-2 small fw-bold {{ evaluation_poids == 'normal' ? 'text-success' : (evaluation_poids == 'faible' ? 'text-danger' : 'text-warning') }}">
-                                                    {% if evaluation_poids == 'normal' %}✅ Normal
-                                                    {% elseif evaluation_poids == 'faible' %}🔻 En dessous de la norme
-                                                    {% else %}🔺 Au dessus de la norme
-                                                    {% endif %}
-                                                </p>
+                                {# ===== COURBE BÉBÉ ===== #}
+                                {% if normes_bebe is defined and normes_bebe is not null and grossesse.poidsNaissance is not null %}
+                                    <div class="col-12 mt-4">
+                                        <h5 class="text-primary mb-3"><i class="fas fa-chart-bar me-2"></i> Courbe de croissance — Normes OMS</h5>
+                                        {% if evaluation_poids == 'normal' and evaluation_taille == 'normal' %}
+                                            <div class="alert alert-success border-2 mb-3">✅ <strong>Votre bébé est dans les normes OMS</strong> pour le poids et la taille.</div>
+                                        {% else %}
+                                            <div class="alert alert-warning border-2 mb-3">⚠️ <strong>Attention :</strong> Certaines mesures sont en dehors des normes OMS. Consultez votre pédiatre.</div>
+                                        {% endif %}
+                                        <div class="row g-4">
+                                            <div class="col-md-6">
+                                                <div class="border border-primary rounded-3 bg-white p-3 shadow-sm">
+                                                    <h6 class="text-primary mb-1 text-center">⚖️ Poids à la naissance</h6>
+                                                    <p class="text-center small text-muted mb-2">Norme OMS : {{ normes_bebe.poids_min }} — {{ normes_bebe.poids_max }} kg</p>
+                                                    <canvas id="chartPoids" height="200"></canvas>
+                                                    <p class="text-center mt-2 small fw-bold {{ evaluation_poids=='normal'?'text-success':(evaluation_poids=='faible'?'text-danger':'text-warning') }}">
+                                                        {% if evaluation_poids=='normal' %}✅ Normal{% elseif evaluation_poids=='faible' %}🔻 En dessous de la norme{% else %}🔺 Au dessus de la norme{% endif %}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="border border-primary rounded-3 bg-white p-3 shadow-sm">
+                                                    <h6 class="text-primary mb-1 text-center">📏 Taille à la naissance</h6>
+                                                    <p class="text-center small text-muted mb-2">Norme OMS : {{ normes_bebe.taille_min }} — {{ normes_bebe.taille_max }} cm</p>
+                                                    <canvas id="chartTaille" height="200"></canvas>
+                                                    <p class="text-center mt-2 small fw-bold {{ evaluation_taille=='normal'?'text-success':(evaluation_taille=='faible'?'text-danger':'text-warning') }}">
+                                                        {% if evaluation_taille=='normal' %}✅ Normal{% elseif evaluation_taille=='faible' %}🔻 En dessous de la norme{% else %}🔺 Au dessus de la norme{% endif %}
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
-                                            <div class="border border-primary rounded-3 bg-white p-3 shadow-sm">
-                                                <h6 class="text-primary mb-1 text-center">📏 Taille à la naissance</h6>
-                                                <p class="text-center small text-muted mb-2">
-                                                    Norme OMS : {{ normes_bebe.taille_min }} — {{ normes_bebe.taille_max }} cm
-                                                </p>
-                                                <canvas id="chartTaille" height="200"></canvas>
-                                                <p class="text-center mt-2 small fw-bold {{ evaluation_taille == 'normal' ? 'text-success' : (evaluation_taille == 'faible' ? 'text-danger' : 'text-warning') }}">
-                                                    {% if evaluation_taille == 'normal' %}✅ Normal
-                                                    {% elseif evaluation_taille == 'faible' %}🔻 En dessous de la norme
-                                                    {% else %}🔺 Au dessus de la norme
-                                                    {% endif %}
-                                                </p>
-                                            </div>
-                                        </div>
+                                        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                                        <script>
+                                        new Chart(document.getElementById('chartPoids'), { type:'line', data:{ labels:['Minimum OMS','Votre bébé','Maximum OMS'], datasets:[{ label:'Poids (kg)', data:[{{ normes_bebe.poids_min }},{{ grossesse.poidsNaissance }},{{ normes_bebe.poids_max }}], backgroundColor:'rgba(233,30,140,0.1)', borderColor:'#e91e8c', borderWidth:3, pointBackgroundColor:['#4a90d9','{{ evaluation_poids=="normal"?"#4caf50":"#f44336" }}','#4a90d9'], pointRadius:[8,12,8], pointBorderColor:'white', pointBorderWidth:3, fill:true, tension:0.4 }] }, options:{ responsive:true, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.parsed.y+' kg'}}}, scales:{y:{beginAtZero:false,min:1.5,max:5.5,ticks:{callback:val=>val+' kg'}}} } });
+                                        new Chart(document.getElementById('chartTaille'), { type:'line', data:{ labels:['Minimum OMS','Votre bébé','Maximum OMS'], datasets:[{ label:'Taille (cm)', data:[{{ normes_bebe.taille_min }},{{ grossesse.tailleNaissance ?? 0 }},{{ normes_bebe.taille_max }}], backgroundColor:'rgba(74,144,217,0.1)', borderColor:'#4a90d9', borderWidth:3, pointBackgroundColor:['#9c27b0','{{ evaluation_taille=="normal"?"#4caf50":"#f44336" }}','#9c27b0'], pointRadius:[8,12,8], pointBorderColor:'white', pointBorderWidth:3, fill:true, tension:0.4 }] }, options:{ responsive:true, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.parsed.y+' cm'}}}, scales:{y:{beginAtZero:false,min:40,max:60,ticks:{callback:val=>val+' cm'}}} } });
+                                        </script>
                                     </div>
-                                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                                    <script>
-                                  new Chart(document.getElementById('chartPoids'), {
-    type: 'line',
-    data: {
-        labels: ['Minimum OMS', 'Votre bébé', 'Maximum OMS'],
-        datasets: [{
-            label: 'Poids (kg)',
-            data: [{{ normes_bebe.poids_min }}, {{ grossesse.poidsNaissance }}, {{ normes_bebe.poids_max }}],
-            backgroundColor: 'rgba(233, 30, 140, 0.1)',
-            borderColor: '#e91e8c',
-            borderWidth: 3,
-            pointBackgroundColor: ['#4a90d9', '{{ evaluation_poids == "normal" ? "#4caf50" : "#f44336" }}', '#4a90d9'],
-            pointRadius: [8, 12, 8],
-            pointBorderColor: 'white',
-            pointBorderWidth: 3,
-            fill: true,
-            tension: 0.4,
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: { display: false },
-            tooltip: { callbacks: { label: ctx => ctx.parsed.y + ' kg' } }
-        },
-        scales: {
-            y: { beginAtZero: false, min: 1.5, max: 5.5, ticks: { callback: val => val + ' kg' } }
-        }
-    }
-});
-
-new Chart(document.getElementById('chartTaille'), {
-    type: 'line',
-    data: {
-        labels: ['Minimum OMS', 'Votre bébé', 'Maximum OMS'],
-        datasets: [{
-            label: 'Taille (cm)',
-            data: [{{ normes_bebe.taille_min }}, {{ grossesse.tailleNaissance ?? 0 }}, {{ normes_bebe.taille_max }}],
-            backgroundColor: 'rgba(74, 144, 217, 0.1)',
-            borderColor: '#4a90d9',
-            borderWidth: 3,
-            pointBackgroundColor: ['#9c27b0', '{{ evaluation_taille == "normal" ? "#4caf50" : "#f44336" }}', '#9c27b0'],
-            pointRadius: [8, 12, 8],
-            pointBorderColor: 'white',
-            pointBorderWidth: 3,
-            fill: true,
-            tension: 0.4,
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: { display: false },
-            tooltip: { callbacks: { label: ctx => ctx.parsed.y + ' cm' } }
-        },
-        scales: {
-            y: { beginAtZero: false, min: 40, max: 60, ticks: { callback: val => val + ' cm' } }
-        }
-    }
-});
-                                    </script>
-                                </div>
+                                {% endif %}
+                                {# ===== FIN COURBE BÉBÉ ===== #}
                             {% endif %}
-                            {# ===== FIN COURBE BÉBÉ ===== #}
-                        {% endif %}
+                        </div>
                     {% else %}
                         <p class="mb-0 text-muted">Aucune grossesse enregistrée pour le moment. Cliquez sur « Mon suivi de grossesse » pour la compléter.</p>
                     {% endif %}
                 </div>
+                {# ===== FIN CARTE SUIVI GROSSESSE ===== #}
+                                {# ===== FIN CARTE SUIVI GROSSESSE ===== #}
 
-                <div class="row g-4 mb-4">
-                    <div class="col-lg-6">
-                        <div class="d-grid d-md-flex gap-2">
-                            <a href="#informations-maman" class="btn btn-outline-primary">
-                                <i class="fas fa-user me-1"></i> Mes informations maman
+                {# ===== BLOC BÉBÉ SEMAINE ===== #}
+                {% if grossesse and grossesse.statutGrossesse != 'terminee' and bebe_semaine is defined and bebe_semaine %}
+                <div class="border border-primary rounded-3 bg-light p-4 mb-4 shadow-sm">
+                    <h5 class="text-primary mb-3">
+                        👶 Semaine {{ bebe_semaine.semaine }} — Mois {{ bebe_semaine.mois }}
+                    </h5>
+                    <div class="row align-items-center g-4">
+
+                        {# Image selon le mois #}
+                        <div class="col-md-5 text-center">
+                            <img
+                                src="{{ bebe_semaine.image_echographie }}"
+                                alt="Échographie mois {{ bebe_semaine.mois }}"
+                                class="img-fluid rounded-3 shadow"
+                                style="max-height:220px; object-fit:cover; border:3px solid #e91e8c;"
+                                onerror="this.src='/images/echographie/default.jpg'"
+                            >
+                            <p class="small text-muted mt-2">
+                                📷 Mois {{ bebe_semaine.mois }} de grossesse (semaine {{ bebe_semaine.semaine }})
+                            </p>
+                        </div>
+
+                        {# Infos bébé #}
+                        <div class="col-md-7">
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <div class="p-3 rounded-3" style="background:rgba(233,30,140,0.08);">
+                                        <div class="fw-bold text-primary">📏 {{ bebe_semaine.taille }} cm</div>
+                                        <small class="text-muted">Taille approximative</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-3 rounded-3" style="background:rgba(74,144,217,0.08);">
+                                        <div class="fw-bold text-primary">⚖️ {{ bebe_semaine.poids }} g</div>
+                                        <small class="text-muted">Poids approximatif</small>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="p-3 rounded-3" style="background:rgba(76,175,80,0.08);">
+                                        <p class="mb-0 small">{{ bebe_semaine.dev }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                {% endif %}
+                {# ===== FIN BLOC BÉBÉ SEMAINE ===== #}
+
+                {# ===== BOUTONS D'ACTION ===== #}
+                <div class="row g-4 mb-4 mt-2">
+
+                {# ===== BOUTONS D'ACTION ===== #}
+                <div class="row g-4 mb-4 mt-2">
+                    <div class="col-12">
+                        <div class="d-flex flex-wrap gap-3">
+                            <a href="#informations-maman" class="btn px-4 py-2" style="border-radius:12px;border:2px solid #4a90d9;color:#4a90d9;background:white;">
+                                <i class="fas fa-user me-2"></i> Mes informations maman
                             </a>
-                            <a href="{{ path('app_maman_grossesse_edit', { id: maman.id }) }}" class="btn admin-btn-rose">
-                                <i class="fas fa-baby-carriage me-1"></i> Mon suivi de grossesse
+                            <a href="{{ path('app_maman_grossesse_edit', { id: maman.id }) }}" class="btn px-4 py-2" style="border-radius:12px;background:linear-gradient(135deg,#e91e8c,#ff6bb3);border:none;color:white;">
+                                <i class="fas fa-baby-carriage me-2"></i> Mon suivi de grossesse
+                            </a>
+                            {% if nutrition is defined and nutrition %}
+                                <a href="#" onclick="document.getElementById('nutritionModal').style.display='flex';return false;" class="btn px-4 py-2" style="border-radius:12px;background:linear-gradient(135deg,#4caf50,#81c784);border:none;color:white;">
+                                    <i class="fas fa-carrot me-2"></i> Nutrition
+                                </a>
+                            {% endif %}
+                            <a href="#" onclick="document.getElementById('scannerModal').style.display='flex';return false;" class="btn px-4 py-2" style="border-radius:12px;background:linear-gradient(135deg,#ff9800,#ffb74d);border:none;color:white;">
+                                <i class="fas fa-search me-2"></i> 🍎 Scanner aliment
+                            </a>
+                            {% if grossesse and grossesse.trimestreActuel == 3 %}
+                                <a href="{{ path('app_checklist', { id: maman.id }) }}" class="btn px-4 py-2" style="border-radius:12px;background:linear-gradient(135deg,#9c27b0,#ce93d8);border:none;color:white;">
+                                    🧳 Checklist valise
+                                </a>
+                            {% endif %}
+                            <a href="#" onclick="document.getElementById('prenomModal').style.display='flex';return false;" class="btn px-4 py-2" style="border-radius:12px;background:linear-gradient(135deg,#e91e8c,#f48fb1);border:none;color:white;">
+                                👶 Calculateur prénom
                             </a>
                         </div>
                     </div>
                 </div>
+                {# ===== FIN BOUTONS D'ACTION ===== #}
 
+                {# ===== GRILLE INFORMATIONS (col-lg-8 + col-lg-4) ===== #}
                 <div class="row g-4" id="informations-maman">
+
+                    {# COLONNE GAUCHE #}
                     <div class="col-lg-8">
 {# ===== CHATBOT POPOUT ===== #}
 {% if mode == 'show' %}
@@ -683,32 +694,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         {# ===== CARTE HÔPITAUX ===== #}
                         <div class="border border-primary rounded-3 bg-light p-4 mb-4 shadow-sm">
-                            <h5 class="text-primary mb-3">
-                                <i class="fas fa-map-marker-alt me-2"></i> Hôpitaux & cliniques proches
-                            </h5>
-                            <p class="small text-muted mb-3">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Carte des établissements de santé proches de votre position.
-                            </p>
-                            <div id="map" style="height: 350px; border-radius: 12px;"></div>
-                            {# Légende #}
-<div class="d-flex flex-wrap gap-3 mt-3 mb-3">
-    <span><span style="background:#e91e8c;border-radius:50%;display:inline-block;width:14px;height:14px;"></span> Hôpital</span>
-    <span><span style="background:#ff9800;border-radius:50%;display:inline-block;width:14px;height:14px;"></span> Clinique</span>
-    <span><span style="background:#4caf50;border-radius:50%;display:inline-block;width:14px;height:14px;"></span> Pharmacie</span>
-    <span><span style="background:#4a90d9;border-radius:50%;display:inline-block;width:14px;height:14px;"></span> Votre position</span>
-</div>
-
-{# Liste triée par distance #}
-<h6 class="text-primary mt-3 mb-2"><i class="fas fa-list me-1"></i> Établissements proches — triés par distance</h6>
-<div id="hospitals-list">
-    <p class="small text-muted">Chargement en cours...</p>
-</div>
-
+                            <h5 class="text-primary mb-3"><i class="fas fa-map-marker-alt me-2"></i> Hôpitaux & cliniques proches</h5>
+                            <p class="small text-muted mb-3"><i class="fas fa-info-circle me-1"></i> Carte des établissements de santé proches de votre position.</p>
+                            <div id="map" style="height:250px;border-radius:12px;"></div>
+                            <div class="d-flex flex-wrap gap-3 mt-3 mb-3">
+                                <span><span style="background:#e91e8c;border-radius:50%;display:inline-block;width:14px;height:14px;"></span> Hôpital</span>
+                                <span><span style="background:#ff9800;border-radius:50%;display:inline-block;width:14px;height:14px;"></span> Clinique</span>
+                                <span><span style="background:#4caf50;border-radius:50%;display:inline-block;width:14px;height:14px;"></span> Pharmacie</span>
+                                <span><span style="background:#4a90d9;border-radius:50%;display:inline-block;width:14px;height:14px;"></span> Votre position</span>
+                            </div>
+                            <h6 class="text-primary mt-3 mb-2"><i class="fas fa-list me-1"></i> Établissements proches — triés par distance</h6>
+                            <div id="hospitals-list"><p class="small text-muted">Chargement en cours...</p></div>
                             <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
                             <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
                             <script>
-document.addEventListener('DOMContentLoaded', function () {
+                            document.addEventListener('DOMContentLoaded', function () {
     var map = L.map('map').setView([36.8065, 10.1815], 13);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -736,15 +736,15 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     // Calcul distance en km
- function calcDistance(lat1, lon1, lat2, lon2) {
-    var R = 6371;
-    var dLat = (lat2 - lat1) * Math.PI / 180;
-    var dLon = (lon2 - lon1) * Math.PI / 180;
-    var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon/2) * Math.sin(dLon/2);
-   return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1);
-}
+    function calcDistance(lat1, lon1, lat2, lon2) {
+        var R = 6371;
+        var dLat = (lat2 - lat1) * Math.PI / 180;
+        var dLon = (lon2 - lon1) * Math.PI / 180;
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+        return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1);
+    }
 
     // Déterminer le type d'établissement
     function getType(categories) {
@@ -761,7 +761,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function loadHospitals(userLat, userLng) {
-       fetch(https://api.geoapify.com/v2/places?categories=healthcare.hospital,healthcare.clinic_or_praxis,healthcare.pharmacy&filter=circle:${userLng},${userLat},7000&limit=15&apiKey=1175ae2fbe7c4881803c31dae105044d)
+        fetch(`https://api.geoapify.com/v2/places?categories=healthcare.hospital,healthcare.clinic_or_praxis,healthcare.pharmacy&filter=circle:${userLng},${userLat},7000&limit=15&apiKey=1175ae2fbe7c4881803c31dae105044d`)
             .then(r => r.json())
             .then(data => {
                 var results = [];
@@ -775,21 +775,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     var cats     = f.properties.categories || [];
                     var type     = getType(cats);
                     var label    = getTypeLabel(type);
-                    var mapsUrl  = https://www.google.com/maps/dir/?api=1&destination=${fLat},${fLon};
+                    var mapsUrl  = `https://www.google.com/maps/dir/?api=1&destination=${fLat},${fLon}`;
 
                     // Marqueur sur la carte
                     L.marker([fLat, fLon], {icon: icons[type]})
                         .addTo(map)
-.bindPopup(`
-    <div style="min-width:200px">
-        <strong>${label}</strong><br>
-        <strong>${name}</strong><br>
-        <small style="color:#888">${address}</small><br>
-        <a href="${mapsUrl}" target="_blank" style="display:block;margin-top:8px;background:#e91e8c;color:white;text-align:center;padding:6px;border-radius:8px;text-decoration:none;font-size:13px;">
-            🗺️ Y aller
-        </a>
-    </div>
-`);
+                        .bindPopup(`
+                            <div style="min-width:200px">
+                                <strong>${label}</strong><br>
+                                <strong>${name}</strong><br>
+                                <small style="color:#888">${address}</small><br>
+                                <a href="${mapsUrl}" target="_blank" style="display:block;margin-top:8px;background:#e91e8c;color:white;text-align:center;padding:6px;border-radius:8px;text-decoration:none;font-size:13px;">
+                                    🗺️ Y aller
+                                </a>
+                            </div>
+                        `);
 
                     results.push({ name, address, distance, type, label, mapsUrl });
                 });
@@ -798,47 +798,45 @@ document.addEventListener('DOMContentLoaded', function () {
                 results.sort((a, b) => a.distance - b.distance);
 
                 // Afficher la liste sous la carte
-var listEl = document.getElementById('hospitals-list');
-if (listEl) {
-    var visibleCount = 5;
-    
-function renderList(count) {
-    var html = results.slice(0, count).map((h, i) => `
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;margin-bottom:8px;background:white;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:4px solid ${h.type === 'hospital' ? '#e91e8c' : h.type === 'pharmacy' ? '#4caf50' : '#ff9800'}">
-            <div style="display:flex;align-items:center;gap:10px">
-                <span style="font-size:22px">${h.type === 'hospital' ? '🏥' : h.type === 'pharmacy' ? '💊' : '🏨'}</span>
-                <div>
-                    <div style="font-weight:600;font-size:13px">${h.name}</div>
-                    <div style="font-size:11px;color:#888;margin-top:2px">${h.label}</div>
-                    <div style="font-size:11px;color:#aaa;margin-top:1px">${h.address.substring(0, 50)}${h.address.length > 50 ? '...' : ''}</div>
-                </div>
-            </div>
-            <div style="text-align:center;flex-shrink:0;margin-left:10px">
-                <div style="background:#f0f4ff;border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600;color:#4a90d9;margin-bottom:6px">📍 ${h.distance} km</div>
-                <a href="${h.mapsUrl}" target="_blank" style="display:block;background:#e91e8c;color:white;padding:5px 10px;border-radius:8px;text-decoration:none;font-size:11px;font-weight:600">🗺️ Y aller</a>
-            </div>
-        </div>
-    `).join('');
+                var listEl = document.getElementById('hospitals-list');
+                if (listEl) {
+                    function renderList(count) {
+                        var html = results.slice(0, count).map((h, i) => `
+                            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;margin-bottom:8px;background:white;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:4px solid ${h.type === 'hospital' ? '#e91e8c' : h.type === 'pharmacy' ? '#4caf50' : '#ff9800'}">
+                                <div style="display:flex;align-items:center;gap:10px">
+                                    <span style="font-size:22px">${h.type === 'hospital' ? '🏥' : h.type === 'pharmacy' ? '💊' : '🏨'}</span>
+                                    <div>
+                                        <div style="font-weight:600;font-size:13px">${h.name}</div>
+                                        <div style="font-size:11px;color:#888;margin-top:2px">${h.label}</div>
+                                        <div style="font-size:11px;color:#aaa;margin-top:1px">${h.address.substring(0, 50)}${h.address.length > 50 ? '...' : ''}</div>
+                                    </div>
+                                </div>
+                                <div style="text-align:center;flex-shrink:0;margin-left:10px">
+                                    <div style="background:#f0f4ff;border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600;color:#4a90d9;margin-bottom:6px">📍 ${h.distance} km</div>
+                                    <a href="${h.mapsUrl}" target="_blank" style="display:block;background:#e91e8c;color:white;padding:5px 10px;border-radius:8px;text-decoration:none;font-size:11px;font-weight:600">🗺️ Y aller</a>
+                                </div>
+                            </div>
+                        `).join('');
 
-    if (results.length > 5) {
-        if (count < results.length) {
-            html += `<button onclick="showMore()" style="width:100%;padding:10px;margin-top:4px;background:white;border:2px dashed #4a90d9;color:#4a90d9;border-radius:10px;cursor:pointer;font-weight:600">
-                ⬇️ Voir plus (${results.length - count} autres établissements)
-            </button>`;
-        } else {
-            html += `<button onclick="showLess()" style="width:100%;padding:10px;margin-top:4px;background:white;border:2px dashed #888;color:#888;border-radius:10px;cursor:pointer;font-weight:600">
-                ⬆️ Voir moins
-            </button>`;
-        }
-    }
-    listEl.innerHTML = html;
-}
+                        if (results.length > 5) {
+                            if (count < results.length) {
+                                html += `<button onclick="showMore()" style="width:100%;padding:10px;margin-top:4px;background:white;border:2px dashed #4a90d9;color:#4a90d9;border-radius:10px;cursor:pointer;font-weight:600">
+                                    ⬇️ Voir plus (${results.length - count} autres établissements)
+                                </button>`;
+                            } else {
+                                html += `<button onclick="showLess()" style="width:100%;padding:10px;margin-top:4px;background:white;border:2px dashed #888;color:#888;border-radius:10px;cursor:pointer;font-weight:600">
+                                    ⬆️ Voir moins
+                                </button>`;
+                            }
+                        }
+                        listEl.innerHTML = html;
+                    }
 
-    window.showMore = function() { renderList(results.length); };
-    window.showLess = function() { renderList(5); };
-    
-    renderList(visibleCount);
-}
+                    window.showMore = function() { renderList(results.length); };
+                    window.showLess = function() { renderList(5); };
+                    
+                    renderList(5);
+                }
             })
             .catch(err => console.log('Erreur Geoapify:', err));
     }
@@ -874,129 +872,321 @@ function renderList(count) {
                         </div>
                         {# ===== FIN CARTE HÔPITAUX ===== #}
 
+                        {# Informations personnelles #}
                         <div class="border border-primary rounded-3 bg-light p-4 mb-4 shadow-sm">
                             <h4 class="text-primary mb-3"><i class="fas fa-phone-alt me-2"></i> Informations personnelles & contact</h4>
                             <div class="row g-3">
-                                <div class="col-md-6">
-                                    <span class="text-muted small d-block">Numéro d'urgence</span>
-                                    <strong>+216 {{ maman.numeroUrgence }}</strong>
-                                </div>
-                                <div class="col-md-6">
-                                    <span class="text-muted small d-block">Groupe sanguin</span>
-                                    <strong>{{ maman.groupeSanguin }}</strong>
-                                </div>
-                                <div class="col-md-6">
-                                    <span class="text-muted small d-block">Taille</span>
-                                    <strong>{{ maman.taille }} cm</strong>
-                                </div>
-                                <div class="col-md-6">
-                                    <span class="text-muted small d-block">Poids</span>
-                                    <strong>{{ maman.poids }} kg</strong>
-                                </div>
+                                <div class="col-md-6"><span class="text-muted small d-block">Numéro d'urgence</span><strong>+216 {{ maman.numeroUrgence }}</strong></div>
+                                <div class="col-md-6"><span class="text-muted small d-block">Groupe sanguin</span><strong>{{ maman.groupeSanguin }}</strong></div>
+                                <div class="col-md-6"><span class="text-muted small d-block">Taille</span><strong>{{ maman.taille }} cm</strong></div>
+                                <div class="col-md-6"><span class="text-muted small d-block">Poids</span><strong>{{ maman.poids }} kg</strong></div>
+                                {% if maman.dateNaissance %}
+                                    <div class="col-md-6"><span class="text-muted small d-block">Date de naissance</span><strong>{{ maman.dateNaissance|date('d/m/Y') }} ({{ maman.age }} ans)</strong></div>
+                                {% endif %}
                             </div>
                         </div>
 
+                        {# Informations santé #}
                         <div class="border border-primary rounded-3 bg-light p-4 mb-4 shadow-sm">
                             <h4 class="text-primary mb-3"><i class="fas fa-file-medical me-2"></i> Informations santé</h4>
-                            <div class="mb-3">
-                                <span class="text-muted small d-block">Allergies</span>
-                                <span>{{ maman.allergies ?: 'Aucune indiquée' }}</span>
-                            </div>
-                            <div class="mb-3">
-                                <span class="text-muted small d-block">Antécédents médicaux</span>
-                                <span>{{ maman.antecedentsMedicaux ?: 'Aucun indiqué' }}</span>
-                            </div>
-                            <div class="mb-3">
-                                <span class="text-muted small d-block">Maladies chroniques</span>
-                                <span>{{ maman.maladiesChroniques ?: 'Aucune indiquée' }}</span>
-                            </div>
-                            <div>
-                                <span class="text-muted small d-block">Médicaments actuels</span>
-                                <span>{{ maman.medicamentsActuels ?: 'Aucun indiqué' }}</span>
-                            </div>
+                            <div class="mb-3"><span class="text-muted small d-block">Allergies</span><span>{{ maman.allergies ?: 'Aucune indiquée' }}</span></div>
+                            <div class="mb-3"><span class="text-muted small d-block">Antécédents médicaux</span><span>{{ maman.antecedentsMedicaux ?: 'Aucun indiqué' }}</span></div>
+                            <div class="mb-3"><span class="text-muted small d-block">Maladies chroniques</span><span>{{ maman.maladiesChroniques ?: 'Aucune indiquée' }}</span></div>
+                            <div><span class="text-muted small d-block">Médicaments actuels</span><span>{{ maman.medicamentsActuels ?: 'Aucun indiqué' }}</span></div>
                         </div>
 
+                        {# Mode de vie #}
                         <div class="border border-primary rounded-3 bg-light p-4 mb-4 shadow-sm">
                             <h4 class="text-primary mb-3"><i class="fas fa-heartbeat me-2"></i> Mode de vie & bien-être</h4>
                             <div class="row g-3">
-                                <div class="col-md-6">
-                                    <span class="text-muted small d-block">Fumeuse</span>
-                                    <strong>{{ maman.fumeur ? 'Oui' : 'Non' }}</strong>
-                                </div>
-                                <div class="col-md-6">
-                                    <span class="text-muted small d-block">Consommation d'alcool</span>
-                                    <strong>{{ maman.consommationAlcool ? 'Oui' : 'Non' }}</strong>
-                                </div>
-                                <div class="col-12">
-                                    <span class="text-muted small d-block">Niveau d'activité physique</span>
-                                    <strong>{{ maman.niveauActivitePhysique }}</strong>
-                                </div>
-                                <div class="col-12">
-                                    <span class="text-muted small d-block">Habitudes alimentaires</span>
-                                    <span>{{ maman.habitudesAlimentaires ?: '—' }}</span>
-                                </div>
+                                <div class="col-md-6"><span class="text-muted small d-block">Fumeuse</span><strong>{{ maman.fumeur ? 'Oui' : 'Non' }}</strong></div>
+                                <div class="col-md-6"><span class="text-muted small d-block">Consommation d'alcool</span><strong>{{ maman.consommationAlcool ? 'Oui' : 'Non' }}</strong></div>
+                                <div class="col-12"><span class="text-muted small d-block">Niveau d'activité physique</span><strong>{{ maman.niveauActivitePhysique }}</strong></div>
+                                <div class="col-12"><span class="text-muted small d-block">Habitudes alimentaires</span><span>{{ maman.habitudesAlimentaires ?: '—' }}</span></div>
                             </div>
                         </div>
-                    </div>
 
+                    </div>
+                    {# FIN COLONNE GAUCHE #}
+
+                    {# COLONNE DROITE #}
                     <div class="col-lg-4">
-                        <div class="border rounded-3 p-4 mb-4 shadow-sm bg-light {{ imc_alerte|default(false) ? 'border-danger' : 'border-primary' }}">
+
+                        {# IMC #}
+                        <div class="border rounded-3 p-3 mb-4 shadow-sm bg-light {{ imc_alerte|default(false) ? 'border-danger' : 'border-primary' }}">
                             <h5 class="text-primary mb-3"><i class="fas fa-weight me-2"></i> Votre IMC</h5>
                             {% if imc is defined and imc is not null %}
-                                <p class="mb-1 display-6 fw-bold text-dark">{{ imc }}</p>
+                                <p class="mb-1 fs-2 fw-bold text-dark">{{ imc }}</p>
                                 <p class="mb-0 text-body">{{ imc_categorie|default('') }}</p>
                                 <p class="mt-2 small mb-0 {{ imc_alerte|default(false) ? 'text-danger fw-semibold' : 'text-body-secondary' }}">
-                                    {% if imc_alerte|default(false) %}
-                                        IMC à risque — consultez un professionnel.
-                                    {% else %}
-                                        IMC calculé automatiquement à partir de votre taille et poids.
-                                    {% endif %}
+                                    {% if imc_alerte|default(false) %}IMC à risque — consultez un professionnel.
+                                    {% else %}IMC calculé automatiquement à partir de votre taille et poids.{% endif %}
                                 </p>
                             {% else %}
                                 <p class="text-body-secondary mb-0">Indisponible (taille ou poids manquant).</p>
                             {% endif %}
                         </div>
 
-                        <div class="border border-primary rounded-3 bg-light p-4 shadow-sm conseils-sante-card mb-4">
+                        {# Conseils santé #}
+                        <div class="border border-primary rounded-3 bg-light p-4 shadow-sm mb-4">
                             <h5 class="text-primary mb-4 pb-2 border-bottom border-2 border-primary">
                                 <i class="fas fa-lightbulb me-2"></i> Conseils santé
                             </h5>
                             <div class="conseils-list">
                                 {% for conseil in conseils|default([]) %}
-                                    <div class="conseil-item d-flex align-items-start mb-3 p-3 rounded-3 bg-white border border-primary border-opacity-25">
-                                        <span class="conseil-icon flex-shrink-0 rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px;">
+                                    <div class="d-flex align-items-start mb-3 p-3 rounded-3 bg-white border border-primary border-opacity-25">
+                                        <span class="flex-shrink-0 rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center me-3" style="width:32px;height:32px;">
                                             <i class="fas fa-check small"></i>
                                         </span>
-                                        <span class="conseil-text small lh-base">{{ conseil }}</span>
+                                        <span class="small lh-base">{{ conseil }}</span>
                                     </div>
                                 {% else %}
-                                    <div class="conseil-item d-flex align-items-start p-3 rounded-3 bg-white border border-primary border-opacity-25">
-                                        <span class="conseil-icon flex-shrink-0 rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px;">
+                                    <div class="d-flex align-items-start p-3 rounded-3 bg-white border border-primary border-opacity-25">
+                                        <span class="flex-shrink-0 rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center me-3" style="width:32px;height:32px;">
                                             <i class="fas fa-heart small"></i>
                                         </span>
-                                        <span class="conseil-text small text-muted lh-base">Continuez à prendre soin de vous.</span>
+                                        <span class="small text-muted lh-base">Continuez à prendre soin de vous.</span>
                                     </div>
                                 {% endfor %}
                             </div>
                         </div>
 
+                        {# Boutons actions #}
                         <div class="d-flex flex-wrap gap-2">
-                            <a href="{{ path('app_suivi_grossesse_edit', { id: maman.id }) }}" class="btn btn-primary btn-sm flex-grow-1 flex-lg-grow-0 px-3 py-2 btn-border-radius">
+                            <a href="{{ path('app_suivi_grossesse_edit', { id: maman.id }) }}" class="btn btn-primary btn-sm flex-grow-1 px-3 py-2 btn-border-radius">
                                 <i class="fas fa-edit me-1"></i> Modifier
                             </a>
-                            <a href="{{ path('app_appointment') }}" class="btn btn-primary btn-sm flex-grow-1 flex-lg-grow-0 px-3 py-2 btn-border-radius">
+                            <a href="{{ path('app_appointment') }}" class="btn btn-primary btn-sm flex-grow-1 px-3 py-2 btn-border-radius">
                                 <i class="fas fa-calendar-check me-1"></i> Rendez-vous
                             </a>
-                            <form method="post" action="{{ path('app_suivi_grossesse_delete', { id: maman.id }) }}" class="d-inline flex-grow-1 flex-lg-grow-0" onsubmit="return confirm('Êtes-vous sûre de vouloir supprimer votre profil ? Cette action est irréversible.');">
+                            <form method="post" action="{{ path('app_suivi_grossesse_delete', { id: maman.id }) }}" class="d-inline w-100" onsubmit="return confirm('Êtes-vous sûre de vouloir supprimer votre profil ? Cette action est irréversible.');">
                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ maman.id) }}">
                                 <button type="submit" class="btn btn-outline-danger btn-sm w-100 px-3 py-2 btn-border-radius">
                                     <i class="fas fa-trash-alt me-1"></i> Supprimer
                                 </button>
                             </form>
                         </div>
+
+                    </div>
+                    {# FIN COLONNE DROITE #}
+
+                </div>
+                {# ===== FIN GRILLE INFORMATIONS ===== #}
+
+                {# ================================================================ #}
+                {# ===== MODALS (toutes en dehors de la grille, dans container) ===== #}
+                {# ================================================================ #}
+
+                {# ===== CHATBOT POPOUT ===== #}
+                <style>
+                @keyframes slideUp { from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
+                @keyframes typing { 0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);} }
+                .typing-dot{width:8px;height:8px;background:#e91e8c;border-radius:50%;display:inline-block;margin:0 2px;animation:typing 1.2s infinite;}
+                .typing-dot:nth-child(2){animation-delay:0.2s;}.typing-dot:nth-child(3){animation-delay:0.4s;}
+                .chat-message{animation:slideUp 0.3s ease;}
+                #chat-window{display:none;flex-direction:column;}
+                #chat-window.open{display:flex !important;animation:slideUp 0.3s ease;}
+                @keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+                </style>
+
+                <button onclick="toggleChat()" id="chat-btn" style="position:fixed;bottom:30px;right:30px;width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,#e91e8c,#ff6bb3);border:none;color:white;font-size:26px;box-shadow:0 4px 20px rgba(233,30,140,0.5);cursor:pointer;z-index:9999;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.12)'" onmouseout="this.style.transform='scale(1)'">🤱</button>
+                <div id="chat-badge" style="position:fixed;bottom:84px;right:28px;background:#ff4444;color:white;border-radius:50%;width:20px;height:20px;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700;z-index:10000;">1</div>
+                <div id="chat-window" style="position:fixed;bottom:105px;right:30px;width:370px;height:530px;background:white;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,0.18);z-index:9998;overflow:hidden;">
+                    <div style="background:linear-gradient(135deg,#e91e8c,#ff6bb3);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <div style="width:42px;height:42px;background:rgba(255,255,255,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;">🤱</div>
+                            <div>
+                                <div style="color:white;font-weight:700;font-size:14px;">Maternia AI</div>
+                                <div style="color:rgba(255,255,255,0.85);font-size:11px;">● En ligne — Je connais votre profil</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button onclick="clearChat()" title="Nouvelle conversation" style="background:rgba(255,255,255,0.2);border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:13px;">🗑️</button>
+                            <button onclick="toggleChat()" style="background:rgba(255,255,255,0.2);border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;">✕</button>
+                        </div>
+                    </div>
+                    <div id="chatbot-messages" style="height:310px;overflow-y:auto;padding:14px;background:#f9f9f9;scroll-behavior:smooth;">
+                        <div class="chat-message" style="display:flex;align-items:flex-start;margin-bottom:12px;">
+                            <div style="width:28px;height:28px;background:linear-gradient(135deg,#e91e8c,#ff6bb3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-right:8px;">🤱</div>
+                            <div>
+                                <div style="background:white;border-radius:0 12px 12px 12px;padding:10px 13px;max-width:100%;box-shadow:0 1px 4px rgba(0,0,0,0.07);font-size:13px;color:#333;line-height:1.5;">Bonjour ! Je suis Maternia AI 💕 Je connais votre profil médical et je suis là pour vous aider.</div>
+                                <div style="font-size:10px;color:#aaa;margin-top:3px;margin-left:4px;" id="msg-time-0"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="padding:8px 12px;background:white;border-top:1px solid #f0f0f0;display:flex;gap:5px;flex-wrap:wrap;">
+                        {% for suggestion in ['Aliments a eviter ?','Exercices ?','Vitamines ?','Signes alarme ?'] %}
+                            <button onclick="askSuggestion('{{ suggestion }}')" style="background:rgba(233,30,140,0.07);color:#e91e8c;border:1px solid rgba(233,30,140,0.2);border-radius:20px;padding:3px 9px;font-size:11px;cursor:pointer;" onmouseover="this.style.background='rgba(233,30,140,0.15)'" onmouseout="this.style.background='rgba(233,30,140,0.07)'">{{ suggestion }}</button>
+                        {% endfor %}
+                    </div>
+                    <div style="padding:10px 14px;background:white;border-top:1px solid #f0f0f0;display:flex;gap:8px;align-items:center;">
+                        <input type="text" id="chatbot-input" placeholder="Posez votre question..." style="flex:1;border:2px solid rgba(233,30,140,0.2);border-radius:25px;padding:8px 15px;font-size:13px;outline:none;" onfocus="this.style.borderColor='#e91e8c'" onblur="this.style.borderColor='rgba(233,30,140,0.2)'">
+                        <button onclick="sendMessage()" style="width:38px;height:38px;background:linear-gradient(135deg,#e91e8c,#ff6bb3);border:none;border-radius:50%;color:white;cursor:pointer;font-size:15px;flex-shrink:0;">➤</button>
                     </div>
                 </div>
-            </div>
+                <script>
+                const MAMAN_ID = {{ maman.id }};
+                function getTime(){var now=new Date();return now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');}
+                document.getElementById('msg-time-0').textContent=getTime();
+                function toggleChat(){var win=document.getElementById('chat-window');var badge=document.getElementById('chat-badge');win.classList.toggle('open');if(badge)badge.style.display='none';}
+                function clearChat(){fetch(`/suivi_grossesse/${MAMAN_ID}/chatbot/reset`,{method:'POST',headers:{'Content-Type':'application/json'}}).then(()=>{document.getElementById('chatbot-messages').innerHTML=`<div class="chat-message" style="display:flex;align-items:flex-start;margin-bottom:12px;"><div style="width:28px;height:28px;background:linear-gradient(135deg,#e91e8c,#ff6bb3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-right:8px;">🤱</div><div><div style="background:white;border-radius:0 12px 12px 12px;padding:10px 13px;box-shadow:0 1px 4px rgba(0,0,0,0.07);font-size:13px;color:#333;">Nouvelle conversation ! Comment puis-je vous aider ? 💕</div><div style="font-size:10px;color:#aaa;margin-top:3px;margin-left:4px;">${getTime()}</div></div></div>`;});}
+                function sendMessage(){var input=document.getElementById('chatbot-input');var question=input.value.trim();if(!question)return;appendMessage(question,'user');input.value='';appendTyping();fetch(`/suivi_grossesse/${MAMAN_ID}/chatbot`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:question})}).then(r=>r.json()).then(data=>{removeTyping();appendMessage(data.reponse||"Une erreur est survenue.",'bot');}).catch(()=>{removeTyping();appendMessage("Service momentanément indisponible. 💕",'bot');});}
+                function askSuggestion(text){document.getElementById('chatbot-input').value=text;sendMessage();}
+                function appendMessage(text,sender){var box=document.getElementById('chatbot-messages');var time=getTime();if(sender==='user'){box.innerHTML+=`<div class="chat-message" style="display:flex;justify-content:flex-end;margin-bottom:12px;"><div><div style="background:linear-gradient(135deg,#e91e8c,#ff6bb3);color:white;border-radius:12px 0 12px 12px;padding:10px 13px;max-width:260px;font-size:13px;line-height:1.5;">${text}</div><div style="font-size:10px;color:#aaa;margin-top:3px;text-align:right;margin-right:4px;">${time}</div></div></div>`;}else{box.innerHTML+=`<div class="chat-message" style="display:flex;align-items:flex-start;margin-bottom:12px;"><div style="width:28px;height:28px;background:linear-gradient(135deg,#e91e8c,#ff6bb3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-right:8px;">🤱</div><div><div style="background:white;border-radius:0 12px 12px 12px;padding:10px 13px;max-width:260px;box-shadow:0 1px 4px rgba(0,0,0,0.07);font-size:13px;color:#333;line-height:1.5;">${text}</div><div style="font-size:10px;color:#aaa;margin-top:3px;margin-left:4px;">${time}</div></div></div>`;}box.scrollTop=box.scrollHeight;}
+                function appendTyping(){var box=document.getElementById('chatbot-messages');box.innerHTML+=`<div id="typing-indicator" style="display:flex;align-items:flex-start;margin-bottom:12px;"><div style="width:28px;height:28px;background:linear-gradient(135deg,#e91e8c,#ff6bb3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-right:8px;">🤱</div><div style="background:white;border-radius:0 12px 12px 12px;padding:12px 16px;box-shadow:0 1px 4px rgba(0,0,0,0.07);"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div></div>`;box.scrollTop=box.scrollHeight;}
+                function removeTyping(){var el=document.getElementById('typing-indicator');if(el)el.remove();}
+                document.addEventListener('DOMContentLoaded',function(){var input=document.getElementById('chatbot-input');if(input){input.addEventListener('keypress',function(e){if(e.key==='Enter')sendMessage();});}});
+                </script>
+                {# ===== FIN CHATBOT POPOUT ===== #}
+
+                {# ===== MODAL NUTRITION ===== #}
+                {% if nutrition is defined and nutrition %}
+                <div id="nutritionModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99999;align-items:center;justify-content:center;padding:20px;">
+                    <div style="background:white;border-radius:24px;width:100%;max-width:750px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+                        <div style="background:linear-gradient(135deg,#4caf50,#81c784);padding:20px 24px;border-radius:24px 24px 0 0;display:flex;align-items:center;justify-content:space-between;">
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <div style="width:48px;height:48px;background:rgba(255,255,255,0.25);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;">🥗</div>
+                                <div>
+                                    <div style="color:white;font-weight:700;font-size:18px;">Mon calculateur nutritionnel</div>
+                                    <div style="color:rgba(255,255,255,0.85);font-size:12px;">Trimestre {{ nutrition.trimestre }} — {{ nutrition.imc_categorie }}{% if imc is defined and imc %} (IMC {{ imc }}){% endif %}</div>
+                                </div>
+                            </div>
+                            <button onclick="document.getElementById('nutritionModal').style.display='none'" style="background:rgba(255,255,255,0.2);border:none;color:white;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px;">✕</button>
+                        </div>
+                        <div style="padding:24px;">
+                            <div class="alert alert-{{ nutrition.evaluation.couleur }} border-2 d-flex align-items-center gap-2 mb-4">
+                                <span style="font-size:20px;">{{ nutrition.evaluation.icone }}</span>
+                                <span class="small">{{ nutrition.evaluation.message }}</span>
+                            </div>
+                            <h6 class="text-success mb-3"><i class="fas fa-fire me-2"></i>Besoins caloriques journaliers</h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-3 col-6"><div style="background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border:2px solid #4caf50;border-radius:16px;padding:16px;text-align:center;"><div style="font-size:28px;font-weight:800;color:#2e7d32;">{{ nutrition.calories_total }}</div><div style="font-size:11px;color:#666;margin-top:4px;">kcal/jour total</div></div></div>
+                                <div class="col-md-3 col-6"><div style="background:linear-gradient(135deg,#e3f2fd,#e8eaf6);border:2px solid #2196f3;border-radius:16px;padding:16px;text-align:center;"><div style="font-size:22px;font-weight:700;color:#1565c0;">{{ nutrition.calories_base }}</div><div style="font-size:11px;color:#666;margin-top:4px;">kcal base (BMR)</div></div></div>
+                                <div class="col-md-3 col-6"><div style="background:linear-gradient(135deg,#fce4ec,#fce4ec);border:2px solid #e91e8c;border-radius:16px;padding:16px;text-align:center;"><div style="font-size:22px;font-weight:700;color:#c2185b;">+{{ nutrition.surplus_trimestre }}</div><div style="font-size:11px;color:#666;margin-top:4px;">surplus grossesse</div></div></div>
+                                <div class="col-md-3 col-6"><div style="background:linear-gradient(135deg,#fff8e1,#fff8e1);border:2px solid #ff9800;border-radius:16px;padding:16px;text-align:center;"><div style="font-size:22px;font-weight:700;color:#e65100;">{% if nutrition.ajustement_imc > 0 %}+{% endif %}{{ nutrition.ajustement_imc }}</div><div style="font-size:11px;color:#666;margin-top:4px;">ajust. IMC</div></div></div>
+                            </div>
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-5">
+                                    <h6 class="text-success mb-3"><i class="fas fa-chart-pie me-2"></i>Répartition macronutriments</h6>
+                                    <canvas id="chartMacros" height="220"></canvas>
+                                </div>
+                                <div class="col-md-7">
+                                    <h6 class="text-success mb-3"><i class="fas fa-balance-scale me-2"></i>Détail macronutriments</h6>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div style="background:#fce4ec;border-radius:12px;padding:12px 16px;"><div class="d-flex justify-content-between align-items-center mb-1"><span style="font-weight:600;font-size:13px;">🥩 Protéines</span><span style="font-weight:700;color:#c2185b;">{{ nutrition.proteines }}g/jour</span></div><div style="background:rgba(0,0,0,0.1);border-radius:10px;height:8px;"><div style="background:#e91e8c;border-radius:10px;height:8px;width:20%;"></div></div><small class="text-muted">20% des calories — viande, œufs, légumineuses</small></div>
+                                        <div style="background:#e8f5e9;border-radius:12px;padding:12px 16px;"><div class="d-flex justify-content-between align-items-center mb-1"><span style="font-weight:600;font-size:13px;">🌾 Glucides</span><span style="font-weight:700;color:#2e7d32;">{{ nutrition.glucides }}g/jour</span></div><div style="background:rgba(0,0,0,0.1);border-radius:10px;height:8px;"><div style="background:#4caf50;border-radius:10px;height:8px;width:50%;"></div></div><small class="text-muted">50% des calories — céréales complètes, fruits</small></div>
+                                        <div style="background:#fff8e1;border-radius:12px;padding:12px 16px;"><div class="d-flex justify-content-between align-items-center mb-1"><span style="font-weight:600;font-size:13px;">🥑 Lipides</span><span style="font-weight:700;color:#e65100;">{{ nutrition.lipides }}g/jour</span></div><div style="background:rgba(0,0,0,0.1);border-radius:10px;height:8px;"><div style="background:#ff9800;border-radius:10px;height:8px;width:30%;"></div></div><small class="text-muted">30% des calories — huile d'olive, noix, poisson</small></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <h6 class="text-success mb-3"><i class="fas fa-pills me-2"></i>Micronutriments essentiels — Normes OMS</h6>
+                            <div class="row g-2 mb-4">
+                                {% for micro in nutrition.micronutriments %}
+                                    <div class="col-md-4 col-6"><div style="border:2px solid {{ micro.couleur }}20;border-radius:14px;padding:12px;background:{{ micro.couleur }}08;"><div class="d-flex align-items-center gap-2 mb-1"><span style="font-size:18px;">{{ micro.icone }}</span><span style="font-weight:700;font-size:13px;color:{{ micro.couleur }};">{{ micro.valeur }} {{ micro.unite }}</span></div><div style="font-weight:600;font-size:12px;color:#333;">{{ micro.nom }}</div><div style="font-size:10px;color:#888;margin-top:2px;">{{ micro.sources }}</div><span style="font-size:10px;background:{{ micro.couleur }}20;color:{{ micro.couleur }};border-radius:20px;padding:1px 6px;margin-top:4px;display:inline-block;">{{ micro.importance }}</span></div></div>
+                                {% endfor %}
+                            </div>
+                            <h6 class="text-success mb-3"><i class="fas fa-star me-2"></i>Top 5 aliments — Trimestre {{ nutrition.trimestre }}</h6>
+                            <div class="d-flex flex-wrap gap-2 mb-4">
+                                {% for aliment in nutrition.aliments_top %}
+                                    <div style="background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border:1px solid #4caf5040;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:8px;"><span style="font-size:20px;">{{ aliment.icone }}</span><div><div style="font-weight:700;font-size:12px;color:#2e7d32;">{{ aliment.nom }}</div><div style="font-size:10px;color:#666;">{{ aliment.raison }}</div></div></div>
+                                {% endfor %}
+                            </div>
+                            <div style="background:#f9f9f9;border-left:4px solid #4caf50;border-radius:0 12px 12px 0;padding:12px 16px;"><p class="small text-muted mb-0"><i class="fas fa-info-circle me-1 text-success"></i>Ces valeurs sont calculées selon la formule Mifflin-St Jeor et les recommandations OMS. Consultez toujours votre médecin ou diététicienne pour un suivi personnalisé.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <script>
+                document.addEventListener('DOMContentLoaded',function(){var ctx=document.getElementById('chartMacros');if(!ctx)return;new Chart(ctx,{type:'doughnut',data:{labels:['Protéines 20%','Glucides 50%','Lipides 30%'],datasets:[{data:[{{ nutrition.proteines*4 }},{{ nutrition.glucides*4 }},{{ nutrition.lipides*9 }}],backgroundColor:['#e91e8c','#4caf50','#ff9800'],borderColor:['white','white','white'],borderWidth:3,hoverOffset:8}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10}},tooltip:{callbacks:{label:ctx=>ctx.label+' — '+ctx.parsed+' kcal'}}}}});});
+                </script>
+                {% endif %}
+                {# ===== FIN MODAL NUTRITION ===== #}
+
+                {# ===== MODAL SCANNER ALIMENTS ===== #}
+                <div id="scannerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99999;align-items:center;justify-content:center;padding:20px;">
+                    <div style="background:white;border-radius:24px;width:100%;max-width:650px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+                        <div style="background:linear-gradient(135deg,#ff9800,#ffb74d);padding:20px 24px;border-radius:24px 24px 0 0;display:flex;align-items:center;justify-content:space-between;">
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <div style="width:48px;height:48px;background:rgba(255,255,255,0.25);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;">🍎</div>
+                                <div><div style="color:white;font-weight:700;font-size:18px;">Scanner aliments</div><div style="color:rgba(255,255,255,0.85);font-size:12px;">Vérifiez si un aliment est sûr pendant la grossesse</div></div>
+                            </div>
+                            <button onclick="document.getElementById('scannerModal').style.display='none'" style="background:rgba(255,255,255,0.2);border:none;color:white;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px;">✕</button>
+                        </div>
+                        <div style="padding:24px;">
+                            <div class="mb-4">
+                                <div style="display:flex;gap:10px;margin-bottom:10px;">
+                                    <input type="text" id="scanner-input" placeholder="Ex: brie, coca-cola, nutella..." style="flex:1;border:2px solid rgba(255,152,0,0.3);border-radius:12px;padding:12px 16px;font-size:14px;outline:none;" onfocus="this.style.borderColor='#ff9800'" onblur="this.style.borderColor='rgba(255,152,0,0.3)'" onkeypress="if(event.key==='Enter') rechercherAliment()">
+                                    <button onclick="rechercherAliment()" style="background:linear-gradient(135deg,#ff9800,#ffb74d);border:none;color:white;padding:12px 20px;border-radius:12px;cursor:pointer;font-weight:600;font-size:14px;">🔍 Chercher</button>
+                                </div>
+                                <div style="display:flex;gap:8px;margin-bottom:10px;">
+                                    <input type="number" id="scanner-barcode" placeholder="Code barre (ex: 3017620422003)" style="flex:1;border:2px solid rgba(255,152,0,0.3);border-radius:12px;padding:12px 16px;font-size:14px;outline:none;" onfocus="this.style.borderColor='#ff9800'" onblur="this.style.borderColor='rgba(255,152,0,0.3)'" onkeypress="if(event.key==='Enter') rechercherParCode()">
+                                    <button onclick="rechercherParCode()" style="background:linear-gradient(135deg,#ff9800,#ffb74d);border:none;color:white;padding:12px 20px;border-radius:12px;cursor:pointer;font-weight:600;font-size:14px;">📦 Scanner</button>
+                                </div>
+                                <div class="d-flex flex-wrap gap-2">
+                                    {% for suggestion in ['Brie','Saumon fumé','Nutella','Coca-Cola','Yaourt','Thon'] %}
+                                        <button onclick="rechercherRapide('{{ suggestion }}')" style="background:rgba(255,152,0,0.1);color:#e65100;border:1px solid rgba(255,152,0,0.3);border-radius:20px;padding:4px 12px;font-size:12px;cursor:pointer;">{{ suggestion }}</button>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div id="scanner-loading" style="display:none;text-align:center;padding:30px;"><div style="font-size:40px;animation:spin 1s linear infinite;">🔍</div><p class="text-muted mt-2">Recherche en cours...</p></div>
+                            <div id="scanner-result" style="display:none;"></div>
+                            <div id="scanner-empty" style="display:none;text-align:center;padding:30px;"><div style="font-size:48px;">🤷</div><p class="text-muted mt-2">Produit non trouvé. Essayez un autre nom.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                const TRIMESTRE_MAMAN = {{ grossesse ? (grossesse.trimestreActuel ?? 1) : 1 }};
+                const INTERDITS = ['alcool','biere','vin','whisky','vodka','camembert','brie','roquefort','livarot','munster','reblochon','saucisson','rillettes','pâté','foie gras','surimi cru','sushi','sashimi','saumon fum','truite fum','hareng fum','cigarette'];
+                const MODERATION = ['cafe','cafeine','thon','espadon','requin','maquereau','cola','energy drink','sucre','sirop'];
+                function getStatutGrossesse(nom,ingredients){var texte=(nom+' '+(ingredients||'')).toLowerCase();for(var i=0;i<INTERDITS.length;i++){if(texte.includes(INTERDITS[i])){return{niveau:'interdit',couleur:'#f44336',bg:'#ffebee',icone:'🚨',label:'Interdit pendant la grossesse',conseil:getConseilInterdit(INTERDITS[i],TRIMESTRE_MAMAN)};}}for(var j=0;j<MODERATION.length;j++){if(texte.includes(MODERATION[j])){return{niveau:'moderation',couleur:'#ff9800',bg:'#fff8e1',icone:'⚠️',label:'À consommer avec modération',conseil:getConseilModeration(MODERATION[j],TRIMESTRE_MAMAN)};}}return{niveau:'autorise',couleur:'#4caf50',bg:'#e8f5e9',icone:'✅',label:'Autorisé pendant la grossesse',conseil:'Cet aliment peut être consommé sans risque particulier. Continuez à manger varié et équilibré 💕'};}
+                function getConseilInterdit(mot,trimestre){if(mot.includes('alcool')||mot.includes('biere')||mot.includes('vin'))return'Zéro alcool pendant toute la grossesse — aucune dose n\'est considérée sûre pour votre bébé.';if(['camembert','brie','roquefort','livarot','munster','reblochon'].includes(mot))return'Les fromages à pâte molle non pasteurisés présentent un risque de listériose. Préférez les fromages à pâte cuite (emmental, comté).';if(['saucisson','rillettes','pâté','foie gras'].includes(mot))return'Les charcuteries crues et les pâtés sont à éviter à cause du risque de toxoplasmose et listériose.';if(['sushi','sashimi','surimi cru'].includes(mot))return'Le poisson cru est déconseillé pendant la grossesse (risque de parasites). Préférez le poisson bien cuit.';if(mot.includes('saumon fum')||mot.includes('truite fum')||mot.includes('hareng fum'))return'Le poisson fumé peut contenir de la listéria. Préférez le saumon bien cuit pendant la grossesse.';return'Cet aliment est déconseillé pendant la grossesse. Consultez votre médecin.';}
+                function getConseilModeration(mot,trimestre){if(mot.includes('cafe')||mot.includes('cafeine'))return'Limitez la caféine à 200mg/jour (environ 2 cafés). Au trimestre '+trimestre+', la caféine passe dans le placenta.';if(['thon','espadon','requin','maquereau'].includes(mot))return'Les gros poissons accumulent du mercure. Maximum 1 fois/semaine, et évitez l\'espadon et le requin complètement.';if(mot.includes('cola')||mot.includes('energy'))return'Les boissons sucrées et énergisantes sont à limiter — sucre en excès et caféine déconseillés.';return'À consommer avec modération pendant la grossesse. Privilégiez des alternatives plus saines.';}
+                function getNutriscoreStyle(score){if(!score)return{bg:'#9e9e9e',color:'white',label:'?'};var s=score.toUpperCase();var styles={'A':{bg:'#1a9641',color:'white'},'B':{bg:'#6abf69',color:'white'},'C':{bg:'#e6c619',color:'#333'},'D':{bg:'#e67e22',color:'white'},'E':{bg:'#d7191c',color:'white'}};return{...(styles[s]||{bg:'#9e9e9e',color:'white'}),label:s};}
+                function afficherResultat(product){var nom=product.product_name||product.product_name_fr||'Produit inconnu';var ingredients=product.ingredients_text||product.ingredients_text_fr||'';var allergenes=product.allergens_tags||[];var nutriscore=product.nutriscore_grade||product.nutrition_grade_fr||null;var image=product.image_front_small_url||product.image_url||null;var statut=getStatutGrossesse(nom,ingredients);var ns=getNutriscoreStyle(nutriscore);var allergenesList=allergenes.map(a=>a.replace('en:','').replace('fr:','')).filter(a=>a).join(', ')||'Aucun détecté';var html=`<div style="border:3px solid ${statut.couleur};border-radius:16px;overflow:hidden;"><div style="background:${statut.bg};padding:16px 20px;display:flex;align-items:center;gap:12px;"><span style="font-size:32px;">${statut.icone}</span><div><div style="font-weight:700;font-size:16px;color:${statut.couleur};">${statut.label}</div><div style="font-size:13px;color:#555;margin-top:2px;">${nom}</div></div>${image?`<img src="${image}" style="width:60px;height:60px;object-fit:contain;border-radius:8px;margin-left:auto;" onerror="this.style.display='none'">`:''}  </div><div style="padding:16px 20px;"><div style="background:#f9f9f9;border-radius:12px;padding:12px 16px;margin-bottom:14px;"><div style="font-weight:600;font-size:12px;color:#555;margin-bottom:8px;">🏷️ Nutriscore — Qualité nutritionnelle</div><div style="display:flex;align-items:center;gap:8px;">${[{l:'A',bg:'#1a9641',c:'white',label:'Excellent'},{l:'B',bg:'#6abf69',c:'white',label:'Bon'},{l:'C',bg:'#e6c619',c:'#333',label:'Moyen'},{l:'D',bg:'#e67e22',c:'white',label:'Mauvais'},{l:'E',bg:'#d7191c',c:'white',label:'Très mauvais'}].map(x=>`<div style="display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="width:32px;height:32px;border-radius:50%;background:${x.l===ns.label?x.bg:'#ddd'};color:${x.l===ns.label?x.c:'#aaa'};font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;transform:${x.l===ns.label?'scale(1.3)':'scale(1)'};box-shadow:${x.l===ns.label?'0 2px 8px rgba(0,0,0,0.25)':'none'};">${x.l}</div>${x.l===ns.label?`<div style="font-size:9px;font-weight:700;color:${x.bg};">${x.label}</div>`:''}</div>`).join('')}</div></div><div style="background:#f5f5f5;border-radius:10px;padding:10px 14px;margin-bottom:14px;"><div style="font-weight:600;font-size:12px;color:#555;margin-bottom:4px;">🌿 Allergènes</div><div style="font-size:12px;color:#333;">${allergenesList}</div></div><div style="background:linear-gradient(135deg,rgba(255,152,0,0.1),rgba(255,183,77,0.1));border-left:4px solid #ff9800;border-radius:0 10px 10px 0;padding:12px 14px;"><div style="font-weight:600;font-size:12px;color:#e65100;margin-bottom:4px;">💕 Conseil — Trimestre ${TRIMESTRE_MAMAN}</div><div style="font-size:12px;color:#555;line-height:1.5;">${statut.conseil}</div></div></div></div>`;document.getElementById('scanner-result').innerHTML=html;document.getElementById('scanner-result').style.display='block';document.getElementById('scanner-loading').style.display='none';document.getElementById('scanner-empty').style.display='none';}
+                function rechercherAliment(){var query=document.getElementById('scanner-input').value.trim();if(!query)return;document.getElementById('scanner-loading').style.display='block';document.getElementById('scanner-result').style.display='none';document.getElementById('scanner-empty').style.display='none';fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=1&lc=fr`).then(r=>r.json()).then(data=>{if(data.products&&data.products.length>0){afficherResultat(data.products[0]);}else{document.getElementById('scanner-loading').style.display='none';document.getElementById('scanner-empty').style.display='block';}}).catch(()=>{document.getElementById('scanner-loading').style.display='none';document.getElementById('scanner-empty').style.display='block';});}
+                function rechercherParCode(){var code=document.getElementById('scanner-barcode').value.trim();if(!code)return;document.getElementById('scanner-loading').style.display='block';document.getElementById('scanner-result').style.display='none';document.getElementById('scanner-empty').style.display='none';fetch(`https://world.openfoodfacts.org/api/v0/product/${code}.json`).then(r=>r.json()).then(data=>{if(data.status===1&&data.product){afficherResultat(data.product);}else{document.getElementById('scanner-loading').style.display='none';document.getElementById('scanner-empty').style.display='block';}}).catch(()=>{document.getElementById('scanner-loading').style.display='none';document.getElementById('scanner-empty').style.display='block';});}
+                function rechercherRapide(nom){document.getElementById('scanner-input').value=nom;rechercherAliment();}
+                </script>
+                {# ===== FIN MODAL SCANNER ALIMENTS ===== #}
+
+                {# ===== MODAL CALCULATEUR PRÉNOM ===== #}
+                <div id="prenomModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99999;align-items:center;justify-content:center;padding:20px;">
+                    <div style="background:white;border-radius:24px;width:100%;max-width:650px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+                        <div style="background:linear-gradient(135deg,#e91e8c,#f48fb1);padding:20px 24px;border-radius:24px 24px 0 0;display:flex;align-items:center;justify-content:space-between;">
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <div style="width:48px;height:48px;background:rgba(255,255,255,0.25);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;">👶</div>
+                                <div><div style="color:white;font-weight:700;font-size:18px;">Calculateur de prénom</div><div style="color:rgba(255,255,255,0.85);font-size:12px;">Signification, popularité et compatibilité</div></div>
+                            </div>
+                            <button onclick="document.getElementById('prenomModal').style.display='none'" style="background:rgba(255,255,255,0.2);border:none;color:white;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px;">✕</button>
+                        </div>
+                        <div style="padding:24px;">
+                            <div class="mb-4">
+                                <div style="display:flex;gap:10px;margin-bottom:10px;">
+                                    <input type="text" id="prenom-input" placeholder="Ex: Sofia, Adam, Lina..." style="flex:1;border:2px solid rgba(233,30,140,0.3);border-radius:12px;padding:12px 16px;font-size:14px;outline:none;" onfocus="this.style.borderColor='#e91e8c'" onblur="this.style.borderColor='rgba(233,30,140,0.3)'" onkeypress="if(event.key==='Enter') analyserPrenom()">
+                                    <input type="text" id="nom-famille-input" placeholder="Nom de famille (optionnel)" style="flex:1;border:2px solid rgba(233,30,140,0.3);border-radius:12px;padding:12px 16px;font-size:14px;outline:none;" onfocus="this.style.borderColor='#e91e8c'" onblur="this.style.borderColor='rgba(233,30,140,0.3)'" onkeypress="if(event.key==='Enter') analyserPrenom()">
+                                </div>
+                                <button onclick="analyserPrenom()" style="width:100%;background:linear-gradient(135deg,#e91e8c,#f48fb1);border:none;color:white;padding:12px;border-radius:12px;cursor:pointer;font-weight:600;font-size:14px;">✨ Analyser ce prénom</button>
+                                <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;">
+                                    {% for suggestion in ['Sofia','Adam','Lina','Youssef','Nour','Rayan','Yasmine','Omar'] %}
+                                        <button onclick="rechercherPrenom('{{ suggestion }}')" style="background:rgba(233,30,140,0.08);color:#e91e8c;border:1px solid rgba(233,30,140,0.2);border-radius:20px;padding:4px 12px;font-size:12px;cursor:pointer;">{{ suggestion }}</button>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div id="prenom-loading" style="display:none;text-align:center;padding:30px;"><div style="font-size:40px;animation:spin 1s linear infinite;">👶</div><p class="text-muted mt-2">Analyse en cours...</p></div>
+                            <div id="prenom-result" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                function analyserPrenom(){var prenom=document.getElementById('prenom-input').value.trim();var nomFamille=document.getElementById('nom-famille-input').value.trim();if(!prenom)return;document.getElementById('prenom-loading').style.display='block';document.getElementById('prenom-result').style.display='none';fetch(`/suivi_grossesse/${MAMAN_ID}/prenom`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prenom:prenom,nomFamille:nomFamille})}).then(r=>r.json()).then(data=>{document.getElementById('prenom-loading').style.display='none';if(data.error){document.getElementById('prenom-result').innerHTML='<p class="text-danger">Erreur : '+data.error+'</p>';document.getElementById('prenom-result').style.display='block';return;}afficherResultatPrenom(data);}).catch(()=>{document.getElementById('prenom-loading').style.display='none';document.getElementById('prenom-result').innerHTML='<p class="text-danger">Service indisponible 💕</p>';document.getElementById('prenom-result').style.display='block';});}
+                function afficherResultatPrenom(d){var genreEmoji=d.genre==='masculin'?'👦':d.genre==='féminin'?'👧':'👶';var genreCouleur=d.genre==='masculin'?'#2196f3':d.genre==='féminin'?'#e91e8c':'#9c27b0';var similairesHtml=(d.similaires||[]).map(p=>`<button onclick="rechercherPrenom('${p}')" style="background:rgba(233,30,140,0.08);color:#e91e8c;border:1px solid rgba(233,30,140,0.2);border-radius:20px;padding:4px 12px;font-size:12px;cursor:pointer;">${p}</button>`).join('');var compatibiliteHtml='';if(d.score_compatibilite>0){var score=d.score_compatibilite;var stars='';for(var i=1;i<=10;i++){stars+=`<span style="font-size:18px;color:${i<=score?'#e91e8c':'#ddd'};">♥</span>`;}compatibiliteHtml=`<div style="background:linear-gradient(135deg,rgba(233,30,140,0.05),rgba(244,143,177,0.05));border:2px solid rgba(233,30,140,0.2);border-radius:16px;padding:16px;margin-bottom:14px;"><div style="font-weight:700;font-size:13px;color:#e91e8c;margin-bottom:8px;">💑 Compatibilité avec le nom de famille</div><div style="margin-bottom:8px;">${stars}</div><div style="font-size:13px;color:#555;">${d.compatibilite}</div></div>`;}
+                var html=`<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;"><div style="width:64px;height:64px;background:linear-gradient(135deg,${genreCouleur},${genreCouleur}88);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:32px;">${genreEmoji}</div><div><div style="font-size:28px;font-weight:800;color:#333;">${d.prenom}</div><div style="display:flex;gap:8px;margin-top:4px;"><span style="background:${genreCouleur}20;color:${genreCouleur};border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;">${d.genre}</span><span style="background:rgba(255,152,0,0.15);color:#e65100;border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;">${d.rang}</span></div></div></div><div style="background:#f9f9f9;border-radius:14px;padding:16px;margin-bottom:14px;"><div style="font-weight:700;font-size:13px;color:#555;margin-bottom:6px;">🌍 Origine</div><div style="font-size:14px;color:#333;">${d.origine}</div></div><div style="background:linear-gradient(135deg,rgba(233,30,140,0.05),rgba(244,143,177,0.05));border-left:4px solid #e91e8c;border-radius:0 14px 14px 0;padding:16px;margin-bottom:14px;"><div style="font-weight:700;font-size:13px;color:#e91e8c;margin-bottom:6px;">✨ Signification</div><div style="font-size:14px;color:#333;line-height:1.6;">${d.signification}</div></div><div style="background:#e3f2fd;border-radius:14px;padding:16px;margin-bottom:14px;"><div style="font-weight:700;font-size:13px;color:#1565c0;margin-bottom:6px;">📊 Popularité</div><div style="font-size:14px;color:#333;">${d.popularite}</div></div>${compatibiliteHtml}<div style="background:#fff8e1;border-radius:14px;padding:16px;margin-bottom:14px;"><div style="font-weight:700;font-size:13px;color:#e65100;margin-bottom:6px;">💡 Le saviez-vous ?</div><div style="font-size:13px;color:#555;line-height:1.5;">${d.anecdote}</div></div><div><div style="font-weight:700;font-size:13px;color:#9c27b0;margin-bottom:8px;">💕 Prénoms similaires</div><div style="display:flex;flex-wrap:wrap;gap:6px;">${similairesHtml}</div></div>`;
+                document.getElementById('prenom-result').innerHTML=html;document.getElementById('prenom-result').style.display='block';}
+                function rechercherPrenom(prenom){document.getElementById('prenom-input').value=prenom;analyserPrenom();}
+                </script>
+                {# ===== FIN MODAL CALCULATEUR PRÉNOM ===== #}
+
+            </div>{# fin container #}
         </section>
 
     {% elseif mode == 'edit' %}
@@ -1012,7 +1202,6 @@ function renderList(count) {
                 </div>
             </div>
         </div>
-
         <section class="py-5 wow fadeIn" data-wow-delay="0.1s">
             <div class="container py-5">
                 <nav aria-label="breadcrumb" class="mb-4">
@@ -1025,22 +1214,14 @@ function renderList(count) {
                 <div class="row justify-content-center">
                     <div class="col-lg-9">
                         <div class="border border-primary rounded-3 bg-light p-4 p-lg-5 shadow-sm">
-                            {{ form_start(form, {
-    'attr': {
-        'class': 'needs-validation',
-        'novalidate': 'novalidate'
-    }
-}) }}
+                            {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
                             <div class="mb-4">
                                 <h5 class="text-primary mb-3">Contact & santé</h5>
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             {{ form_label(form.numeroUrgence) }}
-                                            <div class="input-group">
-                                                <span class="input-group-text">+216</span>
-                                                {{ form_widget(form.numeroUrgence, {'attr': {'class': 'form-control', 'placeholder': '9 12 34 56 78'}}) }}
-                                            </div>
+                                            <div class="input-group"><span class="input-group-text">+216</span>{{ form_widget(form.numeroUrgence, {'attr': {'class': 'form-control', 'placeholder': '9 12 34 56 78'}}) }}</div>
                                             {{ form_errors(form.numeroUrgence) }}
                                         </div>
                                         <div class="mb-3">{{ form_row(form.email) }}</div>
@@ -1048,6 +1229,14 @@ function renderList(count) {
                                     <div class="col-md-6">{{ form_row(form.groupeSanguin) }}</div>
                                     <div class="col-md-6">{{ form_row(form.taille) }}</div>
                                     <div class="col-md-6">{{ form_row(form.poids) }}</div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            {{ form_label(form.dateNaissance) }}
+                                            {{ form_widget(form.dateNaissance, {'attr': {'class': 'form-control'}}) }}
+                                            <div class="form-text">🎂 Utilisée pour calculer vos besoins nutritionnels</div>
+                                            {{ form_errors(form.dateNaissance) }}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="mb-4">
@@ -1080,7 +1269,7 @@ function renderList(count) {
         </section>
 
     {% elseif profilEnregistre|default(false) %}
-        {# ——— MODE SUCCÈS (après création) ——— #}
+        {# ——— MODE SUCCÈS ——— #}
         <div class="container-fluid py-5 hero-header wow fadeIn" data-wow-delay="0.1s">
             <div class="container py-5">
                 <div class="row g-5">
@@ -1120,156 +1309,97 @@ function renderList(count) {
         </section>
 
     {% else %}
-{# ——— MODE CRÉATION ——— #}
-<div class="container-fluid py-5 hero-header wow fadeIn" data-wow-delay="0.1s">
-    <div class="container py-5">
-        <div class="row g-5">
-            <div class="col-lg-8 col-md-12">
-                <h1 class="mb-3 text-primary">Mon profil maman</h1>
-                <h1 class="mb-4 display-1 text-white">Complétez votre profil</h1>
-                <p class="lead text-white mb-0">Ces informations permettent à l'équipe Maternia de mieux vous accompagner tout au long de votre grossesse.</p>
+        {# ——— MODE CRÉATION ——— #}
+        <div class="container-fluid py-5 hero-header wow fadeIn" data-wow-delay="0.1s">
+            <div class="container py-5">
+                <div class="row g-5">
+                    <div class="col-lg-8 col-md-12">
+                        <h1 class="mb-3 text-primary">Mon profil maman</h1>
+                        <h1 class="mb-4 display-1 text-white">Complétez votre profil</h1>
+                        <p class="lead text-white mb-0">Ces informations permettent à l'équipe Maternia de mieux vous accompagner tout au long de votre grossesse.</p>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
-<section class="py-5 wow fadeIn" data-wow-delay="0.1s">
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-9">
-
-                {# Progress Steps #}
-                <div class="d-flex justify-content-between align-items-center mb-5 position-relative px-3">
-                    <div style="position:absolute;top:20px;left:0;right:0;height:3px;background:#f0d6e8;z-index:0;"></div>
-                    <div style="position:absolute;top:20px;left:0;width:100%;height:3px;background:#e91e8c;z-index:1;"></div>
-                    {% for step in [
-                        {num: '1', label: 'Contact & santé'},
-                        {num: '2', label: 'Antécédents'},
-                        {num: '3', label: 'Mode de vie'}
-                    ] %}
-                        <div class="text-center" style="z-index:2">
-                            <div style="width:42px;height:42px;border-radius:50%;background:#e91e8c;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;margin:0 auto 8px;box-shadow:0 2px 8px rgba(233,30,140,0.3);">
-                                {{ step.num }}
-                            </div>
-                            <small style="color:#e91e8c;font-weight:600;font-size:11px;">{{ step.label }}</small>
-                        </div>
-                    {% endfor %}
-                </div>
-
-                <div class="border border-primary rounded-3 bg-light p-4 p-lg-5 shadow-sm">
-                    <div class="d-flex align-items-center mb-4">
-                        <div style="width:48px;height:48px;background:linear-gradient(135deg,#e91e8c,#ff6bb3);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-right:14px;flex-shrink:0;">🤱</div>
-                        <div>
-                            <h4 class="text-primary mb-0">Vos informations</h4>
-                            <small class="text-muted">Données enregistrées de manière confidentielle</small>
-                        </div>
-                    </div>
-
-                    <div class="alert alert-info py-2 mb-4 small">
-                        <i class="fas fa-info-circle me-2"></i>
-                        <strong>Déjà un profil ?</strong> Après enregistrement, vous recevrez un lien personnel (ex. <code>/suivi_grossesse/1</code>). Conservez-le pour consulter ou modifier vos informations à tout moment.
-                    </div>
-
-                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
-
-                    {# Section 1 #}
-                    <div class="p-4 mb-4 rounded-3" style="background:linear-gradient(135deg,rgba(233,30,140,0.05),rgba(255,107,179,0.05));border:1px solid rgba(233,30,140,0.15);">
-                        <div class="d-flex align-items-center mb-3">
-                            <span style="font-size:20px;margin-right:10px;">👩‍⚕️</span>
-                            <h5 class="text-primary mb-0">Contact & santé</h5>
-                        </div>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    {{ form_label(form.numeroUrgence) }}
-                                    <div class="input-group input-group-lg">
-                                        <span class="input-group-text" style="background:#e91e8c;color:white;border:none;border-radius:12px 0 0 12px;">+216</span>
-                                        {{ form_widget(form.numeroUrgence, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'xx xxx xxx', 'maxlength': 11, 'style': 'border-radius:0 12px 12px 0;'}}) }}
-                                    </div>
-                                    <div class="form-text">8 chiffres, commençant par 2, 4, 5 ou 9</div>
-                                    {{ form_errors(form.numeroUrgence) }}
+        <section class="py-5 wow fadeIn" data-wow-delay="0.1s">
+            <div class="container py-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-9">
+                        <div class="d-flex justify-content-between align-items-center mb-5 position-relative px-3">
+                            <div style="position:absolute;top:20px;left:0;right:0;height:3px;background:#f0d6e8;z-index:0;"></div>
+                            <div style="position:absolute;top:20px;left:0;width:100%;height:3px;background:#e91e8c;z-index:1;"></div>
+                            {% for step in [{num:'1',label:'Contact & santé'},{num:'2',label:'Antécédents'},{num:'3',label:'Mode de vie'}] %}
+                                <div class="text-center" style="z-index:2">
+                                    <div style="width:42px;height:42px;border-radius:50%;background:#e91e8c;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;margin:0 auto 8px;box-shadow:0 2px 8px rgba(233,30,140,0.3);">{{ step.num }}</div>
+                                    <small style="color:#e91e8c;font-weight:600;font-size:11px;">{{ step.label }}</small>
                                 </div>
-                                <div class="mb-3">{{ form_row(form.email) }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="border border-primary rounded-3 bg-light p-4 p-lg-5 shadow-sm">
+                            <div class="d-flex align-items-center mb-4">
+                                <div style="width:48px;height:48px;background:linear-gradient(135deg,#e91e8c,#ff6bb3);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-right:14px;flex-shrink:0;">🤱</div>
+                                <div><h4 class="text-primary mb-0">Vos informations</h4><small class="text-muted">Données enregistrées de manière confidentielle</small></div>
                             </div>
-                            <div class="col-md-6">{{ form_row(form.groupeSanguin) }}</div>
-                            <div class="col-md-6">{{ form_row(form.taille) }}</div>
-                            <div class="col-md-6">{{ form_row(form.poids) }}</div>
+                            <div class="alert alert-info py-2 mb-4 small">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Déjà un profil ?</strong> Après enregistrement, vous recevrez un lien personnel (ex. <code>/suivi_grossesse/1</code>). Conservez-le pour consulter ou modifier vos informations à tout moment.
+                            </div>
+                            {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                            <div class="p-4 mb-4 rounded-3" style="background:linear-gradient(135deg,rgba(233,30,140,0.05),rgba(255,107,179,0.05));border:1px solid rgba(233,30,140,0.15);">
+                                <div class="d-flex align-items-center mb-3"><span style="font-size:20px;margin-right:10px;">👩‍⚕️</span><h5 class="text-primary mb-0">Contact & santé</h5></div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            {{ form_label(form.numeroUrgence) }}
+                                            <div class="input-group input-group-lg"><span class="input-group-text" style="background:#e91e8c;color:white;border:none;border-radius:12px 0 0 12px;">+216</span>{{ form_widget(form.numeroUrgence, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'xx xxx xxx', 'maxlength': 11, 'style': 'border-radius:0 12px 12px 0;'}}) }}</div>
+                                            <div class="form-text">8 chiffres, commençant par 2, 4, 5 ou 9</div>
+                                            {{ form_errors(form.numeroUrgence) }}
+                                        </div>
+                                        <div class="mb-3">{{ form_row(form.email) }}</div>
+                                    </div>
+                                    <div class="col-md-6">{{ form_row(form.groupeSanguin) }}</div>
+                                    <div class="col-md-6">{{ form_row(form.taille) }}</div>
+                                    <div class="col-md-6">{{ form_row(form.poids) }}</div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold small">🎂 Date de naissance</label>
+                                        {{ form_widget(form.dateNaissance, {'attr': {'class': 'form-control form-control-lg', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);'}}) }}
+                                        <div class="form-text">Utilisée pour calculer vos besoins nutritionnels 🥗</div>
+                                        {{ form_errors(form.dateNaissance) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 mb-4 rounded-3" style="background:linear-gradient(135deg,rgba(156,39,176,0.05),rgba(206,147,216,0.05));border:1px solid rgba(156,39,176,0.15);">
+                                <div class="d-flex align-items-center mb-3"><span style="font-size:20px;margin-right:10px;">📋</span><h5 class="text-primary mb-0">Antécédents & traitements</h5></div>
+                                <div class="row g-3">
+                                    <div class="col-12"><label class="form-label fw-semibold small">🌿 Allergies connues</label><div class="mic-wrapper">{{ form_widget(form.allergies, {'attr': {'class': 'form-control', 'rows': 2, 'placeholder': 'Ex. pénicilline, arachides, latex...', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);resize:none;'}}) }}<button type="button" class="mic-btn" onclick="startVoice('maman_allergies', this)" title="Dicter par voix">🎤</button></div></div>
+                                    <div class="col-12"><label class="form-label fw-semibold small">🏥 Antécédents médicaux</label><div class="mic-wrapper">{{ form_widget(form.antecedentsMedicaux, {'attr': {'class': 'form-control', 'rows': 2, 'placeholder': 'Ex. fausse couche, césarienne, diabète gestationnel...', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);resize:none;'}}) }}<button type="button" class="mic-btn" onclick="startVoice('maman_antecedentsMedicaux', this)" title="Dicter par voix">🎤</button></div></div>
+                                    <div class="col-12"><label class="form-label fw-semibold small">💊 Maladies chroniques</label><div class="mic-wrapper">{{ form_widget(form.maladiesChroniques, {'attr': {'class': 'form-control', 'rows': 2, 'placeholder': 'Ex. diabète de type 2, asthme...', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);resize:none;'}}) }}<button type="button" class="mic-btn" onclick="startVoice('maman_maladiesChroniques', this)" title="Dicter par voix">🎤</button></div></div>
+                                    <div class="col-12"><label class="form-label fw-semibold small">💉 Médicaments actuels</label><div class="mic-wrapper">{{ form_widget(form.medicamentsActuels, {'attr': {'class': 'form-control', 'rows': 2, 'placeholder': 'Ex. acide folique, fer, vitamine D...', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);resize:none;'}}) }}<button type="button" class="mic-btn" onclick="startVoice('maman_medicamentsActuels', this)" title="Dicter par voix">🎤</button></div></div>
+                                </div>
+                            </div>
+                            <div class="p-4 mb-4 rounded-3" style="background:linear-gradient(135deg,rgba(76,175,80,0.05),rgba(165,214,167,0.05));border:1px solid rgba(76,175,80,0.15);">
+                                <div class="d-flex align-items-center mb-3"><span style="font-size:20px;margin-right:10px;">🌿</span><h5 class="text-primary mb-0">Mode de vie</h5></div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">{{ form_row(form.fumeur) }}</div>
+                                    <div class="col-md-6">{{ form_row(form.consommationAlcool) }}</div>
+                                    <div class="col-12">{{ form_row(form.niveauActivitePhysique) }}</div>
+                                    <div class="col-12"><label class="form-label fw-semibold small">🥗 Habitudes alimentaires</label><div class="mic-wrapper">{{ form_widget(form.habitudesAlimentaires, {'attr': {'class': 'form-control', 'placeholder': 'Ex. végétarienne, sans gluten, méditerranéenne...', 'style': 'border-radius:12px;border:2px solid rgba(76,175,80,0.3);'}}) }}<button type="button" class="mic-btn" onclick="startVoice('maman_habitudesAlimentaires', this)" title="Dicter par voix">🎤</button></div></div>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-wrap gap-3 mt-2">
+                                <button type="submit" class="btn px-5 py-3 btn-border-radius" style="background:linear-gradient(135deg,#e91e8c,#ff6bb3);border:none;color:white;font-weight:600;font-size:15px;box-shadow:0 4px 15px rgba(233,30,140,0.4);"><i class="fas fa-check me-2"></i>Enregistrer mon profil</button>
+                                <a href="{{ path('app_home') }}" class="btn btn-outline-secondary px-4 py-3 btn-border-radius">Annuler</a>
+                            </div>
+                            {{ form_end(form) }}
                         </div>
                     </div>
 
- {# Section 2 #}
-<div class="p-4 mb-4 rounded-3" style="background:linear-gradient(135deg,rgba(156,39,176,0.05),rgba(206,147,216,0.05));border:1px solid rgba(156,39,176,0.15);">
-    <div class="d-flex align-items-center mb-3">
-        <span style="font-size:20px;margin-right:10px;">📋</span>
-        <h5 class="text-primary mb-0">Antécédents & traitements</h5>
-    </div>
-    <div class="row g-3">
-        <div class="col-12">
-            <label class="form-label fw-semibold small">🌿 Allergies connues</label>
-            <div class="mic-wrapper">
-                {{ form_widget(form.allergies, {'attr': {'class': 'form-control', 'rows': 2, 'placeholder': 'Ex. pénicilline, arachides, latex...', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);resize:none;'}}) }}
-                <button type="button" class="mic-btn" onclick="startVoice('maman_allergies', this)" title="Dicter par voix">🎤</button>
-            </div>
-        </div>
-        <div class="col-12">
-            <label class="form-label fw-semibold small">🏥 Antécédents médicaux</label>
-            <div class="mic-wrapper">
-                {{ form_widget(form.antecedentsMedicaux, {'attr': {'class': 'form-control', 'rows': 2, 'placeholder': 'Ex. fausse couche, césarienne, diabète gestationnel, 
-prééclampsie, grossesse extra-utérine...', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);resize:none;'}}) }}
-                <button type="button" class="mic-btn" onclick="startVoice('maman_antecedentsMedicaux', this)" title="Dicter par voix">🎤</button>
-            </div>
-        </div>
-        <div class="col-12">
-            <label class="form-label fw-semibold small">💊 Maladies chroniques</label>
-            <div class="mic-wrapper">
-                {{ form_widget(form.maladiesChroniques, {'attr': {'class': 'form-control', 'rows': 2, 'placeholder': 'Ex. diabète de type 2, asthme...', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);resize:none;'}}) }}
-                <button type="button" class="mic-btn" onclick="startVoice('maman_maladiesChroniques', this)" title="Dicter par voix">🎤</button>
-            </div>
-        </div>
-        <div class="col-12">
-            <label class="form-label fw-semibold small">💉 Médicaments actuels</label>
-            <div class="mic-wrapper">
-                {{ form_widget(form.medicamentsActuels, {'attr': {'class': 'form-control', 'rows': 2, 'placeholder': 'Ex. acide folique, fer, vitamine D...', 'style': 'border-radius:12px;border:2px solid rgba(233,30,140,0.2);resize:none;'}}) }}
-                <button type="button" class="mic-btn" onclick="startVoice('maman_medicamentsActuels', this)" title="Dicter par voix">🎤</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-{# Section 3 #}
-<div class="p-4 mb-4 rounded-3" style="background:linear-gradient(135deg,rgba(76,175,80,0.05),rgba(165,214,167,0.05));border:1px solid rgba(76,175,80,0.15);">
-    <div class="d-flex align-items-center mb-3">
-        <span style="font-size:20px;margin-right:10px;">🌿</span>
-        <h5 class="text-primary mb-0">Mode de vie</h5>
-    </div>
-    <div class="row g-3">
-        <div class="col-md-6">{{ form_row(form.fumeur) }}</div>
-        <div class="col-md-6">{{ form_row(form.consommationAlcool) }}</div>
-        <div class="col-12">{{ form_row(form.niveauActivitePhysique) }}</div>
-        <div class="col-12">
-            <label class="form-label fw-semibold small">🥗 Habitudes alimentaires</label>
-            <div class="mic-wrapper">
-                {{ form_widget(form.habitudesAlimentaires, {'attr': {'class': 'form-control', 'placeholder': 'Ex. végétarienne, sans gluten, méditerranéenne...', 'style': 'border-radius:12px;border:2px solid rgba(76,175,80,0.3);'}}) }}
-                <button type="button" class="mic-btn" onclick="startVoice('maman_habitudesAlimentaires', this)" title="Dicter par voix">🎤</button>
-            </div>
-        </div>
-    </div>
-</div>
-                    {# Boutons #}
-                    <div class="d-flex flex-wrap gap-3 mt-2">
-                        <button type="submit" class="btn px-5 py-3 btn-border-radius" style="background:linear-gradient(135deg,#e91e8c,#ff6bb3);border:none;color:white;font-weight:600;font-size:15px;box-shadow:0 4px 15px rgba(233,30,140,0.4);">
-                            <i class="fas fa-check me-2"></i>Enregistrer mon profil
-                        </button>
-                        <a href="{{ path('app_home') }}" class="btn btn-outline-secondary px-4 py-3 btn-border-radius">Annuler</a>
-                    </div>
-
-                    {{ form_end(form) }}
+{{ form_end(form) }}
                 </div>
             </div>
-        </div>
-    </div>
-</section>
+        </section>
     {% endif %}
-   <script>
+<script>
 // Overlay enregistrement
 function showRecordingOverlay(btn) {
     var overlay = document.createElement('div');
