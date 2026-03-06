@@ -16,7 +16,7 @@ class Maman
 #[ORM\Id]
 #[ORM\GeneratedValue]
 #[ORM\Column]
-private ?int $id = null; // @phpstan-ignore property.unusedType
+private ?int $id = null; 
     #[ORM\Column(length: 30)]
     #[Assert\NotBlank(message: 'Le numéro d\'urgence est obligatoire.')]
     #[Assert\Regex(
