@@ -1,0 +1,15 @@
+php bin/phpunit tests/Entity/ConsultationTest.php
+php bin/phpunit tests/Entity/ConsultationCreneauTest.php
+php bin/phpunit tests/Entity/ReservationClientTest.php
+
+
+php bin/phpunit tests/Entity/
+
+# Niveau 6
+vendor/bin/phpstan analyse src/Entity/Consultation.php src/Entity/ConsultationCreneau.php src/Entity/ReservationClient.php src/Controller/ConsultationController.php --level=6 
+
+# Niveau 8
+vendor/bin/phpstan analyse src/Entity/Consultation.php src/Entity/ConsultationCreneau.php src/Entity/ReservationClient.php src/Controller/ConsultationController.php --level=8
+
+# Niveau 9
+vendor/bin/phpstan analyse src/Entity/Consultation.php src/Entity/ConsultationCreneau.php src/Entity/ReservationClient.php src/Controller/ConsultationController.php --level=9
